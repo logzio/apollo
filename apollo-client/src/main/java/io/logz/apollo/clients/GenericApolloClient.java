@@ -27,6 +27,7 @@ class GenericApolloClient {
     private final String hostname;
     private final int port;
     private final String protocol;
+    private final Optional<String> prefix;
     private final ObjectMapper mapper;
     private String token;
 
@@ -37,7 +38,7 @@ class GenericApolloClient {
         DELETE
     }
 
-    GenericApolloClient(String userName, String plainPassword, String hostname, int port, String protocol) {
+    GenericApolloClient(String userName, String plainPassword, String protocol, String hostname, int port, Optional<String> prefix) {
         client = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -49,6 +50,7 @@ class GenericApolloClient {
         this.hostname = hostname;
         this.port = port;
         this.protocol = protocol;
+        this.prefix = prefix;
         this.mapper = new ObjectMapper();
     }
 
@@ -94,7 +96,9 @@ class GenericApolloClient {
         return new RestResponse(response.code(), response.body().string());
     }
 
-    String getUserName() { return userName; }
+    String getUserName() {
+        return userName;
+    }
 
     <T> T getResult(String url, TypeReference<T> responseType) throws ApolloClientException {
         return runAndGetResult(url, Optional.empty(), responseType, HTTP_METHOD.GET);
@@ -176,8 +180,9 @@ class GenericApolloClient {
     }
 
     private String getFullUrlWithToken(String url) {
+        String urlPrefix = prefix.isPresent() ? "/" + prefix.get() : "";
         String tokenPostfix = StringUtils.isNotBlank(token) ? "?_token=" + token : "";
-        return protocol + "://" + hostname + ":" + port + url + tokenPostfix;
+        return protocol + "://" + hostname + ":" + port + urlPrefix + url + tokenPostfix;
     }
 
     private String generateLoginJson() {

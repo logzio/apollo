@@ -15,13 +15,18 @@ import io.logz.apollo.helpers.RestResponse;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class ApolloAdminClient {
 
     private final GenericApolloClient genericApolloClient;
 
-    public ApolloAdminClient(String userName, String plainAdminPassword, String hostname, int port, String protocol) {
-        genericApolloClient = new GenericApolloClient(userName, plainAdminPassword, hostname, port, protocol);
+    public ApolloAdminClient(String userName, String plainAdminPassword, String protocol, String hostname, int port) {
+        genericApolloClient = new GenericApolloClient(userName, plainAdminPassword, protocol, hostname, port, Optional.empty());
+    }
+
+    public ApolloAdminClient(String userName, String plainAdminPassword, String protocol, String hostname, int port, String prefix) {
+        genericApolloClient = new GenericApolloClient(userName, plainAdminPassword, protocol, hostname, port, Optional.of(prefix));
     }
 
     public void login() throws IOException, ApolloCouldNotLoginException {

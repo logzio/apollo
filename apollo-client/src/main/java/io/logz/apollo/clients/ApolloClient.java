@@ -18,13 +18,18 @@ import io.logz.apollo.models.DeploymentGroupsResponseObject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ApolloClient {
 
     private final GenericApolloClient genericApolloClient;
 
-    public ApolloClient(String userName, String plainPassword, String hostname, int port, String protocol) {
-        genericApolloClient = new GenericApolloClient(userName, plainPassword, hostname, port, protocol);
+    public ApolloClient(String userName, String plainPassword, String protocol, String hostname, int port) {
+        genericApolloClient = new GenericApolloClient(userName, plainPassword, protocol, hostname, port, Optional.empty());
+    }
+
+    public ApolloClient(String userName, String plainPassword, String protocol, String hostname, int port, String prefix) {
+        genericApolloClient = new GenericApolloClient(userName, plainPassword, protocol, hostname, port, Optional.of(prefix));
     }
 
     public void login() throws IOException, ApolloCouldNotLoginException {

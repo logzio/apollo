@@ -8,7 +8,7 @@ public class ApolloTestClient extends ApolloClient {
     private final User testUser;
 
     public ApolloTestClient(User user, String hostname, int port, String protocol) {
-        super(user.getUserEmail(), Common.DEFAULT_PASSWORD, hostname, port, protocol);
+        super(user.getUserEmail(), Common.DEFAULT_PASSWORD, protocol, hostname, port);
         testUser = user;
     }
 
