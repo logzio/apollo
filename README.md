@@ -1,27 +1,28 @@
 # Apollo
 
 ### What is Apollo?
-A simple, lightweight, CD solution on top of Kubernetes.
+Apollo is a simple, lightweight, Continuous Deployment (CD) solution on top of Kubernetes.
 
-Apollo can integrate with any building process you might have. You just need to notify it of a ready artifact, and that's it.
-Apollo also gives a restricted access on top of Kubernetes.
+Apollo can integrate with any existing building process you might have in place. All you need to do is notify it of a ready artifact, and that's it.
 
-Each user has fine-grained permissions, to only deploy what it need.
+Apollo also provides restricted access on top of Kubernetes.
 
-Please see the `Wiki` for the full docs
+Each user has fine-grained permissions, to ensure safe deployments.
+
+Please refer to the `Wiki` for more extensive documentation.
 
 ### Main Features
-- Deploy a combination of a kubernetes Deployment and Service into designated kubernetes cluster and namespace. 
-- View logs, revert deployments and get back to any point in time with just 1-click
-- Manage multiple kubernetes clusters and multiple namespaces in the same cluster
-- Full permissions model for deployments. Each user can deploy only what he needs
-- Live query on kubernetes to get the current status of the deployments. You can also view pods status, view logs from each pod, and restart each pod
-- Full restful API, and Java client to automate whatever you need, or deploy automatically
-- Once initially deployed, you can deploy future versions of Apollo, from Apollo
+- Deploy a combination of a Kubernetes deployments and services into a designated Kubernetes cluster and namespace. 
+- View logs, revert deployments and get back to any point in time with just one click.
+- Manage multiple Kubernetes clusters and multiple namespaces in the same cluster.
+- Full permissions model for deployments. Each user can deploy only what he needs to deploy.
+- Live querying on Kubernetes to get the current status of the deployments. You can also view pods status, view logs from each pod, and restart each pod.
+- Full RESTful API and Java client to automate whatever you need, or deploy automatically.
+- Once initially deployed, you can deploy future versions of Apollo, using Apollo!
 
 
 ### Run it
-Apollo require a hocon format configuration file to get all of its resources. Configuration can be supplied as a Filesystem path or as a Consul Key.
+Apollo requires a HOCON format configuration file to get all of its resources. Configurations can be supplied as a Filesystem path or as a Consul Key.
 
 Configuration example:
 ```hocon
