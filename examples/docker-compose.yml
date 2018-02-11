@@ -14,7 +14,7 @@ services:
           - db.local
 
   apollo:
-    image: logzio/apollo:e4b1c1b19532be6dc7013cd4903e4a605a952edb
+    image: registry.internal.logz.io:5000/apollo:e4b1c1b19532be6dc7013cd4903e4a605a952edb
     ports:
       - "8081:8081"
       - "30001:80"
