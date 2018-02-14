@@ -22,3 +22,7 @@ script:
   - ./ui/build.sh
   - ./mvnw test
 
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+     echo "TRAVIS_BRANCH is $TRAVIS_BRANCH";
+    fi
