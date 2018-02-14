@@ -23,6 +23,7 @@ script:
   - ./mvnw test
 
 after_success:
+  - echo "TRAVIS_BRANCH is $TRAVIS_BRANCH";
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
      echo "TRAVIS_BRANCH is $TRAVIS_BRANCH";
     fi
