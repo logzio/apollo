@@ -24,7 +24,7 @@ script:
 
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
-     echo TRAVIS_BRANCH is $TRAVIS_BRANCH;
+     echo "TRAVIS_BRANCH is $TRAVIS_BRANCH";
 #    docker build -t logzio/apollo:$TRAVIS_COMMIT .;
 #    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
 #    docker push logzio/apollo:$TRAVIS_COMMIT;
