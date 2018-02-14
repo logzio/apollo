@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/logzio/apollo.svg?branch=master)](https://travis-ci.org/logzio/apollo)
+
 # Apollo
 
 ### What is Apollo?
