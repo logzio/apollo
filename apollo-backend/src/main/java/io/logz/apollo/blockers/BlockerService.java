@@ -96,7 +96,7 @@ public class BlockerService {
         try {
             BlockerFunction blockerFunction = getBlockerTypeBinding(blockerDefinition.getBlockerTypeName()).get().newInstance();
             blockerFunction.init(blockerDefinition.getBlockerJsonConfiguration());
-            return Optional.of(new Blocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getServiceId(),
+            return Optional.of(new Blocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getBlockerTypeName(), blockerDefinition.getServiceId(),
                     blockerDefinition.getEnvironmentId(), blockerDefinition.getActive(), blockerFunction));
 
         } catch (InstantiationException | IllegalAccessException e) {

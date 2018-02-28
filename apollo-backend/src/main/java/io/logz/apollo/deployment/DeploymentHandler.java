@@ -138,7 +138,7 @@ public class DeploymentHandler {
             Optional<Blocker> blocker = blockerService.shouldBlock(newDeployment);
             if (blocker.isPresent()) {
                 logger.info("Deployment is blocked by {}", blocker.get().getName());
-                throw new ApolloDeploymentTooManyRequestsException("Deployment is currently blocked by " + blocker.get().getName());
+                throw new ApolloDeploymentTooManyRequestsException("Deployment is currently blocked by '" + blocker.get().getName() + "' of type '" + blocker.get().getTypeName() + "'");
             }
 
             logger.info("All checks passed. Running deployment");

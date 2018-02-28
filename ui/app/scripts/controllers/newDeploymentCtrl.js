@@ -179,7 +179,7 @@ angular.module('apollo')
 
                     // 403 are handled generically on the interceptor
                     if (error.status !== 403) {
-                        growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
+                        growl.error(error.data, {ttl: 7000});
                     }
                 });
             }

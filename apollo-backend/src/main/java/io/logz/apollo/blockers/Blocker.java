@@ -7,14 +7,16 @@ public class Blocker {
 
     private final Integer id;
     private final String name;
+    private final String typeName;
     private final Integer serviceId;
     private final Integer environmentId;
     private final Boolean isActive;
     private final BlockerFunction blockerFunction;
 
-    public Blocker(Integer id, String name, Integer serviceId, Integer environmentId, Boolean isActive, BlockerFunction blockerFunction) {
+    public Blocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId, Boolean isActive, BlockerFunction blockerFunction) {
         this.id = id;
         this.name = name;
+        this.typeName = typeName;
         this.serviceId = serviceId;
         this.environmentId = environmentId;
         this.isActive = isActive;
@@ -24,6 +26,8 @@ public class Blocker {
     public int getId() { return id; }
 
     public String getName() { return name; }
+
+    public String getTypeName() { return typeName; }
 
     public Integer getServiceId() {
         return serviceId;
