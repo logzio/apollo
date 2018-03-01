@@ -135,6 +135,7 @@ public class KubernetesMonitor {
                     groupDao.updateGroupScalingStatus(group.getId(), Group.ScalingStatus.DONE);
                     logger.info("Updated k8s scaling factor for group " + group.getName() + " to " + group.getScalingFactor());
                 } catch (ApolloNotFoundException e) {
+                    // If there's no such deployment, we don't want to keep trying to change it's scaling factor, so we're setting the status to DONE.
                     group.setScalingStatus(Group.ScalingStatus.DONE);
                     groupDao.updateGroupScalingStatus(group.getId(), Group.ScalingStatus.DONE);
                     logger.error("Could not find Kubernetes deployment with service ID " + group.getServiceId() + " and group " + group.getName(), e);
