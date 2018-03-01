@@ -10,6 +10,7 @@ import io.logz.apollo.deployment.DeploymentEnvStatusManager;
 import io.logz.apollo.excpetions.ApolloNotFoundException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,10 +131,13 @@ public class KubernetesMonitor {
                 KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(environment);
                 try {
                     kubernetesHandler.setScalingFactor(serviceDao.getService(group.getServiceId()), group.getName(), group.getScalingFactor());
-                    group.setScalingStatus(Deployment.DeploymentStatus.DONE);
-                    groupDao.updateGroupScalingStatus(group.getId(), Deployment.DeploymentStatus.DONE);
+                    group.setScalingStatus(Group.ScalingStatus.DONE);
+                    groupDao.updateGroupScalingStatus(group.getId(), Group.ScalingStatus.DONE);
                     logger.info("Updated k8s scaling factor for group " + group.getName() + " to " + group.getScalingFactor());
                 } catch (ApolloNotFoundException e) {
+                    // If there's no such deployment, we don't want to keep trying to change it's scaling factor, so we're setting the status to DONE.
+                    group.setScalingStatus(Group.ScalingStatus.DONE);
+                    groupDao.updateGroupScalingStatus(group.getId(), Group.ScalingStatus.DONE);
                     logger.error("Could not find Kubernetes deployment with service ID " + group.getServiceId() + " and group " + group.getName(), e);
                 }
             });

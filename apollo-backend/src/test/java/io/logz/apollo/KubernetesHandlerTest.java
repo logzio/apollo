@@ -181,7 +181,7 @@ public class KubernetesHandlerTest {
         apolloTestClient.updateScalingFactor(group.getId(), newScalingFactor);
         Group updatedGroupBefore = groupDao.getGroup(group.getId());
 
-        assertThat(updatedGroupBefore.getScalingStatus()).isEqualByComparingTo(Deployment.DeploymentStatus.PENDING);
+        assertThat(updatedGroupBefore.getScalingStatus()).isEqualByComparingTo(Group.ScalingStatus.PENDING);
         assertThat(updatedGroupBefore.getScalingFactor()).isEqualTo(newScalingFactor);
 
         Common.waitABit(3);

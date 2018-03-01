@@ -73,8 +73,13 @@ public class ScalingController {
             return;
         }
 
+        if (group.getScalingStatus() == Group.ScalingStatus.BLOCKED) {
+            assignJsonResponseToReq(req, HttpStatus.FORBIDDEN, groupId);
+            return;
+        }
+
         group.setScalingFactor(scalingFactor);
-        group.setScalingStatus(Deployment.DeploymentStatus.PENDING);
+        group.setScalingStatus(Group.ScalingStatus.PENDING);
         groupDao.updateGroup(group);
 
         assignJsonResponseToReq(req, HttpStatus.OK, group);

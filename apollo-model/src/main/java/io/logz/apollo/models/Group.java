@@ -1,12 +1,20 @@
 package io.logz.apollo.models;
 
 public class Group {
+
+    public enum ScalingStatus {
+        PENDING,
+        DONE,
+        CANCELED,
+        BLOCKED
+    }
+
     private int id;
     private String name;
     private int serviceId;
     private int environmentId;
     private int scalingFactor;
-    private Deployment.DeploymentStatus scalingStatus;
+    private Group.ScalingStatus scalingStatus;
     private String jsonParams;
 
     public Group() {
@@ -53,11 +61,11 @@ public class Group {
         this.scalingFactor = scalingFactor;
     }
 
-    public Deployment.DeploymentStatus getScalingStatus() {
+    public Group.ScalingStatus getScalingStatus() {
         return scalingStatus;
     }
 
-    public void setScalingStatus(Deployment.DeploymentStatus scalingStatus) {
+    public void setScalingStatus(Group.ScalingStatus scalingStatus) {
         this.scalingStatus = scalingStatus;
     }
 

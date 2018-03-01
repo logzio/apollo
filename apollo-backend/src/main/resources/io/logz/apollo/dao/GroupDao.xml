@@ -37,7 +37,7 @@
     <select id="getAllRunningScalingOperations" resultType="io.logz.apollo.models.Group">
         SELECT *
         FROM groups
-        WHERE scaling_status NOT IN ("DONE", "CANCELED")
+        WHERE scaling_status NOT IN ("DONE", "CANCELED", "BLOCKED")
     </select>
 
     <insert id="addGroup">

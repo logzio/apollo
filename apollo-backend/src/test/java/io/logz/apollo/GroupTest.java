@@ -1,12 +1,18 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.exceptions.ApolloClientException;
+import io.logz.apollo.exceptions.ApolloNotAuthorizedException;
 import io.logz.apollo.helpers.Common;
+import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.Group;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.script.ScriptException;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitGroup;
@@ -16,10 +22,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class GroupTest {
 
     private static ApolloTestClient apolloTestClient;
+    private static GroupDao groupDao;
 
     @BeforeClass
-    public static void initialize() {
+    public static void initialize() throws ScriptException, IOException, SQLException {
         apolloTestClient = Common.signupAndLogin();
+        StandaloneApollo standaloneApollo = StandaloneApollo.getOrCreateServer();
+        groupDao = standaloneApollo.getInstance(GroupDao.class);
     }
 
     @Test
@@ -61,5 +70,13 @@ public class GroupTest {
             }
         }
         assertThat(found).isTrue();
+    }
+
+    @Test
+    public void testTryingToScaleGroupThatIsBlockedToScaling() throws ApolloClientException {
+        Group group = createAndSubmitGroup(apolloTestClient);
+        group.setScalingStatus(Group.ScalingStatus.BLOCKED);
+        groupDao.updateGroup(group);
+        assertThatThrownBy(() -> apolloTestClient.updateScalingFactor(group.getId(), group.getScalingFactor() + 1)).isInstanceOf(ApolloNotAuthorizedException.class);
     }
 }
