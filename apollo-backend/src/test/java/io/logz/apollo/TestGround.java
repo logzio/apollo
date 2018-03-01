@@ -11,8 +11,6 @@ import java.sql.SQLException;
  */
 public class TestGround {
 
-    // This is a very important test comment.
-
     @Test
     public void testGround() throws IOException, ScriptException, SQLException {
 
