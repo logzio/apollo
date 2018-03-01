@@ -135,6 +135,8 @@ public class KubernetesMonitor {
                     groupDao.updateGroupScalingStatus(group.getId(), Group.ScalingStatus.DONE);
                     logger.info("Updated k8s scaling factor for group " + group.getName() + " to " + group.getScalingFactor());
                 } catch (ApolloNotFoundException e) {
+                    group.setScalingStatus(Group.ScalingStatus.DONE);
+                    groupDao.updateGroupScalingStatus(group.getId(), Group.ScalingStatus.DONE);
                     logger.error("Could not find Kubernetes deployment with service ID " + group.getServiceId() + " and group " + group.getName(), e);
                 }
             });
