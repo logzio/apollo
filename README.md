@@ -44,7 +44,7 @@ Apollo requires a HOCON format configuration file to get all of its resources. C
 Configuration example:
 ```hocon
 apollo {
-  db {  # Self explenatory
+  db {  # Self explanatory
     port = 3306
     host = "..."
     user = "apollo"
@@ -68,7 +68,7 @@ apollo {
   }
 }
 ```
-Under `examples` you can find a simple Docker Compose to help you set it up localy
+Under `examples` you can find a simple Docker Compose to help you set it up locally
 
 ```bash
 cd examples/
