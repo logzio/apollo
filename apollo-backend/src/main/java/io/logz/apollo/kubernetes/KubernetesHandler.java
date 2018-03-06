@@ -403,7 +403,7 @@ public class KubernetesHandler {
                     + service.getId() + " and group " + groupName + ", can't return the status!");
         }
 
-        return kubernetesDeployment.getStatus().getAvailableReplicas();
+        return Optional.ofNullable(kubernetesDeployment.getStatus().getAvailableReplicas()).orElse(0);
     }
 
     public void setScalingFactor(Service service, String groupName, int scalingFactor) throws ApolloNotFoundException {
