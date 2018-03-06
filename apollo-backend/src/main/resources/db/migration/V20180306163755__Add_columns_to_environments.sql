@@ -1,0 +1,1 @@
+ALTER TABLE environment ADD require_health_check tinyint(1) DEFAULT '1';
