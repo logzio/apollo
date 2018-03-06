@@ -26,6 +26,7 @@ import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.PodStatus;
 import io.logz.apollo.models.Service;
 import org.json.JSONException;
@@ -36,6 +37,7 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitGroup;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -225,7 +227,10 @@ public class KubernetesHandlerTest {
                                                                      statusDeployment.getEnvironment(),
                                                                      deployableVersion);
 
-        restDeployment.setId(apolloTestClient.addDeployment(restDeployment).getId());
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(restDeployment);
+
+        LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
+        restDeployment.setId((int) deployment.get("id"));
 
         assertThat(apolloTestClient.getDeployment(restDeployment.getId()).getSourceVersion())
                 .isEqualTo(statusDeployment.getDeployableVersion().getGitCommitSha());

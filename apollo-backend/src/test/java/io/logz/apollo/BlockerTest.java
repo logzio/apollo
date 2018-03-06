@@ -2,7 +2,6 @@ package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
-import io.logz.apollo.exceptions.ApolloBlockedException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.models.BlockerDefinition;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by roiravhon on 6/5/17.
@@ -39,7 +38,13 @@ public class BlockerTest {
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, null);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
 
         blocker.setActive(false);
         apolloTestAdminClient.updateBlocker(blocker);
@@ -59,7 +64,14 @@ public class BlockerTest {
 
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", blockedEnvironment, null);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, service, deployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, service, deployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
+
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, okEnvironment, service, deployableVersion);
     }
 
@@ -76,7 +88,14 @@ public class BlockerTest {
 
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, blockedService, blockedDeployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, blockedService, blockedDeployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
+
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, okService, okDeployableVersion);
     }
 
@@ -94,7 +113,14 @@ public class BlockerTest {
 
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", blockedEnvironment, blockedService);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, blockedService, blockedDeployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, blockedService, blockedDeployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
+
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, okService, okDeployableVersion);
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, okEnvironment, blockedService, blockedDeployableVersion);
     }
@@ -117,7 +143,13 @@ public class BlockerTest {
                 getTimeBasedBlockerJsonConfiguration(dayOfWeek, twoMinutesBeforeNow, twoMinutesFromNow),
                 environment, service);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
 
         blocker.setBlockerJsonConfiguration(getTimeBasedBlockerJsonConfiguration(dayOfWeek, twoMinutesFromNow, threeMinutesFromNow));
         apolloTestAdminClient.updateBlocker(blocker);
@@ -146,7 +178,13 @@ public class BlockerTest {
                 getBranchBlockerJsonConfiguration("develop"),
                 environment, service);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
 
         blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration("master"));
         apolloTestAdminClient.updateBlocker(blocker);
@@ -174,7 +212,13 @@ public class BlockerTest {
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, serviceA, deployableVersionA);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, serviceB, deployableVersionB)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, serviceB, deployableVersionB);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
 
         excludedService.add(serviceB.getId());
         blocker.setBlockerJsonConfiguration(getConcurrencyBlockerJsonConfiguration(1, excludedService));
@@ -195,7 +239,13 @@ public class BlockerTest {
         
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service ,failedDeployableVersion)).isInstanceOf(ApolloBlockedException.class);
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, failedDeployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
 
         // Attempt to deploy a valid commit should work
         DeployableVersion validDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service,
@@ -217,7 +267,13 @@ public class BlockerTest {
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
 
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service ,failedDeployableVersion)).isInstanceOf(ApolloBlockedException.class);;
+        try {
+            ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, failedDeployableVersion);
+            // If we got to this assertion, then we have a blocker issue:
+            assertThat(true).isEqualTo(false);
+        } catch (Exception e) {
+            assertThat(e.getMessage()).contains("Deployment is currently blocked");
+        }
 
         apolloTestAdminClient.overrideBlockerByUser(apolloTestClient.getTestUser(), blocker);
 

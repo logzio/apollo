@@ -3,6 +3,7 @@ package io.logz.apollo.helpers;
 import io.logz.apollo.models.DeploymentRole;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PasswordManager;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.User;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.clients.ApolloTestAdminClient;
@@ -20,6 +21,7 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -179,7 +181,15 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(testService, testEnvironment, testDeployableVersion);
-        testDeployment.setId(apolloTestClient.addDeployment(testDeployment).getId());
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
+
+        try {
+            LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
+            testDeployment.setId((int) deployment.get("id"));
+        } catch (IndexOutOfBoundsException e) {
+            String errorMessage = (String) result.getUnsuccessful().get(0).get("reason");
+            throw new Exception(errorMessage);
+        }
 
         return testDeployment;
     }
@@ -192,7 +202,15 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
-        testDeployment.setId(apolloTestClient.addDeployment(testDeployment).getId());
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
+
+        try {
+            LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
+            testDeployment.setId((int) deployment.get("id"));
+        } catch (IndexOutOfBoundsException e) {
+            String errorMessage = (String) result.getUnsuccessful().get(0).get("reason");
+            throw new Exception(errorMessage);
+        }
 
         return testDeployment;
     }

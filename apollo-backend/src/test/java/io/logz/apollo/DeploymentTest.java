@@ -1,18 +1,16 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
-import io.logz.apollo.exceptions.ApolloClientException;
+import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.helpers.Common;
-import io.logz.apollo.helpers.ModelsGenerator;
-import io.logz.apollo.models.DeployableVersion;
+import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.Environment;
-import io.logz.apollo.models.Service;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Optional;
 
-import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
+import static io.logz.apollo.helpers.ModelsGenerator.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,10 +19,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public class DeploymentTest {
 
+    private static ApolloTestClient apolloTestClient;
+    private static DeploymentDao deploymentDao;
+
+    @BeforeClass
+    public static void init() throws Exception {
+        apolloTestClient = Common.signupAndLogin();
+        StandaloneApollo standaloneApollo = StandaloneApollo.getOrCreateServer();
+        deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
+    }
+
     @Test
     public void testGetAndAddDeployment() throws Exception {
-
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
 
         Deployment testDeployment = createAndSubmitDeployment(apolloTestClient);
 
@@ -40,8 +46,6 @@ public class DeploymentTest {
 
     @Test
     public void testGetAllDeployments() throws Exception {
-
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
 
         Deployment testDeployment = createAndSubmitDeployment(apolloTestClient);
 
@@ -65,12 +69,11 @@ public class DeploymentTest {
     @Test
     public void testSimultaneousDeployments() throws Exception {
 
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
-
         Deployment deployment1 = createAndSubmitDeployment(apolloTestClient);
 
         // Submit that again to verify we can't run the same one twice
-        assertThatThrownBy(() -> apolloTestClient.addDeployment(deployment1)).isInstanceOf(ApolloClientException.class);
+        assertThat(apolloTestClient.addDeployment(deployment1).getUnsuccessful().size()).isEqualTo(1);
+        assertThat(apolloTestClient.addDeployment(deployment1).getSuccessful().size()).isEqualTo(0);
 
         // Just to make sure we are not blocking different deployments to run on the same time
         createAndSubmitDeployment(apolloTestClient);

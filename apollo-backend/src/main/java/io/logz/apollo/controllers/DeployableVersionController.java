@@ -1,16 +1,19 @@
 package io.logz.apollo.controllers;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.scm.CommitDetails;
 import io.logz.apollo.scm.GithubConnector;
+import org.apache.commons.lang.StringUtils;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
-import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -61,6 +64,18 @@ public class DeployableVersionController {
     @GET("/deployable-version/latest/service/{serviceId}")
     public List<DeployableVersion> getLatestDeployableVersionsByServiceId(int serviceId) {
         return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId);
+    }
+
+    @LoggedIn
+    @GET("/deployable-version/multi-service/{serviceIdsCsv}")
+    public List<DeployableVersion> getDeployableVersionForMultiServices(String serviceIdsCsv) {
+        Iterable<String> serviceIds = Splitter.on(",").omitEmptyStrings().trimResults().split(serviceIdsCsv);
+
+        if (Iterables.size(serviceIds) == 1) {
+            return deployableVersionDao.getLatestDeployableVersionsByServiceId(Integer.parseInt(serviceIdsCsv));
+        }
+
+        return deployableVersionDao.getDeployableVersionForMultiServices(getDeployableVersionForMultiServicesQuery(Lists.newArrayList(serviceIds)));
     }
 
     @LoggedIn
@@ -144,5 +159,21 @@ public class DeployableVersionController {
 
         deployableVersionDao.addDeployableVersion(newDeployableVersion);
         assignJsonResponseToReq(req, HttpStatus.CREATED, newDeployableVersion);
+    }
+
+    private String getDeployableVersionForMultiServicesQuery(List<String> serviceIds) {
+        String query = "";
+
+        for (int index = 0; index < serviceIds.size(); index++) {
+            query += " INNER JOIN deployable_version dv" + String.valueOf(index);
+        }
+
+        query += " ON dv.service_id = " + serviceIds.get(0);
+
+        for (int index = 0; index < serviceIds.size(); index++) {
+            query += " AND dv.git_commit_sha = dv" + String.valueOf(index) + ".git_commit_sha AND dv" + String.valueOf(index) + ".service_id = " + serviceIds.get(index);
+        }
+
+        return query;
     }
 }

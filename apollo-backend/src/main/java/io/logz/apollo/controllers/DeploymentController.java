@@ -1,13 +1,15 @@
 package io.logz.apollo.controllers;
 
+import com.google.common.base.Splitter;
 import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.LockService;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeploymentDao;
-import io.logz.apollo.excpetions.ApolloDeploymentBlockedException;
-import io.logz.apollo.excpetions.ApolloDeploymentConflictException;
-import io.logz.apollo.excpetions.ApolloDeploymentTooManyRequestsException;
+import io.logz.apollo.dao.DeployableVersionDao;
+import io.logz.apollo.excpetions.ApolloDeploymentException;
+import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
@@ -31,14 +33,17 @@ import static java.util.Objects.requireNonNull;
 public class DeploymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
+    private static final String IDS_DELIMITER = ",";
 
     private final DeploymentDao deploymentDao;
+    private final DeployableVersionDao deployableVersionDao;
     private final LockService lockService;
     private final DeploymentHandler deploymentHandler;
 
     @Inject
-    public DeploymentController(DeploymentDao deploymentDao, LockService lockService, DeploymentHandler deploymentHandler) {
+    public DeploymentController(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, LockService lockService, DeploymentHandler deploymentHandler) {
         this.deploymentDao = requireNonNull(deploymentDao);
+        this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.lockService = requireNonNull(lockService);
         this.deploymentHandler = requireNonNull(deploymentHandler);
     }
@@ -81,19 +86,33 @@ public class DeploymentController {
 
     @LoggedIn
     @POST("/deployment")
-    public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, Req req) {
-        try {
-            Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, req);
-            assignJsonResponseToReq(req, HttpStatus.CREATED, deployment);
-        } catch (ApolloDeploymentBlockedException e) {
-            assignJsonResponseToReq(req, HttpStatus.FORBIDDEN, e.getMessage());
-        } catch (ApolloDeploymentConflictException e) {
-            assignJsonResponseToReq(req, HttpStatus.CONFLICT, e.getMessage());
-        } catch (ApolloDeploymentTooManyRequestsException e) {
-            assignJsonResponseToReq(req, HttpStatus.NOT_ACCEPTABLE, e.getMessage());
-        } catch (Exception e) {
-            assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
+    public void addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String deploymentMessage, Req req) {
+        Iterable<String> environmentIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(environmentIdsCsv);
+        Iterable<String> serviceIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(serviceIdsCsv);
+
+        MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
+
+        DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
+
+        environmentIds.forEach(environmentIdString -> serviceIds.forEach(serviceIdString -> {
+
+            int environmentId = Integer.parseInt(environmentIdString);
+            int serviceId = Integer.parseInt(serviceIdString);
+
+            DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
+
+            if (serviceDeployableVersion == null) {
+                responseObject.addUnsuccessful(environmentId, serviceId, "There is no deployableVersion for commit sha " + deployableVersion.getGitCommitSha() + " and service " + serviceId);
+            } else {
+                try {
+                    Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, req);
+                    responseObject.addSuccessful(environmentId, serviceId, deployment);
+                } catch (ApolloDeploymentException e) {
+                    responseObject.addUnsuccessful(environmentId, serviceId, e.getMessage());
+                }
+            }
+        }));
+        assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
     }
 
     @LoggedIn
