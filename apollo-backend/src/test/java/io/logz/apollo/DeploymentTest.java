@@ -3,11 +3,18 @@ package io.logz.apollo;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.helpers.Common;
+import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
+import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.DeploymentPermission;
+import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.Service;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import static io.logz.apollo.helpers.ModelsGenerator.*;
@@ -77,5 +84,29 @@ public class DeploymentTest {
 
         // Just to make sure we are not blocking different deployments to run on the same time
         createAndSubmitDeployment(apolloTestClient);
+    }
+
+    @Test
+    public void testMultiServiceDeployment() throws Exception {
+        Environment env1 = createAndSubmitEnvironment(apolloTestClient);
+        Environment env2 = createAndSubmitEnvironment(apolloTestClient);
+        Service service1 = createAndSubmitService(apolloTestClient);
+        Service service2 = createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion1 = createAndSubmitDeployableVersion(apolloTestClient, service1);
+        createAndSubmitDeployableVersion(apolloTestClient, service2, deployableVersion1.getGithubRepositoryUrl(), deployableVersion1.getGitCommitSha());
+
+        String envIdsCsv = String.valueOf(env1.getId()) + "," + String.valueOf(env2.getId());
+        String serviceIdsCsv = String.valueOf(service1.getId()) + "," + String.valueOf(service2.getId());
+
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+
+        MultiDeploymentResponseObject result = apolloTestClient.addDeploymentWithParams(envIdsCsv, serviceIdsCsv, deployableVersion1.getId());
+
+        assertThat(result.getSuccessful().size()).isEqualTo(4);
+        assertThat(result.getUnsuccessful().size()).isEqualTo(0);
+
+        LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
+        assertThat(deploymentDao.getDeployment((int) deployment.get("id"))).isNotNull();
     }
 }

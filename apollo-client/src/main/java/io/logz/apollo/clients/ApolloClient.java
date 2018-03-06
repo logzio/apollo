@@ -107,11 +107,11 @@ public class ApolloClient {
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }
 
-    public MultiDeploymentResponseObject addDeploymentWithParams(Deployment deployment, String environmentIdsCsv, String serviceIdsCsv) throws ApolloClientException {
+    public MultiDeploymentResponseObject addDeploymentWithParams(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId) throws ApolloClientException {
         String requestBody = Common.generateJson("environmentIdsCsv", environmentIdsCsv,
                 "serviceIdsCsv", serviceIdsCsv,
-                "deployableVersionId", String.valueOf(deployment.getDeployableVersionId()),
-                "deploymentMessage", deployment.getDeploymentMessage());
+                "deployableVersionId", String.valueOf(deployableVersionId),
+                "deploymentMessage", "this is a deployment message");
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }
