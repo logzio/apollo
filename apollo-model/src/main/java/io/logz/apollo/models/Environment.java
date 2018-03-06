@@ -14,6 +14,7 @@ public class Environment {
     private String kubernetesNamespace;
     private int servicePortCoefficient;
     private Boolean requireDeploymentMessage;
+    private Boolean requireHealthCheck;
 
     public Environment() {
 
@@ -89,5 +90,13 @@ public class Environment {
 
     public void setRequireDeploymentMessage(Boolean requireDeploymentMessage) {
         this.requireDeploymentMessage = requireDeploymentMessage;
+    }
+
+    public Boolean getRequireHealthCheck() {
+        return this.requireHealthCheck;
+    }
+
+    public void setRequireHealthCheck(Boolean requireHealthCheck) {
+        this.requireHealthCheck = requireHealthCheck;
     }
 }
