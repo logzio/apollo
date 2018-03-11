@@ -3,6 +3,7 @@ package io.logz.apollo;
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.exceptions.ApolloBlockedException;
+import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.models.BlockerDefinition;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
@@ -222,6 +224,22 @@ public class BlockerTest {
         apolloTestAdminClient.overrideBlockerByUser(apolloTestClient.getTestUser(), blocker);
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, failedDeployableVersion);
+    }
+
+    @Test
+    public void changeBlockerActiveAttribute() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
+
+        Boolean beforeActive = blocker.getActive();
+        Boolean afterActive = !beforeActive;
+
+        BlockerDefinition updatedBlocker = apolloTestClient.updateBlockerDefinitionActiveness(blocker.getId(), String.valueOf(afterActive));
+        assertThat(updatedBlocker.getActive()).isEqualTo(afterActive);
     }
 
     private String getTimeBasedBlockerJsonConfiguration(int dayOfWeek, LocalTime startDate, LocalTime endDate) {
