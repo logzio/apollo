@@ -5,7 +5,7 @@ angular.module('apollo')
                                     '$timeout' , '$state', 'growl', 'usSpinnerService',
             function (apolloApiService, $scope, $stateParams, $interval, $timeout, $state, growl, usSpinnerService) {
 
-                $scope.deploymentId = $stateParams.deploymentId;
+                $scope.myDeployments = $stateParams.deploymentResult == null ? [] : $stateParams.deploymentResult.successful.map(function (successful) { return successful.deployment.id; });
                 $scope.selectedDeployment = null;
                 $scope.selectedDeploymentContainers = [];
                 $scope.selectedDeploymentLatestPod = null;
@@ -16,7 +16,7 @@ angular.module('apollo')
                     $scope.selectedDeployment = selectedDeployment;
                 };
 
-                $scope.revert = function(deploymentId) {
+                $scope.revert = function() {
                     usSpinnerService.spin('ongoing-spinner');
                     apolloApiService.revertDeployment($scope.selectedDeployment.id).then(function(response) {
                         usSpinnerService.stop('ongoing-spinner');

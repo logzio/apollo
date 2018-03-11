@@ -27,7 +27,7 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="deployment in runningAndJustFinishedDeployments | filter:globalSearch | orderBy: 'deployment.lastUpdate': true"
-                            ng-class="{'my-deployment':deployment.id == deploymentId}">
+                            ng-class="{'my-deployment':myDeployments.indexOf(deployment.id) > -1}">
                             <td>{{deployment.lastUpdate | date:'dd/MM/yy HH:mm:ss'}}</td>
                             <td>{{allServices[deployment.serviceId].name}}</td>
                             <td>{{allEnvironments[deployment.environmentId].name}}</td>

@@ -87,8 +87,8 @@ function ApiService($q, $http){
 
     var createNewDeployment = function(deployableVersionId, deployedService, deployedEnvironment, deploymentMessage) {
         return $http.post(CONFIG.appUrl + "deployment/", {
-            serviceId: deployedService,
-            environmentId: deployedEnvironment,
+            serviceIdsCsv: deployedService,
+            environmentIdsCsv: deployedEnvironment,
             deployableVersionId: deployableVersionId,
             deploymentMessage: deploymentMessage
         });
