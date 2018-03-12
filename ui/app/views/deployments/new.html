@@ -295,7 +295,7 @@
         </div>
     </div>
 
-    <div modal="blockedDeployments" class="modal fade" id="blocked-deployments" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div modal="blockedDeployments" class="modal" id="blocked-deployments" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -321,7 +321,7 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" ng-click="$('#blocked-deployments').modal('show'); redirectToOngoing()" class="btn btn-default" data-dismiss="modal">OK</button>
+                    <button type="button" ng-click="$('#blocked-deployments').modal('hide'); redirectToOngoing()" class="btn btn-default" data-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>

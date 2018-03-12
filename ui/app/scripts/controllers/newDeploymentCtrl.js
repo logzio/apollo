@@ -133,8 +133,13 @@ angular.module('apollo')
                         $('body').removeClass('modal-open');
                         $('.modal-backdrop').remove();
 
-                        // Redirect user to ongoing deployments
-                        $state.go('deployments.ongoing', {deploymentResult: response.data}); // TODO refactor for response object
+                        if (response.data.unsuccessful.length == 1) {
+                            growl.error("Your deployment was blocked! " + response.data.unsuccessful[0].reason, {ttl: 7000});
+                        } else if (response.data.successful.length == 1) {
+                            $scope.redirectToOngoing();
+                        } else {
+                            growl.error("An error occurred.", {ttl: 7000});
+                        }
                     }, 500);
 
                 }, function (error) {
@@ -188,7 +193,7 @@ angular.module('apollo')
 
                             $('#blocked-deployments').modal('show');
                         } else {
-                            redirectToOngoing();
+                            $scope.redirectToOngoing();
                         }
 
                     }, 500);
