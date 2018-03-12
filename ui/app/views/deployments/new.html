@@ -295,4 +295,36 @@
         </div>
     </div>
 
+    <div modal="blockedDeployments" class="modal fade" id="blocked-deployments" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Some of your deployments were blocked</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                        <thead>
+                            <tr>
+                                <th>Evvironment</th>
+                                <th>Service</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="blockedDeployment in blockedDeployments">
+                            <td>{{blockedDeployment.environment}}</td>
+                            <td>{{blockedDeployment.service}}</td>
+                            <td>{{blockedDeployment.reason}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-click="$('#blocked-deployments').modal('show'); redirectToOngoing()" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

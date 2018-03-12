@@ -134,7 +134,7 @@ angular.module('apollo')
                         $('.modal-backdrop').remove();
 
                         // Redirect user to ongoing deployments
-                        $state.go('deployments.ongoing', {deploymentResult: response.data});
+                        $state.go('deployments.ongoing', {deploymentResult: response.data}); // TODO refactor for response object
                     }, 500);
 
                 }, function (error) {
@@ -173,12 +173,24 @@ angular.module('apollo')
                         $('body').removeClass('modal-open');
                         $('.modal-backdrop').remove();
 
+                        $scope.successfulDeployments = response.data.successful;
+
                         if (response.data.unsuccessful.length > 0) {
-                            // TODO: if there are blocked deployments, show a pop up and indicate which ones.
+                            $scope.blockedDeployments = [];
+
+                            angular.forEach(response.data.unsuccessful, function(unsuccessfulDeployment) {
+                                $scope.blockedDeployments.push({
+                                    service: getServiceNameById(unsuccessfulDeployment.service),
+                                    environment: getEnvironmentNameById(unsuccessfulDeployment.environment),
+                                    reason: unsuccessfulDeployment.reason
+                                });
+                            });
+
+                            $('#blocked-deployments').modal('show');
+                        } else {
+                            redirectToOngoing();
                         }
 
-                        // Redirect user to ongoing deployments
-                        $state.go('deployments.ongoing', {deploymentResult: response.data});
                     }, 500);
 
                 }, function (error) {
@@ -196,6 +208,18 @@ angular.module('apollo')
             localStorageService.set(previouseEnvironmentLocalStorageKey, $scope.selectedEnvironments);
             localStorageService.set(previouseServiceLocalStorageKey, $scope.selectedServices);
         };
+
+        var getServiceNameById = function(id) {
+            return $scope.possibleServices.filter(function(a){return a.id == id})[0].name;
+        }
+
+        var getEnvironmentNameById = function(id) {
+            return $scope.possibleEnvironments.filter(function(a){return a.id == id})[0].name;
+        }
+
+        $scope.redirectToOngoing = function() {
+            $state.go('deployments.ongoing', {deploymentResult: $scope.successfulDeployments});
+        }
 
         $scope.firstLine = function (multiLineString) {
             if (!multiLineString) {
