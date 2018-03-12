@@ -137,4 +137,27 @@ public class BlockerDefinitionController {
         blockerDefinitionDao.deleteUserToBlockerOverride(userEmail, blockerId);
         assignJsonResponseToReq(req, HttpStatus.OK, "deleted");
     }
+
+    @PUT("/blocker-definition/{id}/active/{active}")
+    public void updateBlockerDefinitionActiveness(int id, String active, Req req) {
+
+        BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
+
+        if (blockerDefinition == null) {
+            Map<String, String> message = ImmutableMap.of("message", "Blocker not found");
+            assignJsonResponseToReq(req, HttpStatus.NOT_FOUND, message);
+            return;
+        }
+
+        try {
+            blockerDefinition.setActive(Boolean.valueOf(active));
+        } catch (Exception e) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, blockerDefinition);
+            return;
+        }
+
+        blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
+
+        assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
+    }
 }
