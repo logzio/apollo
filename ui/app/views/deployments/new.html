@@ -29,7 +29,7 @@
                             <tbody>
                             <tr ng-repeat="environment in possibleEnvironments | filter:globalSearch"
                                 ng-click="toggleSelectedEnvironment(environment)"
-                                ng-dblclick="nextStep()"
+                                ng-dblclick="toggleSelectedEnvironment(environment); nextStep()"
                                 ng-class="{'active':selectedEnvironments.indexOf(environment) > -1}">
                                 <td ng-if="!isGroupDeployment">
                                     <input type="checkbox"
@@ -69,7 +69,7 @@
                             <tbody>
                             <tr ng-repeat="service in possibleServices | filter:globalSearch"
                                 ng-click="toggleSelectedService(service)"
-                                ng-dblclick="nextStep()"
+                                ng-dblclick="toggleSelectedService(service); nextStep()"
                                 ng-class="{'active':selectedServices.indexOf(service) > -1}">
                                 <td>
                                     <input ng-if="!service.isPartOfGroup"

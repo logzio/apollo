@@ -272,7 +272,7 @@ angular.module('apollo')
                 }
                 $scope.selectedEnvironments.push(environment);
             }
-            if ($scope.isGroupDeployment && $scope.selectedServices !== null && $scope.selectedServices.length > 0) {
+            if ($scope.isGroupDeployment && $scope.selectedServices !== null && $scope.selectedServices.length > 0 && $scope.selectedEnvironments.length > 0) {
                 loadGroups($scope.selectedEnvironments[0].id, $scope.selectedServices[0].id);
             }
             updateEnvironmentsNames();
