@@ -180,7 +180,7 @@ public class ApolloClient {
         return genericApolloClient.getResult("/blocker-definition/", new TypeReference<List<BlockerDefinition>>() {});
     }
 
-    public BlockerDefinition updateBlockerDefinitionActiveness(int id, String active) throws ApolloClientException {
+    public BlockerDefinition updateBlockerDefinitionActiveness(int id, Boolean active) throws ApolloClientException {
         return genericApolloClient.putAndGetResult("/blocker-definition/" + id + "/active/" + active, "", new TypeReference<BlockerDefinition>() {});
     }
 

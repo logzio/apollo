@@ -149,7 +149,12 @@ public class BlockerDefinitionController {
             return;
         }
 
-        blockerDefinition.setActive(Boolean.valueOf(active));
+        try {
+            blockerDefinition.setActive(Boolean.valueOf(active));
+        } catch (Exception e) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, blockerDefinition);
+            return;
+        }
 
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
 

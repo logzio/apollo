@@ -238,7 +238,7 @@ public class BlockerTest {
         Boolean beforeActive = blocker.getActive();
         Boolean afterActive = !beforeActive;
 
-        BlockerDefinition updatedBlocker = apolloTestClient.updateBlockerDefinitionActiveness(blocker.getId(), String.valueOf(afterActive));
+        BlockerDefinition updatedBlocker = apolloTestClient.updateBlockerDefinitionActiveness(blocker.getId(), afterActive);
         assertThat(updatedBlocker.getActive()).isEqualTo(afterActive);
     }
 
