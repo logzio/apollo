@@ -280,6 +280,22 @@ public class BlockerTest {
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, failedDeployableVersion);
     }
 
+    @Test
+    public void changeBlockerActiveAttribute() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
+
+        Boolean beforeActive = blocker.getActive();
+        Boolean afterActive = !beforeActive;
+
+        BlockerDefinition updatedBlocker = apolloTestClient.updateBlockerDefinitionActiveness(blocker.getId(), afterActive);
+        assertThat(updatedBlocker.getActive()).isEqualTo(afterActive);
+    }
+
     private String getTimeBasedBlockerJsonConfiguration(int dayOfWeek, LocalTime startDate, LocalTime endDate) {
 
         return "{\n" +

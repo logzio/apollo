@@ -41,6 +41,7 @@ public class ModelsGenerator {
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
         testEnvironment.setServicePortCoefficient(0);
         testEnvironment.setRequireDeploymentMessage(false);
+        testEnvironment.setRequireDeploymentMessage(true);
 
         return testEnvironment;
     }

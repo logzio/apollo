@@ -45,7 +45,8 @@ public class ApolloClient {
                 "availability", environment.getAvailability(), "kubernetesMaster", environment.getKubernetesMaster(),
                 "kubernetesToken", environment.getKubernetesToken(), "kubernetesNamespace", environment.getKubernetesNamespace(),
                 "servicePortCoefficient", String.valueOf(environment.getServicePortCoefficient()),
-                "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()));
+                "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
+                "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()));
 
         return genericApolloClient.postAndGetResult("/environment", requestBody, new TypeReference<Environment>(){});
     }
@@ -186,6 +187,10 @@ public class ApolloClient {
 
     public List<BlockerDefinition> getAllBlockerDefinitions() throws ApolloClientException {
         return genericApolloClient.getResult("/blocker-definition/", new TypeReference<List<BlockerDefinition>>() {});
+    }
+
+    public BlockerDefinition updateBlockerDefinitionActiveness(int id, Boolean active) throws ApolloClientException {
+        return genericApolloClient.putAndGetResult("/blocker-definition/" + id + "/active/" + active, "", new TypeReference<BlockerDefinition>() {});
     }
 
     public Notification addNotification(Notification notification) throws ApolloClientException {
