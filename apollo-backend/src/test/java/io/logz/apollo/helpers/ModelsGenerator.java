@@ -177,22 +177,7 @@ public class ModelsGenerator {
         DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(testService);
         testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
 
-        // Give the user permissions to deploy
-        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, testEnvironment);
-
-        // Now we have enough to create a deployment
-        Deployment testDeployment = ModelsGenerator.createDeployment(testService, testEnvironment, testDeployableVersion);
-        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
-
-        try {
-            LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
-            testDeployment.setId((int) deployment.get("id"));
-        } catch (IndexOutOfBoundsException e) {
-            String errorMessage = (String) result.getUnsuccessful().get(0).get("reason");
-            throw new Exception(errorMessage);
-        }
-
-        return testDeployment;
+        return createAndSubmitDeployment(apolloTestClient, testEnvironment, testService, testDeployableVersion);
     }
 
     public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
@@ -205,10 +190,10 @@ public class ModelsGenerator {
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
-        try {
+        if (result.getSuccessful().size() > 0) {
             LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
             testDeployment.setId((int) deployment.get("id"));
-        } catch (IndexOutOfBoundsException e) {
+        } else {
             String errorMessage = (String) result.getUnsuccessful().get(0).get("reason");
             throw new Exception(errorMessage);
         }

@@ -96,13 +96,21 @@ public class DeploymentController {
 
         environmentIds.forEach(environmentIdString -> serviceIds.forEach(serviceIdString -> {
 
-            int environmentId = Integer.parseInt(environmentIdString);
-            int serviceId = Integer.parseInt(serviceIdString);
+            int environmentId;
+            int serviceId;
+
+            try {
+                environmentId = Integer.parseInt(environmentIdString);
+                serviceId = Integer.parseInt(serviceIdString);
+            } catch (NumberFormatException e) {
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, responseObject);
+                return;
+            }
 
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
 
             if (serviceDeployableVersion == null) {
-                responseObject.addUnsuccessful(environmentId, serviceId, "There is no deployableVersion for commit sha " + deployableVersion.getGitCommitSha() + " and service " + serviceId);
+                responseObject.addUnsuccessful(environmentId, serviceId, "DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId);
             } else {
                 try {
                     Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, req);
@@ -112,7 +120,12 @@ public class DeploymentController {
                 }
             }
         }));
-        assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
+
+        if (responseObject.getSuccessful().size() > 0) {
+            assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
+        } else {
+            assignJsonResponseToReq(req, HttpStatus.ACCEPTED, responseObject);
+        }
     }
 
     @LoggedIn

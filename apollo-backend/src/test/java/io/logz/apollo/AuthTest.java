@@ -175,7 +175,8 @@ public class AuthTest {
         apolloTestClient.addDeployment(okDeployment);
 
         Deployment failDeployment = ModelsGenerator.createDeployment(secondTestService, testEnvironment, testDeployableVersion);
-        assertThat((String) apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).startsWith("There is no deployableVersion for commit sha");
+        assertThat((String) apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).startsWith("DeployableVersion with");
+        assertThat((String) apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).contains("is not applicable on service");
     }
 
     @Test

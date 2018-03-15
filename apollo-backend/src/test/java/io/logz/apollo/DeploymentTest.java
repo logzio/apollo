@@ -1,10 +1,8 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
-import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
-import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.DeploymentPermission;
@@ -17,9 +15,11 @@ import org.junit.Test;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
-import static io.logz.apollo.helpers.ModelsGenerator.*;
+import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
+import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitEnvironment;
+import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitService;
+import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Created by roiravhon on 1/5/17.
@@ -27,13 +27,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class DeploymentTest {
 
     private static ApolloTestClient apolloTestClient;
-    private static DeploymentDao deploymentDao;
 
     @BeforeClass
     public static void init() throws Exception {
         apolloTestClient = Common.signupAndLogin();
-        StandaloneApollo standaloneApollo = StandaloneApollo.getOrCreateServer();
-        deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
     }
 
     @Test
@@ -101,12 +98,12 @@ public class DeploymentTest {
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
 
-        MultiDeploymentResponseObject result = apolloTestClient.addDeploymentWithParams(envIdsCsv, serviceIdsCsv, deployableVersion1.getId());
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, serviceIdsCsv, deployableVersion1.getId());
 
         assertThat(result.getSuccessful().size()).isEqualTo(4);
         assertThat(result.getUnsuccessful().size()).isEqualTo(0);
 
         LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
-        assertThat(deploymentDao.getDeployment((int) deployment.get("id"))).isNotNull();
+        assertThat(apolloTestClient.getDeployment((int) deployment.get("id"))).isNotNull();
     }
 }
