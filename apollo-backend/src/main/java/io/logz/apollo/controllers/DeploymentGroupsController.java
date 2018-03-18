@@ -45,17 +45,17 @@ public class DeploymentGroupsController {
             Group group = groupDao.getGroup(groupId);
 
             if (group == null) {
-                responseObject.addUnsuccessful(groupId, "Non existing group.");
+                responseObject.addUnsuccessful(groupId, new ApolloDeploymentException("Non existing group."));
                 continue;
             }
 
             if (group.getServiceId() != serviceId) {
-                responseObject.addUnsuccessful(groupId,"The deployment service ID " + serviceId + " doesn't match the group service ID " + group.getServiceId());
+                responseObject.addUnsuccessful(groupId, new ApolloDeploymentException("The deployment service ID " + serviceId + " doesn't match the group service ID " + group.getServiceId()));
                 continue;
             }
 
             if (group.getEnvironmentId() != environmentId) {
-                responseObject.addUnsuccessful(groupId, "The deployment environment ID " + environmentId + " doesn't match the group environment ID " + group.getEnvironmentId());
+                responseObject.addUnsuccessful(groupId, new ApolloDeploymentException("The deployment environment ID " + environmentId + " doesn't match the group environment ID " + group.getEnvironmentId()));
                 continue;
             }
 
@@ -64,7 +64,7 @@ public class DeploymentGroupsController {
                         deploymentMessage, Optional.of(group), req);
                 responseObject.addSuccessful(groupId, deployment);
             } catch (ApolloDeploymentException e) {
-                responseObject.addUnsuccessful(groupId, e.getMessage());
+                responseObject.addUnsuccessful(groupId, e);
             }
         }
         assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);

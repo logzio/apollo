@@ -121,7 +121,7 @@ public class AuthTest {
         testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
 
         Deployment testDeployment = ModelsGenerator.createDeployment(testService, testEnvironment, testDeployableVersion);
-        assertThat(apolloTestClient.addDeployment(testDeployment).getUnsuccessful().get(0).get("reason")).isEqualTo("Not Authorized!");
+        assertThat(apolloTestClient.addDeployment(testDeployment).getUnsuccessful().get(0).getException().getMessage()).isEqualTo("Not Authorized!");
     }
 
     @Test
@@ -148,7 +148,7 @@ public class AuthTest {
         apolloTestClient.addDeployment(okDeployment);
 
         Deployment failDeployment = ModelsGenerator.createDeployment(testService, secondTestEnvironment, testDeployableVersion);
-        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).isEqualTo("Not Authorized!");
+        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).getException().getMessage()).isEqualTo("Not Authorized!");
     }
 
     @Test
@@ -175,8 +175,8 @@ public class AuthTest {
         apolloTestClient.addDeployment(okDeployment);
 
         Deployment failDeployment = ModelsGenerator.createDeployment(secondTestService, testEnvironment, testDeployableVersion);
-        assertThat((String) apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).startsWith("DeployableVersion with");
-        assertThat((String) apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).contains("is not applicable on service");
+        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).getException().getMessage()).startsWith("DeployableVersion with");
+        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).getException().getMessage()).contains("is not applicable on service");
     }
 
     @Test
@@ -201,7 +201,7 @@ public class AuthTest {
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(testEnvironment), Optional.of(testService), DeploymentPermission.PermissionType.DENY);
 
         Deployment failDeployment = ModelsGenerator.createDeployment(testService, testEnvironment, testDeployableVersion);
-        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).isEqualTo("Not Authorized!");
+        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).getException().getMessage()).isEqualTo("Not Authorized!");
     }
 
     @Test
@@ -249,6 +249,6 @@ public class AuthTest {
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.empty(), Optional.of(testService), DeploymentPermission.PermissionType.DENY);
 
         Deployment failDeployment = ModelsGenerator.createDeployment(testService, testEnvironment, testDeployableVersion);
-        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).get("reason")).isEqualTo("Not Authorized!");
+        assertThat(apolloTestClient.addDeployment(failDeployment).getUnsuccessful().get(0).getException().getMessage()).isEqualTo("Not Authorized!");
     }
 }

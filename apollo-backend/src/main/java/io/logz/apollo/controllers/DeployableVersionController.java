@@ -75,7 +75,7 @@ public class DeployableVersionController {
             return deployableVersionDao.getLatestDeployableVersionsByServiceId(Integer.parseInt(serviceIdsCsv));
         }
 
-        return deployableVersionDao.getDeployableVersionForMultiServices(getDeployableVersionForMultiServicesQuery(Lists.newArrayList(serviceIds)));
+        return deployableVersionDao.getDeployableVersionForMultiServices(serviceIdsCsv, serviceIdsCsv.split(",").length);
     }
 
     @LoggedIn
@@ -159,21 +159,5 @@ public class DeployableVersionController {
 
         deployableVersionDao.addDeployableVersion(newDeployableVersion);
         assignJsonResponseToReq(req, HttpStatus.CREATED, newDeployableVersion);
-    }
-
-    private String getDeployableVersionForMultiServicesQuery(List<String> serviceIds) {
-        String query = "";
-
-        for (int index = 0; index < serviceIds.size(); index++) {
-            query += " INNER JOIN deployable_version dv" + String.valueOf(index);
-        }
-
-        query += " ON dv.service_id = " + serviceIds.get(0);
-
-        for (int index = 0; index < serviceIds.size(); index++) {
-            query += " AND dv.git_commit_sha = dv" + String.valueOf(index) + ".git_commit_sha AND dv" + String.valueOf(index) + ".service_id = " + serviceIds.get(index);
-        }
-
-        return query;
     }
 }

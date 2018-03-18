@@ -229,8 +229,8 @@ public class KubernetesHandlerTest {
 
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(restDeployment);
 
-        LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
-        restDeployment.setId((int) deployment.get("id"));
+        Deployment deployment = result.getSuccessful().get(0).getDeployment();
+        restDeployment.setId(deployment.getId());
 
         assertThat(apolloTestClient.getDeployment(restDeployment.getId()).getSourceVersion())
                 .isEqualTo(statusDeployment.getDeployableVersion().getGitCommitSha());

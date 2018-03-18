@@ -30,9 +30,13 @@
     </select>
 
     <select id="getDeployableVersionForMultiServices" resultType="io.logz.apollo.models.DeployableVersion">
-        SELECT * FROM deployable_version dv
-        ${dynamicQuery}
-        ORDER BY dv.commit_date DESC limit 200
+        SELECT * FROM (
+            SELECT *, count(*) AS count FROM deployable_version
+            WHERE service_id IN (${serviceIdsCsv}) GROUP BY git_commit_sha
+        ) AS result
+        WHERE result.count = #{numOfServices}
+        ORDER BY result.commit_date DESC
+        LIMIT 200
     </select>
 
     <insert id="addDeployableVersion" useGeneratedKeys="true" keyProperty="id" keyColumn="id">

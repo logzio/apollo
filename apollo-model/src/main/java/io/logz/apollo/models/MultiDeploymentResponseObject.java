@@ -1,61 +1,103 @@
 package io.logz.apollo.models;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MultiDeploymentResponseObject {
 
-    private final static String GROUP = "group";
-    private final static String ENVIRONMENT = "environment";
-    private final static String SERVICE = "service";
-    private final static String REASON = "reason";
-    private final static String DEPLOYMENT = "deployment";
-
-    private List<Map<String, Object>> successful;
-    private List<Map<String, Object>> unsuccessful;
+    private List<SuccessfulDeploymentResponseObject> successful;
+    private List<UnsuccessfulDeploymentResponseObject> unsuccessful;
 
     public MultiDeploymentResponseObject() {
         successful = new ArrayList<>();
         unsuccessful = new ArrayList<>();
     }
 
-    public void addUnsuccessful(int groupId, String reason) {
-        Map<String, Object> unsuccessfulGroup = new HashMap<>();
-        unsuccessfulGroup.put(GROUP, groupId);
-        unsuccessfulGroup.put(REASON, reason);
-        unsuccessful.add(unsuccessfulGroup);
+    public void addUnsuccessful(int groupId, Exception exception) {
+        unsuccessful.add(new UnsuccessfulDeploymentResponseObject(groupId, exception));
     }
 
     public void addSuccessful(int groupId, Deployment deployment) {
-        Map<String, Object> successfulGroup = new HashMap<>();
-        successfulGroup.put(GROUP, groupId);
-        successfulGroup.put(DEPLOYMENT, deployment);
-        successful.add(successfulGroup);
+        successful.add(new SuccessfulDeploymentResponseObject(groupId, deployment));
     }
 
-    public void addUnsuccessful(int environmentId, int serviceId, String reason) {
-        Map<String, Object> unsuccessfulEnvAndService = new HashMap<>();
-        unsuccessfulEnvAndService.put(ENVIRONMENT, environmentId);
-        unsuccessfulEnvAndService.put(SERVICE, serviceId);
-        unsuccessfulEnvAndService.put(REASON, reason);
-        unsuccessful.add(unsuccessfulEnvAndService);
+    public void addUnsuccessful(int environmentId, int serviceId, Exception exception) {
+        unsuccessful.add(new UnsuccessfulDeploymentResponseObject(environmentId, serviceId, exception));
     }
 
     public void addSuccessful(int environmentId, int serviceId, Deployment deployment) {
-        Map<String, Object> successfulEnvAndService = new HashMap<>();
-        successfulEnvAndService.put(ENVIRONMENT, environmentId);
-        successfulEnvAndService.put(SERVICE, serviceId);
-        successfulEnvAndService.put(DEPLOYMENT, deployment);
-        successful.add(successfulEnvAndService);
+        successful.add(new SuccessfulDeploymentResponseObject(environmentId, serviceId, deployment));
     }
 
-    public List<Map<String, Object>> getUnsuccessful() {
+    public List<UnsuccessfulDeploymentResponseObject> getUnsuccessful() {
         return unsuccessful;
     }
 
-    public List<Map<String, Object>> getSuccessful() {
+    public List<SuccessfulDeploymentResponseObject> getSuccessful() {
         return successful;
+    }
+
+    public static class SingleDeploymentResponseObject {
+
+        private Integer groupId;
+        private Integer environmentId;
+        private Integer serviceId;
+
+        SingleDeploymentResponseObject(Integer groupId) {
+            this.groupId = groupId;
+        }
+
+        SingleDeploymentResponseObject(Integer environmentId, Integer serviceId) {
+            this.environmentId = environmentId;
+            this.serviceId = serviceId;
+        }
+
+        public Integer getGroupId() {
+            return groupId;
+        }
+
+        public Integer getEnvironmentId() {
+            return environmentId;
+        }
+
+        public Integer getServiceId() { return serviceId; }
+    }
+
+    public static class SuccessfulDeploymentResponseObject extends SingleDeploymentResponseObject {
+
+        private Deployment deployment;
+
+        SuccessfulDeploymentResponseObject(Integer groupId, Deployment deployment) {
+            super(groupId);
+            this.deployment = deployment;
+        }
+
+        SuccessfulDeploymentResponseObject(Integer environmentId, Integer serviceId, Deployment deployment) {
+            super(environmentId, serviceId);
+            this.deployment = deployment;
+        }
+
+        public Deployment getDeployment() {
+            return deployment;
+        }
+    }
+
+    public static class UnsuccessfulDeploymentResponseObject extends SingleDeploymentResponseObject {
+
+        private Exception exception;
+
+        UnsuccessfulDeploymentResponseObject(Integer groupId, Exception exception) {
+            super(groupId);
+            this.exception = exception;
+        }
+
+        UnsuccessfulDeploymentResponseObject(Integer environmentId, Integer serviceId, Exception exception) {
+            super(environmentId, serviceId);
+            this.exception = exception;
+        }
+
+        public Exception getException() {
+            return exception;
+        }
     }
 }

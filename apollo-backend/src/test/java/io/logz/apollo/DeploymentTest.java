@@ -12,7 +12,6 @@ import io.logz.apollo.models.Service;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
 import java.util.Optional;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
@@ -76,8 +75,9 @@ public class DeploymentTest {
         Deployment deployment1 = createAndSubmitDeployment(apolloTestClient);
 
         // Submit that again to verify we can't run the same one twice
-        assertThat(apolloTestClient.addDeployment(deployment1).getUnsuccessful().size()).isEqualTo(1);
-        assertThat(apolloTestClient.addDeployment(deployment1).getSuccessful().size()).isEqualTo(0);
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(deployment1);
+        assertThat(result.getUnsuccessful().size()).isEqualTo(1);
+        assertThat(result.getSuccessful().size()).isEqualTo(0);
 
         // Just to make sure we are not blocking different deployments to run on the same time
         createAndSubmitDeployment(apolloTestClient);
@@ -103,7 +103,7 @@ public class DeploymentTest {
         assertThat(result.getSuccessful().size()).isEqualTo(4);
         assertThat(result.getUnsuccessful().size()).isEqualTo(0);
 
-        LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
-        assertThat(apolloTestClient.getDeployment((int) deployment.get("id"))).isNotNull();
+        Deployment deployment = result.getSuccessful().get(0).getDeployment();
+        assertThat(apolloTestClient.getDeployment(deployment.getId())).isNotNull();
     }
 }

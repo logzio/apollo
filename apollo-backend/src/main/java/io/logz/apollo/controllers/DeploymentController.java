@@ -110,22 +110,18 @@ public class DeploymentController {
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
 
             if (serviceDeployableVersion == null) {
-                responseObject.addUnsuccessful(environmentId, serviceId, "DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId);
+                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId));
             } else {
                 try {
                     Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, req);
                     responseObject.addSuccessful(environmentId, serviceId, deployment);
                 } catch (ApolloDeploymentException e) {
-                    responseObject.addUnsuccessful(environmentId, serviceId, e.getMessage());
+                    responseObject.addUnsuccessful(environmentId, serviceId, e);
                 }
             }
         }));
 
-        if (responseObject.getSuccessful().size() > 0) {
-            assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
-        } else {
-            assignJsonResponseToReq(req, HttpStatus.ACCEPTED, responseObject);
-        }
+        assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
     }
 
     @LoggedIn

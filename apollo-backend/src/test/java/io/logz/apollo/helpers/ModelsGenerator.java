@@ -21,7 +21,6 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Optional;
 
 /**
@@ -191,11 +190,10 @@ public class ModelsGenerator {
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
         if (result.getSuccessful().size() > 0) {
-            LinkedHashMap deployment = (LinkedHashMap) result.getSuccessful().get(0).get("deployment");
-            testDeployment.setId((int) deployment.get("id"));
+            Deployment deployment = result.getSuccessful().get(0).getDeployment();
+            testDeployment.setId(deployment.getId());
         } else {
-            String errorMessage = (String) result.getUnsuccessful().get(0).get("reason");
-            throw new Exception(errorMessage);
+            throw result.getUnsuccessful().get(0).getException();
         }
 
         return testDeployment;
