@@ -183,11 +183,13 @@ angular.module('apollo')
                         if (response.data.unsuccessful.length > 0) {
                             $scope.blockedDeployments = [];
 
+                            console.log(response.data.unsuccessful);
+
                             angular.forEach(response.data.unsuccessful, function(unsuccessfulDeployment) {
                                 $scope.blockedDeployments.push({
-                                    service: getServiceNameById(unsuccessfulDeployment.service),
-                                    environment: getEnvironmentNameById(unsuccessfulDeployment.environment),
-                                    reason: unsuccessfulDeployment.reason
+                                    service: getServiceNameById(unsuccessfulDeployment.serviceId),
+                                    environment: getEnvironmentNameById(unsuccessfulDeployment.environmentId),
+                                    reason: unsuccessfulDeployment.exception.message
                                 });
                             });
 
