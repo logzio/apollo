@@ -125,7 +125,7 @@ public class AuthTest {
     }
 
     @Test
-    public void testDeploymentWithNullService() throws ApolloClientException, ScriptException, IOException, SQLException {
+    public void testDeploymentWithWildCardService() throws ApolloClientException, ScriptException, IOException, SQLException {
 
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
 
@@ -152,7 +152,7 @@ public class AuthTest {
     }
 
     @Test
-    public void testDeploymentWithNullEnvironment() throws ApolloClientException, ScriptException, IOException, SQLException {
+    public void testDeploymentWithWildCardEnvironment() throws ApolloClientException, ScriptException, IOException, SQLException {
 
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
 

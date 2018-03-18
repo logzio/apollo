@@ -43,6 +43,8 @@ public class MultiDeploymentResponseObject {
         private Integer environmentId;
         private Integer serviceId;
 
+        SingleDeploymentResponseObject() {}
+
         SingleDeploymentResponseObject(Integer groupId) {
             this.groupId = groupId;
         }
@@ -67,6 +69,8 @@ public class MultiDeploymentResponseObject {
 
         private Deployment deployment;
 
+        SuccessfulDeploymentResponseObject() {}
+
         SuccessfulDeploymentResponseObject(Integer groupId, Deployment deployment) {
             super(groupId);
             this.deployment = deployment;
@@ -85,6 +89,8 @@ public class MultiDeploymentResponseObject {
     public static class UnsuccessfulDeploymentResponseObject extends SingleDeploymentResponseObject {
 
         private Exception exception;
+
+        UnsuccessfulDeploymentResponseObject() {}
 
         UnsuccessfulDeploymentResponseObject(Integer groupId, Exception exception) {
             super(groupId);
