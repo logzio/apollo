@@ -112,6 +112,7 @@ public class ModelsGenerator {
         testService.setName("Prod app " + Common.randomStr(5));
         testService.setDeploymentYaml("");  // TODO: fill something real
         testService.setServiceYaml("");  // TODO: fill something real
+        testService.setIngressYaml("");  // TODO: fill something real
         testService.setIsPartOfGroup(false);
 
         return testService;

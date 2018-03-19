@@ -17,6 +17,8 @@ import io.logz.apollo.models.Service;
 public class RealDeploymentGenerator {
 
     private static final int NODE_PORT = 30002;
+    private final int SERVICE_PORT = 80;
+    private final String SERVICE_NAME = "test-service";
     private final String DEFAULT_LABEL_KEY = "app";
     private final String DEFAULT_LABEL_VALUE = "nginx";
 
@@ -61,10 +63,12 @@ public class RealDeploymentGenerator {
                 service = ModelsGenerator.createService();
                 service.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, extraLabelKey, extraLabelValue));
                 service.setServiceYaml(getServiceDeploymentYaml(extraLabelKey, extraLabelValue));
+                service.setIngressYaml(getIngressServiceYaml(extraLabelKey, extraLabelValue));
                 serviceDao.addService(service);
             } else {
                 serviceParam.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, extraLabelKey, extraLabelValue));
                 serviceParam.setServiceYaml(getServiceDeploymentYaml(extraLabelKey, extraLabelValue));
+                serviceParam.setIngressYaml(getIngressServiceYaml(extraLabelKey, extraLabelValue));
                 serviceDao.updateService(serviceParam);
                 service = serviceDao.getService(serviceParam.getId());
             }
@@ -182,12 +186,12 @@ public class RealDeploymentGenerator {
                 "  labels:\n" +
                 "    " + DEFAULT_LABEL_KEY + ": " + DEFAULT_LABEL_VALUE + "\n" +
                 "    " + extraLabelKey + ": " + extraLabelValue + "\n" +
-                "  name: roi-test-service\n" +
+                "  name: " + SERVICE_NAME +"\n" +
                 "  namespace: default\n" +
                 "spec:  \n" +
                 "  ports:\n" +
                 "  - nodePort: " + NODE_PORT + "\n" +
-                "    port: 80\n" +
+                "    port: "+ SERVICE_PORT +"\n" +
                 "    protocol: TCP\n" +
                 "    targetPort: 80\n" +
                 "  selector:\n" +
@@ -196,5 +200,26 @@ public class RealDeploymentGenerator {
                 "  type: NodePort\n" +
                 "status:\n" +
                 "  loadBalancer: {}";
+    }
+
+    private String getIngressServiceYaml(String extraLabelKey, String extraLabelValue) {
+        return "apiVersion: extensions/v1beta1\n" +
+                "kind: Ingress\n" +
+                "metadata:\n" +
+                "  labels:\n" +
+                "    " + DEFAULT_LABEL_KEY + ": " + DEFAULT_LABEL_VALUE + "\n" +
+                "    " + extraLabelKey + ": " + extraLabelValue + "\n" +
+                "  name: ingress-test\n" +
+                "  namespace: default\n" +
+                "  annotations:\n" +
+                "    kubernetes.io/ingress.class: traefik\n" +
+                "spec:  \n" +
+                "  rules:\n" +
+                "  - host: app.example.hostname\n" +
+                "    http:\n" +
+                "       paths:\n" +
+                "           - backend:\n" +
+                "               serviceName: " + SERVICE_NAME +"\n" +
+                "               servicePort: " + SERVICE_PORT +"\n";
     }
 }

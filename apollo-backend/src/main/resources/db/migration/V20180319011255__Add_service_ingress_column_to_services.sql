@@ -1,0 +1,1 @@
+ALTER TABLE service ADD ingress_yaml text NULL;
