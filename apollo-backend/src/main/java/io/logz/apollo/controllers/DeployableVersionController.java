@@ -1,8 +1,8 @@
 package io.logz.apollo.controllers;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.models.DeployableVersion;
@@ -70,12 +70,7 @@ public class DeployableVersionController {
     @GET("/deployable-version/multi-service/{serviceIdsCsv}")
     public List<DeployableVersion> getDeployableVersionForMultiServices(String serviceIdsCsv) {
         Iterable<String> serviceIds = Splitter.on(",").omitEmptyStrings().trimResults().split(serviceIdsCsv);
-
-        if (Iterables.size(serviceIds) == 1) {
-            return deployableVersionDao.getLatestDeployableVersionsByServiceId(Integer.parseInt(serviceIdsCsv));
-        }
-
-        return deployableVersionDao.getDeployableVersionForMultiServices(serviceIdsCsv, serviceIdsCsv.split(",").length);
+        return deployableVersionDao.getDeployableVersionForMultiServices(Joiner.on("").join(serviceIds),  Iterables.size(serviceIds));
     }
 
     @LoggedIn

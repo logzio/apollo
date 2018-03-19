@@ -103,7 +103,7 @@ public class DeploymentController {
                 environmentId = Integer.parseInt(environmentIdString);
                 serviceId = Integer.parseInt(serviceIdString);
             } catch (NumberFormatException e) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, responseObject);
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
                 return;
             }
 
