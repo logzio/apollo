@@ -1,7 +1,8 @@
 package io.logz.apollo;
 
+import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.models.DeploymentPermission;
-import io.logz.apollo.models.DeploymentGroupsResponseObject;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.kubernetes.ApolloToKubernetesStore;
 import io.logz.apollo.clients.ApolloTestClient;
@@ -29,7 +30,6 @@ public class DeploymentGroupsTest {
 
     private static ApolloTestClient apolloTestClient;
     private static ApolloToKubernetesStore apolloToKubernetesStore;
-    private String GROUP_STRING = "group";
 
     @BeforeClass
     public static void init() throws Exception {
@@ -81,24 +81,24 @@ public class DeploymentGroupsTest {
         Deployment deployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
 
         // Create expected response object
-        DeploymentGroupsResponseObject expectedResponse = new DeploymentGroupsResponseObject();
-        expectedResponse.addSuccessfulGroup(goodGroup1.getId(), deployment);
-        expectedResponse.addSuccessfulGroup(goodGroup2.getId(), deployment);
-        expectedResponse.addUnsuccessfulGroup(0, "Non existing group.");
-        expectedResponse.addUnsuccessfulGroup(groupWithDifferentServiceId.getId(),"The deployment service ID " + deployment.getServiceId() +
-                " doesn't match the group service ID " + groupWithDifferentServiceId.getServiceId());
+        MultiDeploymentResponseObject expectedResponse = new MultiDeploymentResponseObject();
+        expectedResponse.addSuccessful(goodGroup1.getId(), deployment);
+        expectedResponse.addSuccessful(goodGroup2.getId(), deployment);
+        expectedResponse.addUnsuccessful(0, new ApolloDeploymentException("Non existing group."));
+        expectedResponse.addUnsuccessful(groupWithDifferentServiceId.getId(),new ApolloDeploymentException("The deployment service ID " + deployment.getServiceId() +
+                " doesn't match the group service ID " + groupWithDifferentServiceId.getServiceId()));
 
         // Grant permissions
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(environment), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
 
         // Get results
-        DeploymentGroupsResponseObject result = apolloTestClient.addDeployment(deployment, groupIdsCsv);
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(deployment, groupIdsCsv);
 
-        assertThat(result.getUnsuccessful()).isEqualTo(expectedResponse.getUnsuccessful());
-        assertThat(result.getSuccessful().get(0).get(GROUP_STRING))
-                .isEqualTo(expectedResponse.getSuccessful().get(0).get(GROUP_STRING));
-        assertThat(result.getSuccessful().get(1).get(GROUP_STRING))
-                .isEqualTo(expectedResponse.getSuccessful().get(1).get(GROUP_STRING));
+        assertThat(result.getUnsuccessful().size()).isEqualTo(expectedResponse.getUnsuccessful().size());
+        assertThat(result.getSuccessful().get(0).getGroupId())
+                .isEqualTo(expectedResponse.getSuccessful().get(0).getGroupId());
+        assertThat(result.getSuccessful().get(1).getGroupId())
+                .isEqualTo(expectedResponse.getSuccessful().get(1).getGroupId());
     }
 
     private void assertImageName(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String imageName) {

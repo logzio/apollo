@@ -1,16 +1,19 @@
 package io.logz.apollo.controllers;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Iterables;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.scm.CommitDetails;
 import io.logz.apollo.scm.GithubConnector;
+import org.apache.commons.lang.StringUtils;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
-import org.apache.commons.lang.StringUtils;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -61,6 +64,13 @@ public class DeployableVersionController {
     @GET("/deployable-version/latest/service/{serviceId}")
     public List<DeployableVersion> getLatestDeployableVersionsByServiceId(int serviceId) {
         return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId);
+    }
+
+    @LoggedIn
+    @GET("/deployable-version/multi-service/{serviceIdsCsv}")
+    public List<DeployableVersion> getDeployableVersionForMultiServices(String serviceIdsCsv) {
+        Iterable<String> serviceIds = Splitter.on(",").omitEmptyStrings().trimResults().split(serviceIdsCsv);
+        return deployableVersionDao.getDeployableVersionForMultiServices(Joiner.on("").join(serviceIds),  Iterables.size(serviceIds));
     }
 
     @LoggedIn
