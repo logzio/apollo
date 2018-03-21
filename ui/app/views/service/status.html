@@ -145,6 +145,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="restartAllPods(selectedStatus.environmentId, selectedStatus.serviceId, selectedStatus.groupName)">Restart all pods gradually</button>
                     <button type="button" class="btn btn-default" ng-click="refreshStatus()">Refresh</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>

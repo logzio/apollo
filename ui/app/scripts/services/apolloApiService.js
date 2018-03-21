@@ -169,6 +169,14 @@ function ApiService($q, $http){
         });
     };
 
+    var restartAllPods = function (environmentId, serviceId, groupName) {
+        return $http.post(CONFIG.appUrl + "k8s/pod/restart-all", {
+            environmentId: environmentId,
+            serviceId: serviceId,
+            groupName: groupName
+        });
+    };
+
     var createService = function(name, deploymentYaml, serviceYaml, isPartOfGroup) {
         return $http.post(CONFIG.appUrl + "service/", {
             name: name,
@@ -320,6 +328,7 @@ function ApiService($q, $http){
         latestCreatedPodWithGroup: latestCreatedPodWithGroup,
         podContainers: podContainers,
         restartPod: restartPod,
+        restartAllPods: restartAllPods,
         createService: createService,
         updateService: updateService,
         createGroup: createGroup,
