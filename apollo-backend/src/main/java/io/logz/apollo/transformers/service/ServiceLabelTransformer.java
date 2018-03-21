@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.logz.apollo.kubernetes.ApolloToKubernetes;
 import io.logz.apollo.transformers.LabelsNormalizer;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -27,16 +28,21 @@ public class ServiceLabelTransformer implements BaseServiceTransformer {
                 .build();
 
         Map<String, String> labelsFromService = service.getMetadata().getLabels();
+        Map<String, String> labelsToSet = new LinkedHashMap<>();
+
+        if (labelsFromService != null) {
+            labelsToSet.putAll(labelsFromService);
+        }
 
         // Just make sure we are not overriding any label explicitly provided by the user
         desiredLabels.forEach((key, value) -> {
-            if (!labelsFromService.containsKey(key)) {
-                labelsFromService.put(key, value);
+            if (!labelsToSet.containsKey(key)) {
+                labelsToSet.put(key, value);
             }
         });
 
         // And add all back to the deployment
-        service.getMetadata().setLabels(labelsFromService);
+        service.getMetadata().setLabels(labelsToSet);
 
         return service;
     }

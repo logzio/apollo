@@ -166,8 +166,6 @@ public class ApolloToKubernetes {
                 return null;
             }
 
-            Service service = getKubernetesService();
-
             // Convert the ingress object to fabric8 model
             Ingress ingress = mapper.readValue(apolloService.getIngressYaml(), Ingress.class);
 
