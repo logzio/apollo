@@ -151,7 +151,7 @@ public class ApolloToKubernetes {
             return service;
 
         } catch (IOException e) {
-            throw new ApolloParseException("Could not parse ingress YAML from DB", e);
+            throw new ApolloParseException("Could not parse service YAML from DB", e);
         }
     }
 
@@ -161,8 +161,8 @@ public class ApolloToKubernetes {
             // Update the deployment, as it could have changed since (Status)
             apolloDeployment = deploymentDao.getDeployment(apolloDeployment.getId());
 
-            // Ingress are allowed to be null, and it requires a k8s Service to be defined
-            if (apolloService.getIngressYaml() == null || apolloService.getServiceYaml() == null) {
+            // Ingress are allowed to be null
+            if (apolloService.getIngressYaml() == null) {
                 return null;
             }
 
@@ -209,6 +209,11 @@ public class ApolloToKubernetes {
     public static String getApolloServiceUniqueIdentifier(io.logz.apollo.models.Environment apolloEnvironment,
                                                            io.logz.apollo.models.Service apolloService, Optional<String> groupName) {
         return getApolloUniqueIdentifierWithPrefix(apolloEnvironment, apolloService, groupName, "service");
+    }
+
+    public static String getApolloIngressUniqueIdentifier(io.logz.apollo.models.Environment apolloEnvironment,
+                                                          io.logz.apollo.models.Service apolloService, Optional<String> groupName) {
+        return getApolloUniqueIdentifierWithPrefix(apolloEnvironment, apolloService, groupName, "ingress");
     }
 
     public static String getApolloPodUniqueIdentifier(io.logz.apollo.models.Environment apolloEnvironment,

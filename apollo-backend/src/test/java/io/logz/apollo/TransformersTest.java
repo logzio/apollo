@@ -137,9 +137,6 @@ public class TransformersTest {
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
         assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
-
-        realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
-        apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
         assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
     }
 

@@ -20,7 +20,7 @@ public class IngressLabelTransformer implements BaseIngressTransformer {
         Map<String, String> desiredLabels = ImmutableMap.<String, String> builder()
                 .put("environment", LabelsNormalizer.normalize(apolloEnvironment.getName()))
                 .put("geo_region", LabelsNormalizer.normalize(apolloEnvironment.getGeoRegion()))
-                .put("apollo_unique_identifier", ApolloToKubernetes.getApolloServiceUniqueIdentifier(apolloEnvironment,
+                .put("apollo_unique_identifier", ApolloToKubernetes.getApolloIngressUniqueIdentifier(apolloEnvironment,
                         apolloService, Optional.empty()))
                 .build();
 
