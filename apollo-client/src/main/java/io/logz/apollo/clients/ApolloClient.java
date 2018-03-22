@@ -63,6 +63,7 @@ public class ApolloClient {
         String requestBody = Common.generateJson("name", service.getName(),
                 "deploymentYaml", service.getDeploymentYaml(),
                 "serviceYaml", service.getServiceYaml(),
+                "ingressYaml", service.getIngressYaml(),
                 "isPartOfGroup", String.valueOf(service.getIsPartOfGroup()));
         return genericApolloClient.postAndGetResult("/service", requestBody, new TypeReference<Service>(){});
     }
@@ -171,8 +172,8 @@ public class ApolloClient {
         return genericApolloClient.getResult("/scaling/kubernetes-factor/" + groupId, new TypeReference<Integer>() {});
     }
 
-    public Service updateService(int id, String name, String deploymentYaml, String serviceYaml, Boolean isPartOfGroup) throws ApolloClientException {
-        String requestBody = Common.generateJson("id", String.valueOf(id), "name", name, "deploymentYaml", deploymentYaml, "serviceYaml", serviceYaml, "isPartOfGroup", isPartOfGroup.toString());
+    public Service updateService(int id, String name, String deploymentYaml, String serviceYaml, String ingressYaml, Boolean isPartOfGroup) throws ApolloClientException {
+        String requestBody = Common.generateJson("id", String.valueOf(id), "name", name, "deploymentYaml", deploymentYaml, "serviceYaml", serviceYaml, "ingressYaml", ingressYaml, "isPartOfGroup", isPartOfGroup.toString());
         return genericApolloClient.putAndGetResult("/service/" + id, requestBody, new TypeReference<Service>() {});
     }
 

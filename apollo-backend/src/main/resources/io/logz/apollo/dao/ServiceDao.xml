@@ -16,8 +16,8 @@
     </select>
 
     <insert id="addService" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO service (name, deployment_yaml, service_yaml, is_part_of_group)
-        VALUES (#{name}, #{deploymentYaml}, #{serviceYaml}, #{isPartOfGroup})
+        INSERT INTO service (name, deployment_yaml, service_yaml, ingress_yaml, is_part_of_group)
+        VALUES (#{name}, #{deploymentYaml}, #{serviceYaml}, #{ingressYaml}, #{isPartOfGroup})
     </insert>
 
     <update id="updateService">
@@ -25,6 +25,7 @@
         name=#{name},
         deployment_yaml=#{deploymentYaml},
         service_yaml=#{serviceYaml},
+        ingress_yaml=#{ingressYaml},
         is_part_of_group=#{isPartOfGroup}
         WHERE id=#{id}
     </update>

@@ -52,7 +52,7 @@ public class DeploymentGroupsTest {
         realDeploymentGenerator = new RealDeploymentGenerator("{{ image }}", "{{ key }}", "{{ value }}", 0, new JSONObject(params).toString());
         Deployment deployment = realDeploymentGenerator.getDeployment();
         Service service = apolloTestClient.getService(deployment.getServiceId());
-        apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), true);
+        apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), service.getIngressYaml(), true);
 
         apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
 

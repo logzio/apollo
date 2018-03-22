@@ -52,9 +52,9 @@ angular.module('apollo')
             $scope.save = function() {
                 var service = $scope.selectedService;
                 if (service.id) {
-                    apolloApiService.updateService(service.id, service.name, service.deploymentYaml, service.serviceYaml, service.isPartOfGroup).then(handleSuccess, handleError);
+                    apolloApiService.updateService(service.id, service.name, service.deploymentYaml, service.serviceYaml, service.ingressYaml, service.isPartOfGroup).then(handleSuccess, handleError);
                 } else {
-                    apolloApiService.createService(service.name, service.deploymentYaml, service.serviceYaml, service.isPartOfGroup).then(handleSuccess, handleError);
+                    apolloApiService.createService(service.name, service.deploymentYaml, service.serviceYaml, service.ingressYaml, service.isPartOfGroup).then(handleSuccess, handleError);
                 }
             };
         }]);

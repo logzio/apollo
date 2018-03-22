@@ -45,12 +45,13 @@ public class ServiceController {
 
     @LoggedIn
     @POST("/service")
-    public void addService(String name, String deploymentYaml, String serviceYaml, Boolean isPartOfGroup, Req req) {
+    public void addService(String name, String deploymentYaml, String serviceYaml, String ingressYaml, Boolean isPartOfGroup, Req req) {
         Service newService = new Service();
 
         newService.setName(name);
         newService.setDeploymentYaml(deploymentYaml);
         newService.setServiceYaml(serviceYaml);
+        newService.setIngressYaml(ingressYaml);
         newService.setIsPartOfGroup(isPartOfGroup);
 
         serviceDao.addService(newService);
@@ -59,7 +60,7 @@ public class ServiceController {
 
     @LoggedIn
     @PUT("/service/{id}")
-    public void updateService(int id, String name, String deploymentYaml, String serviceYaml, Boolean isPartOfGroup, Req req) {
+    public void updateService(int id, String name, String deploymentYaml, String serviceYaml, String ingressYaml, Boolean isPartOfGroup, Req req) {
         Service service = serviceDao.getService(id);
 
         if (service == null) {
@@ -71,6 +72,7 @@ public class ServiceController {
         service.setName(name);
         service.setDeploymentYaml(deploymentYaml);
         service.setServiceYaml(serviceYaml);
+        service.setIngressYaml(ingressYaml);
         service.setIsPartOfGroup(isPartOfGroup);
 
         serviceDao.updateService(service);

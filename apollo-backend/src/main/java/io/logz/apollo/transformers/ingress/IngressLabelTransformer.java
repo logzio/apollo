@@ -1,7 +1,7 @@
-package io.logz.apollo.transformers.service;
+package io.logz.apollo.transformers.ingress;
 
+import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import com.google.common.collect.ImmutableMap;
-import io.fabric8.kubernetes.api.model.Service;
 import io.logz.apollo.kubernetes.ApolloToKubernetes;
 import io.logz.apollo.transformers.LabelsNormalizer;
 
@@ -9,29 +9,26 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Created by roiravhon on 1/31/17.
- */
-public class ServiceLabelTransformer implements BaseServiceTransformer {
+
+public class IngressLabelTransformer implements BaseIngressTransformer {
     @Override
-    public Service transform(Service service,
+    public Ingress transform(Ingress ingress,
                              io.logz.apollo.models.Deployment apolloDeployment,
                              io.logz.apollo.models.Service apolloService,
-                             io.logz.apollo.models.Environment apolloEnvironment,
-                             io.logz.apollo.models.DeployableVersion apolloDeployableVersion) {
+                             io.logz.apollo.models.Environment apolloEnvironment) {
 
         Map<String, String> desiredLabels = ImmutableMap.<String, String> builder()
                 .put("environment", LabelsNormalizer.normalize(apolloEnvironment.getName()))
                 .put("geo_region", LabelsNormalizer.normalize(apolloEnvironment.getGeoRegion()))
-                .put("apollo_unique_identifier", ApolloToKubernetes.getApolloServiceUniqueIdentifier(apolloEnvironment,
+                .put("apollo_unique_identifier", ApolloToKubernetes.getApolloIngressUniqueIdentifier(apolloEnvironment,
                         apolloService, Optional.empty()))
                 .build();
 
-        Map<String, String> labelsFromService = service.getMetadata().getLabels();
+        Map<String, String> labelsFromIngress = ingress.getMetadata().getLabels();
         Map<String, String> labelsToSet = new LinkedHashMap<>();
 
-        if (labelsFromService != null) {
-            labelsToSet.putAll(labelsFromService);
+        if (labelsFromIngress != null) {
+            labelsToSet.putAll(labelsFromIngress);
         }
 
         // Just make sure we are not overriding any label explicitly provided by the user
@@ -41,9 +38,9 @@ public class ServiceLabelTransformer implements BaseServiceTransformer {
             }
         });
 
-        // And add all back to the deployment
-        service.getMetadata().setLabels(labelsToSet);
+        // And add all back to the ingress
+        ingress.getMetadata().setLabels(labelsToSet);
 
-        return service;
+        return ingress;
     }
 }

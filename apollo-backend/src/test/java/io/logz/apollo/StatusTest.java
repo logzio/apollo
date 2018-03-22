@@ -33,7 +33,7 @@ public class StatusTest {
         // Group
         Group group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service1.getId(), environment1.getId());
 
-        apolloTestClient.updateService(service1.getId(), service1.getName(), service1.getDeploymentYaml(), service1.getServiceYaml(), true);
+        apolloTestClient.updateService(service1.getId(), service1.getName(), service1.getDeploymentYaml(), service1.getServiceYaml(), service1.getIngressYaml(), true);
 
         List<KubernetesDeploymentStatus> result = apolloTestClient.getCurrentServiceStatus(service1.getId());
 
