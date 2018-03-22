@@ -142,7 +142,10 @@ angular
                       ]
                     })
                   }
-                }
+                },
+        params: {
+            deploymentResult: null
+        }
     })
       .state('deployments.history',{
             templateUrl:'views/deployments/history.html',

@@ -3,6 +3,7 @@ package io.logz.apollo.helpers;
 import io.logz.apollo.models.DeploymentRole;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PasswordManager;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.User;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.clients.ApolloTestAdminClient;
@@ -176,14 +177,7 @@ public class ModelsGenerator {
         DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(testService);
         testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
 
-        // Give the user permissions to deploy
-        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, testEnvironment);
-
-        // Now we have enough to create a deployment
-        Deployment testDeployment = ModelsGenerator.createDeployment(testService, testEnvironment, testDeployableVersion);
-        testDeployment.setId(apolloTestClient.addDeployment(testDeployment).getId());
-
-        return testDeployment;
+        return createAndSubmitDeployment(apolloTestClient, testEnvironment, testService, testDeployableVersion);
     }
 
     public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
@@ -194,7 +188,14 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
-        testDeployment.setId(apolloTestClient.addDeployment(testDeployment).getId());
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
+
+        if (result.getSuccessful().size() > 0) {
+            Deployment deployment = result.getSuccessful().get(0).getDeployment();
+            testDeployment.setId(deployment.getId());
+        } else {
+            throw result.getUnsuccessful().get(0).getException();
+        }
 
         return testDeployment;
     }

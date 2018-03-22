@@ -29,6 +29,16 @@
         LIMIT 200
     </select>
 
+    <select id="getDeployableVersionForMultiServices" resultType="io.logz.apollo.models.DeployableVersion">
+        SELECT * FROM (
+            SELECT *, count(*) AS count FROM deployable_version
+            WHERE service_id IN (${serviceIdsCsv}) GROUP BY git_commit_sha
+        ) AS result
+        WHERE result.count = #{numOfServices}
+        ORDER BY result.commit_date DESC
+        LIMIT 200
+    </select>
+
     <insert id="addDeployableVersion" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO deployable_version (github_repository_url, git_commit_sha, service_id, commit_url, commit_message, commit_date, committer_avatar_url, committer_name)
         VALUES (#{githubRepositoryUrl}, #{gitCommitSha}, #{serviceId}, #{commitUrl}, #{commitMessage}, #{commitDate}, #{committerAvatarUrl}, #{committerName})

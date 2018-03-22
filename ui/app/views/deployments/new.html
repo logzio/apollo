@@ -19,6 +19,7 @@
                         <table class="table table-hover" datatable="ng" dt-options="dtOptions">
                             <thead>
                             <tr>
+                                <th ng-if="!isGroupDeployment"></th>
                                 <th>Name</th>
                                 <th>Region</th>
                                 <th>Availability</th>
@@ -26,10 +27,16 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="environment in allEnvironments | filter:globalSearch"
-                                ng-click="setSelectedEnvironment(environment)"
-                                ng-dblclick="nextStep()"
-                                ng-class="{'active':environment.id == environmentSelected.id}">
+                            <tr ng-repeat="environment in possibleEnvironments | filter:globalSearch"
+                                ng-click="toggleSelectedEnvironment(environment)"
+                                ng-dblclick="toggleSelectedEnvironment(environment); nextStep()"
+                                ng-class="{'active':selectedEnvironments.indexOf(environment) > -1}">
+                                <td ng-if="!isGroupDeployment">
+                                    <input type="checkbox"
+                                           name="selectedEnvironments[]"
+                                           value="{{environment}}"
+                                           ng-checked="selectedEnvironments.indexOf(environment) > -1">
+                                </td>
                                 <td>{{environment.name}}</td>
                                 <td>{{environment.geoRegion}}</td>
                                 <td>{{environment.availability}}</td>
@@ -54,15 +61,23 @@
                         <table class="table table-hover" datatable="ng" dt-options="dtOptions">
                             <thead>
                             <tr>
+                                <th></th>
                                 <th>Name</th>
                                 <th>YAMLs</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="service in allServices | filter:globalSearch"
-                                ng-click="setSelectedService(service)"
-                                ng-dblclick="nextStep()"
-                                ng-class="{'active':service.id == serviceSelected.id}">
+                            <tr ng-repeat="service in possibleServices | filter:globalSearch"
+                                ng-click="toggleSelectedService(service)"
+                                ng-dblclick="toggleSelectedService(service); nextStep()"
+                                ng-class="{'active':selectedServices.indexOf(service) > -1}">
+                                <td>
+                                    <input ng-if="!service.isPartOfGroup"
+                                           type="checkbox"
+                                           name="selectedServices[]"
+                                           value="{{service}}"
+                                           ng-checked="selectedServices.indexOf(service) > -1">
+                                </td>
                                 <td>{{service.name}}</td>
                                 <td>
                                     <button type="button" class="btn btn-primary" uib-tooltip="See kubernetes deployment YAML"
@@ -171,8 +186,8 @@
             <div class="well">
                 <h4>So just making sure</h4>
                 <p>You are going to deploy commit <b>{{versionSelected.gitCommitSha}}</b><br> </p>
-                <p>To service <b>{{serviceSelected.name}}</b><br></p>
-                <p>On environment <b>{{environmentSelected.name}}</b></p>
+                <p>To service <b>{{serviceNames}}</b><br></p>
+                <p>On environment <b>{{environmentNames}}</b></p>
                 <p ng-if="selectedGroups.length > 0">On groups <b>{{groupNames}}</b></p><br>
                 <button class="btn btn-default btn-lg center-block" data-toggle="modal" data-target="#confirm-modal">That is correct</button>
             </div>
@@ -298,6 +313,38 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div modal="blockedDeployments" class="modal" id="blocked-deployments" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Some of your deployments were blocked</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                        <thead>
+                            <tr>
+                                <th>Evvironment</th>
+                                <th>Service</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="blockedDeployment in blockedDeployments">
+                            <td>{{blockedDeployment.environment}}</td>
+                            <td>{{blockedDeployment.service}}</td>
+                            <td>{{blockedDeployment.reason}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-click="$('#blocked-deployments').modal('hide'); redirectToOngoing()" class="btn btn-default" data-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>
