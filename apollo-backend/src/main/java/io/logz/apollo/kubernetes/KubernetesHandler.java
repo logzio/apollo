@@ -74,6 +74,7 @@ public class KubernetesHandler {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
             io.fabric8.kubernetes.api.model.extensions.Deployment kubernetesDeployment = apolloToKubernetes.getKubernetesDeployment();
             io.fabric8.kubernetes.api.model.Service kubernetesService = apolloToKubernetes.getKubernetesService();
+            io.fabric8.kubernetes.api.model.extensions.Ingress kubernetesIngress = apolloToKubernetes.getKubernetesIngress();
 
             kubernetesClient
                     .extensions()
@@ -87,6 +88,14 @@ public class KubernetesHandler {
                         .services()
                         .inNamespace(environment.getKubernetesNamespace())
                         .createOrReplace(kubernetesService);
+            }
+            // Ingress are allowed to be null
+            if (kubernetesIngress != null) {
+                kubernetesClient
+                        .extensions()
+                        .ingresses()
+                        .inNamespace(environment.getKubernetesNamespace())
+                        .createOrReplace(kubernetesIngress);
             }
 
             logger.info("Started deployment id {}", deployment.getId());

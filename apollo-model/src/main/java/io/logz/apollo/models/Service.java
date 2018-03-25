@@ -9,6 +9,7 @@ public class Service {
     private String name;
     private String deploymentYaml;
     private String serviceYaml;
+    private String ingressYaml;
     private String defaultShell;
     private Boolean isPartOfGroup;
 
@@ -46,6 +47,15 @@ public class Service {
 
     public void setServiceYaml(String serviceYaml) {
         this.serviceYaml = serviceYaml;
+    }
+
+
+    public String getIngressYaml() {
+        return ingressYaml;
+    }
+
+    public void setIngressYaml(String ingressYaml) {
+        this.ingressYaml = ingressYaml;
     }
 
     public String getDefaultShell() {

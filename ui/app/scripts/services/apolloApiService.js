@@ -177,20 +177,22 @@ function ApiService($q, $http){
         });
     };
 
-    var createService = function(name, deploymentYaml, serviceYaml, isPartOfGroup) {
+    var createService = function(name, deploymentYaml, serviceYaml, ingressYaml, isPartOfGroup) {
         return $http.post(CONFIG.appUrl + "service/", {
             name: name,
             deploymentYaml: deploymentYaml,
             serviceYaml: serviceYaml,
+            ingressYaml: ingressYaml,
             isPartOfGroup: !!isPartOfGroup
         });
     };
 
-    var updateService = function(id, name, deploymentYaml, serviceYaml, isPartOfGroup) {
+    var updateService = function(id, name, deploymentYaml, serviceYaml, ingressYaml, isPartOfGroup) {
         return $http.put(CONFIG.appUrl + "service/" + id, {
             name: name,
             deploymentYaml: deploymentYaml,
             serviceYaml: serviceYaml,
+            ingressYaml: ingressYaml,
             isPartOfGroup: !!isPartOfGroup
         });
     };

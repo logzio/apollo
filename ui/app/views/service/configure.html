@@ -58,6 +58,10 @@
                             <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="selectedService.serviceYaml" name="serviceYaml"></ui-codemirror>
                         </div>
                         <div class="form-group">
+                            <label>Ingress YAML</label>
+                            <ui-codemirror ui-codemirror-opts="editorOptions" ng-model="selectedService.ingressYaml" name="incressYaml"></ui-codemirror>
+                        </div>
+                        <div class="form-group">
                             <label>Is part of group</label>
                             <input type="checkbox" ng-model="selectedService.isPartOfGroup" name="isPartOfGroup">
                         </div>

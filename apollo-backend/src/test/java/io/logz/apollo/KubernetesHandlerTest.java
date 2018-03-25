@@ -93,7 +93,7 @@ public class KubernetesHandlerTest {
         group.setEnvironmentId(finishedDeployment.getEnvironment().getId());
         groupDao.updateGroup(group);
         Service service = apolloTestClient.getService(group.getServiceId());
-        apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), true);
+        apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), service.getIngressYaml(), true);
 
         finishedDeploymentForEnvTest = new RealDeploymentGenerator("image", "key", "value", 0,
                 null, apolloTestClient.getService(group.getServiceId()), null, group.getName());

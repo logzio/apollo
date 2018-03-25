@@ -127,6 +127,20 @@ public class TransformersTest {
     }
 
     @Test
+    public void testIngressLabelsTransformer() throws ApolloParseException {
+
+        RealDeploymentGenerator realDeploymentGenerator;
+        ApolloToKubernetes apolloToKubernetes;
+
+        String sampleLabelFromTransformer = "environment";
+
+        realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
+        apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
+        assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
+        assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
+    }
+
+    @Test
     public void testDeploymentEnvironmentVariablesTransformer() throws ApolloParseException, IOException {
 
         RealDeploymentGenerator realDeploymentGenerator;
@@ -147,7 +161,7 @@ public class TransformersTest {
         ApolloToKubernetes apolloToKubernetes;
 
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
-        service = apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), true);
+        service = apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), service.getIngressYaml(), true);
 
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
 
@@ -191,6 +205,10 @@ public class TransformersTest {
 
     private void assertServiceLabelExists(io.fabric8.kubernetes.api.model.Service service, String labelKey, String labelValue) {
         assertThat(service.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
+    }
+
+    private void assertIngressLabelExists(io.fabric8.kubernetes.api.model.extensions.Ingress ingress, String labelKey, String labelValue) {
+        assertThat(ingress.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
     }
 
     private void assertDeploymentEnvironmentVariableExists(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String envName, String envValue) {
