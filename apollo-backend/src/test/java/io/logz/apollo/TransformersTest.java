@@ -90,7 +90,7 @@ public class TransformersTest {
         RealDeploymentGenerator realDeploymentGenerator;
         ApolloToKubernetes apolloToKubernetes;
 
-        String SampleLabelFromTransformer = "environment";
+        String sampleLabelFromTransformer = "environment";
 
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
@@ -100,12 +100,12 @@ public class TransformersTest {
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
         assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(),
-                SampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
+                sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
 
         // Check that the transformer does not override a given label with a default one
-        realDeploymentGenerator = new RealDeploymentGenerator("image", SampleLabelFromTransformer, "value", 0);
+        realDeploymentGenerator = new RealDeploymentGenerator("image", sampleLabelFromTransformer, "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), SampleLabelFromTransformer, "value");
+        assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), sampleLabelFromTransformer, "value");
     }
 
     @Test

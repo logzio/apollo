@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -224,6 +225,34 @@ public class KubernetesHandler {
             if (e.getCode() != HttpStatus.ACCEPTED) {
                 throw new ApolloKubernetesException();
             }
+        }
+    }
+
+    public void restartAllPods(Service service, Optional<String> groupName) throws ApolloKubernetesException, ApolloNotFoundException {
+        try {
+            io.fabric8.kubernetes.api.model.extensions.Deployment deployment = getKubernetesDeployment(service, groupName);
+
+            if (deployment == null) {
+                throw new ApolloNotFoundException("Deployment not found!");
+            }
+            // There's no option to force kubernetes deployment to restart all pods gradually, so we have to edit an innocuous field of the deployment
+            kubernetesClient
+                    .extensions()
+                    .deployments()
+                    .inNamespace(environment.getKubernetesNamespace())
+                    .withName(deployment.getMetadata().getName())
+                    .edit()
+                    .editSpec()
+                    .editTemplate()
+                    .editMetadata()
+                    .addToLabels("date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss")))
+                    .endMetadata()
+                    .endTemplate()
+                    .endSpec()
+                    .done();
+
+        } catch (KubernetesClientException e) {
+            throw new ApolloKubernetesException();
         }
     }
 

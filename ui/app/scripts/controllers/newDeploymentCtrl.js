@@ -133,9 +133,9 @@ angular.module('apollo')
                         $('body').removeClass('modal-open');
                         $('.modal-backdrop').remove();
 
-                        if (response.data.unsuccessful.length == 1) {
+                        if (response.data.unsuccessful.length >= 1) {
                             growl.error("Your deployment was blocked! " + response.data.unsuccessful[0].reason, {ttl: 7000});
-                        } else if (response.data.successful.length == 1) {
+                        } else if (response.data.successful.length >= 1) {
                             $scope.redirectToOngoing();
                         } else {
                             growl.error("An error occurred.", {ttl: 7000});
@@ -182,8 +182,6 @@ angular.module('apollo')
 
                         if (response.data.unsuccessful.length > 0) {
                             $scope.blockedDeployments = [];
-
-                            console.log(response.data.unsuccessful);
 
                             angular.forEach(response.data.unsuccessful, function(unsuccessfulDeployment) {
                                 $scope.blockedDeployments.push({

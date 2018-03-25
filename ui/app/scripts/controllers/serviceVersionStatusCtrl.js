@@ -124,6 +124,21 @@ angular.module('apollo')
                 });
             };
 
+            $scope.restartAllPods = function (environmentId, serviceId, groupName) {
+
+                console.log("serviceID: " + serviceId + ", envID: " + environmentId + ", group name: " + groupName);
+
+                usSpinnerService.spin('result-spinner');
+
+                apolloApiService.restartAllPods(environmentId, serviceId, groupName).then(function (response) {
+                    usSpinnerService.stop('result-spinner');
+                    growl.success("Successfully restarted all pods!");
+                }, function (error) {
+                    usSpinnerService.stop('result-spinner');
+                    growl.error("Could not restart the pods! got: " + error.statusText);
+                });
+            };
+
             $scope.refreshStatus = function () {
                 if ($scope.showingBy === "service") {
                     $scope.showByService($scope.showingByValue);
