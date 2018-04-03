@@ -224,7 +224,7 @@ angular.module('apollo')
 
         $scope.closeBlockerModal = function() {
             $('#blocked-deployments').modal('hide');
-            $scope.redirectToOngoing(); 
+            $scope.redirectToOngoing();
         }
 
         $scope.redirectToOngoing = function() {
