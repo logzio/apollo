@@ -222,6 +222,11 @@ angular.module('apollo')
             return $scope.possibleEnvironments.filter(function(a){return a.id == id})[0].name;
         }
 
+        $scope.closeBlockerModal = function() {
+            $('#blocked-deployments').modal('hide');
+            $scope.redirectToOngoing();
+        }
+
         $scope.redirectToOngoing = function() {
             $state.go('deployments.ongoing', {deploymentResult: $scope.successfulDeployments});
         }
