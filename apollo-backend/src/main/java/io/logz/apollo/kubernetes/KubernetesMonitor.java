@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -110,7 +111,17 @@ public class KubernetesMonitor {
                         returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
                         break;
                     default:
-                        returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
+                        if (deployment.getGroupName() == null) {
+                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.empty());
+                        } else {
+                            Group group = groupDao.getGroupByName(deployment.getGroupName());
+                            if (group == null) {
+                                logger.warn("Deployment {} is deployed on non-existing group {}! Trying to monitor...", deployment.getId(), deployment.getGroupName());
+                                returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.empty());
+                            } else {
+                                returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.of(group.getScalingFactor()));
+                            }
+                        }
                         break;
                 }
 
