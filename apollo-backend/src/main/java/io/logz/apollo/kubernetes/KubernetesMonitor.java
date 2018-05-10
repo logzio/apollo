@@ -112,12 +112,12 @@ public class KubernetesMonitor {
                         break;
                     default:
                         if (deployment.getGroupName() == null) {
-                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.empty());
+                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
                         } else {
                             Group group = groupDao.getGroupByName(deployment.getGroupName());
                             if (group == null) {
                                 logger.warn("Deployment {} is deployed on non-existing group {}! Trying to monitor...", deployment.getId(), deployment.getGroupName());
-                                returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.empty());
+                                returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
                             } else {
                                 returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.of(group.getScalingFactor()));
                             }

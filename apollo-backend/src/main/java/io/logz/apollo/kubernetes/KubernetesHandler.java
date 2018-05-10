@@ -128,6 +128,10 @@ public class KubernetesHandler {
         }
     }
 
+    Deployment monitorDeployment(Deployment deployment) {
+        return monitorDeployment(deployment, Optional.empty());
+    }
+
     Deployment monitorDeployment(Deployment deployment, Optional<Integer> scalingFactor) {
 
         try {
