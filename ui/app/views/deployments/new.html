@@ -27,15 +27,17 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="environment in possibleEnvironments | filter:globalSearch"
+                            <tr ng-repeat="environment in possibleEnvironments | orderBy:environmentsOrderBy | filter:globalSearch"
                                 ng-click="toggleSelectedEnvironment(environment)"
                                 ng-dblclick="toggleSelectedEnvironment(environment); nextStep()"
-                                ng-class="{'active':selectedEnvironments.indexOf(environment) > -1}">
+                                ng-class="{'active':selectedEnvironments.indexOf(environment) > -1, 'marked-as-favorite': favoriteEnvironmentsNames.indexOf(environment.name) > -1}">
                                 <td ng-if="!isGroupDeployment">
                                     <input type="checkbox"
                                            name="selectedEnvironments[]"
                                            value="{{environment}}"
                                            ng-checked="selectedEnvironments.indexOf(environment) > -1">
+
+                                    <i class="mark-as-favorite-container fa" ng-click="toggleMarkEnvironmentAsFavorite(environment.name, $event)" ng-class="favoriteEnvironmentsNames.indexOf(environment.name) > -1 ? 'fa-star' : 'fa-star-o'"></i>
                                 </td>
                                 <td>{{environment.name}}</td>
                                 <td>{{environment.geoRegion}}</td>
@@ -67,16 +69,18 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="service in possibleServices | filter:globalSearch"
+                            <tr ng-repeat="service in possibleServices | orderBy:servicesOrderBy | filter:globalSearch"
                                 ng-click="toggleSelectedService(service)"
                                 ng-dblclick="toggleSelectedService(service); nextStep()"
-                                ng-class="{'active':selectedServices.indexOf(service) > -1}">
+                                ng-class="{'active':selectedServices.indexOf(service) > -1, 'marked-as-favorite': favoriteServicesNames.indexOf(service.name) > -1}">
                                 <td>
                                     <input ng-if="!service.isPartOfGroup"
                                            type="checkbox"
                                            name="selectedServices[]"
                                            value="{{service}}"
                                            ng-checked="selectedServices.indexOf(service) > -1">
+
+                                    <i class="mark-as-favorite-container fa" ng-click="toggleMarkServiceAsFavorite(service.name, $event)" ng-class="favoriteServicesNames.indexOf(service.name) > -1 ? 'fa-star' : 'fa-star-o'"></i>
                                 </td>
                                 <td>{{service.name}}</td>
                                 <td>

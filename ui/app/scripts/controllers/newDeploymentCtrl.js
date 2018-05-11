@@ -6,7 +6,15 @@ angular.module('apollo')
             function (apolloApiService, $scope, $timeout, $state, growl, usSpinnerService, DTColumnDefBuilder, localStorageService, hotkeys) {
 
 
+        var favoriteEnvironmentsLocalStorageKey = 'favorite-environments-names';
+        $scope.favoriteEnvironmentsNames = localStorageService.get(favoriteEnvironmentsLocalStorageKey) || [];
+
         var previouseEnvironmentLocalStorageKey = 'previous-run-environment-id';
+
+
+        var favoriteServicesLocalStorageKey = 'favorite-services-names';
+        $scope.favoriteServicesNames = localStorageService.get(favoriteServicesLocalStorageKey) || [];
+
         var previouseServiceLocalStorageKey = 'previous-run-service-id';
 
         // Kinda ugly custom sorting for datatables
@@ -303,6 +311,33 @@ angular.module('apollo')
             updateServicesNames();
         };
 
+       $scope.toggleMarkServiceAsFavorite = function(serviceName, event) {
+           var indexOfService = $scope.favoriteServicesNames.indexOf(serviceName);
+           if (indexOfService > -1) {
+               $scope.favoriteServicesNames.splice(indexOfService, 1);
+           } else {
+               $scope.favoriteServicesNames.push(serviceName);
+           }
+
+           event.stopPropagation(); // To make sure the <tr> ng-click="toggleSelectedService(service)" wont take effect
+
+           localStorageService.set(favoriteServicesLocalStorageKey, $scope.favoriteServicesNames);
+       };
+
+
+        $scope.toggleMarkEnvironmentAsFavorite = function(environmentName, event) {
+            var indexOfEnvironment = $scope.favoriteEnvironmentsNames.indexOf(environmentName);
+            if (indexOfEnvironment > -1) {
+                $scope.favoriteEnvironmentsNames.splice(indexOfEnvironment, 1);
+            } else {
+                $scope.favoriteEnvironmentsNames.push(environmentName);
+            }
+
+            event.stopPropagation(); // To make sure the <tr> ng-click="toggleSelectedEnvironment(service)" wont take effect
+
+            localStorageService.set(favoriteEnvironmentsLocalStorageKey, $scope.favoriteEnvironmentsNames);
+        };
+
         $scope.selectAllGroups = function() {
             $scope.selectedGroups = [];
             angular.forEach($scope.possibleGroups, function(group) {
@@ -402,6 +437,20 @@ angular.module('apollo')
                 $scope.selectedServices = $scope.possibleServices.filter(function(a){return previousServiceIds.indexOf(a.id) > -1})
             }
         });
+
+		$scope.servicesOrderBy = function(service) {
+            const isntFavorite = $scope.favoriteServicesNames.indexOf(service.name) === -1;
+
+            // ~~false === 0, ~~true === 1, this is a trick to make sure favorite services will be sorted first
+            return [ ~~isntFavorite, service.name ].join('');
+        };
+
+		$scope.environmentsOrderBy = function(environment) {
+            const isntFavorite = $scope.favoriteEnvironmentsNames.indexOf(environment.name) === -1;
+
+            // ~~false === 0, ~~true === 1, this is a trick to make sure favorite environments will be sorted first
+            return [ ~~isntFavorite, environment.name ].join('');
+        };
 
 		function loadDeployableVersions(serviceIdsCsv) {
             apolloApiService.getDeployableVersionForMultiServices(serviceIdsCsv).then(function(response) {
