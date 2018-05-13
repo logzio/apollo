@@ -7,6 +7,7 @@ import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.deployment.DeploymentEnvStatusManager;
+import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.excpetions.ApolloNotFoundException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
@@ -111,16 +112,12 @@ public class KubernetesMonitor {
                         returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
                         break;
                     default:
-                        if (deployment.getGroupName() == null) {
-                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
+                        if (deployment.getGroupName() != null
+                                && groupDao.getGroupByName(deployment.getGroupName()) != null
+                                && groupDao.getGroupByName(deployment.getGroupName()).getScalingFactor() == 0) {
+                            returnedDeployment = kubernetesHandler.monitorNoReplicasDeployment(deployment);
                         } else {
-                            Group group = groupDao.getGroupByName(deployment.getGroupName());
-                            if (group == null) {
-                                logger.warn("Deployment {} is deployed on non-existing group {}! Trying to monitor...", deployment.getId(), deployment.getGroupName());
-                                returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
-                            } else {
-                                returnedDeployment = kubernetesHandler.monitorDeployment(deployment, Optional.of(group.getScalingFactor()));
-                            }
+                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
                         }
                         break;
                 }

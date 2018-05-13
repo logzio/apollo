@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -129,38 +128,21 @@ public class KubernetesHandler {
     }
 
     Deployment monitorDeployment(Deployment deployment) {
-        return monitorDeployment(deployment, Optional.empty());
-    }
-
-    Deployment monitorDeployment(Deployment deployment, Optional<Integer> scalingFactor) {
-
         try {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
-            Optional<io.fabric8.kubernetes.api.model.extensions.Deployment> returnedDeployment = kubernetesClient
-                    .extensions()
-                    .deployments()
-                    .inNamespace(environment.getKubernetesNamespace())
-                    .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
-                    .list()
-                    .getItems()
-                    .stream()
-                    .findFirst();
+            Optional<io.fabric8.kubernetes.api.model.extensions.Deployment> returnedDeployment = getKubernetesDeployment(apolloToKubernetes);
 
             if (returnedDeployment.isPresent()) {
                 io.fabric8.kubernetes.api.model.extensions.DeploymentStatus deploymentStatus = returnedDeployment.get().getStatus();
 
-                if (scalingFactor.isPresent() && scalingFactor.get().equals(0)) {
-                    logger.info("Monitoring of deployment id {}: No replicas required", deployment.getId());
-                    updateDeploymentStatus(deployment);
-                } else {
-                    int updatedReplicas = deploymentStatus.getUpdatedReplicas();
-                    int totalReplicas = deploymentStatus.getReplicas();
+                int updatedReplicas = deploymentStatus.getUpdatedReplicas();
+                int totalReplicas = deploymentStatus.getReplicas();
 
-                    logger.info("Monitoring of deployment id {}: out of {} replicas, {} are updated", deployment.getId(), totalReplicas, updatedReplicas);
-                    if (updatedReplicas == totalReplicas) {
-                        updateDeploymentStatus(deployment);
-                    }
+                logger.info("Monitoring of deployment id {}: out of {} replicas, {} are updated", deployment.getId(), totalReplicas, updatedReplicas);
+                if (updatedReplicas == totalReplicas) {
+                    updateDeploymentStatus(deployment);
                 }
+
             } else {
                 logger.warn("Found no deployments in kubernetes matching apollo_unique_identifier={}", apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue());
             }
@@ -171,6 +153,38 @@ public class KubernetesHandler {
             logger.error("Got exception while monitoring deployment {}. Leaving it in its original state", deployment.getId(), e);
             return deployment;
         }
+    }
+
+    Deployment monitorNoReplicasDeployment(Deployment deployment) {
+        try {
+            ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
+            Optional<io.fabric8.kubernetes.api.model.extensions.Deployment> returnedDeployment = getKubernetesDeployment(apolloToKubernetes);
+
+            if (returnedDeployment.isPresent()) {
+                logger.info("Monitoring of deployment id {}: No replicas required", deployment.getId());
+                updateDeploymentStatus(deployment);
+            } else {
+                logger.warn("Found no deployments in kubernetes matching apollo_unique_identifier={}", apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue());
+            }
+
+            return deployment;
+
+        } catch (Exception e) {
+            logger.error("Got exception while monitoring deployment {}. Leaving it in its original state", deployment.getId(), e);
+            return deployment;
+        }
+    }
+
+    private Optional<io.fabric8.kubernetes.api.model.extensions.Deployment> getKubernetesDeployment(ApolloToKubernetes apolloToKubernetes) {
+        return kubernetesClient
+                .extensions()
+                .deployments()
+                .inNamespace(environment.getKubernetesNamespace())
+                .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
+                .list()
+                .getItems()
+                .stream()
+                .findFirst();
     }
 
     private void updateDeploymentStatus(Deployment deployment) {
@@ -330,9 +344,9 @@ public class KubernetesHandler {
 
             return Optional.of(
                     ((DefaultKubernetesClient) kubernetesClient)
-                    .getHttpClient()
-                    .newCall(request)
-                    .execute());
+                            .getHttpClient()
+                            .newCall(request)
+                            .execute());
         } catch (IOException e) {
             logger.warn("Got IOException while proxy the request to jolokia!", e);
             return Optional.empty();

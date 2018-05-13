@@ -37,7 +37,6 @@ import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitGroup;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,7 +55,7 @@ public class KubernetesHandlerTest {
     private static RealDeploymentGenerator notFinishedCanceledDeployment;
     private static RealDeploymentGenerator finishedCanceledDeployment;
     private static RealDeploymentGenerator statusDeployment;
-    private static RealDeploymentGenerator groupWithScalingFactor0Deployment;
+    private static RealDeploymentGenerator groupWithScalingFactorZeroDeployment;
     private static PodStatus podStatus;
 
     private static DeploymentDao deploymentDao;
@@ -89,13 +88,13 @@ public class KubernetesHandlerTest {
         finishedCanceledDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
         statusDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
 
-        // group with scaling factor 0
-        Group groupWithScalingFactor0 = createAndSubmitGroup(apolloTestClient);
-        groupWithScalingFactor0.setScalingFactor(0);
-        groupWithScalingFactor0Deployment = new RealDeploymentGenerator("image", "key", "value", 0,
-                null, apolloTestClient.getService(groupWithScalingFactor0.getServiceId()),null, groupWithScalingFactor0.getName());
-        groupWithScalingFactor0.setEnvironmentId(groupWithScalingFactor0Deployment.getEnvironment().getId());
-        groupDao.updateGroup(groupWithScalingFactor0);
+        // group with scaling factor zero
+        Group groupWithScalingFactorZero = createAndSubmitGroup(apolloTestClient);
+        groupWithScalingFactorZero.setScalingFactor(0);
+        groupWithScalingFactorZeroDeployment = new RealDeploymentGenerator("image", "key", "value", 0,
+                null, apolloTestClient.getService(groupWithScalingFactorZero.getServiceId()),null, groupWithScalingFactorZero.getName());
+        groupWithScalingFactorZero.setEnvironmentId(groupWithScalingFactorZeroDeployment.getEnvironment().getId());
+        groupDao.updateGroup(groupWithScalingFactorZero);
 
         // Prepare env for env_test
         group = createAndSubmitGroup(apolloTestClient, finishedDeployment.getEnvironment().getId());
@@ -113,7 +112,7 @@ public class KubernetesHandlerTest {
         setMockDeploymentStatus(notFinishedCanceledDeployment, false, apolloToKubernetesStore.getOrCreateApolloToKubernetes(notFinishedCanceledDeployment.getDeployment()));
         setMockDeploymentStatus(finishedCanceledDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(finishedCanceledDeployment.getDeployment()));
         setMockDeploymentStatus(statusDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(statusDeployment.getDeployment()));
-        setMockDeploymentStatus(groupWithScalingFactor0Deployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(groupWithScalingFactor0Deployment.getDeployment()));
+        setMockDeploymentStatus(groupWithScalingFactorZeroDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(groupWithScalingFactorZeroDeployment.getDeployment()));
         setMockDeploymentStatus(finishedDeploymentForEnvTest, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(finishedDeploymentForEnvTest.getDeployment()));
 
         // Setting a mock pod status
@@ -132,7 +131,7 @@ public class KubernetesHandlerTest {
         setMockPodLogsAndStatus(notFinishedCanceledDeployment, LOG_MESSAGE_IN_POD, podStatus, apolloToKubernetesStore.getOrCreateApolloToKubernetes(notFinishedCanceledDeployment.getDeployment()));
         setMockPodLogsAndStatus(finishedCanceledDeployment, LOG_MESSAGE_IN_POD, podStatus, apolloToKubernetesStore.getOrCreateApolloToKubernetes(finishedCanceledDeployment.getDeployment()));
         setMockPodLogsAndStatus(statusDeployment, LOG_MESSAGE_IN_POD, podStatus, apolloToKubernetesStore.getOrCreateApolloToKubernetes(statusDeployment.getDeployment()));
-        setMockPodLogsAndStatus(groupWithScalingFactor0Deployment, LOG_MESSAGE_IN_POD, podStatus, apolloToKubernetesStore.getOrCreateApolloToKubernetes(groupWithScalingFactor0Deployment.getDeployment()));
+        setMockPodLogsAndStatus(groupWithScalingFactorZeroDeployment, LOG_MESSAGE_IN_POD, podStatus, apolloToKubernetesStore.getOrCreateApolloToKubernetes(groupWithScalingFactorZeroDeployment.getDeployment()));
         setMockPodLogsAndStatus(finishedDeploymentForEnvTest, LOG_MESSAGE_IN_POD, podStatus, apolloToKubernetesStore.getOrCreateApolloToKubernetes(finishedDeploymentForEnvTest.getDeployment()));
 
         // Prepare deployment for env_test
@@ -149,7 +148,7 @@ public class KubernetesHandlerTest {
         kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(notFinishedCanceledDeployment.getEnvironment(), kubernetesClient);
         kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedCanceledDeployment.getEnvironment(), kubernetesClient);
         kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(statusDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(groupWithScalingFactor0Deployment.getEnvironment(), kubernetesClient);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(groupWithScalingFactorZeroDeployment.getEnvironment(), kubernetesClient);
         kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedDeploymentForEnvTest.getEnvironment(), kubernetesClient);
 
         // Since the mock library does not support "createOrReplace" we can't mock this phase (and its fine to neglect it since its fabric8 code)
@@ -158,7 +157,7 @@ public class KubernetesHandlerTest {
         notFinishedCanceledDeployment.updateDeploymentStatus(Deployment.DeploymentStatus.CANCELING);
         finishedCanceledDeployment.updateDeploymentStatus(Deployment.DeploymentStatus.CANCELING);
         statusDeployment.updateDeploymentStatus(Deployment.DeploymentStatus.DONE);
-        groupWithScalingFactor0Deployment.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
+        groupWithScalingFactorZeroDeployment.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
         finishedDeploymentForEnvTest.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
 
         // TODO: This can cause test concurrency issues in case we will want to run this in parallel. In the current singleton nature of those tests, no other way unfortunately
@@ -174,13 +173,13 @@ public class KubernetesHandlerTest {
         Deployment currentFinishedDeployment = deploymentDao.getDeployment(finishedDeployment.getDeployment().getId());
         Deployment currentNotFinishedCanceledDeployment = deploymentDao.getDeployment(notFinishedCanceledDeployment.getDeployment().getId());
         Deployment currentFinishedCanceledDeployment = deploymentDao.getDeployment(finishedCanceledDeployment.getDeployment().getId());
-        Deployment currentGroupWithScalingFactor0Deploymentt = deploymentDao.getDeployment(groupWithScalingFactor0Deployment.getDeployment().getId());
+        Deployment currentGroupWithScalingFactorZeroDeployment = deploymentDao.getDeployment(groupWithScalingFactorZeroDeployment.getDeployment().getId());
 
         assertThat(currentNotFinishedDeployment.getStatus()).isEqualTo(Deployment.DeploymentStatus.STARTED);
         assertThat(currentFinishedDeployment.getStatus()).isEqualTo(Deployment.DeploymentStatus.DONE);
         assertThat(currentNotFinishedCanceledDeployment.getStatus()).isEqualTo(Deployment.DeploymentStatus.CANCELING);
         assertThat(currentFinishedCanceledDeployment.getStatus()).isEqualTo(Deployment.DeploymentStatus.CANCELED);
-        assertThat(currentGroupWithScalingFactor0Deploymentt.getStatus()).isEqualTo(Deployment.DeploymentStatus.DONE);
+        assertThat(currentGroupWithScalingFactorZeroDeployment.getStatus()).isEqualTo(Deployment.DeploymentStatus.DONE);
 
         // Test envStatus
         String envStatusFromObject = currentFinishedDeployment.getEnvStatus();
