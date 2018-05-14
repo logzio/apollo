@@ -113,7 +113,6 @@ public class KubernetesMonitor {
                         break;
                     default:
                         if (deployment.getGroupName() != null
-                                && groupDao.getGroupByName(deployment.getGroupName()) != null
                                 && groupDao.getGroupByName(deployment.getGroupName()).getScalingFactor() == 0) {
                             returnedDeployment = kubernetesHandler.monitorNoReplicasDeployment(deployment);
                         } else {
