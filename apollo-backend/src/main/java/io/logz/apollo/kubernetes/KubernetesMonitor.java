@@ -7,6 +7,7 @@ import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.deployment.DeploymentEnvStatusManager;
+import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.excpetions.ApolloNotFoundException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
@@ -18,6 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -110,7 +112,12 @@ public class KubernetesMonitor {
                         returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
                         break;
                     default:
-                        returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
+                        if (deployment.getGroupName() != null
+                                && groupDao.getGroupByName(deployment.getGroupName()).getScalingFactor() == 0) {
+                            returnedDeployment = kubernetesHandler.monitorNoReplicasDeployment(deployment);
+                        } else {
+                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
+                        }
                         break;
                 }
 
