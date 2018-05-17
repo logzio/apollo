@@ -70,7 +70,7 @@ public class DeployableVersionController {
     @GET("/deployable-version/multi-service/{serviceIdsCsv}")
     public List<DeployableVersion> getDeployableVersionForMultiServices(String serviceIdsCsv) {
         Iterable<String> serviceIds = Splitter.on(",").omitEmptyStrings().trimResults().split(serviceIdsCsv);
-        return deployableVersionDao.getDeployableVersionForMultiServices(Joiner.on("").join(serviceIds),  Iterables.size(serviceIds));
+        return deployableVersionDao.getDeployableVersionForMultiServices(Joiner.on(",").join(serviceIds),  Iterables.size(serviceIds));
     }
 
     @LoggedIn
