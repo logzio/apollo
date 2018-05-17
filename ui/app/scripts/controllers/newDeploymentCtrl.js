@@ -438,20 +438,6 @@ angular.module('apollo')
             }
         });
 
-		$scope.servicesOrderBy = function(service) {
-            const isntFavorite = $scope.favoriteServicesNames.indexOf(service.name) === -1;
-
-            // ~~false === 0, ~~true === 1, this is a trick to make sure favorite services will be sorted first
-            return [ ~~isntFavorite, service.name ].join('');
-        };
-
-		$scope.environmentsOrderBy = function(environment) {
-            const isntFavorite = $scope.favoriteEnvironmentsNames.indexOf(environment.name) === -1;
-
-            // ~~false === 0, ~~true === 1, this is a trick to make sure favorite environments will be sorted first
-            return [ ~~isntFavorite, environment.name ].join('');
-        };
-
 		function loadDeployableVersions(serviceIdsCsv) {
             apolloApiService.getDeployableVersionForMultiServices(serviceIdsCsv).then(function(response) {
                 $scope.allDeployableVersions = response.data;
