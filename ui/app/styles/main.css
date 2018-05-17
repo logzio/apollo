@@ -249,24 +249,23 @@ code {
     background: #f4f4f4;
 }
 
-table.table.table-hover tbody tr .marked-as-favorite {
-    background-color: #fff5e8;
+table.table.table-hover tbody tr.marked-as-favorite {
+    background-color: #fff5e5;
 }
 
-table.table.table-hover tbody tr .marked-as-favorite:hover {
-    background-color: #efe6d9;
+table.table.table-hover tbody tr.marked-as-favorite:hover {
+    background-color: #eee5d6;
 }
 
 table.table.table-hover tbody tr td .mark-as-favorite-container {
-    margin-left: 5px;
     color: #f58c02;
     cursor: pointer;
 }
 
 table.table.table-hover tbody tr td .mark-as-favorite-container:hover {
-    color: #d47802;
+    color: #e28102;
 }
 
 table.table.table-hover tbody tr td .mark-as-favorite-container:active {
-    color: #ad6202;
+    color: #ca7302;
 }

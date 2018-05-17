@@ -378,7 +378,7 @@ angular.module('apollo')
             paginationType: 'simple_numbers',
             displayLength: 20,
             dom: '<"row"<"col-sm-6"i><"col-sm-6"f>>rt<"bottom"p>',
-            order: [[ 0, "asc" ]]
+            order: [[ 0, "desc" ], [ 2, "asc" ]] // Mark as favorite and name
         };
 
         $scope.dtOptionsDeployableVersion = {
