@@ -105,7 +105,7 @@ public class KubernetesHandlerTest {
         setMockDeploymentStatus(notFinishedCanceledDeployment, false, apolloToKubernetesStore.getOrCreateApolloToKubernetes(notFinishedCanceledDeployment.getDeployment()));
         setMockDeploymentStatus(finishedCanceledDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(finishedCanceledDeployment.getDeployment()));
         setMockDeploymentStatus(statusDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(statusDeployment.getDeployment()));
-        setMockDeploymentStatus(groupWithScalingFactorZeroDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(groupWithScalingFactorZeroDeployment.getDeployment()), 0);
+        setMockDeploymentStatus(groupWithScalingFactorZeroDeployment, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(groupWithScalingFactorZeroDeployment.getDeployment()), null);
         setMockDeploymentStatus(finishedDeploymentForEnvTest, true, apolloToKubernetesStore.getOrCreateApolloToKubernetes(finishedDeploymentForEnvTest.getDeployment()));
 
         // Setting a mock pod status
@@ -264,7 +264,7 @@ public class KubernetesHandlerTest {
         setMockDeploymentStatus(realDeploymentGenerator, finished, apolloToKubernetes, 1);
     }
 
-    private static void setMockDeploymentStatus(RealDeploymentGenerator realDeploymentGenerator, boolean finished, ApolloToKubernetes apolloToKubernetes, int totalReplicas) {
+    private static void setMockDeploymentStatus(RealDeploymentGenerator realDeploymentGenerator, boolean finished, ApolloToKubernetes apolloToKubernetes, Integer totalReplicas) {
 
         DeploymentStatus deploymentStatus;
         if (finished) {
