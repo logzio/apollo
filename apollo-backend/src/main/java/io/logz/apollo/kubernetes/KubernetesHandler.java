@@ -145,9 +145,9 @@ public class KubernetesHandler {
             if (returnedDeployment.isPresent()) {
                 io.fabric8.kubernetes.api.model.extensions.DeploymentStatus deploymentStatus = returnedDeployment.get().getStatus();
 
-                int totalReplicas = deploymentStatus.getReplicas();
+                Integer totalReplicas = deploymentStatus.getReplicas();
 
-                if (totalReplicas == 0) {
+                if (totalReplicas == null || totalReplicas == 0) {
                     logger.info("Monitoring of deployment id {}: No replicas required.", deployment.getId());
                     updateDeploymentStatus(deployment);
                 } else {
