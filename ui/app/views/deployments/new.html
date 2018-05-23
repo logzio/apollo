@@ -19,7 +19,8 @@
                         <table class="table table-hover" datatable="ng" dt-options="dtOptions">
                             <thead>
                             <tr>
-                                <th ng-if="!isGroupDeployment"></th>
+                                <th style="width: 20px"></th>
+                                <th style="width: 20px"></th>
                                 <th>Name</th>
                                 <th>Region</th>
                                 <th>Availability</th>
@@ -30,11 +31,17 @@
                             <tr ng-repeat="environment in possibleEnvironments | filter:globalSearch"
                                 ng-click="toggleSelectedEnvironment(environment)"
                                 ng-dblclick="toggleSelectedEnvironment(environment); nextStep()"
-                                ng-class="{'active':selectedEnvironments.indexOf(environment) > -1}">
-                                <td ng-if="!isGroupDeployment">
+                                ng-class="{ 'active':selectedEnvironments.indexOf(environment) > -1, 'marked-as-favorite': favoriteEnvironmentsNames.indexOf(environment.name) > -1 }">
+                                <td>
+                                    <!--ng-if instead of ng-class for data table order by-->
+                                    <i class="mark-as-favorite-container fa fa-star" ng-if="favoriteEnvironmentsNames.indexOf(environment.name) > -1" ng-click="toggleMarkEnvironmentAsFavorite(environment.name, $event)"></i>
+                                    <i class="mark-as-favorite-container fa fa-star-o" ng-if="favoriteEnvironmentsNames.indexOf(environment.name) === -1" ng-click="toggleMarkEnvironmentAsFavorite(environment.name, $event)"></i>
+                                </td>
+                                <td>
                                     <input type="checkbox"
                                            name="selectedEnvironments[]"
                                            value="{{environment}}"
+                                           ng-if="!isGroupDeployment"
                                            ng-checked="selectedEnvironments.indexOf(environment) > -1">
                                 </td>
                                 <td>{{environment.name}}</td>
@@ -61,7 +68,8 @@
                         <table class="table table-hover" datatable="ng" dt-options="dtOptions">
                             <thead>
                             <tr>
-                                <th></th>
+                                <th style="width: 20px"></th>
+                                <th style="width: 20px"></th>
                                 <th>Name</th>
                                 <th>YAMLs</th>
                             </tr>
@@ -70,7 +78,12 @@
                             <tr ng-repeat="service in possibleServices | filter:globalSearch"
                                 ng-click="toggleSelectedService(service)"
                                 ng-dblclick="toggleSelectedService(service); nextStep()"
-                                ng-class="{'active':selectedServices.indexOf(service) > -1}">
+                                ng-class="{ 'active':selectedServices.indexOf(service) > -1, 'marked-as-favorite': favoriteServicesNames.indexOf(service.name) > -1 }">
+                                <td>
+                                    <!--ng-if instead of ng-class for data table order by-->
+                                    <i class="mark-as-favorite-container fa fa-star" ng-if="favoriteServicesNames.indexOf(service.name) > -1" ng-click="toggleMarkServiceAsFavorite(service.name, $event)"></i>
+                                    <i class="mark-as-favorite-container fa fa-star-o" ng-if="favoriteServicesNames.indexOf(service.name) === -1" ng-click="toggleMarkServiceAsFavorite(service.name, $event)"></i>
+                                </td>
                                 <td>
                                     <input ng-if="!service.isPartOfGroup"
                                            type="checkbox"
@@ -329,7 +342,7 @@
                     <table class="table table-hover" datatable="ng" dt-options="dtOptions">
                         <thead>
                             <tr>
-                                <th>Evvironment</th>
+                                <th>Environment</th>
                                 <th>Service</th>
                                 <th>Reason</th>
                             </tr>
