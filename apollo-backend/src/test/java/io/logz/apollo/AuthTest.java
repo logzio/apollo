@@ -99,7 +99,7 @@ public class AuthTest {
         apolloTestAdminClient.updateUser(testUser);
 
         // Check that user is forbidden even without logging in
-        assertThatThrownBy(apolloTestClient::getAllUsers).isInstanceOf(ApolloNotAuthorizedException.class);
+        assertThatThrownBy(apolloTestClient::getAllServices).isInstanceOf(ApolloNotAuthorizedException.class);
 
         // Check that user cant log in
         assertThatThrownBy(apolloTestClient::login).isInstanceOf(ApolloCouldNotLoginException.class);
