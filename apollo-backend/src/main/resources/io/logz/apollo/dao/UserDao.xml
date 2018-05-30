@@ -12,13 +12,13 @@
     </select>
 
     <select id="getAllUsers" resultType="io.logz.apollo.models.User">
-        SELECT first_name, last_name, user_email, is_admin
+        SELECT first_name, last_name, user_email, is_admin, is_enabled
         FROM users
     </select>
 
     <insert id="addUser">
         INSERT INTO users
-        VALUES (#{userEmail}, #{firstName}, #{lastName}, #{hashedPassword}, #{isAdmin})
+        VALUES (#{userEmail}, #{firstName}, #{lastName}, #{hashedPassword}, #{isAdmin}, #{isEnabled})
     </insert>
 
     <insert id="updateUser">
@@ -27,7 +27,8 @@
         first_name=#{firstName},
         last_name=#{lastName},
         hashed_password=#{hashedPassword},
-        is_admin=#{isAdmin}
+        is_admin=#{isAdmin},
+        is_enabled=#{isEnabled}
         WHERE user_email=#{userEmail}
     </insert>
 </mapper>

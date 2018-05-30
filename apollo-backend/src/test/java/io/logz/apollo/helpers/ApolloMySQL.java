@@ -20,7 +20,7 @@ public class ApolloMySQL {
 
         // Create mysql instance
         logger.info("Starting MySQL container");
-        mysql = new MySQLContainer("mysql:5.7.18");
+        mysql = new MySQLContainer("mysql:5.7.22");
         mysql.start();
     }
 

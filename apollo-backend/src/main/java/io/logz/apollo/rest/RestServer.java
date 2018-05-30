@@ -73,6 +73,11 @@ public class RestServer {
                 return false;
             }
 
+            if (!requestedUser.isEnabled()) {
+                req.response().code(HttpStatus.FORBIDDEN);
+                return false;
+            }
+
             if (PasswordManager.checkPassword(password, requestedUser.getHashedPassword())) {
                 return true;
             } else {
@@ -85,7 +90,12 @@ public class RestServer {
     private void registerRolesProvider() {
         My.rolesProvider((req, username) -> {
             try {
-                if (userDao.getUser(username).isAdmin()) {
+                User user = userDao.getUser(username);
+                if (!user.isEnabled()) {
+                    req.response().code(HttpStatus.FORBIDDEN);
+                    return null;
+                }
+                if (user.isAdmin()) {
                     return U.set(Role.ADMINISTRATOR);
                 }
                 return U.set(Role.ANYBODY);
@@ -96,5 +106,4 @@ public class RestServer {
             }
         });
     }
-
 }
