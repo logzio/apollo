@@ -2,8 +2,8 @@
 
 angular.module('apollo')
   .controller('deploymentHistoryCtrl', ['apolloApiService', '$scope',
-                                    '$timeout' , '$state', 'growl', 'usSpinnerService', 'DTColumnDefBuilder',
-            function (apolloApiService, $scope, $timeout, $state, growl, usSpinnerService, DTColumnDefBuilder) {
+                                    '$timeout' , '$state', 'growl', 'usSpinnerService', 'DTColumnBuilder', 'DTColumnDefBuilder',
+            function (apolloApiService, $scope, $timeout, $state, growl, usSpinnerService, DTColumnBuilder, DTColumnDefBuilder) {
 
                 // Kinda ugly custom sorting for datatables
                 jQuery.extend( jQuery.fn.dataTableExt.oSort, {
@@ -128,8 +128,34 @@ angular.module('apollo')
                     paginationType: 'simple_numbers',
                     displayLength: 10,
                     dom: '<"top"i>rt<"bottom"p>',
-                    order: [[1, "desc" ]]
+                    order: [[1, "desc" ]],
+                    serverSide: true,
+                    processing: true,
+                    ajax: {
+                        url: CONFIG.appUrl + 'deployment/datatables',
+                        type: 'GET'
+                    },
+                    columns:[
+                        { "data": "id" },
+                        { "data": "lastUpdated" },
+                        { "data": "serviceId" },
+                        { "data": "environmentId" },
+                        { "data": "groupName" },
+                        { "data": "userName" },
+                        { "data": "status" }
+                    ]
                 };
+
+                $scope.dtColumns = [
+                    DTColumnBuilder.newColumn('id', '#'),
+                    DTColumnBuilder.newColumn('lastUpdated', 'Last Updated'),
+                    DTColumnBuilder.newColumn('serviceId', 'Service'),
+                    DTColumnBuilder.newColumn('environmentId', 'Environment'),
+                    DTColumnBuilder.newColumn('groupName', 'Group'),
+                    DTColumnBuilder.newColumn('userName', 'User'),
+                    DTColumnBuilder.newColumn('status', 'Status'),
+                    //DTColumnBuilder.newColumn('actions', 'Actions').renderWith("bla"),
+                ]
 
                 $scope.dtColumnDefs = [
                     DTColumnDefBuilder.newColumnDef([1]).withOption('type', 'date-time')
@@ -162,9 +188,9 @@ angular.module('apollo')
                     $scope.allUsers = tempUsers;
                 });
 
-                apolloApiService.getAllDeployments().then(function(response) {
-                   $scope.allDeployments = response.data;
-                });
+//                apolloApiService.getAllDeployments().then(function(response) {
+//                   $scope.allDeployments = response.data;
+//                });
 
                 apolloApiService.getAllGroups().then(function(response) {
                     var tempGroups = {};
