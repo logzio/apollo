@@ -80,6 +80,38 @@ public class AuthTest {
     }
 
     @Test
+    public void testEnabled() throws Exception {
+        ApolloTestAdminClient apolloTestAdminClient = standaloneApollo.createTestAdminClient();
+        ApolloTestClient apolloTestClient = standaloneApollo.createTestClient();
+
+        User testUser = apolloTestClient.getTestUser();
+
+        // Login admin and signup user
+        apolloTestAdminClient.login();
+        apolloTestAdminClient.signup(testUser, Common.DEFAULT_PASSWORD);
+
+        apolloTestClient.login();
+
+        // Check that its valid
+        assertThat(apolloTestClient.getAllServices()).size().isGreaterThanOrEqualTo(0);
+
+        testUser.setEnabled(false);
+        apolloTestAdminClient.updateUser(testUser);
+
+        // Check that user is forbidden even without logging in
+        assertThatThrownBy(apolloTestClient::getAllUsers).isInstanceOf(ApolloNotAuthorizedException.class);
+
+        // Check that user cant log in
+        assertThatThrownBy(apolloTestClient::login).isInstanceOf(ApolloCouldNotLoginException.class);
+
+        testUser.setEnabled(true);
+        apolloTestAdminClient.updateUser(testUser);
+
+        // Check that its valid again
+        assertThat(apolloTestClient.getAllServices()).size().isGreaterThanOrEqualTo(0);
+    }
+
+    @Test
     public void testGetAllUsers() throws Exception {
 
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
