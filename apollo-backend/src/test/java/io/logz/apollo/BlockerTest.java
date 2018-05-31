@@ -49,6 +49,29 @@ public class BlockerTest {
     }
 
     @Test
+    public void testUnconditionalBlockerWithException() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+
+        List<Integer> exceptionServiceIds = new ArrayList<Integer>() {{ add(service.getId()); }};
+        List<Integer> exceptionEnvironmentIds = new ArrayList<Integer>() {{ add(environment.getId()); }};
+
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "unconditional", getUnconditionalBlockerConfiguration(exceptionServiceIds, exceptionEnvironmentIds), null, null);
+
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient)).isInstanceOf(Exception.class)
+                .hasMessageContaining("Deployment is currently blocked");
+
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
+    }
+
+    @Test
     public void testEnvironmentBlocker() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
@@ -273,6 +296,13 @@ public class BlockerTest {
         return "{\n" +
                 "  \"allowedConcurrentDeployment\": \"" + allowedConcurrentDeployment + "\",\n" +
                 "  \"excludeServices\":" + excludeServices.toString() +
+                "}";
+    }
+
+    private String getUnconditionalBlockerConfiguration(List<Integer> exceptionServiceIds, List<Integer> exceptionEnvironmentIds) {
+        return "{\n" +
+                "  \"exceptionServiceIds\":" + exceptionServiceIds.toString() + ",\n" +
+                "  \"exceptionEnvironmentIds\":" + exceptionEnvironmentIds.toString() +
                 "}";
     }
 }
