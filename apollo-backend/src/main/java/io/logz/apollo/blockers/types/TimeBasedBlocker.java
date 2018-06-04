@@ -1,10 +1,10 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
-import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class TimeBasedBlocker implements BlockerFunction {
     }
 
     @Override
-    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
+    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment, Blocker blocker) {
 
         requireNonNull(timeBasedBlockerConfiguration);
 

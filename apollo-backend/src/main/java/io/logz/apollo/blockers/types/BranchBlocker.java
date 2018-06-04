@@ -1,6 +1,7 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -28,7 +29,7 @@ public class BranchBlocker implements BlockerFunction {
     }
 
     @Override
-    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
+    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment, Blocker blocker) {
         DeployableVersion deployableVersion = blockerInjectableCommons.getDeployableVersionDao()
                                                                       .getDeployableVersion(deployment.getDeployableVersionId());
 

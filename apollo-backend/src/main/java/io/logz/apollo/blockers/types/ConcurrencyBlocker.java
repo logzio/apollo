@@ -1,6 +1,7 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @BlockerType(name = "concurrent")
 public class ConcurrencyBlocker implements BlockerFunction {
@@ -25,7 +25,7 @@ public class ConcurrencyBlocker implements BlockerFunction {
     }
 
     @Override
-    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
+    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment, Blocker blocker) {
 
         if (deployment.getGroupName() != null) {
             return false;
