@@ -59,7 +59,7 @@ public class BlockerService {
     public Optional<Blocker> shouldBlock(Deployment deployment) {
         for (Blocker blocker : getBlockers()) {
             if (isBlockerInScope(blocker, deployment)) {
-                if (blocker.getBlockerFunction().shouldBlock(blockerInjectableCommons, deployment, blocker)) {
+                if (blocker.getBlockerFunction().shouldBlock(blockerInjectableCommons, deployment)) {
                     logger.info("Blocking deployment for service {}, in environment {}, with deployable version of {} from {} due to {} blocker",
                             deployment.getServiceId(), deployment.getEnvironmentId(), deployment.getDeployableVersionId(), deployment.getUserEmail(), blocker.getName());
 

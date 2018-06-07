@@ -9,5 +9,5 @@ import java.io.IOException;
  */
 public interface BlockerFunction {
     void init(String jsonConfiguration) throws IOException;
-    boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment, Blocker blocker);
+    boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment);
 }

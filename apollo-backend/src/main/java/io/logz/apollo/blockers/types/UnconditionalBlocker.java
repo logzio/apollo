@@ -1,7 +1,6 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -25,7 +24,7 @@ public class UnconditionalBlocker implements BlockerFunction {
     }
 
     @Override
-    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment, Blocker blocker) {
+    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
 
         List<Integer> exceptionServiceIds = unconditionalBlockerConfiguration.getExceptionServiceIds();
         List<Integer> exceptionEnvironmentIds = unconditionalBlockerConfiguration.getExceptionEnvironmentIds();
@@ -34,8 +33,10 @@ public class UnconditionalBlocker implements BlockerFunction {
             return true;
         }
 
-        if (((exceptionServiceIds != null && exceptionServiceIds.contains(deployment.getServiceId())) || blocker.getServiceId() != null)
-            && ((exceptionEnvironmentIds != null && exceptionEnvironmentIds.contains(deployment.getEnvironmentId())) || blocker.getEnvironmentId() != null)) {
+        if (((exceptionServiceIds != null && exceptionServiceIds.contains(deployment.getServiceId()))
+                || exceptionServiceIds == null)
+            && ((exceptionEnvironmentIds != null && exceptionEnvironmentIds.contains(deployment.getEnvironmentId()))
+                || exceptionEnvironmentIds == null)) {
             return false;
         }
 

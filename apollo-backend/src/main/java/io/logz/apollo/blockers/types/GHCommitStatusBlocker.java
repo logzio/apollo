@@ -1,6 +1,5 @@
 package io.logz.apollo.blockers.types;
 
-import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -18,7 +17,7 @@ public class GHCommitStatusBlocker implements BlockerFunction {
     }
 
     @Override
-    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment, Blocker blocker) {
+    public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
         DeployableVersion deployableVersion = blockerInjectableCommons.getDeployableVersionDao()
                 .getDeployableVersion(deployment.getDeployableVersionId());
 
