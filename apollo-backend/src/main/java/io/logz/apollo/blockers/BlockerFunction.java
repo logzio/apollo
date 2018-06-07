@@ -1,6 +1,5 @@
 package io.logz.apollo.blockers;
 
-import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 
 import java.io.IOException;

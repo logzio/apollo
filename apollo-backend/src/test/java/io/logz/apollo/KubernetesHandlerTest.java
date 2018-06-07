@@ -30,8 +30,10 @@ import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.PodStatus;
 import io.logz.apollo.models.Service;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.script.ScriptException;
@@ -175,10 +177,10 @@ public class KubernetesHandlerTest {
         assertThat(currentGroupWithScalingFactorZeroDeployment.getStatus()).isEqualTo(Deployment.DeploymentStatus.DONE);
 
         // Test envStatus
-        String envStatusFromObject = currentFinishedDeployment.getEnvStatus();
-        String expectedEnvStatus = getExpectedEnvStatus(currentFinishedDeployment);
+        JSONObject envStatusFromObjectJson = new JSONObject(currentFinishedDeployment.getEnvStatus().replaceAll("\\\\", ""));
+        JSONObject expectedEnvStatusJson = new JSONObject(getExpectedEnvStatus(currentFinishedDeployment));
 
-        assertThat(envStatusFromObject.replaceAll("\\\\", "")).isEqualTo(expectedEnvStatus);
+        JSONAssert.assertEquals(expectedEnvStatusJson, envStatusFromObjectJson, false);
     }
 
     @Test

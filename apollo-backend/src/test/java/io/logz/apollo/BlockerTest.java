@@ -49,6 +49,76 @@ public class BlockerTest {
     }
 
     @Test
+    public void testUnconditionalBlockerWithServiceAndEnvironmentException() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+
+        List<Integer> exceptionServiceIds = new ArrayList<Integer>() {{ add(service.getId()); }};
+        List<Integer> exceptionEnvironmentIds = new ArrayList<Integer>() {{ add(environment.getId()); }};
+
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "unconditional", getUnconditionalBlockerConfiguration(exceptionServiceIds, exceptionEnvironmentIds), null, null);
+
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient)).isInstanceOf(Exception.class)
+                .hasMessageContaining("Deployment is currently blocked");
+
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
+    }
+
+    @Test
+    public void testUnconditionalBlockerWithEnvironmentException() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment exceptionEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+        Environment otherEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+
+        List<Integer> exceptionEnvironmentIds = new ArrayList<Integer>() {{ add(exceptionEnvironment.getId()); }};
+
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "unconditional", getUnconditionalBlockerConfiguration(null, exceptionEnvironmentIds), null, service);
+
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, otherEnvironment, service, deployableVersion)).isInstanceOf(Exception.class)
+                .hasMessageContaining("Deployment is currently blocked");
+
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, exceptionEnvironment, service, deployableVersion);
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
+    }
+
+    @Test
+    public void testUnconditionalBlockerWithServiceException() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service exceptionService = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, exceptionService);
+        Service otherService = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion otherDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, otherService);
+
+        List<Integer> exceptionServiceIds = new ArrayList<Integer>() {{ add(exceptionService.getId()); }};
+
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "unconditional", getUnconditionalBlockerConfiguration(exceptionServiceIds, null), environment, null);
+
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, otherService, otherDeployableVersion)).isInstanceOf(Exception.class)
+                .hasMessageContaining("Deployment is currently blocked");
+
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, exceptionService, deployableVersion);
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
+    }
+
+    @Test
     public void testEnvironmentBlocker() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
@@ -274,5 +344,27 @@ public class BlockerTest {
                 "  \"allowedConcurrentDeployment\": \"" + allowedConcurrentDeployment + "\",\n" +
                 "  \"excludeServices\":" + excludeServices.toString() +
                 "}";
+    }
+
+    private String getUnconditionalBlockerConfiguration(List<Integer> exceptionServiceIds, List<Integer> exceptionEnvironmentIds) {
+
+        if (exceptionServiceIds == null && exceptionEnvironmentIds == null) {
+            return "{}";
+        }
+
+        String jsonConfiguration = "{\n";
+
+        if (exceptionServiceIds != null) {
+            jsonConfiguration += "  \"exceptionServiceIds\":" + exceptionServiceIds.toString();
+            if (exceptionEnvironmentIds != null) {
+                jsonConfiguration += ",\n";
+            }
+        }
+
+        if (exceptionEnvironmentIds != null) {
+            jsonConfiguration +=     "  \"exceptionEnvironmentIds\":" + exceptionEnvironmentIds.toString();
+        }
+
+        return jsonConfiguration += "}";
     }
 }
