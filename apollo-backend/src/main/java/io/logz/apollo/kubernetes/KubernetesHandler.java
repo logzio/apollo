@@ -145,19 +145,17 @@ public class KubernetesHandler {
             if (returnedDeployment.isPresent()) {
                 io.fabric8.kubernetes.api.model.extensions.DeploymentStatus deploymentStatus = returnedDeployment.get().getStatus();
 
-                int updatedReplicas = deploymentStatus.getUpdatedReplicas();
-                int totalReplicas = deploymentStatus.getReplicas();
+                Integer totalReplicas = deploymentStatus.getReplicas();
 
-                logger.info("Monitoring of deployment id {}: out of {} replicas, {} are updated", deployment.getId(), totalReplicas, updatedReplicas);
-                if (updatedReplicas == totalReplicas) {
-                    if (deployment.getStatus().equals(Deployment.DeploymentStatus.STARTED)) {
-                        logger.info("Deployment id {} is done deploying", deployment.getId());
-                        apolloNotifications.notify(Deployment.DeploymentStatus.DONE, deployment);
-                        deployment.setStatus(Deployment.DeploymentStatus.DONE);
-                    } else if (deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELING)) {
-                        logger.info("Deployment id {} is done canceling", deployment.getId());
-                        apolloNotifications.notify(Deployment.DeploymentStatus.CANCELED, deployment);
-                        deployment.setStatus(Deployment.DeploymentStatus.CANCELED);
+                if (totalReplicas == null || totalReplicas == 0) {
+                    logger.info("Monitoring of deployment id {}: No replicas required.", deployment.getId());
+                    updateDeploymentStatus(deployment);
+                } else {
+                    int updatedReplicas = deploymentStatus.getUpdatedReplicas();
+                    logger.info("Monitoring of deployment id {}: out of {} replicas, {} are updated", deployment.getId(), totalReplicas, updatedReplicas);
+
+                    if (updatedReplicas == totalReplicas) {
+                        updateDeploymentStatus(deployment);
                     }
                 }
 
@@ -170,6 +168,18 @@ public class KubernetesHandler {
         } catch (Exception e) {
             logger.error("Got exception while monitoring deployment {}. Leaving it in its original state", deployment.getId(), e);
             return deployment;
+        }
+    }
+
+    private void updateDeploymentStatus(Deployment deployment) {
+        if (deployment.getStatus().equals(Deployment.DeploymentStatus.STARTED)) {
+            logger.info("Deployment id {} is done deploying", deployment.getId());
+            apolloNotifications.notify(Deployment.DeploymentStatus.DONE, deployment);
+            deployment.setStatus(Deployment.DeploymentStatus.DONE);
+        } else if (deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELING)) {
+            logger.info("Deployment id {} is done canceling", deployment.getId());
+            apolloNotifications.notify(Deployment.DeploymentStatus.CANCELED, deployment);
+            deployment.setStatus(Deployment.DeploymentStatus.CANCELED);
         }
     }
 

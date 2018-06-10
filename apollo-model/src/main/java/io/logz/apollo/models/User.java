@@ -10,6 +10,7 @@ public class User {
     private String lastName;
     private String hashedPassword;
     private Boolean isAdmin;
+    private Boolean isEnabled;
 
     public User() {
 
@@ -35,6 +36,10 @@ public class User {
         return isAdmin;
     }
 
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
@@ -53,5 +58,9 @@ public class User {
 
     public void setAdmin(Boolean admin) {
         isAdmin = admin;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        isEnabled = enabled;
     }
 }

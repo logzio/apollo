@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
-import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

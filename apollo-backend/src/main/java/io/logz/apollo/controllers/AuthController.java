@@ -64,6 +64,7 @@ public class AuthController {
         newUser.setLastName(lastName);
         newUser.setHashedPassword(PasswordManager.encryptPassword(password));
         newUser.setAdmin(false);
+        newUser.setEnabled(true);
         userDao.addUser(newUser);
 
         return newUser;
@@ -71,13 +72,14 @@ public class AuthController {
 
     @Administrator
     @PUT("/users")
-    public User updateUser(String userEmail, String firstName, String lastName, String password, Boolean isAdmin) {
+    public User updateUser(String userEmail, String firstName, String lastName, String password, Boolean isAdmin, Boolean isEnabled) {
         User user = getUser(userEmail);
         user.setUserEmail(userEmail);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setHashedPassword(PasswordManager.encryptPassword(password));
         user.setAdmin(isAdmin);
+        user.setEnabled(isEnabled);
         userDao.updateUser(user);
 
         return user;

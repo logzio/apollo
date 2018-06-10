@@ -248,3 +248,24 @@ code {
     padding: 1em 1em;
     background: #f4f4f4;
 }
+
+table.table.table-hover tbody tr.marked-as-favorite {
+    background-color: #fff5e5;
+}
+
+table.table.table-hover tbody tr.marked-as-favorite:hover {
+    background-color: #eee5d6;
+}
+
+table.table.table-hover tbody tr td .mark-as-favorite-container {
+    color: #f58c02;
+    cursor: pointer;
+}
+
+table.table.table-hover tbody tr td .mark-as-favorite-container:hover {
+    color: #e28102;
+}
+
+table.table.table-hover tbody tr td .mark-as-favorite-container:active {
+    color: #ca7302;
+}

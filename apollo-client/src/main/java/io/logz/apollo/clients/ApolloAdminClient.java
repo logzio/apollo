@@ -128,6 +128,18 @@ public class ApolloAdminClient {
         genericApolloClient.deleteAndGetResult("/blocker-definition/override/user", requestBody, new TypeReference<Object>() {});
     }
 
+    public User updateUser(User user) throws ApolloClientException {
+
+        String requestBody = Common.generateJson("userEmail", user.getUserEmail(),
+                "firstName", user.getFirstName(),
+                "lastName", user.getLastName(),
+                "password", user.getHashedPassword(),
+                "isAdmin", String.valueOf(user.isAdmin()),
+                "isEnabled", String.valueOf(user.isEnabled()));
+
+        return genericApolloClient.putAndGetResult("/users", requestBody, new TypeReference<User>() {});
+    }
+
     private String generateSignupJson(User user, String plainPassword) {
         return Common.generateJson( "firstName", user.getFirstName(),
                                     "lastName", user.getLastName(),
