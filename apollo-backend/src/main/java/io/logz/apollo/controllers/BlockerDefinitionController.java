@@ -48,6 +48,30 @@ public class BlockerDefinitionController {
     }
 
     @LoggedIn
+    @GET("/blocker-definition/unconditional")
+    public List<Integer> getUnconditionalBlockers() {
+        return blockerDefinitionDao.getUnconditionalBlockers();
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional/regions/{regions}/environment-types/{environmentTypes}")
+    public List<Integer> getUnconditionalBlockersByEnvironmentTypeAndRegion(String regions, String environmentTypes) {
+        return blockerDefinitionDao.getUnconditionalBlockersByEnvironmentTypeAndRegion(regions, environmentTypes);
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional/regions/{regions}")
+    public List<Integer> getUnconditionalBlockersByRegion(String regions) {
+        return blockerDefinitionDao.getUnconditionalBlockersByRegion(regions);
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional/environment-types/{environmentTypes}")
+    public List<Integer> getUnconditionalBlockersDefinitionsByEnvironmentTypeA(String environmentTypes) {
+        return blockerDefinitionDao.getUnconditionalBlockersByEnvironmentType(environmentTypes);
+    }
+
+    @LoggedIn
     @GET("/blocker-definition/{id}")
     public BlockerDefinition getBlockerDefinition(int id) {
         return blockerDefinitionDao.getBlockerDefinition(id);

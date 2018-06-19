@@ -21,6 +21,43 @@
         FROM blocker_definition
     </select>
 
+    <select id="getUnconditionalBlockers" resultType="Integer">
+        SELECT id FROM blocker_definition
+        WHERE blocker_type_name = 'unconditional'
+        AND service_id IS NULL
+    </select>
+
+    <select id="getUnconditionalBlockersByEnvironmentTypeAndRegion" resultType="Integer">
+        SELECT id FROM blocker_definition
+        WHERE blocker_type_name = 'unconditional'
+        AND service_id IS NULL
+        AND environment_id IN (
+            SELECT id FROM environment
+            WHERE geo_region IN (${regions})
+            AND availability IN (${environmentTypes})
+        )
+    </select>
+
+    <select id="getUnconditionalBlockersByRegion" resultType="Integer">
+        SELECT id FROM blocker_definition
+        WHERE blocker_type_name = 'unconditional'
+        AND service_id IS NULL
+        AND environment_id IN (
+            SELECT id FROM environment
+            WHERE geo_region IN (${regions})
+        )
+    </select>
+
+    <select id="getUnconditionalBlockersByEnvironmentType" resultType="Integer">
+        SELECT id FROM blocker_definition
+        WHERE blocker_type_name = 'unconditional'
+        AND service_id IS NULL
+        AND environment_id IN (
+            SELECT id FROM environment
+            WHERE availability IN (${environmentTypes})
+        )
+    </select>
+
     <insert id="addBlockerDefinition" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO blocker_definition (name, service_id, environment_id, is_active, blocker_type_name, blocker_json_configuration)
         VALUES (#{name}, #{serviceId}, #{environmentId}, #{isActive}, #{blockerTypeName}, #{blockerJsonConfiguration})

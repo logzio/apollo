@@ -11,6 +11,10 @@ import java.util.List;
 public interface BlockerDefinitionDao {
     BlockerDefinition getBlockerDefinition(int id);
     List<BlockerDefinition> getAllBlockerDefinitions();
+    List<Integer> getUnconditionalBlockers();
+    List<Integer> getUnconditionalBlockersByEnvironmentTypeAndRegion(@Param("regions") String regions, @Param("environmentTypes") String environmentTypes);
+    List<Integer> getUnconditionalBlockersByRegion(@Param("regions") String regions);
+    List<Integer> getUnconditionalBlockersByEnvironmentType(@Param("environmentTypes") String environmentTypes);
     void addBlockerDefinition(BlockerDefinition blockerDefinition);
     void updateBlockerDefinition(BlockerDefinition blockerDefinition);
     void deleteBlockerDefinition(int id);
