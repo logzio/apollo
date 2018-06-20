@@ -1,6 +1,8 @@
 package io.logz.apollo.controllers;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.blockers.BlockerService;
 import io.logz.apollo.common.HttpStatus;
@@ -30,6 +32,9 @@ import static java.util.Objects.requireNonNull;
 @Controller
 public class BlockerDefinitionController {
 
+    private final static String CSV_DELIMITER = ",";
+    private final static String STRING_DELIMITER = "','";
+
     private static final Logger logger = LoggerFactory.getLogger(BlockerDefinitionController.class);
 
     private final BlockerDefinitionDao blockerDefinitionDao;
@@ -45,6 +50,34 @@ public class BlockerDefinitionController {
     @GET("/blocker-definition")
     public List<BlockerDefinition> getAllBlockerDefinitions() {
         return blockerDefinitionDao.getAllBlockerDefinitions();
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional")
+    public List<Integer> getUnconditionalBlockers() {
+        return blockerDefinitionDao.getUnconditionalBlockers();
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional/regions/{regionsCsv}/environment-types/{environmentTypesCsv}")
+    public List<Integer> getUnconditionalBlockersByEnvironmentTypeAndRegion(String regionsCsv, String environmentTypesCsv) {
+        Iterable<String> regions = Splitter.on(CSV_DELIMITER).omitEmptyStrings().trimResults().split(regionsCsv);
+        Iterable<String> environmentTypes = Splitter.on(CSV_DELIMITER).omitEmptyStrings().trimResults().split(environmentTypesCsv);
+        return blockerDefinitionDao.getUnconditionalBlockersByEnvironmentTypeAndRegion(Lists.newArrayList(regions), Lists.newArrayList(environmentTypes));
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional/regions/{regionsCsv}")
+    public List<Integer> getUnconditionalBlockersByRegion(String regionsCsv) {
+        Iterable<String> regions = Splitter.on(CSV_DELIMITER).omitEmptyStrings().trimResults().split(regionsCsv);
+        return blockerDefinitionDao.getUnconditionalBlockersByRegion(Lists.newArrayList(regions));
+    }
+
+    @LoggedIn
+    @GET("/blocker-definition/unconditional/environment-types/{environmentTypesCsv}")
+    public List<Integer> getUnconditionalBlockersDefinitionsByEnvironmentTypeA(String environmentTypesCsv) {
+        Iterable<String> environmentTypes = Splitter.on(CSV_DELIMITER).omitEmptyStrings().trimResults().split(environmentTypesCsv);
+        return blockerDefinitionDao.getUnconditionalBlockersByEnvironmentType(Lists.newArrayList(environmentTypes));
     }
 
     @LoggedIn
