@@ -1,13 +1,17 @@
-version: '3'
+version: '2.1'
 
 services:
   db:
-    image: mysql
+    image: mysql:5.7
     ports:
       - "3306:3306"
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - ./mysql/docker-healthcheck:/usr/local/bin/docker-healthcheck
+    healthcheck:
+      test: "docker-healthcheck"
     networks:
       apollonet:
         aliases:
@@ -24,6 +28,9 @@ services:
     volumes:
       - ./apollo.conf:/root/apollo.conf
       - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       apollonet:
         aliases:
