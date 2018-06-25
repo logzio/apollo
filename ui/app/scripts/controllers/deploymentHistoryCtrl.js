@@ -1,9 +1,10 @@
 'use strict';
 
 angular.module('apollo')
-  .controller('deploymentHistoryCtrl', ['apolloApiService', '$scope',
-                                    '$timeout' , '$state', 'growl', 'usSpinnerService', 'DTColumnBuilder', 'DTColumnDefBuilder',
-            function (apolloApiService, $scope, $timeout, $state, growl, usSpinnerService, DTColumnBuilder, DTColumnDefBuilder) {
+  .controller('deploymentHistoryCtrl', ['apolloApiService', '$scope', '$compile',
+                                    '$timeout' , '$state', 'growl', 'usSpinnerService',
+                                    'DTColumnBuilder', 'DTColumnDefBuilder', 'DTOptionsBuilder',
+            function (apolloApiService, $scope, $compile, $timeout, $state, growl, usSpinnerService, DTColumnBuilder, DTColumnDefBuilder, DTOptionsBuilder) {
 
                 // Kinda ugly custom sorting for datatables
                 jQuery.extend( jQuery.fn.dataTableExt.oSort, {
@@ -18,23 +19,22 @@ angular.module('apollo')
                     }
                 });
 
-                $scope.selectedDeployment = null;
+                $scope.selectedDeploymentId = null;
 
-                $scope.setSelectedDeployment = function(selectedDeployment) {
-                    $scope.selectedDeployment = selectedDeployment;
-                   };
+                $scope.setSelectedDeploymentId = function(selectedDeploymentId) {
+                    $scope.selectedDeploymentId = selectedDeploymentId;
+                };
 
                 $scope.getLabel = function(deploymentStatus) {
                     return apolloApiService.matchLabelToDeploymentStatus(deploymentStatus);
                 };
 
-                $scope.showDetails = function() {
+                $scope.showDetails = function(deployableVersionId) {
 
                     $scope.deployableVersion = undefined;
                     usSpinnerService.spin('details-spinner');
 
-                    apolloApiService.getDeployableVersion(
-                    $scope.allDeployments.filter(function(a){return a.id === $scope.selectedDeployment.id;})[0].deployableVersionId)
+                    apolloApiService.getDeployableVersion(deployableVersionId)
                     .then(function(response) {
                         $scope.deployableVersion = response.data;
                         usSpinnerService.stop('details-spinner');
@@ -45,22 +45,12 @@ angular.module('apollo')
                     });
                 };
 
-                $scope.showEnvStatus = function(deployment) {
-
-                    if (typeof(deployment) === 'undefined') {
-                        return;
-                    }
-
-                    if (deployment.status !== 'DONE' && deployment.status !== 'CANCELED') {
-                        $scope.envStatus = 'The environment status is not available while the deployment status is "' + deployment.status + '".';
-                        return;
-                    }
-
+                $scope.showEnvStatus = function(deploymentId) {
                     $scope.envStatus = undefined;
                     $scope.envStatusWithServiceNames = {};
                     usSpinnerService.spin('details-spinner');
 
-                    apolloApiService.getDeploymentEnvStatus(deployment.id)
+                    apolloApiService.getDeploymentEnvStatus(deploymentId)
                     .then(function(response) {
                         $scope.envStatus = response.data;
                         $scope.envStatus = JSON.parse($scope.envStatus);
@@ -91,75 +81,99 @@ angular.module('apollo')
 
                 $scope.revert = function() {
 
-                    // Set spinner
-                    usSpinnerService.spin('revert-spinner');
+                    if ($scope.selectedDeploymentId == null) {
+                        $growl.error("Could not understand which deployment you are talking about, bailing..");
+                        return;
+                    }
 
-                    // Now we can deploy
-                    apolloApiService.createNewDeployment($scope.selectedDeployment.deployableVersionId,
-                        $scope.selectedDeployment.serviceId, $scope.selectedDeployment.environmentId).then(function (response) {
+                    apolloApiService.getDeployment($scope.selectedDeploymentId).then(function(response) {
+                        var selectedDeployment = response.data;
 
-                        // Wait a bit to let the deployment be in the DB
-                        setTimeout(function () {
+                        // Set spinner
+                        usSpinnerService.spin('revert-spinner');
+
+                        // Now we can deploy
+                        apolloApiService.createNewDeployment(selectedDeployment.deployableVersionId,
+                            selectedDeployment.serviceId, selectedDeployment.environmentId).then(function (response) {
+
+                            // Wait a bit to let the deployment be in the DB
+                            setTimeout(function () {
+                                usSpinnerService.stop('revert-spinner');
+
+                                // Redirect user to ongoing deployments
+                                $state.go('deployments.ongoing', {deploymentId: response.data.id});
+                            }, 500);
+
+                        }, function(error) {
+                            // End spinner
                             usSpinnerService.stop('revert-spinner');
 
-                            // Redirect user to ongoing deployments
-                            $state.go('deployments.ongoing', {deploymentId: response.data.id});
-                        }, 500);
-
-                    }, function(error) {
-                        // End spinner
-                        usSpinnerService.stop('revert-spinner');
-
-                        // 403 are handled generically on the interceptor
-                        if (error.status !== 403) {
-                            growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000})
-                        }
+                            // 403 are handled generically on the interceptor
+                            if (error.status !== 403) {
+                                growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000})
+                            }
+                        });
                     });
                 };
 
-                $scope.clearFilters = function() {
-                    $scope.serviceSearch = "";
-                    $scope.environmentSearch = "";
-                    $scope.userSearch = "";
-                    $scope.statusSearch = "";
-                };
-
-                $scope.dtOptions = {
-                    paginationType: 'simple_numbers',
-                    displayLength: 10,
-                    dom: '<"top"i>rt<"bottom"p>',
-                    order: [[1, "desc" ]],
-                    serverSide: true,
-                    processing: true,
-                    ajax: {
+                $scope.dtOptions = DTOptionsBuilder.newOptions()
+                    .withOption('ajax', {
                         url: CONFIG.appUrl + 'deployment/datatables',
                         type: 'GET'
-                    },
-                    columns:[
-                        { "data": "id" },
-                        { "data": "lastUpdated" },
-                        { "data": "serviceId" },
-                        { "data": "environmentId" },
-                        { "data": "groupName" },
-                        { "data": "userName" },
-                        { "data": "status" }
-                    ]
-                };
+                    })
+                    .withDataProp('data')
+                    .withOption('processing', true)
+                    .withOption('serverSide', true)
+                    .withOption('dom', '<"top"i>frt<"bottom"p>')
+                    .withOption('order', [[1, "desc" ]])
+                    .withOption('createdRow', function(row, data, dataIndex) {
+                        $compile(angular.element(row).contents())($scope);
+                    })
+                    .withDisplayLength(50)
+                    .withPaginationType('simple_numbers');
 
                 $scope.dtColumns = [
-                    DTColumnBuilder.newColumn('id', '#'),
-                    DTColumnBuilder.newColumn('lastUpdated', 'Last Updated'),
-                    DTColumnBuilder.newColumn('serviceId', 'Service'),
-                    DTColumnBuilder.newColumn('environmentId', 'Environment'),
-                    DTColumnBuilder.newColumn('groupName', 'Group'),
-                    DTColumnBuilder.newColumn('userName', 'User'),
-                    DTColumnBuilder.newColumn('status', 'Status'),
-                    //DTColumnBuilder.newColumn('actions', 'Actions').renderWith("bla"),
-                ]
-
-                $scope.dtColumnDefs = [
-                    DTColumnDefBuilder.newColumnDef([1]).withOption('type', 'date-time')
+                    DTColumnBuilder.newColumn('id').withTitle('#'),
+                    DTColumnBuilder.newColumn('lastUpdate').withTitle('Last Update').notSortable().renderWith(function(data, type, full) {
+                        return moment.unix(data / 1000).format("DD/MM/YY HH:mm:ss")
+                    }),
+                    DTColumnBuilder.newColumn('serviceName').withTitle('Service').notSortable(),
+                    DTColumnBuilder.newColumn('environmentName').withTitle('Environment').notSortable(),
+                    DTColumnBuilder.newColumn('groupName').withTitle('Group').notSortable(),
+                    DTColumnBuilder.newColumn('userEmail').withTitle('User').notSortable(),
+                    DTColumnBuilder.newColumn('status').withTitle('Status').notSortable().renderWith(function(data, type, full) {
+                        return `
+                            <span class="label ${$scope.getLabel(full.status)}">${full.status}</span>
+                        `
+                    }),
+                    DTColumnBuilder.newColumn('actions').withTitle('Actions').notSortable().renderWith(renderActions)
                 ];
+
+                function renderActions(data, type, full) {
+                    return `
+                                            <div class="row">
+                                                <button type="button" class="btn btn-primary btn-circle" uib-tooltip="Details"
+                                                        ng-click="showDetails(${full.deployableVersionId})"
+                                                        data-toggle="modal" data-target="#show-details">
+                                                    <i class="fa fa-info"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-circle" uib-tooltip="Back to this version"
+                                                        ng-click="setSelectedDeploymentId(${full.id})"
+                                                        data-toggle="modal" data-target="#confirm-revert">
+                                                    <i class="fa fa-undo"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-success btn-circle" uib-tooltip="Environment status"
+                                                        ng-click="showEnvStatus(${full.id})"
+                                                        data-toggle="modal" data-target="#show-env-status">
+                                                    <i class="fa fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-circle disabled" uib-tooltip="${full.deploymentMessage || 'No message was provided'}">
+                                                    <i class="fa fa-comments"></i>
+                                                </button>
+                                            <div>
+                    `
+                };
+
 
                 // Data fetching
                 apolloApiService.getAllEnvironments().then(function(response) {
@@ -187,10 +201,6 @@ angular.module('apollo')
                     });
                     $scope.allUsers = tempUsers;
                 });
-
-//                apolloApiService.getAllDeployments().then(function(response) {
-//                   $scope.allDeployments = response.data;
-//                });
 
                 apolloApiService.getAllGroups().then(function(response) {
                     var tempGroups = {};

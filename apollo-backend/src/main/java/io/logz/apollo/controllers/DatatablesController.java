@@ -1,16 +1,17 @@
 package io.logz.apollo.controllers;
 
-import com.google.common.collect.ImmutableMap;
+import io.logz.apollo.common.QueryStringParser;
 import io.logz.apollo.dao.DeploymentDao;
+import io.logz.apollo.database.OrderDirection;
+import io.logz.apollo.models.DeploymentHistoryDetails;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.http.Req;
+import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -28,30 +29,25 @@ public class DatatablesController {
         this.deploymentDao = requireNonNull(deploymentDao);
     }
 
+    @LoggedIn
     @GET("/deployment/datatables")
     public DataTablesResponseObject getDataTableDeploymentResponse(Req req) {
 
-        System.out.println(req.query());
+        Map<String, String> queryStringMap = QueryStringParser.getQueryStringMap(req.query());
+
+        int draw = Integer.parseInt(queryStringMap.get("draw"));
+        int length = Integer.parseInt(queryStringMap.get("length"));
+        int start = Integer.parseInt(queryStringMap.get("start"));
+        String search = "%" + queryStringMap.get("search[value]") + "%";
+        String orderDirectionString = queryStringMap.get("order[0][dir]");
+
+
         DataTablesResponseObject dataTablesResponseObject = new DataTablesResponseObject();
-        dataTablesResponseObject.draw = 1;
-        dataTablesResponseObject.recordsFiltered = 1;
-        dataTablesResponseObject.recordsTotal = 1;
+        dataTablesResponseObject.draw = draw;
+        dataTablesResponseObject.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+        dataTablesResponseObject.recordsTotal = deploymentDao.getTotalDeploymentsCount();
 
-        List<Map<String, Object>> data = new ArrayList<>();
-
-        ImmutableMap<String, Object> map = ImmutableMap.<String,Object> builder()
-                .put("id", 1)
-                .put("lastUpdated", "2018-04-24 09:54:32")
-                .put("serviceId", 1)
-                .put("environmentId", 1)
-                .put("groupName", "bla")
-                .put("userName", "roi@logz")
-                .put("status", "DONE")
-                .build();
-
-        data.add(map);
-
-        dataTablesResponseObject.data = data;
+        dataTablesResponseObject.data = deploymentDao.filterDeploymentHistoryDetails(search, OrderDirection.valueOf(orderDirectionString.toUpperCase()), start, length);
 
         return dataTablesResponseObject;
     }
@@ -61,7 +57,7 @@ public class DatatablesController {
         public int draw;
         public int recordsTotal;
         public int recordsFiltered;
-        public List<Map<String, Object>> data;
+        public List<DeploymentHistoryDetails> data;
 
         public DataTablesResponseObject() {
         }
@@ -90,11 +86,11 @@ public class DatatablesController {
             this.recordsFiltered = recordsFiltered;
         }
 
-        public List<Map<String, Object>> getData() {
+        public List<DeploymentHistoryDetails> getData() {
             return data;
         }
 
-        public void setData(List<Map<String, Object>> data) {
+        public void setData(List<DeploymentHistoryDetails> data) {
             this.data = data;
         }
     }

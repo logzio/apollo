@@ -10,99 +10,11 @@
     <div class="col-lg-12 col-sm-12">
         <div class="panel panel-default">
             <div class="panel-heading apollo-form-headline">
-                Filters
-                <div class="pull-right">
-                    <button type="button" class="btn btn-default btn-circle apollo-clear-filter" uib-tooltip="Clear filters" ng-click="clearFilters()">
-                        <i class="fa fa-trash-o"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div class="col-lg-3 text-center" >
-                    <span class="apollo-form-headline">Service</span> <br>
-                    <select class="form-control apollo-filter" ng-model="serviceSearch" ng-options="service.name for service in allServices">
-                        <option value="">-- choose service --</option>
-                    </select>
-                </div>
-                <div class="col-lg-3 text-center">
-                    <span class="apollo-form-headline">Environment</span> <br>
-                    <select class="form-control apollo-filter" ng-model="environmentSearch" ng-options="environment.name for environment in allEnvironments">
-                        <option value="">-- choose environment --</option>
-                    </select>
-                </div>
-                <div class="col-lg-3 text-center">
-                    <span class="apollo-form-headline">User</span> <br>
-                    <select class="form-control apollo-filter" ng-model="userSearch" ng-options="user.userEmail for user in allUsers">
-                        <option value="">-- choose user --</option>
-                    </select>
-                </div>
-                <div class="col-lg-3 text-center">
-                    <span class="apollo-form-headline">Status</span> <br>
-                    <select class="form-control apollo-filter" ng-model="statusSearch">
-                        <option value="" selected>-- choose status --</option>
-                        <option ng-repeat="deployment in allDeployments | unique: 'status'" value="{{deployment.status}}">{{deployment.status}}</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="col-lg-12 col-sm-12">
-        <div class="panel panel-default">
-            <div class="panel-heading apollo-form-headline">
                 Past & Current Deployments
             </div>
             <div class="panel-body">
                 <div class="">
-                    <table class="table table-responsive" datatable="ajax" dt-options="dtOptions" dt-columns="dtColumns" dt-column-defs="dtColumnDefs">
-                        <!--<thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Last Updated</th>
-                            <th>Service</th>
-                            <th>Environment</th>
-                            <th>Group</th>
-                            <th>Initiated By</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="deployment in allDeployments | filter:{status: statusSearch} |
-                                                                          filter:{serviceId: serviceSearch.id} |
-                                                                          filter:{environmentId: environmentSearch.id} |
-                                                                          filter:{userEmail: userSearch.id} |
-                                                                          orderBy: 'deploymentLastUpdate': true">
-                                <td>{{deployment.id}}</td>
-                                <td>{{deployment.lastUpdate | date:'dd/MM/yy HH:mm:ss'}}</td>
-                                <td>{{allServices[deployment.serviceId].name}}</td>
-                                <td>{{allEnvironments[deployment.environmentId].name}}</td>
-                                <td>{{deployment.groupName}}</td>
-                                <td>{{allUsers[deployment.userEmail].userEmail}}</td>
-                                <td><span class="label" ng-class="getLabel(deployment.status)">{{deployment.status}}</span></td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-circle" uib-tooltip="Details"
-                                            ng-click="setSelectedDeployment(deployment); showDetails()"
-                                            data-toggle="modal" data-target="#show-details">
-                                        <i class="fa fa-info"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-danger btn-circle" uib-tooltip="Back to this version"
-                                            ng-click="setSelectedDeployment(deployment)"
-                                            data-toggle="modal" data-target="#confirm-revert">
-                                        <i class="fa fa-undo"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-circle" uib-tooltip="Environment status"
-                                            ng-click="setSelectedDeployment(deployment); showEnvStatus(deployment)"
-                                            data-toggle="modal" data-target="#show-env-status">
-                                        <i class="fa fa-eye"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-circle disabled" uib-tooltip="{{deployment.deploymentMessage || 'No message was provided'}}">
-                                        <i class="fa fa-comments"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>-->
+                    <table class="table table-responsive" datatable="" dt-options="dtOptions" dt-columns="dtColumns" dt-column-defs="dtColumnDefs">
                     </table>
                 </div>
             </div>

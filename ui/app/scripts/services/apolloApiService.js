@@ -53,6 +53,10 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + 'deployment/');
     };
 
+    var getDeployment = function(deploymentId) {
+        return $http.get(CONFIG.appUrl + 'deployment/' + deploymentId + '/');
+    };
+
     var getService = function(serviceId) {
         return $http.get(CONFIG.appUrl + 'service/' + serviceId + "/");
     };
@@ -311,6 +315,7 @@ function ApiService($q, $http){
         getAllRunningDeployments: getAllRunningDeployments,
         getRunningAndJustFinishedDeployments: getRunningAndJustFinishedDeployments,
         getAllDeployments: getAllDeployments,
+        getDeployment: getDeployment,
         getService: getService,
         getEnvironment: getEnvironment,
         getUser: getUser,
