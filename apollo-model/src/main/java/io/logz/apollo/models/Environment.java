@@ -5,26 +5,27 @@ package io.logz.apollo.models;
  */
 public class Environment {
 
-    private int id;
+    private Integer id;
     private String name;
     private String geoRegion;
     private String availability;
     private String kubernetesMaster;
     private String kubernetesToken;
     private String kubernetesNamespace;
-    private int servicePortCoefficient;
+    private Integer servicePortCoefficient;
     private Boolean requireDeploymentMessage;
     private Boolean requireHealthCheck;
+    private Integer concurrencyLimit;
 
     public Environment() {
 
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -76,11 +77,11 @@ public class Environment {
         this.kubernetesNamespace = kubernetesNamespace;
     }
 
-    public int getServicePortCoefficient() {
+    public Integer getServicePortCoefficient() {
         return servicePortCoefficient;
     }
 
-    public void setServicePortCoefficient(int servicePortCoefficient) {
+    public void setServicePortCoefficient(Integer servicePortCoefficient) {
         this.servicePortCoefficient = servicePortCoefficient;
     }
 
@@ -93,10 +94,18 @@ public class Environment {
     }
 
     public Boolean getRequireHealthCheck() {
-        return this.requireHealthCheck;
+        return requireHealthCheck;
     }
 
     public void setRequireHealthCheck(Boolean requireHealthCheck) {
         this.requireHealthCheck = requireHealthCheck;
+    }
+
+    public Integer getConcurrencyLimit() {
+        return concurrencyLimit;
+    }
+
+    public void setConcurrencyLimit(Integer concurrencyLimit) {
+        this.concurrencyLimit = concurrencyLimit;
     }
 }

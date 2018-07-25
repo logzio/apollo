@@ -104,7 +104,12 @@ public class KubernetesMonitor {
 
                 switch (deployment.getStatus()) {
                     case PENDING:
-                        returnedDeployment = kubernetesHandler.startDeployment(deployment);
+                        if (isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment)) {
+                            returnedDeployment = kubernetesHandler.startDeployment(deployment);
+                        } else {
+                            logger.info("Environment {} concurrency limit reached, not starting new deployment until one is done.", deployment.getEnvironmentId());
+                            returnedDeployment = deployment;
+                        }
                         break;
                     case PENDING_CANCELLATION:
                         returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
@@ -144,6 +149,20 @@ public class KubernetesMonitor {
         } catch (Exception e) {
             logger.error("Got unexpected exception in the scaling monitoring thread! swallow and moving on..", e);
         }
+    }
+
+    private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment) {
+        Integer concurrencyLimit = environmentDao.getEnvironment(deployment.getEnvironmentId()).getConcurrencyLimit();
+        if (concurrencyLimit != null && concurrencyLimit > 0) {
+            long runningDeploymentOnEnvironment = deploymentDao.getAllRunningDeployments()
+                    .stream()
+                    .filter(runningDeployment -> runningDeployment.getEnvironmentId() == deployment.getEnvironmentId())
+                    .count();
+
+            return runningDeploymentOnEnvironment < concurrencyLimit;
+        }
+
+        return true;
     }
 
     private boolean isLocalRun() {

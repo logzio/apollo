@@ -39,9 +39,9 @@ public class ModelsGenerator {
         testEnvironment.setKubernetesToken("AaBbCc" + Common.randomStr(10));
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
         testEnvironment.setServicePortCoefficient(0);
-        testEnvironment.setRequireDeploymentMessage(false);
         testEnvironment.setRequireDeploymentMessage(true);
-
+        testEnvironment.setConcurrencyLimit(0);
+        
         return testEnvironment;
     }
 

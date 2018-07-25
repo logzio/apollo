@@ -85,6 +85,11 @@ public class StandaloneApollo {
         kubernetesMonitor.start();
     }
 
+    public void stopKubernetesMonitor() {
+        System.setProperty(KubernetesMonitor.LOCAL_RUN_PROPERTY, "true");
+        kubernetesMonitor.stop();
+    }
+
     public void startKubernetesHealth() {
         System.setProperty(KubernetesHealth.LOCAL_RUN_PROPERTY, "false");
         kubernetesHealth.start();
