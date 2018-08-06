@@ -344,6 +344,7 @@
                             <tr>
                                 <th>Environment</th>
                                 <th>Service</th>
+                                <th>Group</th>
                                 <th>Reason</th>
                             </tr>
                         </thead>
@@ -351,6 +352,7 @@
                         <tr ng-repeat="blockedDeployment in blockedDeployments">
                             <td>{{blockedDeployment.environment}}</td>
                             <td>{{blockedDeployment.service}}</td>
+                            <td>{{blockedDeployment.group}}</td>
                             <td>{{blockedDeployment.reason}}</td>
                         </tr>
                         </tbody>

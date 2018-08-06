@@ -141,9 +141,9 @@ angular.module('apollo')
                         $('body').removeClass('modal-open');
                         $('.modal-backdrop').remove();
 
-                        if (response.data.unsuccessful.length >= 1) {
-                            growl.error("Your deployment was blocked! " + response.data.unsuccessful[0].reason, {ttl: 7000});
-                        } else if (response.data.successful.length >= 1) {
+                        if (response.data.unsuccessful.length > 0) {
+                            showBlockedDeployments(response);
+                        } else if (response.data.successful.length > 0) {
                             $scope.redirectToOngoing();
                         } else {
                             growl.error("An error occurred.", {ttl: 7000});
@@ -189,17 +189,7 @@ angular.module('apollo')
                         $scope.successfulDeployments = response.data.successful;
 
                         if (response.data.unsuccessful.length > 0) {
-                            $scope.blockedDeployments = [];
-
-                            angular.forEach(response.data.unsuccessful, function(unsuccessfulDeployment) {
-                                $scope.blockedDeployments.push({
-                                    service: getServiceNameById(unsuccessfulDeployment.serviceId),
-                                    environment: getEnvironmentNameById(unsuccessfulDeployment.environmentId),
-                                    reason: unsuccessfulDeployment.exception.message
-                                });
-                            });
-
-                            $('#blocked-deployments').modal('show');
+                            showBlockedDeployments(response);
                         } else {
                             $scope.redirectToOngoing();
                         }
@@ -222,12 +212,50 @@ angular.module('apollo')
             localStorageService.set(previouseServiceLocalStorageKey, $scope.selectedServices);
         };
 
+        var showBlockedDeployments = function(response) {
+            $scope.blockedDeployments = [];
+
+            angular.forEach(response.data.unsuccessful, function(unsuccessfulDeployment) {
+                $scope.blockedDeployments.push({
+                    service: getServiceNameById(unsuccessfulDeployment.serviceId),
+                    environment: getEnvironmentNameById(unsuccessfulDeployment.environmentId),
+                    group: getGroupNameById(unsuccessfulDeployment.groupId),
+                    reason: unsuccessfulDeployment.exception.message
+                });
+            });
+
+            $('#blocked-deployments').modal('show');
+        }
+
         var getServiceNameById = function(id) {
+
+            if (id == undefined) {
+                if ($scope.selectedServices !== undefined && $scope.selectedServices.length > 0) {
+                    return $scope.selectedServices[0].name;
+                }
+                return '-';
+            }
+
             return $scope.possibleServices.filter(function(a){return a.id == id})[0].name;
         }
 
         var getEnvironmentNameById = function(id) {
+
+            if (id == undefined) {
+                if ($scope.selectedEnvironments !== undefined && $scope.selectedEnvironments.length > 0) {
+                    return $scope.selectedEnvironments[0].name;
+                }
+                return '-';
+            }
+
             return $scope.possibleEnvironments.filter(function(a){return a.id == id})[0].name;
+        }
+
+        var getGroupNameById = function(id) {
+            if (id == undefined)
+                return '-';
+
+            return $scope.possibleGroups.filter(function(a){return a.id == id})[0].name;
         }
 
         $scope.closeBlockerModal = function() {
