@@ -46,7 +46,8 @@ public class ApolloClient {
                 "kubernetesToken", environment.getKubernetesToken(), "kubernetesNamespace", environment.getKubernetesNamespace(),
                 "servicePortCoefficient", String.valueOf(environment.getServicePortCoefficient()),
                 "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
-                "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()));
+                "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()),
+                "concurrentLimit", String.valueOf(environment.getConcurrencyLimit()));
 
         return genericApolloClient.postAndGetResult("/environment", requestBody, new TypeReference<Environment>(){});
     }

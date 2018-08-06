@@ -1,5 +1,6 @@
 package io.logz.apollo.helpers;
 
+import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.models.DeploymentRole;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PasswordManager;
@@ -39,9 +40,9 @@ public class ModelsGenerator {
         testEnvironment.setKubernetesToken("AaBbCc" + Common.randomStr(10));
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
         testEnvironment.setServicePortCoefficient(0);
-        testEnvironment.setRequireDeploymentMessage(false);
         testEnvironment.setRequireDeploymentMessage(true);
-
+        testEnvironment.setConcurrencyLimit(KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1);
+        
         return testEnvironment;
     }
 
