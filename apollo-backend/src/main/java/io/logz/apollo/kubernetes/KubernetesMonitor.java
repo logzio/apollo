@@ -34,6 +34,7 @@ public class KubernetesMonitor {
     private static final Logger logger = LoggerFactory.getLogger(KubernetesMonitor.class);
     private static final int TIMEOUT_TERMINATION = 60;
     public static final String LOCAL_RUN_PROPERTY = "localrun";
+    public static final int MINIMUM_CONCURRENCY_LIMIT = 1;
 
     private final DeploymentEnvStatusManager deploymentEnvStatusManager;
     private final ScheduledExecutorService scheduledExecutorService;
@@ -153,7 +154,7 @@ public class KubernetesMonitor {
 
     private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment) {
         Integer concurrencyLimit = environmentDao.getEnvironment(deployment.getEnvironmentId()).getConcurrencyLimit();
-        if (concurrencyLimit != null && concurrencyLimit > 0) {
+        if (concurrencyLimit != null && concurrencyLimit >= MINIMUM_CONCURRENCY_LIMIT) {
             long runningDeploymentOnEnvironment = deploymentDao.getAllRunningDeployments()
                     .stream()
                     .filter(runningDeployment -> runningDeployment.getEnvironmentId() == deployment.getEnvironmentId())
