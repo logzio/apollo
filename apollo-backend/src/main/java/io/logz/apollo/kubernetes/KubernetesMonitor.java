@@ -155,12 +155,12 @@ public class KubernetesMonitor {
     private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment) {
         Integer concurrencyLimit = environmentDao.getEnvironment(deployment.getEnvironmentId()).getConcurrencyLimit();
         if (concurrencyLimit != null && concurrencyLimit >= MINIMUM_CONCURRENCY_LIMIT) {
-            long ongoingDeploymentOnEnvironment = deploymentDao.getAllStartedDeployments()
+            long startedDeploymentOnEnvironment = deploymentDao.getAllStartedDeployments()
                     .stream()
                     .filter(runningDeployment -> runningDeployment.getEnvironmentId() == deployment.getEnvironmentId())
                     .count();
 
-            return ongoingDeploymentOnEnvironment < concurrencyLimit;
+            return startedDeploymentOnEnvironment < concurrencyLimit;
         }
 
         return true;
