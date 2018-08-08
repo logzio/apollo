@@ -14,6 +14,7 @@ public interface DeploymentDao {
     Deployment getDeployment(int id);
     List<Deployment> getAllDeployments();
     List<Deployment> getAllRunningDeployments();
+    List<Deployment> getAllStartedDeployments();
     List<Deployment> getRunningAndJustFinishedDeployments();
     List<Deployment> getLatestDeployments();
     String getCurrentGitCommitSha(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);

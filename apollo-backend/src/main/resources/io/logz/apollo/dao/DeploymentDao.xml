@@ -21,6 +21,12 @@
         WHERE status not in ("DONE", "CANCELED")
     </select>
 
+    <select id="getAllStartedDeployments" resultType="io.logz.apollo.models.Deployment">
+        SELECT *
+        FROM deployment
+        WHERE status = "STARTED"
+    </select>
+
     <select id="getRunningAndJustFinishedDeployments" resultType="io.logz.apollo.models.Deployment">
         SELECT *
         FROM deployment
