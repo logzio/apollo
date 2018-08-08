@@ -108,7 +108,7 @@ public class KubernetesMonitor {
                         if (isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment)) {
                             returnedDeployment = kubernetesHandler.startDeployment(deployment);
                         } else {
-                            logger.info("Environment {} concurrency limit reached, not starting new deployment until one is done.", deployment.getEnvironmentId());
+                            logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());
                             returnedDeployment = deployment;
                         }
                         break;
@@ -155,12 +155,12 @@ public class KubernetesMonitor {
     private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment) {
         Integer concurrencyLimit = environmentDao.getEnvironment(deployment.getEnvironmentId()).getConcurrencyLimit();
         if (concurrencyLimit != null && concurrencyLimit >= MINIMUM_CONCURRENCY_LIMIT) {
-            long runningDeploymentOnEnvironment = deploymentDao.getAllRunningDeployments()
+            long startedDeploymentOnEnvironment = deploymentDao.getAllStartedDeployments()
                     .stream()
                     .filter(runningDeployment -> runningDeployment.getEnvironmentId() == deployment.getEnvironmentId())
                     .count();
 
-            return runningDeploymentOnEnvironment < concurrencyLimit;
+            return startedDeploymentOnEnvironment < concurrencyLimit;
         }
 
         return true;
