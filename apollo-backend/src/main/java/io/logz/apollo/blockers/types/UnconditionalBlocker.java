@@ -15,7 +15,7 @@ import java.util.List;
 @BlockerType(name = "unconditional")
 public class UnconditionalBlocker implements BlockerFunction {
 
-    private static UnconditionalBlocker.UnconditionalBlockerConfiguration unconditionalBlockerConfiguration;
+    private UnconditionalBlocker.UnconditionalBlockerConfiguration unconditionalBlockerConfiguration;
 
     @Override
     public void init(String jsonConfiguration) throws IOException {
