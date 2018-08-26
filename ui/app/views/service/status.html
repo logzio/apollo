@@ -124,7 +124,7 @@
                                     <td>{{podStatus.startTime | date:'dd/MM/yy H:mm:ss'}}</td>
                                     <td>
                                         <button type="button" class="btn btn-danger btn-circle" uib-tooltip="Restart Pod"
-                                        ng-click="restartPod(podStatus.name)">
+                                                ng-click="selectPod(podStatus)" data-toggle="modal" data-target="#confirm-modal">
                                             <i class="fa fa-times"></i>
                                         </button>
                                         <button type="button" class="btn btn-success btn-circle" uib-tooltip="Live Terminal" data-toggle="modal" data-target="#select-container"
@@ -222,6 +222,28 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeWebSocket()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Are you sure?</h4>
+                </div>
+                <div class="modal-body">
+                    This is a dangerous action! <br>
+                    Confirm here will delete the pod! <br>
+                    New pod will replace it soon, but there might be a moment without any pod running! <br>
+                    Maybe you'd prefer using the gradual, safe option...? <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="restartAllPods(selectedStatus.environmentId, selectedStatus.serviceId, selectedStatus.groupName)">Restart all pods gradually</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="restartPod(selectedPodStatus.name)">Restart the damn pod!</button>
                 </div>
             </div>
         </div>
