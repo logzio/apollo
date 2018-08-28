@@ -221,6 +221,10 @@ function ApiService($q, $http){
         });
     };
 
+    var deleteGroup = function(id) {
+        return $http.delete(CONFIG.appUrl + "group/" + id);
+    }
+
     var updateScalingFactorForGroup = function (groupId, scalingFactor) {
         return $http.put(CONFIG.appUrl + "scaling/" + groupId, {
            scalingFactor: scalingFactor
@@ -340,6 +344,7 @@ function ApiService($q, $http){
         updateService: updateService,
         createGroup: createGroup,
         updateGroup: updateGroup,
+        deleteGroup: deleteGroup,
         updateScalingFactorForGroup: updateScalingFactorForGroup,
         getApolloScalingFactorForGroup: getApolloScalingFactorForGroup,
         getK8sScalingFactorForGroup: getK8sScalingFactorForGroup,
