@@ -73,7 +73,7 @@ angular.module('apollo')
       $scope.changeScalingFactor = function () {
         apolloApiService.updateScalingFactorForGroup($scope.currentGroup.id, $scope.newScalingFactor).then(function(response) {
             usSpinnerService.stop('group-spinner');
-            growl.success("Successfully scaling factor of " + $scope.groupName + " to " + $scope.newScalingFactor);
+            growl.success("Successfully updated scaling factor of " + $scope.groupName + " to " + $scope.newScalingFactor);
             updateGroups();
         }, function (error) {
             usSpinnerService.stop('group-spinner');
