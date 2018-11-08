@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
@@ -221,13 +222,13 @@ public class BlockerTest {
 
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "branch",
-                getBranchBlockerJsonConfiguration("develop"),
+                getBranchBlockerJsonConfiguration(Arrays.asList("develop", "hi")),
                 environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
 
-        blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration("master"));
+        blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration(Arrays.asList("master", "hi")));
         apolloTestAdminClient.updateBlocker(blocker);
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
@@ -333,17 +334,22 @@ public class BlockerTest {
                 "}";
     }
 
-    private String getBranchBlockerJsonConfiguration(String branchName) {
-        return "{\n" +
-                "  \"branchName\": \"" + branchName + "\"\n" +
-                "}";
-    }
-
     private String getConcurrencyBlockerJsonConfiguration(int allowedConcurrentDeployment, List<Integer> excludeServices) {
         return "{\n" +
                 "  \"allowedConcurrentDeployment\": \"" + allowedConcurrentDeployment + "\",\n" +
                 "  \"excludeServices\":" + excludeServices.toString() +
                 "}";
+    }
+
+    private String getBranchBlockerJsonConfiguration(List<String> branchesNames) {
+        String string = "{\n\"branchesNames\":[\"";
+
+        for (String branchName : branchesNames) {
+            string += branchName + "\",\"";
+        }
+
+        string = string.substring(0, string.length() - 2);
+        return string + "]\n}";
     }
 
     private String getUnconditionalBlockerConfiguration(List<Integer> exceptionServiceIds, List<Integer> exceptionEnvironmentIds) {
