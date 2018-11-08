@@ -36,7 +36,7 @@ public class BranchBlocker implements BlockerFunction {
         Boolean shouldBlock = true;
         String repoName = GithubConnector.getRepoNameFromRepositoryUrl(deployableVersion.getGithubRepositoryUrl());
 
-        for (String branch : branchBlockerConfiguration.getBranchesNames()) {
+        for (String branch : branchBlockerConfiguration.getBranchesNames().split(",")) {
             if (blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName,
                     branch, deployableVersion.getGitCommitSha())) {
 
@@ -58,16 +58,16 @@ public class BranchBlocker implements BlockerFunction {
     }
 
     public static class BranchBlockerConfiguration {
-        private List<String> branchesNames;
+        private String branchesNames;
 
         public BranchBlockerConfiguration() {
         }
 
-        public List<String> getBranchesNames() {
+        public String getBranchesNames() {
             return branchesNames;
         }
 
-        public void setBranceshNames(List<String> branchesNames) {
+        public void setBranceshNames(String branchesNames) {
             this.branchesNames = branchesNames;
         }
     }

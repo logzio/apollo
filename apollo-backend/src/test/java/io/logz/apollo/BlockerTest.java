@@ -222,13 +222,13 @@ public class BlockerTest {
 
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "branch",
-                getBranchBlockerJsonConfiguration(Arrays.asList("develop", "hi")),
+                getBranchBlockerJsonConfiguration("develop,hi"),
                 environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
 
-        blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration(Arrays.asList("master", "hi")));
+        blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration("master,hi"));
         apolloTestAdminClient.updateBlocker(blocker);
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
@@ -341,15 +341,10 @@ public class BlockerTest {
                 "}";
     }
 
-    private String getBranchBlockerJsonConfiguration(List<String> branchesNames) {
-        String string = "{\n\"branchesNames\":[\"";
-
-        for (String branchName : branchesNames) {
-            string += branchName + "\",\"";
-        }
-
-        string = string.substring(0, string.length() - 2);
-        return string + "]\n}";
+    private String getBranchBlockerJsonConfiguration(String branchesNames) {
+        return "{\n" +
+                "  \"branchesNames\": \"" + branchesNames + "\"\n" +
+                "}";
     }
 
     private String getUnconditionalBlockerConfiguration(List<Integer> exceptionServiceIds, List<Integer> exceptionEnvironmentIds) {
