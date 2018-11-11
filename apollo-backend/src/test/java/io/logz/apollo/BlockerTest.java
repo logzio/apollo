@@ -333,16 +333,16 @@ public class BlockerTest {
                 "}";
     }
 
-    private String getBranchBlockerJsonConfiguration(String branchName) {
-        return "{\n" +
-                "  \"branchName\": \"" + branchName + "\"\n" +
-                "}";
-    }
-
     private String getConcurrencyBlockerJsonConfiguration(int allowedConcurrentDeployment, List<Integer> excludeServices) {
         return "{\n" +
                 "  \"allowedConcurrentDeployment\": \"" + allowedConcurrentDeployment + "\",\n" +
                 "  \"excludeServices\":" + excludeServices.toString() +
+                "}";
+    }
+
+    private String getBranchBlockerJsonConfiguration(String branchesNames) {
+        return "{\n" +
+                "  \"branchName\": \"" + branchesNames + "\"\n" +
                 "}";
     }
 

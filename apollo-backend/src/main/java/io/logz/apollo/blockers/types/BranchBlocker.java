@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Created by roiravhon on 6/4/17.
@@ -30,21 +31,20 @@ public class BranchBlocker implements BlockerFunction {
     @Override
     public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
         DeployableVersion deployableVersion = blockerInjectableCommons.getDeployableVersionDao()
-                                                                      .getDeployableVersion(deployment.getDeployableVersionId());
+                .getDeployableVersion(deployment.getDeployableVersionId());
 
         String repoName = GithubConnector.getRepoNameFromRepositoryUrl(deployableVersion.getGithubRepositoryUrl());
 
-        if (!blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName,
-                        branchBlockerConfiguration.getBranchName(), deployableVersion.getGitCommitSha())) {
+        Boolean shouldBlock = !Arrays.stream(branchBlockerConfiguration.getbranchName().split(",")).anyMatch(branch ->
+                blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName, branch, deployableVersion.getGitCommitSha()));
 
-            logger.info("Commit sha {} is not part of branch {} on repo {}, blocking!",
-                    deployableVersion.getGitCommitSha(), branchBlockerConfiguration.getBranchName(),
+        if (shouldBlock) {
+            logger.info("Commit sha {} is not part of branches {} on repo {}, blocking!",
+                    deployableVersion.getGitCommitSha(), String.join(", ", branchBlockerConfiguration.getbranchName()),
                     deployableVersion.getGithubRepositoryUrl());
-
-            return true;
         }
 
-        return false;
+        return shouldBlock;
     }
 
     public static class BranchBlockerConfiguration {
@@ -53,7 +53,7 @@ public class BranchBlocker implements BlockerFunction {
         public BranchBlockerConfiguration() {
         }
 
-        public String getBranchName() {
+        public String getbranchName() {
             return branchName;
         }
 
