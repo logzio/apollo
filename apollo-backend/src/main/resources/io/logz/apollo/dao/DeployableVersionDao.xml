@@ -51,4 +51,11 @@
         INSERT INTO deployable_version (github_repository_url, git_commit_sha, service_id, commit_url, commit_message, commit_date, committer_avatar_url, committer_name)
         VALUES (#{githubRepositoryUrl}, #{gitCommitSha}, #{serviceId}, #{commitUrl}, #{commitMessage}, #{commitDate}, #{committerAvatarUrl}, #{committerName})
     </insert>
+
+    <update id="updateCommitDate">
+        UPDATE deployable_version
+        SET commit_date=#{commitDate}
+        WHERE id=#{id}
+    </update>
+
 </mapper>
