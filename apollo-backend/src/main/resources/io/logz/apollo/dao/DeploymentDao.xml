@@ -4,6 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="io.logz.apollo.dao.DeploymentDao">
+    <select id="getLatestDeploymentOfServiceInEnvironment" resultType="io.logz.apollo.models.Deployment">
+        SELECT *
+        FROM deployment
+        WHERE service_id = #{serviceId}
+        AND environment_id = #{environmentId}
+        AND status = 'DONE'
+        AND started_at =
+        (SELECT max(started_at)
+        FROM deployment)
+    </select>
+
     <select id="getDeployment" resultType="io.logz.apollo.models.Deployment">
         SELECT *
         FROM deployment

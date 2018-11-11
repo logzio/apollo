@@ -4,7 +4,6 @@ import io.logz.apollo.database.OrderDirection;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.DeploymentHistoryDetails;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 
 /**
@@ -17,6 +16,7 @@ public interface DeploymentDao {
     List<Deployment> getAllStartedDeployments();
     List<Deployment> getRunningAndJustFinishedDeployments();
     List<Deployment> getLatestDeployments();
+    Deployment getLatestDeploymentOfServiceInEnvironment(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);
     String getCurrentGitCommitSha(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);
     void addDeployment(Deployment deployment);
     void updateDeploymentStatus(@Param("id") int id, @Param("status") Deployment.DeploymentStatus status);

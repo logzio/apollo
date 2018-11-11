@@ -19,7 +19,6 @@ import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
 import javax.inject.Inject;
 import java.util.List;
 
@@ -64,6 +63,12 @@ public class DeploymentController {
     @GET("/latest-deployments")
     public List<Deployment> getLatestDeployments() {
         return deploymentDao.getLatestDeployments();
+    }
+
+    @LoggedIn
+    @GET("/latest-deploy/{serviceId}/{environmentId}")
+    public Deployment getLatestDeploymentOfServiceInEnvironment(int serviceId, int environmentId) {
+        return deploymentDao.getLatestDeploymentOfServiceInEnvironment(serviceId, environmentId);
     }
 
     @LoggedIn
