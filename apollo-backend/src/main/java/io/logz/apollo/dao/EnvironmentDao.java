@@ -11,5 +11,6 @@ public interface EnvironmentDao {
 
     Environment getEnvironment(int id);
     List<Environment> getAllEnvironments();
+    List<Integer> getProductionEnvironmentsIds();
     void addEnvironment(Environment environment);
 }
