@@ -226,4 +226,8 @@ public class ApolloClient {
     public Map<Integer, Boolean> getHealth() throws ApolloClientException {
         return genericApolloClient.getResult("/health", new TypeReference<Map<Integer, Boolean>>() {});
     }
+
+    public List<Integer> getUndeployedServicesInProductionEnvironments() throws ApolloClientException {
+        return genericApolloClient.getResult("/status/getUndeployedServicesInProductionEnvironments", new TypeReference<List<Integer>>() {});
+    }
 }
