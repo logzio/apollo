@@ -13,7 +13,8 @@ public interface DeployableVersionDao {
     DeployableVersion getDeployableVersion(int id);
     List<DeployableVersion> getAllDeployableVersions();
     DeployableVersion getDeployableVersionFromSha(@Param("gitCommitSha") String gitCommitSha, @Param("serviceId") int serviceId);
-    List<DeployableVersion> getLatestDeployableVersionsByServiceId(@Param("serviceId") int serviceId);
+    List<DeployableVersion> getLatestDeployableVersionsByServiceId(@Param("serviceId") int serviceId, @Param("amount") int amount);
+    DeployableVersion getLatestDeployableVersionByServiceId(@Param("serviceId") int serviceId);
     void addDeployableVersion(DeployableVersion deployableVersion);
     List<DeployableVersion> getDeployableVersionForMultiServices(@Param("serviceIdsCsv") String serviceIdsCsv, @Param("numOfServices") int numOfServices);
 }

@@ -32,6 +32,8 @@ public class DeployableVersionController {
     private final DeployableVersionDao deployableVersionDao;
     private final GithubConnector githubConnector;
 
+    private final static int AMOUNT_OF_LATEST_DEPLOYABLE_VERSIONS = 200;
+
     public static int MAX_COMMIT_FIELDS_LENGTH = 1000;
     public static int MAX_COMMIT_MESSAGE_LENGTH = 10000;
     public static String UNKNOWN_COMMIT_FIELD = "Unknown";
@@ -63,7 +65,7 @@ public class DeployableVersionController {
     @LoggedIn
     @GET("/deployable-version/latest/service/{serviceId}")
     public List<DeployableVersion> getLatestDeployableVersionsByServiceId(int serviceId) {
-        return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId);
+        return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId, AMOUNT_OF_LATEST_DEPLOYABLE_VERSIONS);
     }
 
     @LoggedIn
