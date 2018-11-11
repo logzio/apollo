@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.rapidoid.http.Req;
 import javax.inject.Inject;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,11 +85,14 @@ public class DeploymentHandler {
             logger.error("Got exception while getting the current gitCommitSha from kubernetes. That means no revert.", e);
         }
 
+        Date currentDate = new Date();
+
         MDC.put("environmentId", String.valueOf(environmentId));
         MDC.put("serviceId", String.valueOf(serviceId));
         MDC.put("deployableVersionId", String.valueOf(deployableVersionId));
         MDC.put("userEmail", userEmail);
         MDC.put("sourceVersion", sourceVersion);
+        MDC.put("lastUpdate", String.valueOf(currentDate));
 
         logger.info("Got request for a new deployment");
 
@@ -129,6 +133,9 @@ public class DeploymentHandler {
             newDeployment.setStatus(Deployment.DeploymentStatus.PENDING);
             newDeployment.setSourceVersion(sourceVersion);
             newDeployment.setDeploymentMessage(deploymentMessage);
+
+            newDeployment.setLastUpdate(currentDate);
+
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());
                 newDeployment.setDeploymentParams(group.get().getJsonParams());
