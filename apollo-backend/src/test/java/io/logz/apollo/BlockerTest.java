@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
@@ -222,13 +221,13 @@ public class BlockerTest {
 
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "branch",
-                getBranchBlockerJsonConfiguration("develop,hi"),
+                getBranchBlockerJsonConfiguration("develop"),
                 environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
 
-        blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration("master,hi"));
+        blocker.setBlockerJsonConfiguration(getBranchBlockerJsonConfiguration("master"));
         apolloTestAdminClient.updateBlocker(blocker);
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
@@ -343,7 +342,7 @@ public class BlockerTest {
 
     private String getBranchBlockerJsonConfiguration(String branchesNames) {
         return "{\n" +
-                "  \"branchesNames\": \"" + branchesNames + "\"\n" +
+                "  \"branchName\": \"" + branchesNames + "\"\n" +
                 "}";
     }
 

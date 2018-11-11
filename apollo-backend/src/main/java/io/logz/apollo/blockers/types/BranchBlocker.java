@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by roiravhon on 6/4/17.
@@ -31,26 +31,16 @@ public class BranchBlocker implements BlockerFunction {
     @Override
     public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
         DeployableVersion deployableVersion = blockerInjectableCommons.getDeployableVersionDao()
-                                                                      .getDeployableVersion(deployment.getDeployableVersionId());
+                .getDeployableVersion(deployment.getDeployableVersionId());
 
-        Boolean shouldBlock = true;
         String repoName = GithubConnector.getRepoNameFromRepositoryUrl(deployableVersion.getGithubRepositoryUrl());
 
-        for (String branch : branchBlockerConfiguration.getBranchesNames().split(",")) {
-            if (blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName,
-                    branch, deployableVersion.getGitCommitSha())) {
-
-                logger.info("Commit sha {} is part of branch {} on repo {}, not blocking!",
-                        deployableVersion.getGitCommitSha(), branch, deployableVersion.getGithubRepositoryUrl());
-
-                shouldBlock = false;
-                break;
-            }
-        }
+        Boolean shouldBlock = !Arrays.stream(branchBlockerConfiguration.getbranchName().split(",")).anyMatch(branch ->
+                blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName, branch, deployableVersion.getGitCommitSha()));
 
         if (shouldBlock) {
             logger.info("Commit sha {} is not part of branches {} on repo {}, blocking!",
-                    deployableVersion.getGitCommitSha(), String.join(", ", branchBlockerConfiguration.getBranchesNames()),
+                    deployableVersion.getGitCommitSha(), String.join(", ", branchBlockerConfiguration.getbranchName()),
                     deployableVersion.getGithubRepositoryUrl());
         }
 
@@ -58,17 +48,17 @@ public class BranchBlocker implements BlockerFunction {
     }
 
     public static class BranchBlockerConfiguration {
-        private String branchesNames;
+        private String branchName;
 
         public BranchBlockerConfiguration() {
         }
 
-        public String getBranchesNames() {
-            return branchesNames;
+        public String getbranchName() {
+            return branchName;
         }
 
-        public void setBranceshNames(String branchesNames) {
-            this.branchesNames = branchesNames;
+        public void setBranchName(String branchName) {
+            this.branchName = branchName;
         }
     }
 }
