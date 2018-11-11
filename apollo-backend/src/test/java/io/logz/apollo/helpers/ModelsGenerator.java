@@ -21,7 +21,6 @@ import io.logz.apollo.models.Notification;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -31,9 +30,9 @@ public class ModelsGenerator {
 
     public static int DEFAULT_SCALING_FACTOR = 3;
 
-    public static Environment createEnvironment() {
+    public static Environment createEnvironment(String name) {
         Environment testEnvironment = new Environment();
-        testEnvironment.setName("env-name-" + Common.randomStr(5));
+        testEnvironment.setName(name);
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
         testEnvironment.setAvailability("PROD-" + Common.randomStr(5));
         testEnvironment.setKubernetesMaster("kube.prod." + Common.randomStr(5));
@@ -42,12 +41,23 @@ public class ModelsGenerator {
         testEnvironment.setServicePortCoefficient(0);
         testEnvironment.setRequireDeploymentMessage(true);
         testEnvironment.setConcurrencyLimit(KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1);
-        
+
         return testEnvironment;
+    }
+
+    public static Environment createEnvironment() {
+        String name = "env-name-" + Common.randomStr(5);
+        return createEnvironment(name);
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
         Environment testEnvironment = ModelsGenerator.createEnvironment();
+        testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
+        return testEnvironment;
+    }
+
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String name) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment(name);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
     }
@@ -159,7 +169,6 @@ public class ModelsGenerator {
         testDeployment.setEnvironmentId(relatedEnvironment.getId());
         testDeployment.setServiceId(relatedService.getId());
         testDeployment.setDeployableVersionId(relatedDeployableVersion.getId());
-        testDeployment.setLastUpdate(new Date());
         testDeployment.setUserEmail("user-" + Common.randomStr(5));
         testDeployment.setGroupName(groupName);
         testDeployment.setDeploymentMessage("message-" + Common.randomStr(5));
