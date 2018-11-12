@@ -22,7 +22,7 @@ public class ServiceStatusHandler {
     private final DeployableVersionDao deployableVersionDao;
     private final EnvironmentDao environmentDao;
     private final ServiceDao serviceDao;
-    private static final int MIN_DAYS_OF_UNDEPLOYED_SERVICES = 21;
+    private static final int MAX_DAYS_OF_UNDEPLOYED_SERVICES = 21;
 
     @Inject
     public ServiceStatusHandler(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, EnvironmentDao environmentDao, ServiceDao serviceDao) {
@@ -59,12 +59,12 @@ public class ServiceStatusHandler {
         Date latestUpdatedDate = getLatestDeployableVersionDateByServiceId(serviceId);
 
         if(latestDeploymentDate != null) {
-            long diffBetweenDatesInDays = TimeUnit.DAYS.convert(Math.abs(latestDeploymentDate.getTime() - latestUpdatedDate.getTime()), TimeUnit.MILLISECONDS);
-            return diffBetweenDatesInDays > MIN_DAYS_OF_UNDEPLOYED_SERVICES ? true : false;
+            long diffBetweenDatesInDays = getTimeDiffInDays(latestDeploymentDate, latestUpdatedDate);
+            return diffBetweenDatesInDays > MAX_DAYS_OF_UNDEPLOYED_SERVICES ? true : false;
         }
         if(latestUpdatedDate != null) {
-            Date durationSinceLatestUpdate = Date.from(LocalDate.now().minusDays((long) MIN_DAYS_OF_UNDEPLOYED_SERVICES).atStartOfDay(ZoneId.systemDefault()).toInstant());
-            if(latestUpdatedDate.compareTo(durationSinceLatestUpdate) < 0) {
+            Date maxDateSinceLatestUpdate = getMaxDateSinceLatestUpdate();
+            if(latestUpdatedDate.compareTo(maxDateSinceLatestUpdate) < 0) {
                 return true;
             }
         }
@@ -85,5 +85,13 @@ public class ServiceStatusHandler {
             return latestDeployableVersion.getCommitDate();
         }
         return null;
+    }
+
+    private long getTimeDiffInDays(Date date1, Date date2) {
+        return TimeUnit.DAYS.convert(Math.abs(date1.getTime() - date2.getTime()), TimeUnit.MILLISECONDS);
+    }
+
+    private Date getMaxDateSinceLatestUpdate() {
+        return Date.from(LocalDate.now().minusDays((long) MAX_DAYS_OF_UNDEPLOYED_SERVICES).atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 }
