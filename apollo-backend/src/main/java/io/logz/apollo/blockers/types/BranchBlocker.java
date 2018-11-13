@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Created by roiravhon on 6/4/17.
@@ -35,12 +36,19 @@ public class BranchBlocker implements BlockerFunction {
 
         String repoName = GithubConnector.getRepoNameFromRepositoryUrl(deployableVersion.getGithubRepositoryUrl());
 
-        Boolean shouldBlock = !Arrays.stream(branchBlockerConfiguration.getbranchName().split(",")).anyMatch(branch ->
-                blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName, branch, deployableVersion.getGitCommitSha()));
+        Optional<String> validBranch = Optional.ofNullable(Arrays.stream(branchBlockerConfiguration.getbranchName().split(","))
+                .filter(branch -> blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName, branch, deployableVersion.getGitCommitSha()))
+                .findFirst().orElse(null));
+
+        Boolean shouldBlock = !validBranch.isPresent();
 
         if (shouldBlock) {
             logger.info("Commit sha {} is not part of branches {} on repo {}, blocking!",
                     deployableVersion.getGitCommitSha(), String.join(", ", branchBlockerConfiguration.getbranchName()),
+                    deployableVersion.getGithubRepositoryUrl());
+        } else {
+            logger.info("Commit sha {} is part of branch {} on repo {}, not blocking!",
+                    deployableVersion.getGitCommitSha(), validBranch.get(),
                     deployableVersion.getGithubRepositoryUrl());
         }
 
