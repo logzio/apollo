@@ -8,6 +8,7 @@ import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
 import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.EnvironmentServices;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
@@ -22,6 +23,8 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -178,8 +181,14 @@ public class StatusController {
         return kubernetesHandler.getPodContainerNames(podName);
     }
 
-    @GET("/status/getUndeployedServicesInProductionEnvironments")
-    public List<Integer> getUndeployedServicesInProductionEnvironments() {
-       return serviceStatusHandler.getUndeployedServices();
+    @GET("/status/getUndeployedServicesByEnvironmentAvailability/{availability}/{timeUnit}/{undeployedTimeAmount}")
+    public List<EnvironmentServices> getUndeployedServicesByEnvironmentAvailability(String availability, String timeUnit, int undeployedTimeAmount) {
+        TimeUnit timeUnitEnum;
+        try {
+            timeUnitEnum = TimeUnit.valueOf(timeUnit);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Please pass timeUnit parameter in TimeUnit type template", e.getCause());
+        }
+        return serviceStatusHandler.getUndeployedServicesByEnvironmentAvailability(availability, timeUnitEnum, undeployedTimeAmount);
     }
 }
