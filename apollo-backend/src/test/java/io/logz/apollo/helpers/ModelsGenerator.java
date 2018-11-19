@@ -31,11 +31,11 @@ public class ModelsGenerator {
 
     public static int DEFAULT_SCALING_FACTOR = 3;
 
-    public static Environment createEnvironment(String name) {
+    public static Environment createEnvironment(String name, String availability) {
         Environment testEnvironment = new Environment();
         testEnvironment.setName(name);
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
-        testEnvironment.setAvailability("PROD-" + Common.randomStr(5));
+        testEnvironment.setAvailability(availability);
         testEnvironment.setKubernetesMaster("kube.prod." + Common.randomStr(5));
         testEnvironment.setKubernetesToken("AaBbCc" + Common.randomStr(10));
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
@@ -48,7 +48,8 @@ public class ModelsGenerator {
 
     public static Environment createEnvironment() {
         String name = "env-name-" + Common.randomStr(5);
-        return createEnvironment(name);
+        String availability = "PROD-" + Common.randomStr(5);
+        return createEnvironment(name, availability);
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
@@ -57,8 +58,8 @@ public class ModelsGenerator {
         return testEnvironment;
     }
 
-    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String name) throws ApolloClientException {
-        Environment testEnvironment = ModelsGenerator.createEnvironment(name);
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String name, String availability) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment(name, availability);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
     }
