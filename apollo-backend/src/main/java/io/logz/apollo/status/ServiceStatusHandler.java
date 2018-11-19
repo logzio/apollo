@@ -6,6 +6,7 @@ import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.EnvironmentServices;
 import io.logz.apollo.models.Service;
 import javax.inject.Inject;
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -22,7 +24,6 @@ public class ServiceStatusHandler {
     private final DeployableVersionDao deployableVersionDao;
     private final EnvironmentDao environmentDao;
     private final ServiceDao serviceDao;
-    private static final int MAX_DAYS_OF_UNDEPLOYED_SERVICES = 21;
 
     @Inject
     public ServiceStatusHandler(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, EnvironmentDao environmentDao, ServiceDao serviceDao) {
@@ -32,22 +33,21 @@ public class ServiceStatusHandler {
         this.serviceDao = requireNonNull(serviceDao);
     }
 
-    public List<Integer> getUndeployedServices() {
-        List<Integer> productionEnvironmentsIds = getProductionEnvironmentsIds();
-        List<Integer> undeployedServices = new ArrayList<>();
-        productionEnvironmentsIds.forEach(environmentId -> undeployedServices.addAll(getUndeployedServicesByEnvironmentId(environmentId)));
-        return undeployedServices;
-    }
 
-    private List<Integer> getUndeployedServicesByEnvironmentId(int environmentId) {
-        List<Service> services = serviceDao.getAllServices();
-        List<Integer> undeployedServicesIds = new ArrayList<>();
-        services.forEach(service -> {
-            if(isServiceUndeployed(environmentId, service.getId())) {
-                undeployedServicesIds.add(service.getId());
+    public List<EnvironmentServices> getUndeployedServicesByEnvironmentAvailability(String availability, TimeUnit timeUnit, int undeployedTimeAmount) {
+        List<EnvironmentServices> result = new ArrayList<>();
+        environmentDao.getEnvironmentsByAvailability(availability).forEach(environment -> {
+            List<Service> undeployedServices = getUndeployedServicesByEnvironmentId(environment.getId(), timeUnit, undeployedTimeAmount);
+            if (undeployedServices.size() != 0) {
+                result.add(new EnvironmentServices(environment.getId(), environment.getName(), undeployedServices));
             }
         });
-        return undeployedServicesIds;
+        return result;
+    }
+
+    private List<Service> getUndeployedServicesByEnvironmentId(int environmentId, TimeUnit timeUnit, int maxTimeInterval) {
+        List<Service> services = serviceDao.getAllServices();
+        return services.stream().filter(service -> isServiceUndeployed(environmentId, service.getId(), timeUnit, maxTimeInterval)).collect(Collectors.toList());
     }
 
     private List<Integer> getProductionEnvironmentsIds() {
