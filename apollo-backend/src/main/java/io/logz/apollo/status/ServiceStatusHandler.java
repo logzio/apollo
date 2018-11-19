@@ -9,7 +9,8 @@ import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.EnvironmentServices;
 import io.logz.apollo.models.Service;
 import javax.inject.Inject;
-import java.time.LocalDate;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,23 +51,15 @@ public class ServiceStatusHandler {
         return services.stream().filter(service -> isServiceUndeployed(environmentId, service.getId(), timeUnit, maxTimeInterval)).collect(Collectors.toList());
     }
 
-    private List<Integer> getProductionEnvironmentsIds() {
-        return environmentDao.getProductionEnvironmentsIds();
-    }
-
-    private boolean isServiceUndeployed(int environmentId, int serviceId){
+    private boolean isServiceUndeployed(int environmentId, int serviceId, TimeUnit timeUnit, int maxTimeInterval) {
         Date latestDeploymentDate = getLatestDeploymentDateByServiceIdInEnvironment(environmentId, serviceId);
         Date latestUpdatedDate = getLatestDeployableVersionDateByServiceId(serviceId);
 
-        if(latestDeploymentDate != null) {
-            long diffBetweenDatesInDays = getTimeDiffInDays(latestDeploymentDate, latestUpdatedDate);
-            return diffBetweenDatesInDays > MAX_DAYS_OF_UNDEPLOYED_SERVICES ? true : false;
+        if (latestDeploymentDate != null) {
+            return getTimeInterval(latestDeploymentDate, latestUpdatedDate, timeUnit) > maxTimeInterval;
         }
-        if(latestUpdatedDate != null) {
-            Date maxDateSinceLatestUpdate = getMaxDateSinceLatestUpdate();
-            if(latestUpdatedDate.compareTo(maxDateSinceLatestUpdate) < 0) {
-                return true;
-            }
+        if (latestUpdatedDate != null) {
+            return latestUpdatedDate.compareTo(calculateMaxDateSinceLatestUpdate(timeUnit, maxTimeInterval)) > 0;
         }
         return false;
     }
@@ -87,11 +80,11 @@ public class ServiceStatusHandler {
         return null;
     }
 
-    private long getTimeDiffInDays(Date date1, Date date2) {
-        return TimeUnit.DAYS.convert(Math.abs(date1.getTime() - date2.getTime()), TimeUnit.MILLISECONDS);
+    private long getTimeInterval(Date date1, Date date2, TimeUnit resultTimeUnit) {
+        return resultTimeUnit.convert(Duration.between(date1.toInstant(), date2.toInstant()).toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    private Date getMaxDateSinceLatestUpdate() {
-        return Date.from(LocalDate.now().minusDays((long) MAX_DAYS_OF_UNDEPLOYED_SERVICES).atStartOfDay(ZoneId.systemDefault()).toInstant());
+    private Date calculateMaxDateSinceLatestUpdate(TimeUnit timeUnit, int maxTimeInterval) {
+        return Date.from(LocalDateTime.now(ZoneId.of("UTC")).minusSeconds(TimeUnit.SECONDS.convert(maxTimeInterval,timeUnit)).atZone(ZoneId.systemDefault()).toInstant());
     }
 }
