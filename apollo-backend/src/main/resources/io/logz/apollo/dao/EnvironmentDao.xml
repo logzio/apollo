@@ -15,10 +15,10 @@
         FROM environment
     </select>
 
-    <select id="getProductionEnvironmentsIds" resultType="int">
-        SELECT id
+    <select id="getEnvironmentsByAvailability" resultType="io.logz.apollo.models.Environment">
+        SELECT *
         FROM environment
-        WHERE name LIKE '%prod%'
+        WHERE availability = #{availability}
     </select>
 
     <insert id="addEnvironment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
