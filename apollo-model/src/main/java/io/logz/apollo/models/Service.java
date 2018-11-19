@@ -69,4 +69,18 @@ public class Service {
     public Boolean getIsPartOfGroup() { return isPartOfGroup; }
 
     public void setIsPartOfGroup(Boolean isPartOfGroup) { this.isPartOfGroup = isPartOfGroup; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Service)) {
+            return false;
+        }
+        Service service = (Service) o;
+        return service.getId() == this.id &&
+                service.getName().equals(this.name) &&
+                service.getIsPartOfGroup() == this.isPartOfGroup;
+    }
 }
