@@ -1,17 +1,17 @@
 package io.logz.apollo.clients;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.logz.apollo.models.User;
-import io.logz.apollo.models.BlockerDefinition;
-
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.exceptions.ApolloCouldNotLoginException;
-import io.logz.apollo.helpers.Common;
-import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.EnvironmentServices;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
+import io.logz.apollo.models.User;
+import io.logz.apollo.models.BlockerDefinition;
+import io.logz.apollo.helpers.Common;
+import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Notification;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 public class ApolloClient {
 
@@ -227,7 +228,7 @@ public class ApolloClient {
         return genericApolloClient.getResult("/health", new TypeReference<Map<Integer, Boolean>>() {});
     }
 
-    public List<Integer> getUndeployedServicesInProductionEnvironments() throws ApolloClientException {
-        return genericApolloClient.getResult("/status/getUndeployedServicesInProductionEnvironments", new TypeReference<List<Integer>>() {});
+    public List<EnvironmentServices> getUndeployedServicesByEnvironmentAvailability(String availability, TimeUnit timeUnit, int undeployedTimeAmount) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/status/getUndeployedServicesByEnvironmentAvailability/" + availability + "/" + timeUnit + "/" + undeployedTimeAmount, new TypeReference<List<EnvironmentServices>>() {});
     }
 }
