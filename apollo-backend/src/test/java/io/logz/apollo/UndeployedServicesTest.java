@@ -9,99 +9,113 @@ import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.EnvironmentServices;
 import io.logz.apollo.models.Service;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import javax.script.ScriptException;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class UndeployedServicesTest {
+    private static StandaloneApollo standaloneApollo;
     private static ApolloTestClient apolloTestClient;
-    private static int prodEnvironmentId;
-    private static int stagingEnvironmentId;
     private static DeploymentDao deploymentDao;
     private static DeployableVersionDao deployableVersionDao;
-    private static StandaloneApollo standaloneApollo;
-    private static Date date1;
-    private static Date date2;
-    private static int serviceId1;
-    private static int serviceId2;
-    private static int serviceId3;
+    private static Environment environment;
+    private static Service service;
+    private static Deployment deployment;
+    private static DeployableVersion deployableVersion1;
+    private static DeployableVersion deployableVersion2;
+    private static final String environmentAvailability = "PROD";
+    private static List<EnvironmentServices> expectedResult = new ArrayList<>();
 
     @BeforeClass
-    public static void beforeClass() throws ApolloClientException, ScriptException, IOException, SQLException {
+    public static void beforeClass() throws Exception {
         apolloTestClient = Common.signupAndLogin();
         standaloneApollo = StandaloneApollo.getOrCreateServer();
         deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
         deployableVersionDao = standaloneApollo.getInstance(DeployableVersionDao.class);
-        initEnvironments();
-        initServices();
-        initDates();
+        environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod", environmentAvailability);
+        service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        ModelsGenerator.createAndSubmitService(apolloTestClient);
     }
 
-    private static void initEnvironments() throws ApolloClientException {
-        prodEnvironmentId = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod").getId();
-        stagingEnvironmentId = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "staging").getId();
+    @After
+    public void after() {
+        expectedResult.clear();
+
+        if(deployment != null) {
+            deploymentDao.deleteDeployment(deployment.getId());
+        }
+        if(deployableVersion1 != null) {
+            deployableVersionDao.deleteDeployableVersion(deployableVersion1.getId());
+        }
+        if(deployableVersion2 != null) {
+            deployableVersionDao.deleteDeployableVersion(deployableVersion2.getId());
+        }
     }
 
-    private static void initServices() throws ApolloClientException {
-        serviceId1 = ModelsGenerator.createAndSubmitService(apolloTestClient).getId();
-        serviceId2 = ModelsGenerator.createAndSubmitService(apolloTestClient).getId();
-        serviceId3 = ModelsGenerator.createAndSubmitService(apolloTestClient).getId();
+    private void initExpectedResult() {
+        List<Service> services = new ArrayList<>();
+        services.add(service);
+        expectedResult.add(new EnvironmentServices(environment, services));
     }
 
-    private static void initDates() {
-        date1 = Date.from(LocalDateTime.now().minusDays(22).atZone(ZoneId.systemDefault()).toInstant());
-        date2 = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
-    }
+    public void initLatestDeploymentWhenLatestCommitTest() throws Exception {
+        Date currentDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant());
+        deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+        deployableVersionDao.updateCommitDate(deployableVersion1.getId(), currentDateUtcZone);
 
-    private void initTest(int environmentId, int serviceId, Date date1, Date date2) throws Exception {
-        Service service = apolloTestClient.getService(serviceId);
-
-        int deployableVersionId1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service).getId();
-        deployableVersionDao.updateCommitDate(deployableVersionId1, date1);
-        DeployableVersion deployableVersion1 = deployableVersionDao.getDeployableVersion(deployableVersionId1);
-
-        int deployableVersionId2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service).getId();
-        deployableVersionDao.updateCommitDate(deployableVersionId2, date2);
-
-        Deployment deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, apolloTestClient.getEnvironment(environmentId), service, deployableVersion1);
+        deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1);
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
     }
 
-    private void initDeployToProductionEarlierThanLastUpdated(int serviceId) throws Exception {
-       initTest(prodEnvironmentId, serviceId, date1, date2);
+    @Test
+    public void latestDeploymentWhenLatestCommit() throws Exception {
+        initLatestDeploymentWhenLatestCommitTest();
+        assertThat(apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1).size()).isEqualTo(0);
+    }
+
+    private void initNoDeploymentAndCommitExistsTest() throws ApolloClientException {
+        Date currentDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant());
+        deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+        deployableVersionDao.updateCommitDate(deployableVersion1.getId(), currentDateUtcZone);
+
+        initExpectedResult();
     }
 
     @Test
-    public void deployToProductionEarlierThanLastUpdated() throws Exception {
-        initDeployToProductionEarlierThanLastUpdated(serviceId1);
-        assertThat(apolloTestClient.getUndeployedServicesInProductionEnvironments().contains(serviceId1));
+    public void noDeploymentAndCommitExists() throws Exception {
+        initNoDeploymentAndCommitExistsTest();
+        assertThat(apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1)).isEqualTo(expectedResult);
     }
 
-    private void initDeployToStagingDoNothing(int serviceId) throws Exception {
-       initTest(stagingEnvironmentId, serviceId, date1, date2);
+    private void initNewerCommitThanLatestDeploymentTest() throws Exception {
+        Date currentDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant());
+        deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+        deployableVersionDao.updateCommitDate(deployableVersion1.getId(), currentDateUtcZone);
+
+        Date laterDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).plusHours(2).atZone(ZoneId.systemDefault()).toInstant());
+        deployableVersion2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+        deployableVersionDao.updateCommitDate(deployableVersion2.getId(), laterDateUtcZone);
+
+        deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1);
+        deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
+
+        initExpectedResult();
     }
 
     @Test
-    public void deployToStagingDoNothing() throws Exception {
-        initDeployToStagingDoNothing(serviceId2);
-        assertThat(apolloTestClient.getUndeployedServicesInProductionEnvironments().contains(serviceId2));
-    }
-
-    private void initDeployToProductionSameTimeAsLastUpdated(int serviceId) throws Exception {
-        initTest(stagingEnvironmentId, serviceId, date1, date1);
-    }
-
-    @Test
-    public void deployToProductionSameTimeAsLastUpdated() throws Exception {
-        initDeployToProductionSameTimeAsLastUpdated(serviceId3);
-        assertThat(apolloTestClient.getUndeployedServicesInProductionEnvironments().contains(serviceId3));
+    public void NewerCommitThanLatestDeployment() throws Exception {
+        initNewerCommitThanLatestDeploymentTest();
+        assertThat(apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1)).isEqualTo(expectedResult);
     }
 }
