@@ -26,6 +26,7 @@ public interface DeploymentDao {
     List<Integer> getServicesDeployedOnEnv(@Param("environmentId") int environmentId);
     int getTotalDeploymentsCount();
     int getFilteredDeploymentHistoryCount(@Param("searchTerm") String searchTerm);
+    void deleteDeployment(int id);
     List<DeploymentHistoryDetails> filterDeploymentHistoryDetails(@Param("searchTerm") String searchTerm,
                                                                   @Param("orderDirection") OrderDirection orderDirection,
                                                                   @Param("offset") int offset,

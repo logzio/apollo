@@ -10,9 +10,7 @@
         WHERE service_id = #{serviceId}
         AND environment_id = #{environmentId}
         AND status = 'DONE'
-        AND started_at =
-        (SELECT max(started_at)
-        FROM deployment)
+        AND started_at = (SELECT max(started_at) FROM deployment)
     </select>
 
     <select id="getDeployment" resultType="io.logz.apollo.models.Deployment">
@@ -129,4 +127,9 @@
         deployment_message=#{deploymentMessage}
         WHERE id=#{id}
     </update>
+
+    <delete id="deleteDeployment">
+        DELETE FROM deployment
+        WHERE id=#{id}
+    </delete>
 </mapper>
