@@ -36,9 +36,9 @@ public class BranchBlocker implements BlockerFunction {
 
         String repoName = GithubConnector.getRepoNameFromRepositoryUrl(deployableVersion.getGithubRepositoryUrl());
 
-        Optional<String> validBranch = Optional.ofNullable(Arrays.stream(branchBlockerConfiguration.getbranchName().split(","))
+        Optional<String> validBranch = Arrays.stream(branchBlockerConfiguration.getbranchName().split(","))
                 .filter(branch -> blockerInjectableCommons.getGithubConnector().isCommitInBranchHistory(repoName, branch, deployableVersion.getGitCommitSha()))
-                .findFirst().orElse(null));
+                .findFirst();
 
         Boolean shouldBlock = !validBranch.isPresent();
 
