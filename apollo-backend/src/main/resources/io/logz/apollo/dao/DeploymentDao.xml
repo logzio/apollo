@@ -4,11 +4,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="io.logz.apollo.dao.DeploymentDao">
-    <select id="getLatestDeploymentOfServiceInEnvironment" resultType="io.logz.apollo.models.Deployment">
+    <select id="getLatestDeploymentOfServiceAndEnvironment" resultType="io.logz.apollo.models.Deployment">
         SELECT *
         FROM deployment
         WHERE service_id = #{serviceId}
         AND environment_id = #{environmentId}
+        AND status = 'DONE'
+        AND started_at = (SELECT max(started_at) FROM deployment)
+    </select>
+
+    <select id="getLatestDeploymentOfServiceAndEnvironmentByGroupName" resultType="io.logz.apollo.models.Deployment">
+        SELECT *
+        FROM deployment
+        WHERE service_id = #{serviceId}
+        AND environment_id = #{environmentId}
+        AND group_name = #{groupName}
         AND status = 'DONE'
         AND started_at = (SELECT max(started_at) FROM deployment)
     </select>
@@ -111,6 +121,12 @@
     <update id="updateDeploymentEnvStatus">
         UPDATE deployment
         SET env_status=#{envStatus}
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateDeploymentGroupName">
+        UPDATE deployment
+        SET group_name=#{groupName}
         WHERE id=#{id}
     </update>
 

@@ -68,7 +68,7 @@ public class DeploymentController {
     @LoggedIn
     @GET("/latest-deployment/{serviceId}/{environmentId}")
     public Deployment getLatestDeploymentOfServiceInEnvironment(int serviceId, int environmentId) {
-        return deploymentDao.getLatestDeploymentOfServiceInEnvironment(serviceId, environmentId);
+        return deploymentDao.getLatestDeploymentOfServiceAndEnvironment(serviceId, environmentId);
     }
 
     @LoggedIn

@@ -16,11 +16,13 @@ public interface DeploymentDao {
     List<Deployment> getAllStartedDeployments();
     List<Deployment> getRunningAndJustFinishedDeployments();
     List<Deployment> getLatestDeployments();
-    Deployment getLatestDeploymentOfServiceInEnvironment(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);
+    Deployment getLatestDeploymentOfServiceAndEnvironment(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);
+    Deployment getLatestDeploymentOfServiceAndEnvironmentByGroupName(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId, @Param("groupName") String groupName);
     String getCurrentGitCommitSha(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);
     void addDeployment(Deployment deployment);
     void updateDeploymentStatus(@Param("id") int id, @Param("status") Deployment.DeploymentStatus status);
     void updateDeploymentEnvStatus(@Param("id") int id, @Param("envStatus") String envStatus);
+    void updateDeploymentGroupName(@Param("id") int id, @Param("groupName") String groupName);
     void updateDeployment(Deployment deployment);
     String getDeploymentEnvStatus(@Param("id") int id);
     List<Integer> getServicesDeployedOnEnv(@Param("environmentId") int environmentId);
