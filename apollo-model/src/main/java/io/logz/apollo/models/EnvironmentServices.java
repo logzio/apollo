@@ -1,27 +1,23 @@
 package io.logz.apollo.models;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class EnvironmentServices {
 
     private Integer environmentId;
     private String environmentName;
-    private List<Service> services;
+    private Map<Integer, Integer> serviceGroupMap = new HashMap<>();
 
     public EnvironmentServices() {
 
     }
 
-    public EnvironmentServices(Integer environmentId, String environmentName, List<Service> services) {
+    public EnvironmentServices(Integer environmentId, String environmentName, Map<Service,Optional<Group>> servicesAndGroups) {
         this.environmentId = environmentId;
         this.environmentName = environmentName;
-        this.services = services;
-    }
-
-    public EnvironmentServices(Environment environment, List<Service> services) {
-        this.environmentId = environment.getId();
-        this.environmentName = environment.getName();
-        this.services = services;
+        servicesAndGroups.forEach((service,group) -> serviceGroupMap.put(service.getId(),  group.isPresent() ? group.get().getId() : 0));
     }
 
     public Integer getEnvironmentId() {
@@ -40,12 +36,12 @@ public class EnvironmentServices {
         this.environmentName = environmentName;
     }
 
-    public List<Service> getServices() {
-        return services;
+    public Map<Integer, Integer> getServiceGroupMap() {
+        return serviceGroupMap;
     }
 
-    public void setServices(List<Service> services) {
-        this.services = services;
+    public void setServiceGroupMap(Map<Integer, Integer> serviceGroupMap) {
+        this.serviceGroupMap = serviceGroupMap;
     }
 
     @Override
@@ -59,6 +55,6 @@ public class EnvironmentServices {
         EnvironmentServices environmentServices = (EnvironmentServices) o;
         return environmentServices.environmentId == this.environmentId &&
                 environmentServices.environmentName.equals(this.environmentName) &&
-                environmentServices.services.equals(this.services);
+                environmentServices.serviceGroupMap.equals(this.serviceGroupMap);
     }
 }
