@@ -3,6 +3,8 @@ package io.logz.apollo;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
+import io.logz.apollo.dao.GroupDao;
+import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
@@ -11,6 +13,7 @@ import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.EnvironmentServices;
+import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Service;
 import org.junit.After;
 import org.junit.BeforeClass;
@@ -19,7 +22,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -29,11 +35,14 @@ public class UndeployedServicesTest {
     private static ApolloTestClient apolloTestClient;
     private static DeploymentDao deploymentDao;
     private static DeployableVersionDao deployableVersionDao;
+    private static ServiceDao serviceDao;
+    private static GroupDao groupDao;
     private static Environment environment;
     private static Service service;
     private static Deployment deployment;
     private static DeployableVersion deployableVersion1;
     private static DeployableVersion deployableVersion2;
+    private static Group group;
     private static final String environmentAvailability = "PROD";
     private static List<EnvironmentServices> expectedResult = new ArrayList<>();
 
@@ -43,9 +52,13 @@ public class UndeployedServicesTest {
         standaloneApollo = StandaloneApollo.getOrCreateServer();
         deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
         deployableVersionDao = standaloneApollo.getInstance(DeployableVersionDao.class);
+        serviceDao = standaloneApollo.getInstance(ServiceDao.class);
+        groupDao = standaloneApollo.getInstance(GroupDao.class);
         environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod", environmentAvailability);
         service = ModelsGenerator.createAndSubmitService(apolloTestClient);
         ModelsGenerator.createAndSubmitService(apolloTestClient);
+        group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId());
+        serviceDao.updateServiceIsPartOfGroup(service.getId(), true);
     }
 
     @After
@@ -64,9 +77,9 @@ public class UndeployedServicesTest {
     }
 
     private void initExpectedResult() {
-        List<Service> services = new ArrayList<>();
-        services.add(service);
-        expectedResult.add(new EnvironmentServices(environment, services));
+        Map<Service, Optional<Group>> map = new HashMap<>();
+        map.put(service, Optional.of(group));
+        expectedResult.add(new EnvironmentServices(environment.getId(), environment.getName(), map));
     }
 
     public void initLatestDeploymentWhenLatestCommitTest() throws Exception {
@@ -76,6 +89,7 @@ public class UndeployedServicesTest {
 
         deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1);
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
+        deploymentDao.updateDeploymentGroupName(deployment.getId(), group.getName());
     }
 
     @Test
