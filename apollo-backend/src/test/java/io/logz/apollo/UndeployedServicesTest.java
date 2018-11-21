@@ -77,8 +77,10 @@ public class UndeployedServicesTest {
     }
 
     private void initExpectedResult() {
-        Map<Service, Optional<Group>> map = new HashMap<>();
-        map.put(service, Optional.of(group));
+        Map<Service, Optional<List<Group>>> map = new HashMap<>();
+        List<Group> groups = new ArrayList<>();
+        groups.add(group);
+        map.put(service, Optional.of(groups));
         expectedResult.add(new EnvironmentServices(environment.getId(), environment.getName(), map));
     }
 

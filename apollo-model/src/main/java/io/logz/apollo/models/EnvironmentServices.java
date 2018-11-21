@@ -1,6 +1,8 @@
 package io.logz.apollo.models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -8,16 +10,25 @@ public class EnvironmentServices {
 
     private Integer environmentId;
     private String environmentName;
-    private Map<Integer, Integer> serviceGroupMap = new HashMap<>();
+    private Map<String,List<String>> serviceGroupMap = new HashMap<>();
 
     public EnvironmentServices() {
 
     }
 
-    public EnvironmentServices(Integer environmentId, String environmentName, Map<Service,Optional<Group>> servicesAndGroups) {
+    public EnvironmentServices(Integer environmentId, String environmentName, Map<Service,Optional<List<Group>>> serviceAndGroups) {
         this.environmentId = environmentId;
         this.environmentName = environmentName;
-        servicesAndGroups.forEach((service,group) -> serviceGroupMap.put(service.getId(),  group.isPresent() ? group.get().getId() : 0));
+        serviceAndGroups.forEach((service, groups) -> {
+            if(groups.isPresent()) {
+                List<String> groupsNames = new ArrayList<>();
+                groups.get().forEach(group -> groupsNames.add(group.getName()));
+                this.serviceGroupMap.put(service.getName(), groupsNames);
+            }
+            else {
+                this.serviceGroupMap.put(service.getName(),null);
+            }
+        });
     }
 
     public Integer getEnvironmentId() {
@@ -36,11 +47,11 @@ public class EnvironmentServices {
         this.environmentName = environmentName;
     }
 
-    public Map<Integer, Integer> getServiceGroupMap() {
+    public Map<String,List<String>> getServiceGroupMap() {
         return serviceGroupMap;
     }
 
-    public void setServiceGroupMap(Map<Integer, Integer> serviceGroupMap) {
+    public void setServiceGroupMap(Map<String, List<String>> serviceGroupMap) {
         this.serviceGroupMap = serviceGroupMap;
     }
 
