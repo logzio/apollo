@@ -16,6 +16,7 @@ import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 
 import javax.inject.Inject;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -108,6 +109,7 @@ public class DeployableVersionController {
         newDeployableVersion.setGitCommitSha(gitCommitSha);
         newDeployableVersion.setGithubRepositoryUrl(githubRepositoryUrl);
         newDeployableVersion.setServiceId(serviceId);
+        newDeployableVersion.setCommitDate(new Date());
 
         // Just to protect tests from reaching github rate limit
         if (githubRepositoryUrl.contains("github.com")) {

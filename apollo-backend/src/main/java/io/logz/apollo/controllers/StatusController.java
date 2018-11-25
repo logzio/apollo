@@ -8,7 +8,7 @@ import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
 import io.logz.apollo.models.Environment;
-import io.logz.apollo.models.EnvironmentServices;
+import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
@@ -182,7 +182,7 @@ public class StatusController {
     }
 
     @GET("/status/getUndeployedServicesByEnvironmentAvailability/{availability}/{timeUnit}/{undeployedTimeAmount}")
-    public List<EnvironmentServices> getUndeployedServicesByEnvironmentAvailability(String availability, String timeUnit, int undeployedTimeAmount) {
+    public List<EnvironmentServiceGroupMap> getUndeployedServicesByEnvironmentAvailability(String availability, String timeUnit, int undeployedTimeAmount) {
         TimeUnit timeUnitEnum;
         try {
             timeUnitEnum = TimeUnit.valueOf(timeUnit);

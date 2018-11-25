@@ -124,12 +124,6 @@
         WHERE id=#{id}
     </update>
 
-    <update id="updateDeploymentGroupName">
-        UPDATE deployment
-        SET group_name=#{groupName}
-        WHERE id=#{id}
-    </update>
-
     <update id="updateDeployment">
         UPDATE deployment SET
         environment_id=#{environmentId},
@@ -143,9 +137,4 @@
         deployment_message=#{deploymentMessage}
         WHERE id=#{id}
     </update>
-
-    <delete id="deleteDeployment">
-        DELETE FROM deployment
-        WHERE id=#{id}
-    </delete>
 </mapper>

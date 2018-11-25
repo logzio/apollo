@@ -6,17 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class EnvironmentServices {
+public class EnvironmentServiceGroupMap {
 
     private Integer environmentId;
     private String environmentName;
     private Map<String,List<String>> serviceGroupMap = new HashMap<>();
 
-    public EnvironmentServices() {
+    public EnvironmentServiceGroupMap() {
 
     }
 
-    public EnvironmentServices(Integer environmentId, String environmentName, Map<Service,Optional<List<Group>>> serviceAndGroups) {
+    public EnvironmentServiceGroupMap(Integer environmentId, String environmentName, Map<Service,Optional<List<Group>>> serviceAndGroups) {
         this.environmentId = environmentId;
         this.environmentName = environmentName;
         serviceAndGroups.forEach((service, groups) -> {
@@ -26,7 +26,7 @@ public class EnvironmentServices {
                 this.serviceGroupMap.put(service.getName(), groupsNames);
             }
             else {
-                this.serviceGroupMap.put(service.getName(),null);
+                this.serviceGroupMap.put(service.getName(),new ArrayList<>());
             }
         });
     }
@@ -60,12 +60,12 @@ public class EnvironmentServices {
         if (o == this) {
             return true;
         }
-        if (!(o instanceof EnvironmentServices)) {
+        if (!(o instanceof EnvironmentServiceGroupMap)) {
             return false;
         }
-        EnvironmentServices environmentServices = (EnvironmentServices) o;
-        return environmentServices.environmentId == this.environmentId &&
-                environmentServices.environmentName.equals(this.environmentName) &&
-                environmentServices.serviceGroupMap.equals(this.serviceGroupMap);
+        EnvironmentServiceGroupMap environmentServiceGroupMap = (EnvironmentServiceGroupMap) o;
+        return environmentServiceGroupMap.environmentId == this.environmentId &&
+                environmentServiceGroupMap.environmentName.equals(this.environmentName) &&
+                environmentServiceGroupMap.serviceGroupMap.equals(this.serviceGroupMap);
     }
 }

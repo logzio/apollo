@@ -58,10 +58,15 @@ public class DeploymentHandler {
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, Req req) throws ApolloDeploymentException {
-        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, Optional.empty(), req);
+        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, "", Optional.empty(), req);
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, Optional<Group> group, Req req) throws ApolloDeploymentException {
+        String groupName = group.isPresent() ? group.get().getName() : "";
+        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, req);
+    }
+
+    public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Req req) throws ApolloDeploymentException {
         // Get the username from the token
         String userEmail = req.token().get("_user").toString();
         String sourceVersion = null;
@@ -93,6 +98,7 @@ public class DeploymentHandler {
         MDC.put("userEmail", userEmail);
         MDC.put("sourceVersion", sourceVersion);
         MDC.put("lastUpdate", String.valueOf(currentDate));
+        MDC.put("groupName", groupName);
 
         logger.info("Got request for a new deployment");
 
@@ -133,7 +139,7 @@ public class DeploymentHandler {
             newDeployment.setStatus(Deployment.DeploymentStatus.PENDING);
             newDeployment.setSourceVersion(sourceVersion);
             newDeployment.setDeploymentMessage(deploymentMessage);
-
+            newDeployment.setGroupName(groupName);
             newDeployment.setLastUpdate(currentDate);
 
             if (group.isPresent()) {

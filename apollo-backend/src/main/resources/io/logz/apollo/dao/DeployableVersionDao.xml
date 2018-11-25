@@ -57,9 +57,4 @@
         SET commit_date=#{commitDate}
         WHERE id=#{id}
     </update>
-
-    <delete id="deleteDeployableVersion">
-        DELETE FROM deployable_version
-        WHERE id=#{id}
-    </delete>
 </mapper>

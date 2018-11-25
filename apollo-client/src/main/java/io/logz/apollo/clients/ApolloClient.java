@@ -5,7 +5,7 @@ import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.exceptions.ApolloCouldNotLoginException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
-import io.logz.apollo.models.EnvironmentServices;
+import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
 import io.logz.apollo.models.User;
@@ -103,14 +103,19 @@ public class ApolloClient {
     }
 
     public MultiDeploymentResponseObject addDeployment(Deployment deployment) throws ApolloClientException {
-        return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId());
+        return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName());
     }
 
     public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId) throws ApolloClientException {
+        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "");
+    }
+
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName) throws ApolloClientException {
         String requestBody = Common.generateJson("environmentIdsCsv", environmentIdsCsv,
                 "serviceIdsCsv", serviceIdsCsv,
                 "deployableVersionId", String.valueOf(deployableVersionId),
-                "deploymentMessage", "this is a deployment message");
+                "deploymentMessage", "this is a deployment message",
+                "groupName", String.valueOf(groupName));
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }
@@ -228,7 +233,7 @@ public class ApolloClient {
         return genericApolloClient.getResult("/health", new TypeReference<Map<Integer, Boolean>>() {});
     }
 
-    public List<EnvironmentServices> getUndeployedServicesByEnvironmentAvailability(String availability, TimeUnit timeUnit, int undeployedTimeAmount) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/status/getUndeployedServicesByEnvironmentAvailability/" + availability + "/" + timeUnit + "/" + undeployedTimeAmount, new TypeReference<List<EnvironmentServices>>() {});
+    public List<EnvironmentServiceGroupMap> getUndeployedServicesByEnvironmentAvailability(String availability, TimeUnit timeUnit, int undeployedTimeAmount) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/status/getUndeployedServicesByEnvironmentAvailability/" + availability + "/" + timeUnit + "/" + undeployedTimeAmount, new TypeReference<List<EnvironmentServiceGroupMap>>() {});
     }
 }

@@ -29,10 +29,4 @@
         is_part_of_group=#{isPartOfGroup}
         WHERE id=#{id}
     </update>
-
-    <update id="updateServiceIsPartOfGroup">
-        UPDATE service SET
-        is_part_of_group=#{isPartOfGroup}
-        WHERE id=#{id}
-    </update>
 </mapper>

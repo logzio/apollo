@@ -18,5 +18,4 @@ public interface DeployableVersionDao {
     void addDeployableVersion(DeployableVersion deployableVersion);
     List<DeployableVersion> getDeployableVersionForMultiServices(@Param("serviceIdsCsv") String serviceIdsCsv, @Param("numOfServices") int numOfServices);
     void updateCommitDate(@Param("id") int id, @Param("commitDate") Date commitDate);
-    void deleteDeployableVersion(int id);
 }

@@ -22,13 +22,11 @@ public interface DeploymentDao {
     void addDeployment(Deployment deployment);
     void updateDeploymentStatus(@Param("id") int id, @Param("status") Deployment.DeploymentStatus status);
     void updateDeploymentEnvStatus(@Param("id") int id, @Param("envStatus") String envStatus);
-    void updateDeploymentGroupName(@Param("id") int id, @Param("groupName") String groupName);
     void updateDeployment(Deployment deployment);
     String getDeploymentEnvStatus(@Param("id") int id);
     List<Integer> getServicesDeployedOnEnv(@Param("environmentId") int environmentId);
     int getTotalDeploymentsCount();
     int getFilteredDeploymentHistoryCount(@Param("searchTerm") String searchTerm);
-    void deleteDeployment(int id);
     List<DeploymentHistoryDetails> filterDeploymentHistoryDetails(@Param("searchTerm") String searchTerm,
                                                                   @Param("orderDirection") OrderDirection orderDirection,
                                                                   @Param("offset") int offset,
