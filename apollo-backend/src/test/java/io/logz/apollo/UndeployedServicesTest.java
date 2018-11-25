@@ -3,8 +3,6 @@ package io.logz.apollo;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
-import io.logz.apollo.dao.GroupDao;
-import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
@@ -12,20 +10,15 @@ import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
-import io.logz.apollo.models.EnvironmentServices;
+import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Service;
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -35,16 +28,10 @@ public class UndeployedServicesTest {
     private static ApolloTestClient apolloTestClient;
     private static DeploymentDao deploymentDao;
     private static DeployableVersionDao deployableVersionDao;
-    private static ServiceDao serviceDao;
-    private static GroupDao groupDao;
-    private static Environment environment;
-    private static Service service;
     private static Deployment deployment;
     private static DeployableVersion deployableVersion1;
     private static DeployableVersion deployableVersion2;
-    private static Group group;
     private static final String environmentAvailability = "PROD";
-    private static List<EnvironmentServices> expectedResult = new ArrayList<>();
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -52,69 +39,25 @@ public class UndeployedServicesTest {
         standaloneApollo = StandaloneApollo.getOrCreateServer();
         deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
         deployableVersionDao = standaloneApollo.getInstance(DeployableVersionDao.class);
-        serviceDao = standaloneApollo.getInstance(ServiceDao.class);
-        groupDao = standaloneApollo.getInstance(GroupDao.class);
-        environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod", environmentAvailability);
-        service = ModelsGenerator.createAndSubmitService(apolloTestClient);
         ModelsGenerator.createAndSubmitService(apolloTestClient);
-        group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId());
-        serviceDao.updateServiceIsPartOfGroup(service.getId(), true);
     }
 
-    @After
-    public void after() {
-        expectedResult.clear();
-
-        if(deployment != null) {
-            deploymentDao.deleteDeployment(deployment.getId());
-        }
-        if(deployableVersion1 != null) {
-            deployableVersionDao.deleteDeployableVersion(deployableVersion1.getId());
-        }
-        if(deployableVersion2 != null) {
-            deployableVersionDao.deleteDeployableVersion(deployableVersion2.getId());
-        }
-    }
-
-    private void initExpectedResult() {
-        Map<Service, Optional<List<Group>>> map = new HashMap<>();
-        List<Group> groups = new ArrayList<>();
-        groups.add(group);
-        map.put(service, Optional.of(groups));
-        expectedResult.add(new EnvironmentServices(environment.getId(), environment.getName(), map));
-    }
-
-    public void initLatestDeploymentWhenLatestCommitTest() throws Exception {
+    public void initLatestDeploymentWhenLatestCommitTest(Environment environment, Service service, Group group) throws Exception {
         Date currentDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant());
         deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
         deployableVersionDao.updateCommitDate(deployableVersion1.getId(), currentDateUtcZone);
 
-        deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1);
+        deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1, group.getName());
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
-        deploymentDao.updateDeploymentGroupName(deployment.getId(), group.getName());
     }
 
-    @Test
-    public void latestDeploymentWhenLatestCommit() throws Exception {
-        initLatestDeploymentWhenLatestCommitTest();
-        assertThat(apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1).size()).isEqualTo(0);
-    }
-
-    private void initNoDeploymentAndCommitExistsTest() throws ApolloClientException {
+    private void initNoDeploymentAndCommitExistsTest(Environment environment, Service service, Group group) throws ApolloClientException {
         Date currentDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant());
         deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
         deployableVersionDao.updateCommitDate(deployableVersion1.getId(), currentDateUtcZone);
-
-        initExpectedResult();
     }
 
-    @Test
-    public void noDeploymentAndCommitExists() throws Exception {
-        initNoDeploymentAndCommitExistsTest();
-        assertThat(apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1)).isEqualTo(expectedResult);
-    }
-
-    private void initNewerCommitThanLatestDeploymentTest() throws Exception {
+    private void initNewerCommitThanLatestDeploymentTest(Environment environment, Service service, Group group) throws Exception {
         Date currentDateUtcZone = Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant());
         deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
         deployableVersionDao.updateCommitDate(deployableVersion1.getId(), currentDateUtcZone);
@@ -123,15 +66,65 @@ public class UndeployedServicesTest {
         deployableVersion2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
         deployableVersionDao.updateCommitDate(deployableVersion2.getId(), laterDateUtcZone);
 
-        deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1);
+        deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion1, group.getName());
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
+    }
 
-        initExpectedResult();
+    @Test
+    public void latestDeploymentWhenLatestCommit() throws Exception {
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod1", environmentAvailability);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient, true);
+        Group group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId(), "my-group1");
+
+        initLatestDeploymentWhenLatestCommitTest(environment, service, group);
+
+        List<EnvironmentServiceGroupMap> result = apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1);
+        assertThat(result
+                .stream()
+                .anyMatch(
+                        env -> env.getEnvironmentId().equals(environment.getId()) &&
+                                env.getEnvironmentName().equals(environment.getName()) &&
+                                env.getServiceGroupMap().containsKey(service.getName()) &&
+                                env.getServiceGroupMap().get(service.getName()).stream().anyMatch(gName -> gName.equals(group.getName()))
+                )).isFalse();
+    }
+
+    @Test
+    public void noDeploymentAndCommitExists() throws Exception {
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod2", environmentAvailability);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient, true);
+        Group group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId(), "my-group2");
+
+        initNoDeploymentAndCommitExistsTest(environment, service, group);
+
+        List<EnvironmentServiceGroupMap> result = apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1);
+        assertThat(result
+                        .stream()
+                        .anyMatch(
+                                env -> env.getEnvironmentId().equals(environment.getId()) &&
+                                        env.getEnvironmentName().equals(environment.getName()) &&
+                                        env.getServiceGroupMap().containsKey(service.getName()) &&
+                                        env.getServiceGroupMap().get(service.getName()).stream().anyMatch(gName -> gName.equals(group.getName()))
+                        )).isTrue();
+
     }
 
     @Test
     public void NewerCommitThanLatestDeployment() throws Exception {
-        initNewerCommitThanLatestDeploymentTest();
-        assertThat(apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1)).isEqualTo(expectedResult);
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, "prod3", environmentAvailability);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient, true);
+        Group group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId(), "my-group3");
+
+        initNewerCommitThanLatestDeploymentTest(environment, service, group);
+
+        List<EnvironmentServiceGroupMap> result = apolloTestClient.getUndeployedServicesByEnvironmentAvailability(environmentAvailability, TimeUnit.HOURS, 1);
+        assertThat(result
+                .stream()
+                .anyMatch(
+                        env -> env.getEnvironmentId().equals(environment.getId()) &&
+                                env.getEnvironmentName().equals(environment.getName()) &&
+                                env.getServiceGroupMap().containsKey(service.getName()) &&
+                                env.getServiceGroupMap().get(service.getName()).stream().anyMatch(gName -> gName.equals(group.getName()))
+                )).isTrue();
     }
 }
