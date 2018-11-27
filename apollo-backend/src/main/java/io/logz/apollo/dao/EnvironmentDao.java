@@ -1,6 +1,7 @@
 package io.logz.apollo.dao;
 
 import io.logz.apollo.models.Environment;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public interface EnvironmentDao {
 
     Environment getEnvironment(int id);
     List<Environment> getAllEnvironments();
-    List<Environment> getEnvironmentsByAvailability(String availability);
+    List<Environment> getEnvironmentsByAvailability(@Param("availability") String availability);
     void addEnvironment(Environment environment);
 }
+

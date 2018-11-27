@@ -181,14 +181,14 @@ public class StatusController {
         return kubernetesHandler.getPodContainerNames(podName);
     }
 
-    @GET("/status/getUndeployedServicesByEnvironmentAvailability/{availability}/{timeUnit}/{undeployedTimeAmount}")
-    public List<EnvironmentServiceGroupMap> getUndeployedServicesByEnvironmentAvailability(String availability, String timeUnit, int undeployedTimeAmount) {
+    @GET("/status/get-undeployed-services/avaiability/{availability}/time-unit/{timeUnit}/duration/{duration}")
+    public List<EnvironmentServiceGroupMap> getUndeployedServicesByAvailability(String availability, String timeUnit, int duration) {
         TimeUnit timeUnitEnum;
         try {
             timeUnitEnum = TimeUnit.valueOf(timeUnit);
         } catch (IllegalArgumentException | NullPointerException e) {
             throw new IllegalArgumentException("Please pass timeUnit parameter in TimeUnit type template", e.getCause());
         }
-        return serviceStatusHandler.getUndeployedServicesByEnvironmentAvailability(availability, timeUnitEnum, undeployedTimeAmount);
+        return serviceStatusHandler.getUndeployedServicesByAvailability(availability, timeUnitEnum, duration);
     }
 }

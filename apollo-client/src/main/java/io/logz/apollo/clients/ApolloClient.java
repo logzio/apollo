@@ -233,7 +233,7 @@ public class ApolloClient {
         return genericApolloClient.getResult("/health", new TypeReference<Map<Integer, Boolean>>() {});
     }
 
-    public List<EnvironmentServiceGroupMap> getUndeployedServicesByEnvironmentAvailability(String availability, TimeUnit timeUnit, int undeployedTimeAmount) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/status/getUndeployedServicesByEnvironmentAvailability/" + availability + "/" + timeUnit + "/" + undeployedTimeAmount, new TypeReference<List<EnvironmentServiceGroupMap>>() {});
+    public List<EnvironmentServiceGroupMap> getUndeployedServicesByAvailability(String availability, TimeUnit timeUnit, int duration) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/status/get-undeployed-services/avaiability/" + availability + "/time-unit/" + timeUnit + "/duration/" + duration, new TypeReference<List<EnvironmentServiceGroupMap>>() {});
     }
 }
