@@ -16,6 +16,8 @@ import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -109,7 +111,11 @@ public class DeployableVersionController {
         newDeployableVersion.setGitCommitSha(gitCommitSha);
         newDeployableVersion.setGithubRepositoryUrl(githubRepositoryUrl);
         newDeployableVersion.setServiceId(serviceId);
-        newDeployableVersion.setCommitDate(new Date());
+
+        // Will be deleted after fixing GitHub mock - https://github.com/logzio/apollo/issues/132
+        if(githubRepositoryUrl.contains("example.com")) {
+            newDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
+        }
 
         // Just to protect tests from reaching github rate limit
         if (githubRepositoryUrl.contains("github.com")) {

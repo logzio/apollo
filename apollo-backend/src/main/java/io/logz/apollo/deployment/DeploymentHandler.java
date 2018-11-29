@@ -90,14 +90,11 @@ public class DeploymentHandler {
             logger.error("Got exception while getting the current gitCommitSha from kubernetes. That means no revert.", e);
         }
 
-        Date currentDate = new Date();
-
         MDC.put("environmentId", String.valueOf(environmentId));
         MDC.put("serviceId", String.valueOf(serviceId));
         MDC.put("deployableVersionId", String.valueOf(deployableVersionId));
         MDC.put("userEmail", userEmail);
         MDC.put("sourceVersion", sourceVersion);
-        MDC.put("lastUpdate", String.valueOf(currentDate));
         MDC.put("groupName", groupName);
 
         logger.info("Got request for a new deployment");
@@ -140,7 +137,6 @@ public class DeploymentHandler {
             newDeployment.setSourceVersion(sourceVersion);
             newDeployment.setDeploymentMessage(deploymentMessage);
             newDeployment.setGroupName(groupName);
-            newDeployment.setLastUpdate(currentDate);
 
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());

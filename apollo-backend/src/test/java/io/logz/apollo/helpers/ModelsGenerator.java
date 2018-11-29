@@ -20,6 +20,8 @@ import io.logz.apollo.models.Notification;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
@@ -30,11 +32,11 @@ public class ModelsGenerator {
 
     public static int DEFAULT_SCALING_FACTOR = 3;
 
-    public static Environment createEnvironment(String name, String availability) {
+    public static Environment createEnvironment() {
         Environment testEnvironment = new Environment();
-        testEnvironment.setName(name);
+        testEnvironment.setName("env-name-" + Common.randomStr(5));
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
-        testEnvironment.setAvailability(availability);
+        testEnvironment.setAvailability("PROD-" + Common.randomStr(5));
         testEnvironment.setKubernetesMaster("kube.prod." + Common.randomStr(5));
         testEnvironment.setKubernetesToken("AaBbCc" + Common.randomStr(10));
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
@@ -45,20 +47,8 @@ public class ModelsGenerator {
         return testEnvironment;
     }
 
-    public static Environment createEnvironment() {
-        String name = "env-name-" + Common.randomStr(5);
-        String availability = "PROD-" + Common.randomStr(5);
-        return createEnvironment(name, availability);
-    }
-
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
         Environment testEnvironment = ModelsGenerator.createEnvironment();
-        testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
-        return testEnvironment;
-    }
-
-    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String name, String availability) throws ApolloClientException {
-        Environment testEnvironment = ModelsGenerator.createEnvironment(name, availability);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
     }
@@ -77,7 +67,6 @@ public class ModelsGenerator {
         testDeployableVersion.setGitCommitSha("abc129aed837f6" + Common.randomStr(5));
         testDeployableVersion.setGithubRepositoryUrl("http://test.com/logzio/" + Common.randomStr(5));
         testDeployableVersion.setServiceId(relatedService.getId());
-        testDeployableVersion.setCommitDate(new Date());
 
         return testDeployableVersion;
     }
@@ -87,7 +76,6 @@ public class ModelsGenerator {
         testDeployableVersion.setGitCommitSha(commitSha);
         testDeployableVersion.setGithubRepositoryUrl(repositoryUrl);
         testDeployableVersion.setServiceId(relatedService.getId());
-        testDeployableVersion.setCommitDate(new Date());
 
         return testDeployableVersion;
     }
@@ -196,10 +184,10 @@ public class ModelsGenerator {
         testDeployment.setEnvironmentId(relatedEnvironment.getId());
         testDeployment.setServiceId(relatedService.getId());
         testDeployment.setDeployableVersionId(relatedDeployableVersion.getId());
-        testDeployment.setLastUpdate(new Date());
         testDeployment.setUserEmail("user-" + Common.randomStr(5));
         testDeployment.setGroupName(groupName);
         testDeployment.setDeploymentMessage("message-" + Common.randomStr(5));
+        testDeployment.setLastUpdate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.of("UTC")).toInstant()));
         return testDeployment;
     }
 
