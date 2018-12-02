@@ -113,7 +113,7 @@ public class DeployableVersionController {
         newDeployableVersion.setServiceId(serviceId);
 
         // Will be deleted after fixing GitHub mock - https://github.com/logzio/apollo/issues/132
-        if(githubRepositoryUrl.contains("example.com")) {
+        if(githubRepositoryUrl.contains("http://test.com/logzio/")) {
             newDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
         }
 

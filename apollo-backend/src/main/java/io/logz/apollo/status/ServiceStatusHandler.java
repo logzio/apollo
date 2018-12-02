@@ -122,7 +122,7 @@ public class ServiceStatusHandler {
             return getTimeDiff(latestDeploymentDate.get(), latestDeployableVersionDate.get(), timeUnit) > duration;
         }
         if (latestDeployableVersionDate.isPresent()) {
-            return latestDeployableVersionDate.get().compareTo(getLastPossibleDateSinceLastDeployableVersion(timeUnit, duration)) > 0;
+            return latestDeployableVersionDate.get().compareTo(getLastPossibleDateSinceLastDeployableVersion(timeUnit, duration)) < 0;
         }
         return false;
     }

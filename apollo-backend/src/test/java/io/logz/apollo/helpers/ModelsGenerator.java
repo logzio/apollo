@@ -67,6 +67,7 @@ public class ModelsGenerator {
         testDeployableVersion.setGitCommitSha("abc129aed837f6" + Common.randomStr(5));
         testDeployableVersion.setGithubRepositoryUrl("http://test.com/logzio/" + Common.randomStr(5));
         testDeployableVersion.setServiceId(relatedService.getId());
+        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
 
         return testDeployableVersion;
     }
@@ -76,6 +77,7 @@ public class ModelsGenerator {
         testDeployableVersion.setGitCommitSha(commitSha);
         testDeployableVersion.setGithubRepositoryUrl(repositoryUrl);
         testDeployableVersion.setServiceId(relatedService.getId());
+        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
 
         return testDeployableVersion;
     }
