@@ -35,17 +35,16 @@ public class UndeployedServicesTest {
     @Test
     public void testUndeployedService() throws Exception {
 
-        final String repositoryUrl = "example.com";
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         final String availability = environment.getAvailability();
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient, true);
         Group group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId());
-        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service, repositoryUrl, "sha1");
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
         Deployment deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion, group.getName());
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
         Thread.sleep(5000);
-        ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service, repositoryUrl, "sha2");
+        ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
         assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 1).size()).isEqualTo(0);
         assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1).size()).isEqualTo(1);
     }
