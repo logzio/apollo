@@ -114,7 +114,7 @@ public class DeployableVersionController {
 
         // Will be deleted after fixing GitHub mock - https://github.com/logzio/apollo/issues/132
         if(githubRepositoryUrl.contains("http://test.com/logzio/")) {
-            newDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).plusHours(2).toInstant()));
+            newDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
         }
 
         // Just to protect tests from reaching github rate limit
