@@ -45,7 +45,7 @@ public class UndeployedServicesTest {
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
         Thread.sleep(5000);
         ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
-        assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 1).size()).isEqualTo(0);
+        assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 3).size()).isEqualTo(0);
         assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1).size()).isEqualTo(1);
     }
 }
