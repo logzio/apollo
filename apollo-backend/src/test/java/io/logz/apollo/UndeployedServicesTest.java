@@ -8,6 +8,7 @@ import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Service;
 import org.junit.BeforeClass;
@@ -16,6 +17,7 @@ import org.junit.Test;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -45,7 +47,18 @@ public class UndeployedServicesTest {
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.DONE);
         Thread.sleep(5000);
         ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
-        assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 3).size()).isEqualTo(0);
-        assertThat(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1).size()).isEqualTo(1);
+        assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 1), service)).isFalse();
+        assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1), service)).isTrue();
+    }
+
+    private boolean isServicePartOfGroupMap(List<EnvironmentServiceGroupMap> environmentServiceGroupMapList, Service service) {
+        return environmentServiceGroupMapList
+                .stream()
+                .anyMatch(
+                        environmentServiceGroupMap ->
+                                environmentServiceGroupMap
+                                        .getServiceGroupMap().keySet()
+                                        .stream()
+                                        .anyMatch(serviceKey -> serviceKey.contentEquals(service.getName())));
     }
 }
