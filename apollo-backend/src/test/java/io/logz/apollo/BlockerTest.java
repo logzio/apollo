@@ -8,6 +8,7 @@ import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Service;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -263,6 +264,7 @@ public class BlockerTest {
     }
 
     @Test
+    @Ignore
     public void testGHCommitStatusBlocker() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
@@ -286,6 +288,7 @@ public class BlockerTest {
     }
 
     @Test
+    @Ignore
     public void testBlockerUserOverride() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
