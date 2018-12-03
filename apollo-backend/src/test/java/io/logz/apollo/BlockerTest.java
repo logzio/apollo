@@ -205,6 +205,7 @@ public class BlockerTest {
     }
 
     @Test
+    @Ignore
     public void testBranchBlocker() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
