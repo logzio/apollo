@@ -8,20 +8,22 @@ import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
 import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
+import io.logz.apollo.status.ServiceStatusHandler;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,14 +39,16 @@ public class StatusController {
     private final EnvironmentDao environmentDao;
     private final ServiceDao serviceDao;
     private final GroupDao groupDao;
+    private final ServiceStatusHandler serviceStatusHandler;
 
     @Inject
     public StatusController(KubernetesHandlerStore kubernetesHandlerStore, EnvironmentDao environmentDao,
-                            ServiceDao serviceDao, GroupDao groupDao) {
+                            ServiceDao serviceDao, GroupDao groupDao, ServiceStatusHandler serviceStatusHandler) {
         this.kubernetesHandlerStore = requireNonNull(kubernetesHandlerStore);
         this.environmentDao = requireNonNull(environmentDao);
         this.serviceDao = requireNonNull(serviceDao);
         this.groupDao = requireNonNull(groupDao);
+        this.serviceStatusHandler = requireNonNull(serviceStatusHandler);
     }
 
     @GET("/status/service/{id}")
@@ -175,5 +179,16 @@ public class StatusController {
         KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(environment);
 
         return kubernetesHandler.getPodContainerNames(podName);
+    }
+
+    @GET("/status/get-undeployed-services/avaiability/{availability}/time-unit/{timeUnit}/duration/{duration}")
+    public List<EnvironmentServiceGroupMap> getUndeployedServicesByAvailability(String availability, String timeUnit, int duration) {
+        TimeUnit timeUnitEnum;
+        try {
+            timeUnitEnum = TimeUnit.valueOf(timeUnit);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Please pass timeUnit parameter in TimeUnit type template", e.getCause());
+        }
+        return serviceStatusHandler.getUndeployedServicesByAvailability(availability, timeUnitEnum, duration);
     }
 }

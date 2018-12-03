@@ -61,7 +61,7 @@ public class DeploymentGroupsController {
 
             try {
                 Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, deployableVersionId,
-                        deploymentMessage, Optional.of(group), req);
+                        deploymentMessage, group.getName(), Optional.of(group), req);
                 responseObject.addSuccessful(groupId, deployment);
             } catch (ApolloDeploymentException e) {
                 responseObject.addUnsuccessful(groupId, e);

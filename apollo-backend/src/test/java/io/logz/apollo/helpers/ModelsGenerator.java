@@ -17,10 +17,11 @@ import io.logz.apollo.models.Service;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Notification.NotificationType;
 import io.logz.apollo.models.Notification;
-
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
@@ -42,7 +43,7 @@ public class ModelsGenerator {
         testEnvironment.setServicePortCoefficient(0);
         testEnvironment.setRequireDeploymentMessage(true);
         testEnvironment.setConcurrencyLimit(KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1);
-        
+
         return testEnvironment;
     }
 
@@ -66,6 +67,7 @@ public class ModelsGenerator {
         testDeployableVersion.setGitCommitSha("abc129aed837f6" + Common.randomStr(5));
         testDeployableVersion.setGithubRepositoryUrl("http://test.com/logzio/" + Common.randomStr(5));
         testDeployableVersion.setServiceId(relatedService.getId());
+        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
 
         return testDeployableVersion;
     }
@@ -75,6 +77,7 @@ public class ModelsGenerator {
         testDeployableVersion.setGitCommitSha(commitSha);
         testDeployableVersion.setGithubRepositoryUrl(repositoryUrl);
         testDeployableVersion.setServiceId(relatedService.getId());
+        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
 
         return testDeployableVersion;
     }
@@ -110,18 +113,28 @@ public class ModelsGenerator {
     }
 
     public static Service createService() {
+        return createService(false);
+    }
+
+    public static Service createService(boolean isPartOfGroup) {
         Service testService = new Service();
         testService.setName("Prod app " + Common.randomStr(5));
         testService.setDeploymentYaml("");  // TODO: fill something real
         testService.setServiceYaml("");  // TODO: fill something real
         testService.setIngressYaml("");  // TODO: fill something real
-        testService.setIsPartOfGroup(false);
+        testService.setIsPartOfGroup(isPartOfGroup);
 
         return testService;
     }
 
     public static Service createAndSubmitService(ApolloTestClient apolloTestClient) throws ApolloClientException {
         Service testService = ModelsGenerator.createService();
+        testService.setId(apolloTestClient.addService(testService).getId());
+        return testService;
+    }
+
+    public static Service createAndSubmitService(ApolloTestClient apolloTestClient, boolean isPartOfGroup) throws ApolloClientException {
+        Service testService = ModelsGenerator.createService(isPartOfGroup);
         testService.setId(apolloTestClient.addService(testService).getId());
         return testService;
     }
@@ -147,6 +160,20 @@ public class ModelsGenerator {
         return testGroup;
     }
 
+    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId, String name) throws ApolloClientException {
+        Group testGroup = createGroup();
+
+        testGroup.setServiceId(serviceId);
+        testGroup.setEnvironmentId(environmentId);
+        testGroup.setName(name);
+
+        apolloTestClient.addGroup(testGroup);
+
+        testGroup.setId(apolloTestClient.getGroupByName(testGroup.getName()).getId());
+
+        return testGroup;
+    }
+
     public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
                                               DeployableVersion relatedDeployableVersion) {
         return createDeployment(relatedService, relatedEnvironment, relatedDeployableVersion, null);
@@ -159,10 +186,10 @@ public class ModelsGenerator {
         testDeployment.setEnvironmentId(relatedEnvironment.getId());
         testDeployment.setServiceId(relatedService.getId());
         testDeployment.setDeployableVersionId(relatedDeployableVersion.getId());
-        testDeployment.setLastUpdate(new Date());
         testDeployment.setUserEmail("user-" + Common.randomStr(5));
         testDeployment.setGroupName(groupName);
         testDeployment.setDeploymentMessage("message-" + Common.randomStr(5));
+        testDeployment.setLastUpdate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.of("UTC")).toInstant()));
         return testDeployment;
     }
 
@@ -189,6 +216,26 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
+
+        if (result.getSuccessful().size() > 0) {
+            Deployment deployment = result.getSuccessful().get(0).getDeployment();
+            testDeployment.setId(deployment.getId());
+        } else {
+            throw result.getUnsuccessful().get(0).getException();
+        }
+
+        return testDeployment;
+    }
+
+    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
+                                                       Service service, DeployableVersion deployableVersion, String groupName) throws Exception {
+
+        // Give the user permissions to deploy
+        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, environment);
+
+        // Now we have enough to create a deployment
+        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion, groupName);
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
         if (result.getSuccessful().size() > 0) {

@@ -16,6 +16,9 @@ import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 
 import javax.inject.Inject;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +34,8 @@ public class DeployableVersionController {
 
     private final DeployableVersionDao deployableVersionDao;
     private final GithubConnector githubConnector;
+
+    private final static int LATEST_DEPLOYABLE_VERSIONS_COUNT = 200;
 
     public static int MAX_COMMIT_FIELDS_LENGTH = 1000;
     public static int MAX_COMMIT_MESSAGE_LENGTH = 10000;
@@ -63,7 +68,7 @@ public class DeployableVersionController {
     @LoggedIn
     @GET("/deployable-version/latest/service/{serviceId}")
     public List<DeployableVersion> getLatestDeployableVersionsByServiceId(int serviceId) {
-        return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId);
+        return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId, LATEST_DEPLOYABLE_VERSIONS_COUNT);
     }
 
     @LoggedIn
@@ -106,6 +111,11 @@ public class DeployableVersionController {
         newDeployableVersion.setGitCommitSha(gitCommitSha);
         newDeployableVersion.setGithubRepositoryUrl(githubRepositoryUrl);
         newDeployableVersion.setServiceId(serviceId);
+
+        // Will be deleted after fixing GitHub mock - https://github.com/logzio/apollo/issues/132
+        if(githubRepositoryUrl.contains("http://test.com/logzio/")) {
+            newDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
+        }
 
         // Just to protect tests from reaching github rate limit
         if (githubRepositoryUrl.contains("github.com")) {

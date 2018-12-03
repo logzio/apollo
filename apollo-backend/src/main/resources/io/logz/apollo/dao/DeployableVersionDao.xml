@@ -26,7 +26,15 @@
         FROM deployable_version
         WHERE service_id = #{serviceId}
         ORDER BY commit_date DESC
-        LIMIT 200
+        LIMIT #{count}
+    </select>
+
+    <select id="getLatestDeployableVersionByServiceId" resultType="io.logz.apollo.models.DeployableVersion">
+        SELECT *
+        FROM deployable_version
+        WHERE service_id = #{serviceId}
+        ORDER BY commit_date DESC
+        LIMIT 1
     </select>
 
     <select id="getDeployableVersionForMultiServices" resultType="io.logz.apollo.models.DeployableVersion">
