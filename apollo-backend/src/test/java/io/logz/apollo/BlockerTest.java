@@ -205,7 +205,6 @@ public class BlockerTest {
     }
 
     @Test
-    @Ignore
     public void testBranchBlocker() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
@@ -265,7 +264,6 @@ public class BlockerTest {
     }
 
     @Test
-    @Ignore
     public void testGHCommitStatusBlocker() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
@@ -289,7 +287,6 @@ public class BlockerTest {
     }
 
     @Test
-    @Ignore
     public void testBlockerUserOverride() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
