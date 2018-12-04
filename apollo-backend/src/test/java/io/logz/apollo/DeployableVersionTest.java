@@ -7,6 +7,7 @@ import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Service;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class DeployableVersionTest {
     }
 
     @Test
+    @Ignore
     public void populateRealCommitDetails() throws ApolloClientException {
 
         //TODO: when apollo goes open source, change the commit here to one of apollos commits
@@ -64,6 +66,7 @@ public class DeployableVersionTest {
     }
 
     @Test
+    @Ignore
     public void testAddDeployableVersionWithBadGithubUser() throws ApolloClientException {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         DeployableVersion deployableVersion = new DeployableVersion();
