@@ -18,7 +18,7 @@
         FROM deployment
         WHERE service_id = #{serviceId}
         AND environment_id = #{environmentId}
-        AND status = ‘DONE’
+        AND status = 'DONE'
         ORDER BY started_at DESC
         LIMIT 1
     </select>
