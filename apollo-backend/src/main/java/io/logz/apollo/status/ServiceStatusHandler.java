@@ -76,28 +76,29 @@ public class ServiceStatusHandler {
         List<Service> services = serviceDao.getAllServices();
         Map<Service, Optional<List<Group>>> serviceGroupMapResult = new HashMap<>();
         services.forEach(service -> {
-            ServiceGroupPair pair = getPairOfUndeployedServiceAndGroup(service, environmentId, timeUnit, duration);
-            if(pair.isPresent()) {
+            Optional<ServiceGroupPair> pairOfUndeployedServiceAndGroup = getPairOfUndeployedServiceAndGroup(service, environmentId, timeUnit, duration);
+            if (pairOfUndeployedServiceAndGroup.isPresent()) {
+                ServiceGroupPair pair = pairOfUndeployedServiceAndGroup.get();
                 serviceGroupMapResult.put(pair.getService(), pair.getGroupList());
             }
         });
         return serviceGroupMapResult;
     }
 
-    private ServiceGroupPair getPairOfUndeployedServiceAndGroup(Service service, int environmentId, TimeUnit timeUnit, int duration) {
+    private Optional<ServiceGroupPair> getPairOfUndeployedServiceAndGroup(Service service, int environmentId, TimeUnit timeUnit, int duration) {
         List<Group> groups;
         if(service.getIsPartOfGroup()) {
             groups = getUndeployedGroupsByServiceAndEnvironment(service.getId(), environmentId, timeUnit, duration);
             if(groups.size() > 0) {
-                return new ServiceGroupPair(service, Optional.of(groups));
+                return Optional.of(new ServiceGroupPair(service, Optional.of(groups)));
             }
         }
         else {
             if(isServiceUndeployed(service.getId(), environmentId, Optional.empty(), timeUnit, duration)) {
-                return new ServiceGroupPair(service, Optional.empty());
+                return Optional.of(new ServiceGroupPair(service, Optional.empty()));
             }
         }
-        return new ServiceGroupPair();
+        return Optional.empty();
     }
 
     private List<Group> getUndeployedGroupsByServiceAndEnvironment(int serviceId, int environmentId, TimeUnit timeUnit, int duration) {
