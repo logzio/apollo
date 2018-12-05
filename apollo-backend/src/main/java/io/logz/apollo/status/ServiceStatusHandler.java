@@ -90,12 +90,12 @@ public class ServiceStatusHandler {
         if(service.getIsPartOfGroup()) {
             groups = getUndeployedGroupsByServiceAndEnvironment(service.getId(), environmentId, timeUnit, duration);
             if(groups.size() > 0) {
-                return Optional.of(new ServiceGroupPair(service, Optional.of(groups)));
+                return Optional.ofNullable(new ServiceGroupPair(service, Optional.ofNullable(groups)));
             }
         }
         else {
             if(isServiceUndeployed(service.getId(), environmentId, Optional.empty(), timeUnit, duration)) {
-                return Optional.of(new ServiceGroupPair(service, Optional.empty()));
+                return Optional.ofNullable(new ServiceGroupPair(service, Optional.empty()));
             }
         }
         return Optional.empty();
@@ -103,7 +103,7 @@ public class ServiceStatusHandler {
 
     private List<Group> getUndeployedGroupsByServiceAndEnvironment(int serviceId, int environmentId, TimeUnit timeUnit, int duration) {
         return groupDao.getGroupsPerServiceAndEnvironment(serviceId, environmentId).stream().filter(group ->
-                isServiceUndeployed(serviceId, environmentId, Optional.of(group), timeUnit, duration)).collect(Collectors.toList());
+                isServiceUndeployed(serviceId, environmentId, Optional.ofNullable(group), timeUnit, duration)).collect(Collectors.toList());
     }
 
     private boolean isServiceUndeployed(int serviceId, int environmentId, Optional<Group> group, TimeUnit timeUnit, int duration) {
@@ -133,7 +133,7 @@ public class ServiceStatusHandler {
         if(Objects.isNull(deployment)) {
             return Optional.empty();
         }
-        return Optional.of(deployment.getLastUpdate());
+        return Optional.ofNullable(deployment.getLastUpdate());
     }
 
     private Optional<Date> getLatestDeploymentDateByServiceEnvironmentAndGroup(int serviceId, int environmentId, String groupName) {
@@ -141,7 +141,7 @@ public class ServiceStatusHandler {
         if (Objects.isNull(deployment)) {
             return Optional.empty();
         }
-        return Optional.of(deployment.getLastUpdate());
+        return Optional.ofNullable(deployment.getLastUpdate());
     }
 
     private Optional<Date> getLatestDeployableVersionDateByService(int serviceId) {
@@ -149,7 +149,7 @@ public class ServiceStatusHandler {
         if(Objects.isNull(latestDeployableVersion)) {
             return Optional.empty();
         }
-        return Optional.of(latestDeployableVersion.getCommitDate());
+        return Optional.ofNullable(latestDeployableVersion.getCommitDate());
     }
 
     private long getTimeDiff(Date latestDeploymentDate, Date latestDeployableVersionDate, TimeUnit timeUnit) {
