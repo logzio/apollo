@@ -152,4 +152,5 @@ public class ServiceStatusHandler {
     private long getTimeDiff(Date latestDeploymentDate, Date latestDeployableVersionDate, TimeUnit timeUnit) {
         return timeUnit.convert(Duration.between(latestDeploymentDate.toInstant().atZone(ZoneId.of("UTC")), latestDeployableVersionDate.toInstant().atZone(ZoneId.of("UTC"))).toMillis(), TimeUnit.MILLISECONDS);
     }
+
 }
