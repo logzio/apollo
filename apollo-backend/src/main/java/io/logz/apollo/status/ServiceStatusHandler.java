@@ -122,9 +122,6 @@ public class ServiceStatusHandler {
         if (latestDeploymentDate.isPresent() && latestDeployableVersionDate.isPresent()) {
             return getTimeDiff(latestDeploymentDate.get(), latestDeployableVersionDate.get(), timeUnit) > duration;
         }
-        if (latestDeployableVersionDate.isPresent()) {
-            return latestDeployableVersionDate.get().compareTo(getLastPossibleDateSinceLastDeployableVersion(timeUnit, duration)) < 0;
-        }
         return false;
     }
 
@@ -156,7 +153,4 @@ public class ServiceStatusHandler {
         return timeUnit.convert(Duration.between(latestDeploymentDate.toInstant().atZone(ZoneId.of("UTC")), latestDeployableVersionDate.toInstant().atZone(ZoneId.of("UTC"))).toMillis(), TimeUnit.MILLISECONDS);
     }
 
-    private Date getLastPossibleDateSinceLastDeployableVersion(TimeUnit timeUnit, int duration) {
-        return Date.from(LocalDateTime.now(ZoneId.of("UTC")).minusSeconds(TimeUnit.SECONDS.convert(duration,timeUnit)).atZone(ZoneId.systemDefault()).toInstant());
-    }
 }
