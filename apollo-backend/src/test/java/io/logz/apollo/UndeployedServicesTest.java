@@ -51,6 +51,26 @@ public class UndeployedServicesTest {
         assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1), service)).isTrue();
     }
 
+    @Test
+    public void neverDeployedService() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        final String availability = environment.getAvailability();
+
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient, true);
+        ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+
+        Service serviceWithGroup = ModelsGenerator.createAndSubmitService(apolloTestClient, true);
+        ModelsGenerator.createAndSubmitGroup(apolloTestClient, serviceWithGroup.getId(), environment.getId());
+        ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceWithGroup);
+
+        assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 1), service)).isFalse();
+        assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1), service)).isFalse();
+
+        assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.HOURS, 1), serviceWithGroup)).isFalse();
+        assertThat(isServicePartOfGroupMap(apolloTestClient.getUndeployedServicesByAvailability(availability, TimeUnit.MILLISECONDS, 1), serviceWithGroup)).isFalse();
+    }
+
     private boolean isServicePartOfGroupMap(List<EnvironmentServiceGroupMap> environmentServiceGroupMapList, Service service) {
         return environmentServiceGroupMapList
                 .stream()
