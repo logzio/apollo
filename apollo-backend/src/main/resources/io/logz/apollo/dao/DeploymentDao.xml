@@ -10,7 +10,8 @@
         WHERE service_id = #{serviceId}
         AND environment_id = #{environmentId}
         AND status = 'DONE'
-        AND started_at = (SELECT max(started_at) FROM deployment)
+        ORDER BY started_at DESC
+        LIMIT 1
     </select>
 
     <select id="getLatestDeploymentOfServiceAndEnvironmentByGroupName" resultType="io.logz.apollo.models.Deployment">
@@ -18,6 +19,7 @@
         FROM deployment
         WHERE service_id = #{serviceId}
         AND environment_id = #{environmentId}
+        AND group_name = #{groupName}
         AND status = 'DONE'
         ORDER BY started_at DESC
         LIMIT 1
