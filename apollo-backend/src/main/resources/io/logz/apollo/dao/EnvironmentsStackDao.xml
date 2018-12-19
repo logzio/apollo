@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.logz.apollo.dao.EnvironmentsStackDao">
+    <select id="getEnvironments" resultType="io.logz.apollo.models.Environment">
+        SELECT *
+        FROM environment as env
+        JOIN environments_in_stacks as stack ON env.id = stack.environment_id
+        WHERE env.id = #{id}
+    </select>
+
+    <select id="getStackName" resultType="String">
+        SELECT name
+        FROM stack_environments
+        WHERE id = #{id}
+    </select>
+
+    <select id="isStackEnabled" resultType="boolean">
+        SELECT is_enabled
+        FROM stack_environments
+        WHERE id = #{id}
+    </select>
+
+    <insert id="addEnvironmentsStack" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO stack_environments (name, is_enabled)
+        VALUES (#{name}, #{isEnabled})
+    </insert>
+
+    <insert id="addEnvironmentToStack" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO environments_in_stacks (id, environment_id)
+        VALUES (#{stackId}, #{environmentId})
+    </insert>
+</mapper>
