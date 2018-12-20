@@ -1,14 +1,17 @@
 package io.logz.apollo.controllers;
 
+import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.ServicesStackDao;
 import io.logz.apollo.models.Service;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
+import org.rapidoid.http.Req;
 
 import javax.inject.Inject;
 import java.util.List;
 
+import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
 
 @Controller
@@ -37,12 +40,15 @@ public class ServicesStackController {
     }
 
     @POST("/services-stack")
-    public void addServicesStack(String name, boolean isEnabled) {
+    public void addServicesStack(String name, boolean isEnabled, Req req) {
         servicesStackDao.addServicesStack(name, isEnabled);
+        int id = servicesStackDao.getStackIdByName(name);
+        assignJsonResponseToReq(req, HttpStatus.CREATED, id);
     }
 
     @POST("/service-to-stack")
-    public void addServiceToStack(int serviceId, int stackId) {
+    public void addServiceToStack(int serviceId, int stackId, Req req) {
         servicesStackDao.addServiceToStack(serviceId, stackId);
+        assignJsonResponseToReq(req, HttpStatus.CREATED, stackId);
     }
 }

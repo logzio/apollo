@@ -1,14 +1,14 @@
-<?<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="io.logz.apollo.dao.ServicesStackDao">
     <select id="getServices" resultType="io.logz.apollo.models.Service">
-        SELECT *
+        SELECT ser.*
         FROM service as ser
         JOIN services_in_stacks as stack ON ser.id = stack.service_id
-        WHERE ser.id = #{id}
+        WHERE stack.stack_id = #{id}
     </select>
 
     <select id="getStackName" resultType="String">
@@ -17,19 +17,25 @@
         WHERE id = #{id}
     </select>
 
+    <select id="getStackIdByName" resultType="int">
+        SELECT id
+        FROM stack_services
+        WHERE name = #{name}
+    </select>
+
     <select id="isStackEnabled" resultType="boolean">
         SELECT is_enabled
         FROM stack_services
         WHERE id = #{id}
     </select>
 
-    <insert id="addServicesStack" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="addServicesStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
         INSERT INTO stack_services (name, is_enabled)
         VALUES (#{name}, #{isEnabled})
     </insert>
 
-    <insert id="addServiceToStack" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO services_in_stacks (id, service_id)
+    <insert id="addServiceToStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
+        INSERT INTO services_in_stacks (stack_id, service_id)
         VALUES (#{stackId}, #{serviceId})
     </insert>
 </mapper>

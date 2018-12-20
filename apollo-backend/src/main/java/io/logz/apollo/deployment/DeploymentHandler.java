@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.rapidoid.http.Req;
 import javax.inject.Inject;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

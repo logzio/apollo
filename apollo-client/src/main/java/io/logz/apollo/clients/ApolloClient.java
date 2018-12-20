@@ -236,4 +236,56 @@ public class ApolloClient {
     public List<EnvironmentServiceGroupMap> getUndeployedServicesByAvailability(String availability, TimeUnit timeUnit, int duration) throws ApolloClientException, Exception {
         return genericApolloClient.getResult("/status/get-undeployed-services/avaiability/" + availability + "/time-unit/" + timeUnit + "/duration/" + duration, new TypeReference<List<EnvironmentServiceGroupMap>>() {});
     }
+
+    public int addEnvironmentsStack(String name, Boolean isEnabled) throws Exception {
+        String requestBody = Common.generateJson(
+                "name", name,
+                "isEnabled", String.valueOf(isEnabled));
+        return genericApolloClient.postAndGetResult("/environments-stack", requestBody, new TypeReference<Integer>() {});
+    }
+
+    public int addEnvironmentToStack(int environmentId, int stackId) throws Exception {
+        String requestBody = Common.generateJson(
+                "environmentId", String.valueOf(environmentId),
+                "stackId", String.valueOf(stackId));
+        return genericApolloClient.postAndGetResult("/environment-to-stack", requestBody, new TypeReference<Integer>() {});
+    }
+
+    public List<Environment> getEnvironmentsByStack(int id) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/environment-stack/" + id, new TypeReference<List<Environment>>() {});
+    }
+
+    public String getEnvironmentStackName(int id) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/environment-stack/name/" + id, new TypeReference<String>() {});
+    }
+
+    public boolean isEnvironmentStackEnabled(int id) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/environment-stack/is-enabled/" + id, new TypeReference<Boolean>() {});
+    }
+
+    public int addServicesStack(String name, Boolean isEnabled) throws Exception {
+        String requestBody = Common.generateJson(
+                "name", name,
+                "isEnabled", String.valueOf(isEnabled));
+        return genericApolloClient.postAndGetResult("/services-stack", requestBody, new TypeReference<Integer>() {});
+    }
+
+    public int addServiceToStack(int serviceId, int stackId) throws Exception {
+        String requestBody = Common.generateJson(
+                "serviceId", String.valueOf(serviceId),
+                "stackId", String.valueOf(stackId));
+        return genericApolloClient.postAndGetResult("/service-to-stack", requestBody, new TypeReference<Integer>() {});
+    }
+
+    public List<Service> getServicesByStack(int id) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/service-stack/" + id, new TypeReference<List<Service>>() {});
+    }
+
+    public String getServiceStackName(int id) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/service-stack/name/" + id, new TypeReference<String>() {});
+    }
+
+    public boolean isServiceStackEnabled(int id) throws ApolloClientException, Exception {
+        return genericApolloClient.getResult("/service-stack/is-enabled/" + id, new TypeReference<Boolean>() {});
+    }
 }

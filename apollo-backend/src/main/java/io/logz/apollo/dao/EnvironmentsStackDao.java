@@ -9,6 +9,7 @@ public interface EnvironmentsStackDao {
 
     List<Environment> getEnvironments(int id);
     String getStackName(int id);
+    int getStackIdByName(String name);
     boolean isStackEnabled(int id);
     void addEnvironmentsStack(@Param("name") String name, @Param("isEnabled") boolean isEnabled);
     void addEnvironmentToStack(@Param("environmentId") int environmentId, @Param("stackId") int stackId);
