@@ -6,8 +6,10 @@ import io.logz.apollo.exceptions.ApolloCouldNotLoginException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.EnvironmentServiceGroupMap;
+import io.logz.apollo.models.EnvironmentsStack;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
+import io.logz.apollo.models.ServicesStack;
 import io.logz.apollo.models.User;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.helpers.Common;
@@ -15,6 +17,8 @@ import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Notification;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -237,55 +241,99 @@ public class ApolloClient {
         return genericApolloClient.getResult("/status/get-undeployed-services/avaiability/" + availability + "/time-unit/" + timeUnit + "/duration/" + duration, new TypeReference<List<EnvironmentServiceGroupMap>>() {});
     }
 
-    public int addEnvironmentsStack(String name, Boolean isEnabled) throws Exception {
-        String requestBody = Common.generateJson(
-                "name", name,
-                "isEnabled", String.valueOf(isEnabled));
-        return genericApolloClient.postAndGetResult("/environments-stack", requestBody, new TypeReference<Integer>() {});
+    private <T> String createCsvFromList(List<T> list) {
+        return StringUtils.join(list, ',');
+    }
+
+    public EnvironmentsStack getEnvironmentsStack(int stackId) throws ApolloClientException {
+        return genericApolloClient.getResult("/environments-stack/" + stackId, new TypeReference<EnvironmentsStack>() {});
+    }
+
+    public List<EnvironmentsStack> getAllEnvironmentsStacks() throws ApolloClientException {
+        return genericApolloClient.getResult("/environments-stack", new TypeReference<List<EnvironmentsStack>>() {});
     }
 
     public int addEnvironmentToStack(int environmentId, int stackId) throws Exception {
         String requestBody = Common.generateJson(
                 "environmentId", String.valueOf(environmentId),
                 "stackId", String.valueOf(stackId));
-        return genericApolloClient.postAndGetResult("/environment-to-stack", requestBody, new TypeReference<Integer>() {});
+        return genericApolloClient.postAndGetResult("/environments-in-stacks", requestBody, new TypeReference<Integer>() {});
     }
 
-    public List<Environment> getEnvironmentsByStack(int id) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/environment-stack/" + id, new TypeReference<List<Environment>>() {});
-    }
-
-    public String getEnvironmentStackName(int id) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/environment-stack/name/" + id, new TypeReference<String>() {});
-    }
-
-    public boolean isEnvironmentStackEnabled(int id) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/environment-stack/is-enabled/" + id, new TypeReference<Boolean>() {});
-    }
-
-    public int addServicesStack(String name, Boolean isEnabled) throws Exception {
+    public int addEnvironmentsStack(EnvironmentsStack environmentsStack) throws Exception {
+        String environmentsCsv = createCsvFromList(environmentsStack.getEnvironments());
         String requestBody = Common.generateJson(
-                "name", name,
-                "isEnabled", String.valueOf(isEnabled));
-        return genericApolloClient.postAndGetResult("/services-stack", requestBody, new TypeReference<Integer>() {});
+                "name", environmentsStack.getName(),
+                "isEnabled", String.valueOf(environmentsStack.isEnabled()),
+                "environmentsCsv", environmentsCsv);
+        return genericApolloClient.postAndGetResult("/environments-stack", requestBody, new TypeReference<Integer>() {});
+    }
+
+    public void updateEnvironmentsStack(EnvironmentsStack environmentsStack) throws ApolloClientException {
+        String environmentsCsv = createCsvFromList(environmentsStack.getEnvironments());
+        String requestBody = Common.generateJson(
+                "id", String.valueOf(environmentsStack.getId()),
+                "name", environmentsStack.getName(),
+                "isEnabled", String.valueOf(environmentsStack.isEnabled()),
+                "environmentsCsv", environmentsCsv);
+        genericApolloClient.putAndGetResult("/environments-stack", requestBody, new TypeReference<Integer>() {});
+    }
+
+    public void removeEnvironmentFromStack(int environmentId, int stackId) throws IOException {
+        genericApolloClient.delete("/environments-in-stacks/environment-id/" + environmentId + "/stack-id/" + stackId);
+    }
+
+    public void clearEnvironmentsStack(int stackId) throws IOException {
+        genericApolloClient.delete("/environments-in-stacks/" + stackId + "/environments");
+    }
+
+    public void deleteStackEnvironment(int stackId) throws IOException {
+        genericApolloClient.delete("/environments-in-stacks/" + stackId);
+    }
+
+    public ServicesStack getServicesStack(int stackId) throws ApolloClientException {
+        return genericApolloClient.getResult("/services-stack/" + stackId, new TypeReference<ServicesStack>() {});
+    }
+
+    public List<ServicesStack> getAllServicesStacks() throws ApolloClientException {
+        return genericApolloClient.getResult("/services-stack", new TypeReference<List<ServicesStack>>() {});
     }
 
     public int addServiceToStack(int serviceId, int stackId) throws Exception {
         String requestBody = Common.generateJson(
                 "serviceId", String.valueOf(serviceId),
                 "stackId", String.valueOf(stackId));
-        return genericApolloClient.postAndGetResult("/service-to-stack", requestBody, new TypeReference<Integer>() {});
+        return genericApolloClient.postAndGetResult("/services-in-stacks", requestBody, new TypeReference<Integer>() {});
     }
 
-    public List<Service> getServicesByStack(int id) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/service-stack/" + id, new TypeReference<List<Service>>() {});
+    public int addServicesStack(ServicesStack servicesStack) throws Exception {
+        String servicesCsv = createCsvFromList(servicesStack.getServices());
+        String requestBody = Common.generateJson(
+                "name", servicesStack.getName(),
+                "isEnabled", String.valueOf(servicesStack.isEnabled()),
+                "servicesCsv", servicesCsv);
+        return genericApolloClient.postAndGetResult("/services-stack", requestBody, new TypeReference<Integer>() {});
     }
 
-    public String getServiceStackName(int id) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/service-stack/name/" + id, new TypeReference<String>() {});
+    public void updateServicesStack(ServicesStack servicesStack) throws ApolloClientException {
+        String servicesCsv = createCsvFromList(servicesStack.getServices());
+        String requestBody = Common.generateJson(
+                "id", String.valueOf(servicesStack.getId()),
+                "name", servicesStack.getName(),
+                "isEnabled", String.valueOf(servicesStack.isEnabled()),
+                "servicesCsv", servicesCsv);
+        genericApolloClient.putAndGetResult("/services-stack", requestBody, new TypeReference<Integer>() {});
     }
 
-    public boolean isServiceStackEnabled(int id) throws ApolloClientException, Exception {
-        return genericApolloClient.getResult("/service-stack/is-enabled/" + id, new TypeReference<Boolean>() {});
+    public void removeServiceFromStack(int serviceId, int stackId) throws IOException {
+        genericApolloClient.delete("/services-in-stacks/service-id/" + serviceId + "/stack-id/" + stackId);
+    }
+
+    public void clearServicesStack(int stackId) throws IOException {
+        genericApolloClient.delete("/services-in-stacks/" + stackId + "/services");
+    }
+
+    public void deleteStackService(int stackId) throws IOException {
+        genericApolloClient.delete("/services-in-stacks/" + stackId);
     }
 }

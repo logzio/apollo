@@ -1,16 +1,13 @@
 package io.logz.apollo.dao;
 
-import io.logz.apollo.models.Environment;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface EnvironmentsStackDao {
-
-    List<Environment> getEnvironments(int id);
-    String getStackName(int id);
-    int getStackIdByName(String name);
-    boolean isStackEnabled(int id);
-    void addEnvironmentsStack(@Param("name") String name, @Param("isEnabled") boolean isEnabled);
+    List<Integer> getEnvironments(int stackId);
     void addEnvironmentToStack(@Param("environmentId") int environmentId, @Param("stackId") int stackId);
+    void removeEnvironmentFromStack(@Param("environmentId") int environmentId, @Param("stackId") int stackId);
+    void addEnvironmentsToStack(@Param("environments") List<Integer> environments, @Param("stackId") int stackId);
+    void clearEnvironmentsStack(int stackId);
 }

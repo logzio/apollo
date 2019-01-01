@@ -1,16 +1,13 @@
 package io.logz.apollo.dao;
 
-import io.logz.apollo.models.Service;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface ServicesStackDao {
-
-    List<Service> getServices(int id);
-    String getStackName(int id);
-    int getStackIdByName(String name);
-    boolean isStackEnabled(int id);
-    void addServicesStack(@Param("name") String name, @Param("isEnabled") boolean isEnabled);
+    List<Integer> getServices(int stackId);
     void addServiceToStack(@Param("serviceId") int serviceId, @Param("stackId") int stackId);
+    void removeServiceFromStack(@Param("serviceId") int serviceId, @Param("stackId") int stackId);
+    void addServicesToStack(@Param("services") List<Integer> services, @Param("stackId") int stackId);
+    void clearServicesStack(int stackId);
 }

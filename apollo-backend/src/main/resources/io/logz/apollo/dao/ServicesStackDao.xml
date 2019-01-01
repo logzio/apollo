@@ -2,40 +2,35 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="io.logz.apollo.dao.ServicesStackDao">
-    <select id="getServices" resultType="io.logz.apollo.models.Service">
-        SELECT ser.*
-        FROM service as ser
-        JOIN services_in_stacks as stack ON ser.id = stack.service_id
-        WHERE stack.stack_id = #{id}
-    </select>
 
-    <select id="getStackName" resultType="String">
-        SELECT name
-        FROM stack_services
-        WHERE id = #{id}
+    <select id="getServices" resultType="int">
+        SELECT service_id
+        FROM services_in_stacks
+        WHERE stack_id = #{stackId}
     </select>
-
-    <select id="getStackIdByName" resultType="int">
-        SELECT id
-        FROM stack_services
-        WHERE name = #{name}
-    </select>
-
-    <select id="isStackEnabled" resultType="boolean">
-        SELECT is_enabled
-        FROM stack_services
-        WHERE id = #{id}
-    </select>
-
-    <insert id="addServicesStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
-        INSERT INTO stack_services (name, is_enabled)
-        VALUES (#{name}, #{isEnabled})
-    </insert>
 
     <insert id="addServiceToStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
         INSERT INTO services_in_stacks (stack_id, service_id)
         VALUES (#{stackId}, #{serviceId})
     </insert>
+
+    <delete id="removeServiceFromStack">
+        DELETE FROM services_in_stacks
+        WHERE stack_id=#{stackId} AND service_id=#{serviceId}
+    </delete>
+
+    <insert id="addServicesToStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
+        INSERT INTO services_in_stacks (stack_id, service_id)
+        VALUES
+        <foreach collection="services" item="service" separator="," close=";">
+            (#{stackId}, #{service})
+        </foreach>
+    </insert>
+
+    <delete id="clearServicesStack">
+        DELETE FROM services_in_stacks
+        WHERE stack_id = #{stackId}
+    </delete>
+
 </mapper>

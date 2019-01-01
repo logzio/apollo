@@ -2,40 +2,35 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-
 <mapper namespace="io.logz.apollo.dao.EnvironmentsStackDao">
-    <select id="getEnvironments" resultType="io.logz.apollo.models.Environment">
-        SELECT env.*
-        FROM environment as env
-        JOIN environments_in_stacks as stack ON env.id = stack.environment_id
-        WHERE stack.stack_id = #{id}
-    </select>
 
-    <select id="getStackName" resultType="String">
-        SELECT name
-        FROM stack_environments
-        WHERE id = #{id}
+    <select id="getEnvironments" resultType="int">
+        SELECT environment_id
+        FROM environments_in_stacks
+        WHERE stack_id = #{stackId}
     </select>
-
-    <select id="getStackIdByName" resultType="int">
-        SELECT id
-        FROM stack_environments
-        WHERE name = #{name}
-    </select>
-
-    <select id="isStackEnabled" resultType="boolean">
-        SELECT is_enabled
-        FROM stack_environments
-        WHERE id = #{id}
-    </select>
-
-    <insert id="addEnvironmentsStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
-        INSERT INTO stack_environments (name, is_enabled)
-        VALUES (#{name}, #{isEnabled})
-    </insert>
 
     <insert id="addEnvironmentToStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
         INSERT INTO environments_in_stacks (stack_id, environment_id)
         VALUES (#{stackId}, #{environmentId})
     </insert>
+
+    <delete id="removeEnvironmentFromStack">
+        DELETE FROM environments_in_stacks
+        WHERE stack_id=#{stackId} AND environment_id=#{environmentId}
+    </delete>
+
+    <insert id="addEnvironmentsToStack" useGeneratedKeys="false" keyProperty="id" keyColumn="id">
+        INSERT INTO environments_in_stacks (stack_id, environment_id)
+        VALUES
+        <foreach collection="environments" item="environment" separator="," close=";">
+            (#{stackId}, #{environment})
+        </foreach>
+    </insert>
+
+    <delete id="clearEnvironmentsStack">
+        DELETE FROM environments_in_stacks
+        WHERE stack_id = #{stackId}
+    </delete>
+
 </mapper>

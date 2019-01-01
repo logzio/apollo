@@ -12,6 +12,7 @@ import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.NotificationDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.dao.ServicesStackDao;
+import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.dao.UserDao;
 import io.logz.apollo.database.DataSourceFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
@@ -26,7 +27,7 @@ import javax.sql.DataSource;
 
 public class ApolloMyBatisModule extends MyBatisModule {
 
-    private static final String JDBC_URL_FORMAT = "jdbc:mysql://%s:%s/%s?createDatabaseIfNotExist=true";
+    private static final String JDBC_URL_FORMAT = "jdbc:mysql://%s:%s/%s?createDatabaseIfNotExist=true&allowmultiqueries=true";
 
     private final DatabaseConfiguration configuration;
 
@@ -56,6 +57,7 @@ public class ApolloMyBatisModule extends MyBatisModule {
         addMapperClass(NotificationDao.class);
         addMapperClass(EnvironmentsStackDao.class);
         addMapperClass(ServicesStackDao.class);
+        addMapperClass(StackDao.class);
     }
 
     private void createDataSource() {
