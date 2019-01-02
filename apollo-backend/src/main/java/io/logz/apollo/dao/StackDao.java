@@ -14,7 +14,7 @@ public interface StackDao {
     ServicesStack getServicesStack(int id);
     List<Stack> getAllStacks();
     List<Stack> getAllStackFromType(@Param("stackType") StackType stackType);
-    List<EnvironmentsStack> getAllEnvironmentStacks();
+    List<EnvironmentsStack> getAllEnvironmentsStacks();
     List<ServicesStack> getAllServicesStacks();
     void addStack(Stack stack);
     void updateStack(Stack stack);

@@ -33,10 +33,10 @@
         WHERE stack_type = #{stackType}
     </select>
 
-    <select id="getAllEnvironmentStacks" resultType="io.logz.apollo.models.ServicesStack">
+    <select id="getAllEnvironmentsStacks" resultType="io.logz.apollo.models.EnvironmentsStack">
         SELECT *
         FROM stack
-        WHERE stack_type = "SERVICES"
+        WHERE stack_type = "ENVIRONMENTS"
     </select>
 
     <select id="getAllServicesStacks" resultType="io.logz.apollo.models.ServicesStack">

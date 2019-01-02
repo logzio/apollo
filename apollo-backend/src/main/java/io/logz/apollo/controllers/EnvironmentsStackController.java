@@ -1,7 +1,7 @@
 package io.logz.apollo.controllers;
 
-import com.google.common.base.Splitter;
 import io.logz.apollo.common.HttpStatus;
+import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.EnvironmentsStackDao;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.EnvironmentsStack;
@@ -17,7 +17,6 @@ import org.rapidoid.security.annotation.LoggedIn;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
@@ -47,7 +46,7 @@ public class EnvironmentsStackController {
     @LoggedIn
     @GET("/environments-stack")
     public List<EnvironmentsStack> getAllEnvironmentsStacks() {
-        List<EnvironmentsStack> environmentStacks = stackDao.getAllEnvironmentStacks();
+        List<EnvironmentsStack> environmentStacks = stackDao.getAllEnvironmentsStacks();
         return environmentStacks.stream().map(stack -> {
             List<Integer> environments = environmentsStackDao.getEnvironments(stack.getId());
             return new EnvironmentsStack(stack.getId(), stack.getName(), stack.isEnabled(),environments);
@@ -55,64 +54,58 @@ public class EnvironmentsStackController {
     }
 
     @LoggedIn
-    @POST("/environments-in-stacks")
+    @POST("/environments-stack/environment")
     public void addEnvironmentToStack(int environmentId, int stackId, Req req) {
         environmentsStackDao.addEnvironmentToStack(environmentId, stackId);
-        assignJsonResponseToReq(req, HttpStatus.CREATED, stackId);
+        assignJsonResponseToReq(req, HttpStatus.CREATED, getEnvironmentsStack(stackId));
     }
 
     @LoggedIn
     @Transactional
     @POST("/environments-stack")
-    public void addEnvironmentsStack(String name, String isEnabled, String environmentsCsv, Req req) {
-        Iterable<String> environmentsString = Splitter.on(ENVIRONMENTS_DELIMITER).omitEmptyStrings().trimResults().split(environmentsCsv);
-        List<Integer> environmentsIds = StreamSupport.stream(environmentsString.spliterator(), false)
-                                                     .map(environment -> Integer.parseInt(environment))
-                                                     .collect(Collectors.toList());
-        EnvironmentsStack environmentsStack = new EnvironmentsStack(name, Boolean.valueOf(isEnabled));
+    public void addEnvironmentsStack(String name, boolean isEnabled, String environmentsCsv, Req req) {
+        List<Integer> environmentsIds = StringParser.splitCsvToIntegerList(environmentsCsv, ENVIRONMENTS_DELIMITER);
+        EnvironmentsStack environmentsStack = new EnvironmentsStack(name, isEnabled);
         stackDao.addStack(environmentsStack);
         if (environmentsIds.size() > 0) {
             environmentsStackDao.addEnvironmentsToStack(environmentsIds, environmentsStack.getId());
         }
-        assignJsonResponseToReq(req, HttpStatus.CREATED, environmentsStack.getId());
+        assignJsonResponseToReq(req, HttpStatus.CREATED, getEnvironmentsStack(environmentsStack.getId()));
     }
 
     @LoggedIn
     @Transactional
     @PUT("/environments-stack")
     public void updateEnvironmentsStack(int id, String name, boolean isEnabled, String environmentsCsv, Req req) {
-        Iterable<String> environmentsString = Splitter.on(ENVIRONMENTS_DELIMITER).omitEmptyStrings().trimResults().split(environmentsCsv);
-        List<Integer> environmentsIds = StreamSupport.stream(environmentsString.spliterator(), false)
-                                                     .map(environment -> Integer.parseInt(environment))
-                                                     .collect(Collectors.toList());
-        EnvironmentsStack environmentsStack = new EnvironmentsStack(id, name, isEnabled);
-        stackDao.updateStack(environmentsStack);
-        environmentsStackDao.clearEnvironmentsStack(id);//TODO check with mesika
+        List<Integer> environmentsIds = StringParser.splitCsvToIntegerList(environmentsCsv, ENVIRONMENTS_DELIMITER);
         if (environmentsIds.size() <= 0) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "The EnvironmentsStack you asked to update has an empty environments list");
             return;
         }
+        EnvironmentsStack environmentsStack = new EnvironmentsStack(id, name, isEnabled);
+        stackDao.updateStack(environmentsStack);
+        environmentsStackDao.clearEnvironmentsStack(id);
         environmentsStackDao.addEnvironmentsToStack(environmentsIds, id);
-        assignJsonResponseToReq(req, HttpStatus.OK, id);
+        assignJsonResponseToReq(req, HttpStatus.OK, getEnvironmentsStack(id));
     }
 
     @LoggedIn
-    @DELETE("/environments-in-stacks/environment-id/{environmentId}/stack-id/{stackId}")
-    public void removeEnvironmentFromStack(int environmentId, int stackId) {
-        environmentsStackDao.removeEnvironmentFromStack(environmentId, stackId);
+    @DELETE("/environments-stack/environment/{id}/stack/{stackId}")
+    public void removeEnvironmentFromStack(int id, int stackId) {
+        environmentsStackDao.removeEnvironmentFromStack(id, stackId);
     }
 
     @LoggedIn
-    @DELETE("/environments-in-stacks/{stackId}/environments")
-    public void clearEnvironmentsStack(int stackId) {
-        environmentsStackDao.clearEnvironmentsStack(stackId);
+    @DELETE("environments-stack/{id}/clear")
+    public void clearEnvironmentsStack(int id) {
+        environmentsStackDao.clearEnvironmentsStack(id);
     }
 
     @LoggedIn
     @Transactional
-    @DELETE("/environments-in-stacks/{stackId}")
-    public void deleteEnvironmentsStack(int stackId) {
-        environmentsStackDao.clearEnvironmentsStack(stackId);
-        stackDao.deleteStack(stackId);
+    @DELETE("/environments-stack/{id}")
+    public void deleteEnvironmentsStack(int id) {
+        environmentsStackDao.clearEnvironmentsStack(id);
+        stackDao.deleteStack(id);
     }
 }

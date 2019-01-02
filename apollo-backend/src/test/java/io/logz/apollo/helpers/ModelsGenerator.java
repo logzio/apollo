@@ -77,7 +77,7 @@ public class ModelsGenerator {
 
     public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient) throws Exception {
         EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack();
-        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack);
+        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
         testEnvironmentsStack.setId(id);
 
         return testEnvironmentsStack;
@@ -85,7 +85,7 @@ public class ModelsGenerator {
 
     public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient, List<Integer> environments) throws Exception {
         EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack(environments);
-        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack);
+        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
         testEnvironmentsStack.setId(id);
 
         return testEnvironmentsStack;
@@ -110,7 +110,7 @@ public class ModelsGenerator {
 
     public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient) throws Exception {
         ServicesStack testServicessStack = createServicesStack();
-        int id = apolloTestClient.addServicesStack(testServicessStack);
+        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
         testServicessStack.setId(id);
 
         return testServicessStack;
@@ -118,7 +118,7 @@ public class ModelsGenerator {
 
     public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient, List<Integer> services) throws Exception {
         ServicesStack testServicessStack = createServicesStack(services);
-        int id = apolloTestClient.addServicesStack(testServicessStack);
+        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
         testServicessStack.setId(id);
 
         return testServicessStack;

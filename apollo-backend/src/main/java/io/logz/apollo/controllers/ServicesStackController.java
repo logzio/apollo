@@ -1,7 +1,7 @@
 package io.logz.apollo.controllers;
 
-import com.google.common.base.Splitter;
 import io.logz.apollo.common.HttpStatus;
+import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.ServicesStackDao;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.ServicesStack;
@@ -17,7 +17,6 @@ import org.rapidoid.security.annotation.LoggedIn;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
@@ -55,64 +54,58 @@ public class ServicesStackController {
     }
 
     @LoggedIn
-    @POST("/services-in-stacks")
+    @POST("/services-stack/service")
     public void addServiceToStack(int serviceId, int stackId, Req req) {
         servicesStackDao.addServiceToStack(serviceId, stackId);
-        assignJsonResponseToReq(req, HttpStatus.CREATED, stackId);
+        assignJsonResponseToReq(req, HttpStatus.CREATED, getServicesStack(stackId));
     }
 
     @LoggedIn
     @Transactional
     @POST("/services-stack")
-    public void addServicesStack(String name, String isEnabled, String servicesCsv, Req req) {
-        Iterable<String> servicesString = Splitter.on(SERVICES_DELIMITER).omitEmptyStrings().trimResults().split(servicesCsv);
-        List<Integer> servicesIds = StreamSupport.stream(servicesString.spliterator(), false)
-                                                     .map(service -> Integer.parseInt(service))
-                                                     .collect(Collectors.toList());
+    public void addServicesStack(String name, boolean isEnabled, String servicesCsv, Req req) {
+        List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv, SERVICES_DELIMITER);
         ServicesStack servicesStack = new ServicesStack(name, Boolean.valueOf(isEnabled));
         stackDao.addStack(servicesStack);
         if (servicesIds.size() > 0) {
             servicesStackDao.addServicesToStack(servicesIds, servicesStack.getId());
         }
-        assignJsonResponseToReq(req, HttpStatus.CREATED, servicesStack.getId());
+        assignJsonResponseToReq(req, HttpStatus.CREATED, getServicesStack(servicesStack.getId()));
     }
 
     @LoggedIn
     @Transactional
     @PUT("/services-stack")
     public void updateServicesStack(int id, String name, boolean isEnabled, String servicesCsv, Req req) {
-        Iterable<String> servicesString = Splitter.on(SERVICES_DELIMITER).omitEmptyStrings().trimResults().split(servicesCsv);
-        List<Integer> servicesIds = StreamSupport.stream(servicesString.spliterator(), false)
-                                                     .map(service -> Integer.parseInt(service))
-                                                     .collect(Collectors.toList());
-        ServicesStack servicesStack = new ServicesStack(id, name, isEnabled);
-        stackDao.updateStack(servicesStack);
-        servicesStackDao.clearServicesStack(id);//TODO check with mesika
+        List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv, SERVICES_DELIMITER);
         if (servicesIds.size() <= 0) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "The ServicesStack you asked to update has an empty services list");
             return;
         }
+        ServicesStack servicesStack = new ServicesStack(id, name, isEnabled);
+        stackDao.updateStack(servicesStack);
+        servicesStackDao.clearServicesStack(id);
         servicesStackDao.addServicesToStack(servicesIds, id);
-        assignJsonResponseToReq(req, HttpStatus.OK, id);
+        assignJsonResponseToReq(req, HttpStatus.OK, getServicesStack(id));
     }
 
     @LoggedIn
-    @DELETE("/services-in-stacks/service-id/{serviceId}/stack-id/{stackId}")
-    public void removeServiceFromStack(int serviceId, int stackId) {
-        servicesStackDao.removeServiceFromStack(serviceId, stackId);
+    @DELETE("/services-stack/service/{id}/stack/{stackId}")
+    public void removeServiceFromStack(int id, int stackId) {
+        servicesStackDao.removeServiceFromStack(id, stackId);
     }
 
     @LoggedIn
-    @DELETE("/services-in-stacks/{stackId}/services")
-    public void clearServicesStack(int stackId) {
-        servicesStackDao.clearServicesStack(stackId);
+    @DELETE("/services-stack/{id}/clear")
+    public void clearServicesStack(int id) {
+        servicesStackDao.clearServicesStack(id);
     }
 
     @LoggedIn
     @Transactional
-    @DELETE("/services-in-stacks/{stackId}")
-    public void deleteServicesStack(int stackId) {
-        servicesStackDao.clearServicesStack(stackId);
-        stackDao.deleteStack(stackId);
+    @DELETE("/services-stack/{id}")
+    public void deleteServicesStack(int id) {
+        servicesStackDao.clearServicesStack(id);
+        stackDao.deleteStack(id);
     }
 }
