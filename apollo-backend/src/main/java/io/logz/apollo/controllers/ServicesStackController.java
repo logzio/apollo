@@ -2,6 +2,7 @@ package io.logz.apollo.controllers;
 
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.common.StringParser;
+import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.dao.ServicesStackDao;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.ServicesStack;
@@ -26,12 +27,14 @@ public class ServicesStackController {
 
     private final ServicesStackDao servicesStackDao;
     private final StackDao stackDao;
+    private final ServiceDao serviceDao;
     private final static String SERVICES_DELIMITER = ",";
 
     @Inject
-    public ServicesStackController(ServicesStackDao servicesStackDao, StackDao stackDao) {
+    public ServicesStackController(ServicesStackDao servicesStackDao, StackDao stackDao, ServiceDao serviceDao) {
         this.servicesStackDao = requireNonNull(servicesStackDao);
         this.stackDao = requireNonNull(stackDao);
+        this.serviceDao = requireNonNull(serviceDao);
     }
 
     @LoggedIn
@@ -54,8 +57,10 @@ public class ServicesStackController {
     }
 
     @LoggedIn
+    @Transactional
     @POST("/services-stack/service")
     public void addServiceToStack(int serviceId, int stackId, Req req) {
+        validateServiceIsNotPartOfGroup(serviceId, req);
         servicesStackDao.addServiceToStack(serviceId, stackId);
         assignJsonResponseToReq(req, HttpStatus.CREATED, getServicesStack(stackId));
     }
@@ -68,6 +73,9 @@ public class ServicesStackController {
         ServicesStack servicesStack = new ServicesStack(name, Boolean.valueOf(isEnabled));
         stackDao.addStack(servicesStack);
         if (servicesIds.size() > 0) {
+            servicesIds.forEach(id -> {
+                validateServiceIsNotPartOfGroup(id, req);
+            });
             servicesStackDao.addServicesToStack(servicesIds, servicesStack.getId());
         }
         assignJsonResponseToReq(req, HttpStatus.CREATED, getServicesStack(servicesStack.getId()));
@@ -82,6 +90,9 @@ public class ServicesStackController {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "The ServicesStack you asked to update has an empty services list");
             return;
         }
+        servicesIds.forEach(serviceId -> {
+            validateServiceIsNotPartOfGroup(serviceId, req);
+        });
         ServicesStack servicesStack = new ServicesStack(id, name, isEnabled);
         stackDao.updateStack(servicesStack);
         servicesStackDao.clearServicesStack(id);
@@ -107,5 +118,12 @@ public class ServicesStackController {
     public void deleteServicesStack(int id) {
         servicesStackDao.clearServicesStack(id);
         stackDao.deleteStack(id);
+    }
+
+    private void validateServiceIsNotPartOfGroup(int id, Req req) {
+        if (serviceDao.getService(id).getIsPartOfGroup()) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Can't add to stack service that is part of a group");
+            return;
+        }
     }
 }
