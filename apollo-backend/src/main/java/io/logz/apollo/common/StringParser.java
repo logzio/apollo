@@ -20,9 +20,9 @@ public class StringParser {
         return Splitter.on('&').trimResults().withKeyValueSeparator('=').split(queryString);
     }
 
-    public static List<String> splitCsvToStringList(String csv, String delimiter) {
+    public static List<String> splitCsvToStringList(String csv) {
         return Splitter
-                .on(delimiter)
+                .on(",")
                 .omitEmptyStrings()
                 .trimResults()
                 .splitToList(csv)
@@ -31,9 +31,9 @@ public class StringParser {
                 .collect(Collectors.toList());
     }
 
-    public static List<Integer> splitCsvToIntegerList(String csv, String delimiter) {
+    public static List<Integer> splitCsvToIntegerList(String csv) {
         return Splitter
-                .on(delimiter)
+                .on(",")
                 .omitEmptyStrings()
                 .trimResults()
                 .splitToList(csv)
@@ -42,7 +42,7 @@ public class StringParser {
                 .collect(Collectors.toList());
     }
 
-    public static  <T> String createCsvFromList(List<T> list, String delimiter) {
-        return StringUtils.join(list, delimiter);
+    public static <T> String createCsvFromList(List<T> list) {
+        return StringUtils.join(list, ",");
     }
 }

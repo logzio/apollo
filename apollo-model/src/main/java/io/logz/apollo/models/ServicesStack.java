@@ -28,11 +28,6 @@ public class ServicesStack extends Stack {
         this.services = services;
     }
 
-    public ServicesStack(String name, boolean isEnabled, List<Integer> services) {
-        super(name, isEnabled, STACK_TYPE);
-        this.services = services;
-    }
-
     public List<Integer> getServices() {
         return services;
     }

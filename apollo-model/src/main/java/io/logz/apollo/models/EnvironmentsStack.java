@@ -28,11 +28,6 @@ public class EnvironmentsStack extends Stack {
         this.environments = environments;
     }
 
-    public EnvironmentsStack(String name, boolean isEnabled, List<Integer> environments) {
-        super(name, isEnabled, STACK_TYPE);
-        this.environments = environments;
-    }
-
     public List<Integer> getEnvironments() {
         return environments;
     }

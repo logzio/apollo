@@ -28,7 +28,6 @@ public class ServicesStackController {
     private final ServicesStackDao servicesStackDao;
     private final StackDao stackDao;
     private final ServiceDao serviceDao;
-    private final static String SERVICES_DELIMITER = ",";
 
     @Inject
     public ServicesStackController(ServicesStackDao servicesStackDao, StackDao stackDao, ServiceDao serviceDao) {
@@ -60,7 +59,10 @@ public class ServicesStackController {
     @Transactional
     @POST("/services-stack/service")
     public void addServiceToStack(int serviceId, int stackId, Req req) {
-        validateServiceIsNotPartOfGroup(serviceId, req);
+        if (serviceDao.getService(serviceId).getIsPartOfGroup()) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Can't add to stack service that is part of a group");
+            return;
+        }
         servicesStackDao.addServiceToStack(serviceId, stackId);
         assignJsonResponseToReq(req, HttpStatus.CREATED, getServicesStack(stackId));
     }
@@ -69,12 +71,15 @@ public class ServicesStackController {
     @Transactional
     @POST("/services-stack")
     public void addServicesStack(String name, boolean isEnabled, String servicesCsv, Req req) {
-        List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv, SERVICES_DELIMITER);
+        List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv);
         ServicesStack servicesStack = new ServicesStack(name, Boolean.valueOf(isEnabled));
         stackDao.addStack(servicesStack);
         if (servicesIds.size() > 0) {
             servicesIds.forEach(id -> {
-                validateServiceIsNotPartOfGroup(id, req);
+                if (serviceDao.getService(id).getIsPartOfGroup()) {
+                    assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Can't add to stack service that is part of a group");
+                    return;
+                }
             });
             servicesStackDao.addServicesToStack(servicesIds, servicesStack.getId());
         }
@@ -85,13 +90,16 @@ public class ServicesStackController {
     @Transactional
     @PUT("/services-stack")
     public void updateServicesStack(int id, String name, boolean isEnabled, String servicesCsv, Req req) {
-        List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv, SERVICES_DELIMITER);
+        List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv);
         if (servicesIds.size() <= 0) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "The ServicesStack you asked to update has an empty services list");
             return;
         }
         servicesIds.forEach(serviceId -> {
-            validateServiceIsNotPartOfGroup(serviceId, req);
+            if (serviceDao.getService(id).getIsPartOfGroup()) {
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Can't add to stack service that is part of a group");
+                return;
+            }
         });
         ServicesStack servicesStack = new ServicesStack(id, name, isEnabled);
         stackDao.updateStack(servicesStack);
@@ -118,12 +126,5 @@ public class ServicesStackController {
     public void deleteServicesStack(int id) {
         servicesStackDao.clearServicesStack(id);
         stackDao.deleteStack(id);
-    }
-
-    private void validateServiceIsNotPartOfGroup(int id, Req req) {
-        if (serviceDao.getService(id).getIsPartOfGroup()) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Can't add to stack service that is part of a group");
-            return;
-        }
     }
 }

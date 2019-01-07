@@ -26,7 +26,6 @@ public class EnvironmentsStackController {
 
     private final EnvironmentsStackDao environmentsStackDao;
     private final StackDao stackDao;
-    private final static String ENVIRONMENTS_DELIMITER = ",";
 
     @Inject
     public EnvironmentsStackController(EnvironmentsStackDao environmentsStackDao, StackDao stackDao) {
@@ -64,7 +63,7 @@ public class EnvironmentsStackController {
     @Transactional
     @POST("/environments-stack")
     public void addEnvironmentsStack(String name, boolean isEnabled, String environmentsCsv, Req req) {
-        List<Integer> environmentsIds = StringParser.splitCsvToIntegerList(environmentsCsv, ENVIRONMENTS_DELIMITER);
+        List<Integer> environmentsIds = StringParser.splitCsvToIntegerList(environmentsCsv);
         EnvironmentsStack environmentsStack = new EnvironmentsStack(name, isEnabled);
         stackDao.addStack(environmentsStack);
         if (environmentsIds.size() > 0) {
@@ -77,7 +76,7 @@ public class EnvironmentsStackController {
     @Transactional
     @PUT("/environments-stack")
     public void updateEnvironmentsStack(int id, String name, boolean isEnabled, String environmentsCsv, Req req) {
-        List<Integer> environmentsIds = StringParser.splitCsvToIntegerList(environmentsCsv, ENVIRONMENTS_DELIMITER);
+        List<Integer> environmentsIds = StringParser.splitCsvToIntegerList(environmentsCsv);
         if (environmentsIds.size() <= 0) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "The EnvironmentsStack you asked to update has an empty environments list");
             return;

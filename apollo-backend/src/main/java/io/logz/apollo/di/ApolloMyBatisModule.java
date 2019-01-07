@@ -27,7 +27,7 @@ import javax.sql.DataSource;
 
 public class ApolloMyBatisModule extends MyBatisModule {
 
-    private static final String JDBC_URL_FORMAT = "jdbc:mysql://%s:%s/%s?createDatabaseIfNotExist=true&allowmultiqueries=true";
+    private static final String JDBC_URL_FORMAT = "jdbc:mysql://%s:%s/%s?createDatabaseIfNotExist=true";
 
     private final DatabaseConfiguration configuration;
 

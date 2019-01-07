@@ -36,13 +36,11 @@
     <select id="getAllEnvironmentsStacks" resultType="io.logz.apollo.models.EnvironmentsStack">
         SELECT *
         FROM stack
-        WHERE stack_type = "ENVIRONMENTS"
     </select>
 
     <select id="getAllServicesStacks" resultType="io.logz.apollo.models.ServicesStack">
         SELECT *
         FROM stack
-        WHERE stack_type = "SERVICES"
     </select>
 
     <insert id="addStack" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
