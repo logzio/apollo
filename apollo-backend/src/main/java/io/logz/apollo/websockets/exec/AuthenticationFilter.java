@@ -3,7 +3,7 @@ package io.logz.apollo.websockets.exec;
 import io.logz.apollo.auth.PermissionsValidator;
 import io.logz.apollo.auth.TokenConverter;
 import io.logz.apollo.common.HttpStatus;
-import io.logz.apollo.common.QueryStringParser;
+import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.DeploymentPermissionDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,8 +58,8 @@ public class AuthenticationFilter implements Filter {
 
         try {
             String userName = TokenConverter.convertTokenToUser(token.get());
-            int environmentId = QueryStringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_ENVIRONMENT_KEY);
-            int serviceId = QueryStringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_SERVICE_KEY);
+            int environmentId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_ENVIRONMENT_KEY);
+            int serviceId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_SERVICE_KEY);
 
             if (PermissionsValidator.isAllowedToDeploy(serviceId, environmentId, deploymentPermissionDao.getPermissionsByUser(userName))) {
                 logger.info("Granted Live-Session permission to user {} on service {} and environment {}", userName, serviceId, environmentId);

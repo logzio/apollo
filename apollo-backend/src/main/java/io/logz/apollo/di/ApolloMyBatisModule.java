@@ -7,9 +7,12 @@ import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentRoleDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;
 import io.logz.apollo.dao.EnvironmentDao;
+import io.logz.apollo.dao.EnvironmentsStackDao;
 import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.NotificationDao;
 import io.logz.apollo.dao.ServiceDao;
+import io.logz.apollo.dao.ServicesStackDao;
+import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.dao.UserDao;
 import io.logz.apollo.database.DataSourceFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
@@ -52,6 +55,9 @@ public class ApolloMyBatisModule extends MyBatisModule {
         addMapperClass(GroupDao.class);
         addMapperClass(BlockerDefinitionDao.class);
         addMapperClass(NotificationDao.class);
+        addMapperClass(EnvironmentsStackDao.class);
+        addMapperClass(ServicesStackDao.class);
+        addMapperClass(StackDao.class);
     }
 
     private void createDataSource() {

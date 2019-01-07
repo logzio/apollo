@@ -1,6 +1,6 @@
 package io.logz.apollo.controllers;
 
-import io.logz.apollo.common.QueryStringParser;
+import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.database.OrderDirection;
 import io.logz.apollo.models.DeploymentHistoryDetails;
@@ -33,7 +33,7 @@ public class DatatablesController {
     @GET("/deployment/datatables")
     public DataTablesResponseObject getDataTableDeploymentResponse(Req req) {
 
-        Map<String, String> queryStringMap = QueryStringParser.getQueryStringMap(req.query());
+        Map<String, String> queryStringMap = StringParser.getQueryStringMap(req.query());
 
         int draw = Integer.parseInt(queryStringMap.get("draw"));
         int length = Integer.parseInt(queryStringMap.get("length"));
