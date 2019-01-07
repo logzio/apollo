@@ -8,6 +8,13 @@ angular
 
 
 function ApiService($q, $http){
+    var getAllEnvironmentsStacks = function() {
+        return $http.get(CONFIG.appUrl + 'environments-stack');
+    };
+
+     var getAllServicesStacks = function() {
+        return $http.get(CONFIG.appUrl + 'services-stack');
+     };
 
     var getAllUsers = function() {
         return $http.get(CONFIG.appUrl + 'users/');
@@ -305,6 +312,8 @@ function ApiService($q, $http){
     };
 
     return {
+        getAllEnvironmentsStacks: getAllEnvironmentsStacks,
+        getAllServicesStacks: getAllServicesStacks,
         getAllUsers: getAllUsers,
         getAllEnvironments: getAllEnvironments,
         getAllServices: getAllServices,

@@ -30,6 +30,34 @@ angular.module('apollo')
             }
         });
 
+        jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+            "stack-pre": function ( stack ) {
+                return stack;
+            },
+            "stack-asc": function ( a, b ) {
+                if (a.isStack == true && b.isStack == false) {
+                    return -1;
+                }
+
+                if (b.isStack == true && a.isStack == false) {
+                    return 1;
+                }
+
+                return ((a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0));
+            },
+            "stack-desc": function ( a, b ) {
+                if (a.isStack && !b.isStack) {
+                    return 1;
+                }
+
+                if (b.isStack && !a.isStack) {
+                    return -1;
+                }
+
+                return ((a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+            }
+        });
+
         // Define the flow steps
         var deploymentSteps = ["choose-service", "choose-environment", "choose-version", "confirmation"];
 
@@ -49,11 +77,16 @@ angular.module('apollo')
         $scope.selectedEnvironments = [];
         $scope.environmentNames = null;
         $scope.possibleServices = null;
-        $scope.selectedServices = [];
+        $scope.selectedServices = null;
         $scope.serviceNames = null;
 		$scope.versionSelected = null;
 		$scope.showNextStep = true;
 		$scope.isGroupDeployment = false;
+        $scope.possibleEnvironmentsStacks = null;
+        $scope.possibleServicesStacks = null;
+        $scope.servicesAndStackForDisplay = null;
+
+        var servicesAndStackForDisplayWorking = [];
 
 		// Angular can't ng-model to a variable which is not an object :(
 		$scope.deploymentMessage = {};
@@ -236,7 +269,7 @@ angular.module('apollo')
                 return '-';
             }
 
-            return $scope.possibleServices.filter(function(a){return a.id == id})[0].name;
+            return $scope.possibleServices[id].name;
         }
 
         var getEnvironmentNameById = function(id) {
@@ -416,6 +449,10 @@ angular.module('apollo')
             order: [[ 0, "desc" ]]
         };
 
+        $scope.dtColumnDefsServices = [
+            DTColumnDefBuilder.newColumnDef([2]).withOption('type', 'stack')
+        ];
+
          $scope.dtColumnDefsDeployableVersion = [
              DTColumnDefBuilder.newColumnDef([0]).withOption('type', 'date-time')
          ];
@@ -447,24 +484,57 @@ angular.module('apollo')
 
         // Data fetching
 		apolloApiService.getAllEnvironments().then(function(response) {
-            $scope.possibleEnvironments = response.data;
-			// Get selection from local storage
-            var previousEnvironmentIds = localStorageService.get(previouseEnvironmentLocalStorageKey);
+            var tempEnvironment = {};
+            response.data.forEach(function(environment) {
+                tempEnvironment[environment.id] = environment;
+            });
+            $scope.possibleEnvironments = tempEnvironment;
+		});
 
-            if (previousEnvironmentIds !== null) {
-                $scope.selectedEnvironments = $scope.possibleEnvironments.filter(function(a){return previousEnvironmentIds.indexOf(a.id) > -1})
-            }
+		apolloApiService.getAllEnvironmentsStacks().then(function(response) {
+             var tempEnvironmentsStack = {};
+		     response.data.forEach(function(environmentStack) {
+                tempEnvironmentsStack[environmentStack.id] = environmentStack;
+             });
+             $scope.possibleEnvironmentsStacks = tempEnvironmentsStack;
 		});
 
 		apolloApiService.getAllServices().then(function(response) {
-            $scope.possibleServices = response.data;
-
-        	// Get selection from local storage
-            var previousServiceIds = localStorageService.get(previouseServiceLocalStorageKey);
-            if (previousServiceIds !== null) {
-                $scope.selectedServices = $scope.possibleServices.filter(function(a){return previousServiceIds.indexOf(a.id) > -1})
-            }
+            var tempServices = {};
+            response.data.forEach(function(service) {
+                tempServices[service.id] = service;
+                addServiceToDisplayServices(service);
+            });
+            $scope.possibleServices = tempServices;
+            updateFinalDisplayServicesAndStacks();
         });
+
+        apolloApiService.getAllServicesStacks().then(function(response) {
+            var tempServicesStack = {};
+            response.data.forEach(function(servicesStack) {
+               tempServicesStack[servicesStack.id] = servicesStack;
+               addStackToDisplayServices(servicesStack);
+            });
+            $scope.possibleServicesStacks = tempServicesStack;
+            updateFinalDisplayServicesAndStacks();
+        });
+
+        function addStackToDisplayServices(stack) {
+            stack.isStack = true;
+            servicesAndStackForDisplayWorking = servicesAndStackForDisplayWorking.concat(stack);
+        }
+
+        function addServiceToDisplayServices(service) {
+            service.isStack = false;
+            servicesAndStackForDisplayWorking = servicesAndStackForDisplayWorking.concat(service);
+        }
+
+        function updateFinalDisplayServicesAndStacks() {
+            if ($scope.possibleServices !== null && $scope.possibleServicesStacks !== null) {
+                    $scope.servicesAndStackForDisplay = servicesAndStackForDisplayWorking;
+            }
+
+        }
 
 		function loadDeployableVersions(serviceIdsCsv) {
             apolloApiService.getDeployableVersionForMultiServices(serviceIdsCsv).then(function(response) {

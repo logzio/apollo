@@ -65,7 +65,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                        <table class="table table-hover" datatable="ng" dt-options="dtOptions" dt-column-defs="dtColumnDefsServices">
                             <thead>
                             <tr>
                                 <th style="width: 20px"></th>
@@ -75,7 +75,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="service in possibleServices | filter:globalSearch"
+                            <tr ng-repeat="service in servicesAndStackForDisplay"
                                 ng-click="toggleSelectedService(service)"
                                 ng-dblclick="toggleSelectedService(service); nextStep()"
                                 ng-class="{ 'active':selectedServices.indexOf(service) > -1, 'marked-as-favorite': favoriteServicesNames.indexOf(service.name) > -1 }">
