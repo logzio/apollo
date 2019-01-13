@@ -72,7 +72,7 @@ public class ServicesStackController {
     @POST("/services-stack")
     public void addServicesStack(String name, boolean isEnabled, String servicesCsv, Req req) {
         List<Integer> servicesIds = StringParser.splitCsvToIntegerList(servicesCsv);
-        ServicesStack servicesStack = new ServicesStack(name, Boolean.valueOf(isEnabled));
+        ServicesStack servicesStack = new ServicesStack(name, isEnabled);
         stackDao.addStack(servicesStack);
         if (servicesIds.size() > 0) {
             servicesIds.forEach(id -> {

@@ -13,13 +13,13 @@
     <select id="getEnvironmentsStack" resultType="io.logz.apollo.models.EnvironmentsStack">
         SELECT *
         FROM stack
-        WHERE id = #{id}
+        WHERE id = #{id} AND stack_type = "ENVIRONMENTS"
     </select>
 
     <select id="getServicesStack" resultType="io.logz.apollo.models.ServicesStack">
         SELECT *
         FROM stack
-        WHERE id = #{id}
+        WHERE id = #{id} AND stack_type = "SERVICES"
     </select>
 
     <select id="getAllStacks" resultType="io.logz.apollo.models.Stack">
@@ -36,7 +36,7 @@
     <select id="getAllEnvironmentsStacks" resultType="io.logz.apollo.models.EnvironmentsStack">
         SELECT *
         FROM stack
-        WHERE stack_type = "ENVIRONMRNTS"
+        WHERE stack_type = "ENVIRONMENTS"
     </select>
 
     <select id="getAllServicesStacks" resultType="io.logz.apollo.models.ServicesStack">
