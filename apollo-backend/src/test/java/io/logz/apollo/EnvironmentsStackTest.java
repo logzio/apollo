@@ -5,6 +5,7 @@ import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.EnvironmentsStack;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class EnvironmentsStackTest {
     private static List<Integer> environments = new ArrayList<>();
     private static EnvironmentsStack environmentsStack;
     private static int stackId;
-    private static final String NEW_STACK_NAME = "new-stack-name";
+    private static String newStackName;
     private static final boolean NEW_ENABLED = false;
 
     @BeforeClass
@@ -38,6 +39,11 @@ public class EnvironmentsStackTest {
         }
         environmentsStack = ModelsGenerator.createAndSubmitEnvironmentsStack(apolloTestClient, environments);
         stackId = environmentsStack.getId();
+    }
+
+    @Before
+    public void before() {
+        newStackName = "new-stack-name" + Common.randomStr(5);
     }
 
     @Test
@@ -55,7 +61,7 @@ public class EnvironmentsStackTest {
             newEnvironmentsList.add(ModelsGenerator.createAndSubmitEnvironment(apolloTestClient).getId());
         }
         environmentsStack.setEnvironments(newEnvironmentsList);
-        environmentsStack.setName(NEW_STACK_NAME);
+        environmentsStack.setName(newStackName);
         environmentsStack.setEnabled(NEW_ENABLED);
         apolloTestClient.updateEnvironmentsStack(environmentsStack);
         EnvironmentsStack environmentsStackFromDb = apolloTestClient.getEnvironmentsStack(stackId);

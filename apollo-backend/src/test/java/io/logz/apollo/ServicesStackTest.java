@@ -5,6 +5,7 @@ import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.models.ServicesStack;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +24,7 @@ public class ServicesStackTest {
     private static List<Integer> services = new ArrayList<>();
     private static ServicesStack servicesStack;
     private static int stackId;
-    private static final String NEW_STACK_NAME = "new-stack-name";
+    private static String newStackName;
     private static final boolean NEW_ENABLED = false;
 
     @BeforeClass
@@ -38,6 +39,11 @@ public class ServicesStackTest {
         }
         servicesStack = ModelsGenerator.createAndSubmitServicesStack(apolloTestClient, services);
         stackId = servicesStack.getId();
+    }
+
+    @Before
+    public void before() {
+        newStackName = "new-stack-name" + Common.randomStr(5);
     }
 
     @Test
@@ -55,7 +61,7 @@ public class ServicesStackTest {
             newServicesList.add(ModelsGenerator.createAndSubmitService(apolloTestClient).getId());
         }
         servicesStack.setServices(newServicesList);
-        servicesStack.setName(NEW_STACK_NAME);
+        servicesStack.setName(newStackName);
         servicesStack.setEnabled(NEW_ENABLED);
         apolloTestClient.updateServicesStack(servicesStack);
         ServicesStack servicesStackFromDb = apolloTestClient.getServicesStack(stackId);
