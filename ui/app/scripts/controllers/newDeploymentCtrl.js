@@ -532,28 +532,6 @@ angular.module('apollo')
             return $scope.allDeployableVersions.filter(function(a){return a.gitCommitSha === sha})[0].id;
         }
 
-        // Data fetching
-//		apolloApiService.getAllEnvironments().then(function(response) {
-//            var tempEnvironment = {};
-//            response.data.forEach(function(environment) {
-//                tempEnvironment[environment.id] = environment;
-//                addEnvironmentToDisplayEnvironments(environment);
-//            });
-//            $scope.possibleEnvironments = tempEnvironment;
-//            allEnvironments = response.data;
-//            updateFinalDisplayEnvironmentsAndStacks();
-//		});
-//
-//		apolloApiService.getAllEnvironmentsStacks().then(function(response) {
-//             var tempEnvironmentsStack = {};
-//		     response.data.forEach(function(environmentsStack) {
-//                tempEnvironmentsStack[environmentsStack.id] = environmentsStack;
-//                addStackToDisplayEnvironments(environmentsStack);
-//             });
-//             $scope.possibleEnvironmentsStacks = tempEnvironmentsStack;
-//             updateFinalDisplayEnvironmentsAndStacks();
-//		});
-
         apolloApiService.getAllEnvironments()
          .then(getAllEnvironments)
          .then(() => {
