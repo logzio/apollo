@@ -336,9 +336,9 @@ angular.module('apollo')
         };
 
        $scope.toggleSelectedEnvironment = function(environment) {
-            var index = $scope.selectedEnvironments.indexOf(environment);
+            var index = $scope.selectedEnvironmentsAndStacks.indexOf(environment);
             if (index > -1) {
-                $scope.selectedEnvironments.splice(index, 1);
+                $scope.selectedEnvironmentsAndStacks.splice(index, 1);
             }
             else {
                 if ($scope.isGroupDeployment) {
@@ -609,25 +609,41 @@ angular.module('apollo')
 
          }
 
-		apolloApiService.getAllServices().then(function(response) {
+		apolloApiService.getAllServices()
+		    .then(getAllServices)
+		    .then(() => {
+		        apolloApiService.getAllServicesStacks().then(function(response) {
+                    var tempServicesStack = {};
+                    response.data.forEach(function(servicesStack) {
+                       tempServicesStack[servicesStack.id] = servicesStack;
+                       addStackToDisplayServices(servicesStack);
+
+                       var servicesNames = [];
+                       servicesStack.services.forEach(function(serviceId) {
+                            var service = allServices.find(x => x.id === serviceId);
+                            var serviceName = service.name;
+                            servicesNames = servicesNames.concat(serviceName);
+                       });
+
+                       $scope.servicesInStack[servicesStack.id] = servicesNames;
+                    });
+                    $scope.possibleServicesStacks = tempServicesStack;
+                    updateFinalDisplayServicesAndStacks();
+		    })
+        })
+
+        function getAllServices(response) {
             var tempServices = {};
             response.data.forEach(function(service) {
                 tempServices[service.id] = service;
                 addServiceToDisplayServices(service);
             });
             $scope.possibleServices = tempServices;
+            allServices = response.data;
             updateFinalDisplayServicesAndStacks();
-        });
 
-        apolloApiService.getAllServicesStacks().then(function(response) {
-            var tempServicesStack = {};
-            response.data.forEach(function(servicesStack) {
-               tempServicesStack[servicesStack.id] = servicesStack;
-               addStackToDisplayServices(servicesStack);
-            });
-            $scope.possibleServicesStacks = tempServicesStack;
-            updateFinalDisplayServicesAndStacks();
-        });
+            return Promise.resolve();
+        }
 
         function addStackToDisplayServices(stack) {
             stack.isStack = true;

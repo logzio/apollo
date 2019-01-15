@@ -46,7 +46,7 @@
                                            name="selectedEnvironments[]"
                                            value="{{environment}}"
                                            ng-if="!isGroupDeployment"
-                                           ng-checked="selectedEnvironments.indexOf(environment) > -1">
+                                           ng-checked="selectedEnvironmentsAndStacks.indexOf(environment) > -1">
                                 </td>
                                 <td>
                                     <i class="fa fa-clone" aria-hidden="true" style="margin-right: 5px" ng-if="environment.isStack == true" uib-tooltip-html="environmentsInStack[environment.id].join('<br>')"></i>
@@ -103,7 +103,7 @@
                                            type="checkbox"
                                            name="selectedServices[]"
                                            value="{{service}}"
-                                           ng-checked="selectedServices.indexOf(service) > -1">
+                                           ng-checked="selectedServicesAndStacks.indexOf(service) > -1">
                                 </td>
                                 <td>
                                     <i class="fa fa-clone" aria-hidden="true" style="margin-right: 5px" ng-if="service.isStack == true" uib-tooltip-html="servicesInStack[service.id].join('<br>')"></i>
