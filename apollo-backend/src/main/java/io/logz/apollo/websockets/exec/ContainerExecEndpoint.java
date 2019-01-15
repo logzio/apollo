@@ -1,7 +1,7 @@
 package io.logz.apollo.websockets.exec;
 
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
-import io.logz.apollo.common.QueryStringParser;
+import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
@@ -53,8 +53,8 @@ public class ContainerExecEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("podName") String podName, @PathParam("containerName") String containerName) {
-        int environmentId = QueryStringParser.getIntFromQueryString(session.getQueryString(), QUERY_STRING_ENVIRONMENT_KEY);
-        int serviceId = QueryStringParser.getIntFromQueryString(session.getQueryString(), QUERY_STRING_SERVICE_KEY);
+        int environmentId = StringParser.getIntFromQueryString(session.getQueryString(), QUERY_STRING_ENVIRONMENT_KEY);
+        int serviceId = StringParser.getIntFromQueryString(session.getQueryString(), QUERY_STRING_SERVICE_KEY);
 
         Environment environment = environmentDao.getEnvironment(environmentId);
         Service service = serviceDao.getService(serviceId);

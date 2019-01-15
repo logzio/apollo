@@ -4,6 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="io.logz.apollo.dao.EnvironmentDao">
+
     <select id="getEnvironment" resultType="io.logz.apollo.models.Environment">
         SELECT *
         FROM environment
@@ -25,4 +26,5 @@
         INSERT INTO environment (name, geo_region, availability, kubernetes_master, kubernetes_token, kubernetes_namespace, service_port_coefficient, require_deployment_message, require_health_check)
         VALUES (#{name}, #{geoRegion}, #{availability}, #{kubernetesMaster}, #{kubernetesToken}, #{kubernetesNamespace}, #{servicePortCoefficient}, #{requireDeploymentMessage}, #{requireHealthCheck})
     </insert>
+
 </mapper>

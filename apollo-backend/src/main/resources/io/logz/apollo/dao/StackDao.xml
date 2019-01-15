@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.logz.apollo.dao.StackDao">
+
+    <select id="getStack" resultType="io.logz.apollo.models.Stack">
+        SELECT *
+        FROM stack
+        WHERE id = #{id}
+    </select>
+
+    <select id="getEnvironmentsStack" resultType="io.logz.apollo.models.EnvironmentsStack">
+        SELECT *
+        FROM stack
+        WHERE id = #{id} AND stack_type = "ENVIRONMENTS"
+    </select>
+
+    <select id="getServicesStack" resultType="io.logz.apollo.models.ServicesStack">
+        SELECT *
+        FROM stack
+        WHERE id = #{id} AND stack_type = "SERVICES"
+    </select>
+
+    <select id="getAllStacks" resultType="io.logz.apollo.models.Stack">
+        SELECT *
+        FROM stack
+    </select>
+
+    <select id="getAllStackFromType" resultType="io.logz.apollo.models.Stack">
+        SELECT *
+        FROM stack
+        WHERE stack_type = #{stackType}
+    </select>
+
+    <select id="getAllEnvironmentsStacks" resultType="io.logz.apollo.models.EnvironmentsStack">
+        SELECT *
+        FROM stack
+        WHERE stack_type = "ENVIRONMENTS"
+    </select>
+
+    <select id="getAllServicesStacks" resultType="io.logz.apollo.models.ServicesStack">
+        SELECT *
+        FROM stack
+        WHERE stack_type = "SERVICES"
+    </select>
+
+    <insert id="addStack" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO stack (name, is_enabled, stack_type)
+        VALUES (#{name}, #{isEnabled}, #{stackType})
+    </insert>
+
+    <update id="updateStack" parameterType="io.logz.apollo.models.Stack" keyProperty="id" keyColumn="id">
+        UPDATE stack SET
+        name=#{name},
+        is_enabled=#{isEnabled},
+        stack_type=#{stackType}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteStack">
+        DELETE FROM stack
+        WHERE id=#{id}
+    </delete>
+
+</mapper>

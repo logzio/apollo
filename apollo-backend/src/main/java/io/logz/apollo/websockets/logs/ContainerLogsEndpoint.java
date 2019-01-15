@@ -1,7 +1,7 @@
 package io.logz.apollo.websockets.logs;
 
 import io.fabric8.kubernetes.client.dsl.LogWatch;
-import io.logz.apollo.common.QueryStringParser;
+import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
@@ -42,7 +42,7 @@ public class ContainerLogsEndpoint {
 
     @OnOpen
     public void onOpen(Session session, @PathParam("podName") String podName, @PathParam("containerName") String containerName) {
-        int environmentId = QueryStringParser.getIntFromQueryString(session.getQueryString(), QUERY_STRING_ENVIRONMENT_KEY);
+        int environmentId = StringParser.getIntFromQueryString(session.getQueryString(), QUERY_STRING_ENVIRONMENT_KEY);
 
         Environment environment = environmentDao.getEnvironment(environmentId);
 

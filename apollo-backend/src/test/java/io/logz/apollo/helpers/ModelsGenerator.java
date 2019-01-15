@@ -4,7 +4,10 @@ import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.models.DeploymentRole;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PasswordManager;
+import io.logz.apollo.models.EnvironmentsStack;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.ServicesStack;
+import io.logz.apollo.models.StackType;
 import io.logz.apollo.models.User;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.clients.ApolloTestAdminClient;
@@ -22,7 +25,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -51,6 +56,72 @@ public class ModelsGenerator {
         Environment testEnvironment = ModelsGenerator.createEnvironment();
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
+    }
+
+    public static EnvironmentsStack createEnvironmentsStack() {
+        EnvironmentsStack testEnvironmentsStack = new EnvironmentsStack();
+        testEnvironmentsStack.setName("environments-stack-" + Common.randomStr(5));
+        testEnvironmentsStack.setEnabled(true);
+        testEnvironmentsStack.setStackType(StackType.ENVIRONMENTS);
+        testEnvironmentsStack.setEnvironments(new ArrayList<>());
+
+        return testEnvironmentsStack;
+    }
+
+    public static EnvironmentsStack createEnvironmentsStack(List<Integer> environments) {
+        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack();
+        testEnvironmentsStack.setEnvironments(environments);
+
+        return testEnvironmentsStack;
+    }
+
+    public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient) throws Exception {
+        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack();
+        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
+        testEnvironmentsStack.setId(id);
+
+        return testEnvironmentsStack;
+    }
+
+    public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient, List<Integer> environments) throws Exception {
+        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack(environments);
+        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
+        testEnvironmentsStack.setId(id);
+
+        return testEnvironmentsStack;
+    }
+
+    public static ServicesStack createServicesStack() {
+        ServicesStack testServicesStack = new ServicesStack();
+        testServicesStack.setName("services-stack-" + Common.randomStr(5));
+        testServicesStack.setEnabled(true);
+        testServicesStack.setStackType(StackType.SERVICES);
+        testServicesStack.setServices(new ArrayList<>());
+
+        return testServicesStack;
+    }
+
+    public static ServicesStack createServicesStack(List<Integer> services) {
+        ServicesStack testServicessStack = createServicesStack();
+        testServicessStack.setServices(services);
+
+        return testServicessStack;
+    }
+
+    public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient) throws Exception {
+        ServicesStack testServicessStack = createServicesStack();
+        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
+        testServicessStack.setId(id);
+
+        return testServicessStack;
+    }
+
+    public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient, List<Integer> services) throws Exception {
+        ServicesStack testServicessStack = createServicesStack(services);
+        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
+        testServicessStack.setId(id);
+
+        return testServicessStack;
     }
 
     public static Group createGroup() {
