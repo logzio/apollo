@@ -152,7 +152,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="group in possibleGroups | filter:globalSearch"
+                            <tr ng-repeat="group in possibleGroups"
                                 ng-click="toggleSelectedGroup(group)"
                                 ng-class="{'active':selectedGroups.contains(group)}">
                                 <td>
