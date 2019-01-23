@@ -1,0 +1,1 @@
+ALTER TABLE environment MODIFY kubernetes_token VARCHAR(2000);
