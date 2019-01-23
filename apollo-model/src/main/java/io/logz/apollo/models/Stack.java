@@ -1,6 +1,7 @@
 package io.logz.apollo.models;
 
 public abstract class Stack {
+
     private int id;
     private String name;
     private boolean isEnabled;
