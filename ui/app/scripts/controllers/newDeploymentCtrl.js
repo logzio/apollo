@@ -327,6 +327,16 @@ angular.module('apollo')
                 });
         };
 
+        $scope.getGroupsNamesPerEnvironment = function(environmentId) {
+             var groupsNamesPerEnvironment = [];
+             $scope.selectedGroups.forEach(function(group) {
+                if(group.environmentId === environmentId) {
+                    groupsNamesPerEnvironment.push(group.name);
+                }
+             });
+             return groupsNamesPerEnvironment;
+        }
+
         $scope.toggleSelectedGroup = function(group) {
             var index = $scope.selectedGroups.indexOf(group);
 		    if (index > -1) {

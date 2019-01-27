@@ -43,9 +43,8 @@
                                 </td>
                                 <td>
                                     <input type="checkbox"
-                                           name="selectedEnvironments[]"
+                                           name="selectedEnvironmentsAndStacks[]"
                                            value="{{environment}}"
-                                           ng-if="!isGroupDeployment"
                                            ng-checked="selectedEnvironmentsAndStacks.indexOf(environment) > -1">
                                 </td>
                                 <td>
@@ -224,9 +223,7 @@
                 <p>To services <b>{{serviceNames}}</b><br></p>
                 <div ng-repeat="environment in selectedEnvironments" ng-if="selectedGroups.length > 0">
                     <br><p>On environment <b>{{environment.name}}</b></p>
-                    <div ng-repeat="group in selectedGroups">
-                        <p ng-if="selectedGroups.length > 0 && group.environmentId === environment.id">On group <b>{{group.name}}</b></p>
-                    </div>
+                    <p ng-if="getGroupsNamesPerEnvironment(environment.id).length > 0">On group <b>{{getGroupsNamesPerEnvironment(environment.id).join(', ')}}</b></p>
                 </div>
                 <div ng-if="selectedGroups.length == 0"><p>On environments <b>{{environmentNames}}</b></p></div>
                 <button class="btn btn-default btn-lg center-block" data-toggle="modal" data-target="#confirm-modal">That is correct</button>
