@@ -31,7 +31,7 @@
                             <tbody>
                             <tr ng-repeat="environment in environmentsAndStackForDisplay"
                                 ng-click="toggleSelectedEnvironment(environment)"
-                                ng-dblclick="toggleSelectedEnvironment(environment); nextStep()"
+                                ng-dblclick="toggleSelectedEnvironment(environment); handleEnvironmentDbClick()"
                                 ng-class="{ 'active':selectedEnvironmentsAndStacks.indexOf(environment) > -1, 'marked-as-favorite': favoriteEnvironmentsNames.indexOf(environment.name) > -1 }">
                                 <td style="display: none;">
                                     {{environment.orderId}}
@@ -149,6 +149,7 @@
                                 <th>Name</th>
                                 <th>Scaling Factor</th>
                                 <th>Parameters</th>
+                                <th>Environment</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -164,6 +165,7 @@
                                 <td>{{group.name}}</td>
                                 <td>{{group.scalingFactor}}</td>
                                 <td>{{group.jsonParams}}</td>
+                                <td>{{possibleEnvironments[group.environmentId].name}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -219,9 +221,14 @@
             <div class="well">
                 <h4>So just making sure</h4>
                 <p>You are going to deploy commit <b>{{versionSelected.gitCommitSha}}</b><br> </p>
-                <p>To service <b>{{serviceNames}}</b><br></p>
-                <p>On environment <b>{{environmentNames}}</b></p>
-                <p ng-if="selectedGroups.length > 0">On groups <b>{{groupNames}}</b></p><br>
+                <p>To services <b>{{serviceNames}}</b><br></p>
+                <div ng-repeat="environment in selectedEnvironments" ng-if="selectedGroups.length > 0">
+                    <br><p>On environment <b>{{environment.name}}</b></p>
+                    <div ng-repeat="group in selectedGroups">
+                        <p ng-if="selectedGroups.length > 0 && group.environmentId === environment.id">On group <b>{{group.name}}</b></p>
+                    </div>
+                </div>
+                <div ng-if="selectedGroups.length == 0"><p>On environments <b>{{environmentNames}}</b></p></div>
                 <button class="btn btn-default btn-lg center-block" data-toggle="modal" data-target="#confirm-modal">That is correct</button>
             </div>
 
@@ -257,7 +264,7 @@
     </div>
 
     <div class="pull-right">
-        <button type="button" ng-if="showNextStep" class="btn btn-success btn-circle btn-lg apollo-flow-button" ng-click="nextStep()">
+        <button type="button" ng-if="showNextStep" class="btn btn-success btn-circle btn-lg apollo-flow-button" ng-click="handleOnClickNextStep()">
             <i class="fa fa-arrow-right"></i>
         </button>
     </div>

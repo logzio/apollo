@@ -93,6 +93,16 @@ angular.module('apollo')
             $scope.deploymentMessage.text = versionSelected.commitMessage && versionSelected.commitMessage.split('\n')[0]
         };
 
+        $scope.handleOnClickNextStep = () => {
+            switch($scope.currentStep){
+                case  "choose-environment":
+                    $scope.waitForGroupsBeforeNextStep();
+                    break;
+            }
+
+            $scope.nextStep()
+        }
+
         // Visual change the next step
         $scope.nextStep = function() {
             // First validate the input
@@ -102,10 +112,6 @@ angular.module('apollo')
 
                 // Increment the index
                 currIndex++;
-
-                if(currIndex === 2) {
-                    $scope.waitForGroupsBeforeNextStep();
-                }
 
                 // Choose the next step
                 $scope.currentStep = deploymentSteps[currIndex];
@@ -145,40 +151,49 @@ angular.module('apollo')
 
             // Valid groups deployment
             if ($scope.selectedGroups.length > 0 && $scope.selectedServices.length == 1 && $scope.selectedServices[0].isPartOfGroup) {
-                apolloApiService.createNewDeploymentWithGroup(
-                        getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
-                        $scope.selectedServices[0].id,
-                        $scope.selectedEnvironments.map(function (environment) { return environment.id; }).join(','),
-                        $scope.deploymentMessage.text, $scope.selectedGroups.map(function (group) { return group.id; }).join(',')
-                    ).then(function (response) {
+                $scope.selectedEnvironments.forEach(function(environment) {
+                    $scope.selectedGroups.forEach(function(group) {
+                        if(group.environmentId === environment.id) {
+                        apolloApiService.createNewDeploymentWithGroup(
+                            getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
+                            $scope.selectedServices[0].id,
+                            environment.id,
+    //                        $scope.selectedEnvironments.map(function (environment) { return environment.id; }).join(','),
+                            $scope.deploymentMessage.text,
+    //                        $scope.selectedGroups.map(function (group) { return group.id; }).join(',')
+                            group.id,
+                        ).then(function (response) {
 
-                    // Wait a bit to let the deployment be in the DB
-                    setTimeout(function () {
-                        usSpinnerService.stop('deployment-spinner');
+                            // Wait a bit to let the deployment be in the DB
+                            setTimeout(function () {
+                                usSpinnerService.stop('deployment-spinner');
 
-                        // Due to bug with angular-bootstrap and angular 1.4, the modal is not closing when redirecting.
-                        // So just forcing it to :)   TODO: after the bug is fixed, remove this shit
-                        $('#confirm-modal').modal('hide');
-                        $('body').removeClass('modal-open');
-                        $('.modal-backdrop').remove();
+                                // Due to bug with angular-bootstrap and angular 1.4, the modal is not closing when redirecting.
+                                // So just forcing it to :)   TODO: after the bug is fixed, remove this shit
+                                $('#confirm-modal').modal('hide');
+                                $('body').removeClass('modal-open');
+                                $('.modal-backdrop').remove();
 
-                        if (response.data.unsuccessful.length > 0) {
-                            showBlockedDeployments(response);
-                        } else if (response.data.successful.length > 0) {
-                            $scope.redirectToOngoing();
-                        } else {
-                            growl.error("An error occurred.", {ttl: 7000});
-                        }
-                    }, 500);
+                                if (response.data.unsuccessful.length > 0) {
+                                    showBlockedDeployments(response);
+                                } else if (response.data.successful.length > 0) {
+                                    $scope.redirectToOngoing();
+                                } else {
+                                    growl.error("An error occurred.", {ttl: 7000});
+                                }
+                            }, 500);
 
-                }, function (error) {
-                    // End spinner
-                    usSpinnerService.stop('deployment-spinner');
+                        }, function (error) {
+                                // End spinner
+                                usSpinnerService.stop('deployment-spinner');
 
-                    // 403 are handled generically on the interceptor
-                    if (error.status !== 403) {
-                        growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
+                                // 403 are handled generically on the interceptor
+                                if (error.status !== 403) {
+                                    growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
+                                }
+                        });
                     }
+                });
                 });
             }
 
@@ -375,9 +390,10 @@ angular.module('apollo')
             updateEnvironmentsNames();
         };
 
-        $scope.waitForGroupsBeforeNextStep = function() {
+        $scope.waitForGroupsBeforeNextStep = async function() {
             usSpinnerService.spin('deployment-spinner');
-            Promise.all(groupsPromises).then(function (response) {
+            await Promise.all(groupsPromises).then(function (response) {
+
                 let selectedEnvsIds = new Set($scope.selectedEnvironments.map(environment => environment.id));
                 let filteredGroupsByEnvs = $scope.possibleGroups.filter(group => selectedEnvsIds.has(group.environmentId));
 
@@ -394,8 +410,14 @@ angular.module('apollo')
                 $scope.possibleGroups = distinctGroups;
 
                 usSpinnerService.stop('deployment-spinner');
+
             });
         };
+
+       $scope.handleEnvironmentDbClick = () => {
+           $scope.waitForGroupsBeforeNextStep();
+           $scope.nextStep();
+       }
 
        $scope.toggleSelectedServiceOrStack = function(service) {
             var index = $scope.selectedServicesAndStacks.indexOf(service);
