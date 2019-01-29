@@ -93,16 +93,6 @@ angular.module('apollo')
             $scope.deploymentMessage.text = versionSelected.commitMessage && versionSelected.commitMessage.split('\n')[0]
         };
 
-        $scope.handleOnClickNextStep = () => {
-            switch($scope.currentStep){
-                case  "choose-environment":
-                    $scope.waitForGroupsBeforeNextStep();
-                    break;
-            }
-
-            $scope.nextStep()
-        }
-
         // Visual change the next step
         $scope.nextStep = function() {
             // First validate the input
@@ -158,9 +148,7 @@ angular.module('apollo')
                             getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
                             $scope.selectedServices[0].id,
                             environment.id,
-    //                        $scope.selectedEnvironments.map(function (environment) { return environment.id; }).join(','),
                             $scope.deploymentMessage.text,
-    //                        $scope.selectedGroups.map(function (group) { return group.id; }).join(',')
                             group.id,
                         ).then(function (response) {
 
@@ -400,33 +388,35 @@ angular.module('apollo')
             updateEnvironmentsNames();
         };
 
-        $scope.waitForGroupsBeforeNextStep = async function() {
+        $scope.waitForGroupsBeforeNextStep = function() {
             usSpinnerService.spin('deployment-spinner');
-            await Promise.all(groupsPromises).then(function (response) {
-
-                let selectedEnvsIds = new Set($scope.selectedEnvironments.map(environment => environment.id));
-                let filteredGroupsByEnvs = $scope.possibleGroups.filter(group => selectedEnvsIds.has(group.environmentId));
-
-                const distinctGroups = [];
-                const mapGroups = new Map();
-
-                for (const group of filteredGroupsByEnvs) {
-                    if(!mapGroups.has(group.id)){
-                        mapGroups.set(group.id, true);
-                        distinctGroups.push(group);
-                    }
-                }
-
-                $scope.possibleGroups = distinctGroups;
-
+            return Promise.all(groupsPromises).then(function (response) {
                 usSpinnerService.stop('deployment-spinner');
-
             });
         };
 
-       $scope.handleEnvironmentDbClick = () => {
-           $scope.waitForGroupsBeforeNextStep();
-           $scope.nextStep();
+        var filterGroups = function() {
+            var selectedEnvsIds = new Set($scope.selectedEnvironments.map(environment => environment.id));
+            var filteredGroupsByEnvs = $scope.possibleGroups.filter(group => selectedEnvsIds.has(group.environmentId));
+
+            var distinctGroups = [];
+            var mapGroups = new Map();
+
+            for (var group of filteredGroupsByEnvs) {
+                if(!mapGroups.has(group.id)){
+                    mapGroups.set(group.id, true);
+                    distinctGroups.push(group);
+                }
+            }
+
+            $scope.possibleGroups = distinctGroups;
+        }
+
+       $scope.handleEnvironmentDbClick = function() {
+           $scope.waitForGroupsBeforeNextStep().then(function() {
+                filterGroups();
+                $scope.nextStep();
+           });
        }
 
        $scope.toggleSelectedServiceOrStack = function(service) {
@@ -497,7 +487,6 @@ angular.module('apollo')
                 } else {
                     $scope.selectedServices = $scope.selectedServices.filter(function(a){return !a.isPartOfGroup});
                     $scope.selectedServices.push(service);
-//                    $scope.isGroupDeployment = false;
                     deploymentSteps = ["choose-service", "choose-environment", "choose-version", "confirmation"];
                 }
             }
@@ -670,7 +659,6 @@ angular.module('apollo')
             if ($scope.possibleEnvironments !== null && $scope.possibleEnvironmentsStacks !== null) {
                     $scope.environmentsAndStackForDisplay = environmentsAndStackForDisplayWorking;
             }
-
          }
 
 		apolloApiService.getAllServices()
@@ -725,7 +713,6 @@ angular.module('apollo')
             if ($scope.possibleServices !== null && $scope.possibleServicesStacks !== null) {
                     $scope.servicesAndStackForDisplay = servicesAndStackForDisplayWorking;
             }
-
         }
 
 		function loadDeployableVersions(serviceIdsCsv) {
