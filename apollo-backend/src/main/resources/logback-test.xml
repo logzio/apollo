@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+    <appender name="default.console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yy/MM/dd HH:mm:ss.SSS} [%thread] %p %c{2}: %m%n</pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+    </appender>
+
+    <logger name="io.logz" level="INFO"/>
+    <logger name="org.testcontainers" level="INFO"/>
+
+    <root level="INFO">
+        <appender-ref ref="default.console"/>
+    </root>
+</configuration>

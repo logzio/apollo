@@ -19,15 +19,13 @@ import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.PodStatus;
 import io.logz.apollo.models.Service;
-
 import io.logz.apollo.notifications.ApolloNotifications;
-
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.rapidoid.http.Req;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +33,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -44,7 +41,6 @@ import static java.util.Objects.requireNonNull;
 public class KubernetesHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(KubernetesHandler.class);
-    private static final int NUMBER_OF_LOG_LINES_TO_FETCH = 500;
     private static final String APOLLO_JOLOKIA_PORT_LABEL = "apollo_jolokia_port";
     private final ApolloToKubernetesStore apolloToKubernetesStore;
     private final KubernetesClient kubernetesClient;
@@ -431,11 +427,16 @@ public class KubernetesHandler {
 
     private KubernetesClient createKubernetesClient(Environment environment) {
         try {
-            Config config = new ConfigBuilder()
+            ConfigBuilder configBuilder = new ConfigBuilder()
                     .withMasterUrl(environment.getKubernetesMaster())
-                    .withOauthToken(environment.getKubernetesToken())
-                    .build();
+                    .withOauthToken(environment.getKubernetesToken());
 
+            String caCert = environment.getKubernetesCaCert();
+            if (StringUtils.isNotBlank(caCert)) {
+                configBuilder.withCaCertData(caCert);
+            }
+
+            Config config = configBuilder.build();
             return new DefaultKubernetesClient(config);
         } catch (Exception e) {
             logger.error("Could not create kubernetes client for environment {}", environment.getId(), e);
