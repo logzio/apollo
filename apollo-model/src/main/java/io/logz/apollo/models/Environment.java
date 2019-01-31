@@ -16,6 +16,7 @@ public class Environment {
     private Boolean requireDeploymentMessage;
     private Boolean requireHealthCheck;
     private Integer concurrencyLimit;
+    private String additionalParams;
 
     public Environment() {
 
@@ -107,5 +108,13 @@ public class Environment {
 
     public void setConcurrencyLimit(Integer concurrencyLimit) {
         this.concurrencyLimit = concurrencyLimit;
+    }
+
+    public String getAdditionalParams() {
+        return additionalParams;
+    }
+
+    public void setAdditionalParams(String additionalParams) {
+        this.additionalParams = additionalParams;
     }
 }

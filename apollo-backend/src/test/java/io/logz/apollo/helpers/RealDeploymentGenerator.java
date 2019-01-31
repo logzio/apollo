@@ -25,6 +25,13 @@ public class RealDeploymentGenerator {
     private final String DEFAULT_ENVIRONMENT_VARIABLE_NAME = "ENV";
     private final String DEFAULT_ENVIRONMENT_VARIABLE_VALUE = "enval";
 
+    public static final String DEFAULT_DEPLOYMENT_LABLE_KEY = "deployment_key";
+    public static final String DEFAULT_SERVICE_LABLE_KEY = "service_key";
+    public static final String DEFAULT_INGRESS_LABLE_KEY = "ingress_key";
+    private final String DEFAULT_DEPLOYMENT_LABLE_VALUE = "{{ deployment_value }}";
+    private final String DEFAULT_SERVICE_LABLE_VALUE = "{{ service_value }}";
+    private final String DEFAULT_INGRESS_LABLE_VALUE = "{{ ingress_value }}";
+
     private final StandaloneApollo standaloneApollo;
     private final Service service;
     private final DeployableVersion deployableVersion;
@@ -42,6 +49,11 @@ public class RealDeploymentGenerator {
 
     public RealDeploymentGenerator(String deploymentImageName, String extraLabelKey, String extraLabelValue,
                                    int servicePortCoefficient, String deploymentParams, Service serviceParam, Environment environmentParam, String groupName) {
+        this(deploymentImageName, extraLabelKey, extraLabelValue, servicePortCoefficient, deploymentParams, serviceParam, environmentParam, groupName, false);
+    }
+
+    public RealDeploymentGenerator(String deploymentImageName, String extraLabelKey, String extraLabelValue,
+                                   int servicePortCoefficient, String deploymentParams, Service serviceParam, Environment environmentParam, String groupName, Boolean defaultYamlsLabels) {
         try {
             standaloneApollo = StandaloneApollo.getOrCreateServer();
             DeploymentDao deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
@@ -61,14 +73,36 @@ public class RealDeploymentGenerator {
 
             if (serviceParam == null) {
                 service = ModelsGenerator.createService();
-                service.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, extraLabelKey, extraLabelValue));
-                service.setServiceYaml(getServiceDeploymentYaml(extraLabelKey, extraLabelValue));
-                service.setIngressYaml(getIngressServiceYaml(extraLabelKey, extraLabelValue));
+                if (defaultYamlsLabels) {
+                    if (groupName != null) {
+                        service.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, DEFAULT_DEPLOYMENT_LABLE_KEY,
+                                DEFAULT_DEPLOYMENT_LABLE_VALUE, extraLabelKey, extraLabelValue));
+                    } else {
+                        service.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, DEFAULT_DEPLOYMENT_LABLE_KEY, DEFAULT_DEPLOYMENT_LABLE_VALUE));
+                    }
+                    service.setServiceYaml(getServiceDeploymentYaml(DEFAULT_SERVICE_LABLE_KEY, DEFAULT_SERVICE_LABLE_VALUE));
+                    service.setIngressYaml(getIngressServiceYaml(DEFAULT_INGRESS_LABLE_KEY, DEFAULT_INGRESS_LABLE_VALUE));
+                } else {
+                    service.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, extraLabelKey, extraLabelValue));
+                    service.setServiceYaml(getServiceDeploymentYaml(extraLabelKey, extraLabelValue));
+                    service.setIngressYaml(getIngressServiceYaml(extraLabelKey, extraLabelValue));
+                }
                 serviceDao.addService(service);
             } else {
-                serviceParam.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, extraLabelKey, extraLabelValue));
-                serviceParam.setServiceYaml(getServiceDeploymentYaml(extraLabelKey, extraLabelValue));
-                serviceParam.setIngressYaml(getIngressServiceYaml(extraLabelKey, extraLabelValue));
+                if (defaultYamlsLabels) {
+                    if (groupName != null) {
+                        serviceParam.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, DEFAULT_DEPLOYMENT_LABLE_KEY,
+                                DEFAULT_DEPLOYMENT_LABLE_VALUE, extraLabelKey, extraLabelValue));
+                    } else {
+                        serviceParam.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, DEFAULT_DEPLOYMENT_LABLE_KEY, DEFAULT_DEPLOYMENT_LABLE_VALUE));
+                    }
+                    serviceParam.setServiceYaml(getServiceDeploymentYaml(DEFAULT_SERVICE_LABLE_KEY, DEFAULT_SERVICE_LABLE_VALUE));
+                    serviceParam.setIngressYaml(getIngressServiceYaml(DEFAULT_INGRESS_LABLE_KEY, DEFAULT_INGRESS_LABLE_VALUE));
+                } else {
+                    serviceParam.setDeploymentYaml(getDeploymentKubernetesYaml(deploymentImageName, extraLabelKey, extraLabelValue));
+                    serviceParam.setServiceYaml(getServiceDeploymentYaml(extraLabelKey, extraLabelValue));
+                    serviceParam.setIngressYaml(getIngressServiceYaml(extraLabelKey, extraLabelValue));
+                }
                 serviceDao.updateService(serviceParam);
                 service = serviceDao.getService(serviceParam.getId());
             }
@@ -139,15 +173,26 @@ public class RealDeploymentGenerator {
     }
 
     private String getDeploymentKubernetesYaml(String imageName, String extraLabelKey, String extraLabelValue) {
+        return getDeploymentKubernetesYaml(imageName, extraLabelKey, extraLabelValue, null, null);
+    }
 
-        return "apiVersion: extensions/v1beta1\n" +
+    private String getDeploymentKubernetesYaml(String imageName, String extraLabelKey, String extraLabelValue,
+                                               String secondExtraLabelKey, String secondExtraLabelValue) {
+
+        String deploymentYaml = "apiVersion: extensions/v1beta1\n" +
                 "kind: Deployment\n" +
                 "metadata:\n" +
                 "  labels:\n" +
                 "    name: nginx\n" +
                 "    tahat: nginx\n" +
                 "    " + DEFAULT_LABEL_KEY + ": " + DEFAULT_LABEL_VALUE + "\n" +
-                "    " + extraLabelKey + ": " + extraLabelValue + "\n" +
+                "    " + extraLabelKey + ": " + extraLabelValue + "\n";
+
+        if (secondExtraLabelKey != null && secondExtraLabelValue != null) {
+            deploymentYaml += "    " + secondExtraLabelKey + ": " + secondExtraLabelValue + "\n";
+        }
+
+        deploymentYaml +=
                 "  name: nginx\n" +
                 "  namespace: default\n" +
                 "spec:\n" +
@@ -177,6 +222,8 @@ public class RealDeploymentGenerator {
                 "      restartPolicy: Always\n" +
                 "      securityContext: {}\n" +
                 "      terminationGracePeriodSeconds: 30";
+
+        return deploymentYaml;
     }
 
     private String getServiceDeploymentYaml(String extraLabelKey, String extraLabelValue) {

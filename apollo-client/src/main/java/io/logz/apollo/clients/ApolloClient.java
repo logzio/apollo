@@ -52,7 +52,8 @@ public class ApolloClient {
                 "servicePortCoefficient", String.valueOf(environment.getServicePortCoefficient()),
                 "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
                 "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()),
-                "concurrentLimit", String.valueOf(environment.getConcurrencyLimit()));
+                "concurrentLimit", String.valueOf(environment.getConcurrencyLimit()),
+                "additionalParams", environment.getAdditionalParams());
 
         return genericApolloClient.postAndGetResult("/environment", requestBody, new TypeReference<Environment>(){});
     }
