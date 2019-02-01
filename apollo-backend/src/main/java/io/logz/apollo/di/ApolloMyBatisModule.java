@@ -84,6 +84,7 @@ public class ApolloMyBatisModule extends MyBatisModule {
         Flyway flyway = new Flyway();
         flyway.setOutOfOrder(true);
         flyway.setDataSource(jdbcUrl, configuration.getUser(), configuration.getPassword());
+        flyway.setTable("schema_version");
         flyway.migrate();
     }
 
