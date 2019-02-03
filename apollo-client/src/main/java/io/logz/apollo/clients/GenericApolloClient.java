@@ -11,6 +11,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 class GenericApolloClient {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final Logger logger = LoggerFactory.getLogger(GenericApolloClient.class);
 
     private final OkHttpClient client;
     private final String userName;
@@ -101,6 +104,7 @@ class GenericApolloClient {
     }
 
     <T> T getResult(String url, TypeReference<T> responseType) throws ApolloClientException {
+        logger.info("GenericApolloClient is trying to getResult");
         return runAndGetResult(url, Optional.empty(), responseType, HTTP_METHOD.GET);
     }
 
@@ -148,6 +152,7 @@ class GenericApolloClient {
                     case 406:
                         throw new ApolloBlockedException();
                     default:
+                        logger.info("runAndGetResult got an error with body! code: " + restResponse.getCode() + " with text: " + restResponse.getBody());
                         throw new ApolloClientException("Got HTTP return code " + restResponse.getCode() + " with text: " + restResponse.getBody());
                 }
 
@@ -173,6 +178,7 @@ class GenericApolloClient {
                     case 406:
                         throw new ApolloBlockedException();
                     default:
+                        logger.info("runAndGetResult got an error without a body! code: " + restResponse.getCode() + " with text: " + restResponse.getBody());
                         throw new ApolloClientException("Got HTTP return code " + restResponse.getCode() + " with text: " + restResponse.getBody());
                 }
             }

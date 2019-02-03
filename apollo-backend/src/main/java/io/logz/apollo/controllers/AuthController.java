@@ -15,6 +15,8 @@ import org.rapidoid.annotation.PUT;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.Administrator;
 import org.rapidoid.security.annotation.LoggedIn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -29,6 +31,7 @@ import static java.util.Objects.requireNonNull;
 @Controller
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final DeploymentPermissionDao deploymentPermissionDao;
     private final DeploymentRoleDao deploymentRoleDao;
     private final UserDao userDao;
@@ -45,6 +48,7 @@ public class AuthController {
     @LoggedIn
     @GET("/users")
     public List<User> getAllUsers() {
+        logger.info("Auth controller is trying to get all users");
         return userDao.getAllUsers().stream()
                 .map(this::maskPassword)
                 .collect(Collectors.toList());

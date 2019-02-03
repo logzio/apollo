@@ -114,9 +114,11 @@ public class AuthTest {
     public void testGetAllUsers() throws Exception {
 
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        logger.info("Successfully created apollo test client");
 
         // Get all users
         List<User> allUsers = apolloTestClient.getAllUsers();
+        logger.info("Successfully got all users");
 
         // Find our user in the list
         Optional<User> userFromApi = allUsers.stream().filter(user -> user.getUserEmail().equals(apolloTestClient.getTestUser().getUserEmail())).findFirst();
