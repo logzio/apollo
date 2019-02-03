@@ -18,8 +18,6 @@ import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Notification;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 public class ApolloClient {
 
     private final GenericApolloClient genericApolloClient;
-    private static final Logger logger = LoggerFactory.getLogger(ApolloClient.class);
 
     public ApolloClient(String userName, String plainPassword, String protocol, String hostname, int port) {
         genericApolloClient = new GenericApolloClient(userName, plainPassword, protocol, hostname, port, Optional.empty());
@@ -45,7 +42,6 @@ public class ApolloClient {
     }
 
     public List<User> getAllUsers() throws ApolloClientException {
-        logger.info("Apollo client is trying to get all users");
         return genericApolloClient.getResult("/users", new TypeReference<List<User>>(){});
     }
 

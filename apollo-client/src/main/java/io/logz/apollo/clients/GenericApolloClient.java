@@ -104,7 +104,6 @@ class GenericApolloClient {
     }
 
     <T> T getResult(String url, TypeReference<T> responseType) throws ApolloClientException {
-        logger.info("GenericApolloClient is trying to getResult");
         return runAndGetResult(url, Optional.empty(), responseType, HTTP_METHOD.GET);
     }
 
@@ -152,7 +151,6 @@ class GenericApolloClient {
                     case 406:
                         throw new ApolloBlockedException();
                     default:
-                        logger.info("runAndGetResult got an error with body! code: " + restResponse.getCode() + " with text: " + restResponse.getBody());
                         throw new ApolloClientException("Got HTTP return code " + restResponse.getCode() + " with text: " + restResponse.getBody());
                 }
 
@@ -178,7 +176,6 @@ class GenericApolloClient {
                     case 406:
                         throw new ApolloBlockedException();
                     default:
-                        logger.info("runAndGetResult got an error without a body! code: " + restResponse.getCode() + " with text: " + restResponse.getBody());
                         throw new ApolloClientException("Got HTTP return code " + restResponse.getCode() + " with text: " + restResponse.getBody());
                 }
             }

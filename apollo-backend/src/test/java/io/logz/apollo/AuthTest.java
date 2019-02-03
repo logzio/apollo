@@ -16,8 +16,6 @@ import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Service;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -32,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public class AuthTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthTest.class);
     private final StandaloneApollo standaloneApollo;
 
     public AuthTest() throws ScriptException, IOException, SQLException {
@@ -114,11 +111,9 @@ public class AuthTest {
     public void testGetAllUsers() throws Exception {
 
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
-        logger.info("Successfully created apollo test client");
 
         // Get all users
         List<User> allUsers = apolloTestClient.getAllUsers();
-        logger.info("Successfully got all users");
 
         // Find our user in the list
         Optional<User> userFromApi = allUsers.stream().filter(user -> user.getUserEmail().equals(apolloTestClient.getTestUser().getUserEmail())).findFirst();
