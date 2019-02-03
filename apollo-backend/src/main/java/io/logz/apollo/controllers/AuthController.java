@@ -15,7 +15,6 @@ import org.rapidoid.annotation.PUT;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.Administrator;
 import org.rapidoid.security.annotation.LoggedIn;
-
 import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
