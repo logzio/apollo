@@ -430,6 +430,7 @@ public class ModelsGenerator {
         testUser.setLastName("Tahatson " + Common.randomStr(5));
         testUser.setHashedPassword(PasswordManager.encryptPassword(Common.DEFAULT_PASSWORD));
         testUser.setAdmin(admin);
+        testUser.setEnabled(true);
 
         return testUser;
     }
