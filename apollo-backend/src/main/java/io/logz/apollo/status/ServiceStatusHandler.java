@@ -15,7 +15,6 @@ import io.logz.apollo.models.ServiceGroupPair;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
