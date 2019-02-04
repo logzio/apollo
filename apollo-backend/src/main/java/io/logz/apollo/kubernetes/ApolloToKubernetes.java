@@ -106,15 +106,17 @@ public class ApolloToKubernetes {
             // Update the deployment, as it could have changed since (Status)
             apolloDeployment = deploymentDao.getDeployment(apolloDeployment.getId());
             String deploymentYaml = apolloService.getDeploymentYaml();
-            String additionalParams = apolloEnvironment.getAdditionalParams();
 
-            // Fill deployment YAML with group parameters if needed
+            // Fill deployment YAML with parameters if needed
+            HashMap<String, String> additionalParams = new HashMap<>();
+            String environmentAdditionalParams = apolloEnvironment.getAdditionalParams();
+
+            if (environmentAdditionalParams != null && !environmentAdditionalParams.isEmpty()) {
+                additionalParams.putAll(jsonToMap(environmentAdditionalParams));
+            }
+
             if (apolloService.getIsPartOfGroup()) {
-                if (additionalParams == null) {
-                    additionalParams = apolloDeployment.getDeploymentParams();
-                } else {
-                    additionalParams = (apolloDeployment.getDeploymentParams() + apolloEnvironment.getAdditionalParams()).replace("}{", ",");
-                }
+                additionalParams.putAll(jsonToMap(apolloDeployment.getDeploymentParams()));
             }
 
             // Convert the deployment object to fabric8 model
@@ -144,7 +146,7 @@ public class ApolloToKubernetes {
             }
 
             // Convert the service object to fabric8 model
-            Service service = getClassFromYamlWithParameters(apolloService.getServiceYaml(), apolloEnvironment.getAdditionalParams(), Service.class);
+            Service service = getClassFromYamlWithParameters(apolloService.getServiceYaml(), jsonToMap(apolloEnvironment.getAdditionalParams()), Service.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the service yaml of deployment id {}",
@@ -171,7 +173,7 @@ public class ApolloToKubernetes {
             }
 
             // Convert the ingress object to fabric8 model
-            Ingress ingress = getClassFromYamlWithParameters(apolloService.getIngressYaml(), apolloEnvironment.getAdditionalParams(), Ingress.class);
+            Ingress ingress = getClassFromYamlWithParameters(apolloService.getIngressYaml(), jsonToMap(apolloEnvironment.getAdditionalParams()), Ingress.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the ingress yaml of deployment id {}",
@@ -240,10 +242,10 @@ public class ApolloToKubernetes {
         return templateInjector.injectToTemplate(yaml, parameters);
     }
 
-    private <T> T getClassFromYamlWithParameters(String yaml, String parameters, Class<T> valueType) throws IOException {
+    private <T> T getClassFromYamlWithParameters(String yaml, HashMap<String, String> parameters, Class<T> valueType) throws IOException {
 
-        if (parameters != null) {
-            yaml = fillYamlWithParams(yaml, jsonToMap(parameters));
+        if (!parameters.isEmpty()) {
+            yaml = fillYamlWithParams(yaml, parameters);
         }
 
         return mapper.readValue(yaml, valueType);
