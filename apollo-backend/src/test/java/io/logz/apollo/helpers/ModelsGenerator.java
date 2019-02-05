@@ -37,7 +37,7 @@ public class ModelsGenerator {
 
     public static int DEFAULT_SCALING_FACTOR = 3;
 
-    public static Environment createEnvironment() {
+    public static Environment createEnvironment(String additionalParams) {
         Environment testEnvironment = new Environment();
         testEnvironment.setName("env-name-" + Common.randomStr(5));
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
@@ -48,12 +48,23 @@ public class ModelsGenerator {
         testEnvironment.setServicePortCoefficient(0);
         testEnvironment.setRequireDeploymentMessage(true);
         testEnvironment.setConcurrencyLimit(KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1);
+        testEnvironment.setAdditionalParams(additionalParams);
 
         return testEnvironment;
     }
 
+    public static Environment createEnvironment() {
+        return createEnvironment(null);
+    }
+
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
         Environment testEnvironment = ModelsGenerator.createEnvironment();
+        testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
+        return testEnvironment;
+    }
+
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
     }
@@ -419,6 +430,7 @@ public class ModelsGenerator {
         testUser.setLastName("Tahatson " + Common.randomStr(5));
         testUser.setHashedPassword(PasswordManager.encryptPassword(Common.DEFAULT_PASSWORD));
         testUser.setAdmin(admin);
+        testUser.setEnabled(true);
 
         return testUser;
     }

@@ -11,6 +11,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 class GenericApolloClient {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final Logger logger = LoggerFactory.getLogger(GenericApolloClient.class);
 
     private final OkHttpClient client;
     private final String userName;

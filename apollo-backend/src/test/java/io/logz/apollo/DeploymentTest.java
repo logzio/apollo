@@ -2,16 +2,23 @@ package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.helpers.Common;
+import io.logz.apollo.helpers.Fabric8TestMethods;
 import io.logz.apollo.helpers.ModelsGenerator;
+import io.logz.apollo.helpers.RealDeploymentGenerator;
+import io.logz.apollo.helpers.StandaloneApollo;
+import io.logz.apollo.kubernetes.ApolloToKubernetes;
+import io.logz.apollo.kubernetes.ApolloToKubernetesStore;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.Service;
+import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
@@ -26,10 +33,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DeploymentTest {
 
     private static ApolloTestClient apolloTestClient;
+    private static ApolloToKubernetesStore apolloToKubernetesStore;
+    private static StandaloneApollo standaloneApollo;
 
     @BeforeClass
     public static void init() throws Exception {
+        standaloneApollo = StandaloneApollo.getOrCreateServer();
         apolloTestClient = Common.signupAndLogin();
+        apolloToKubernetesStore = standaloneApollo.getInstance(ApolloToKubernetesStore.class);
     }
 
     @Test
@@ -105,5 +116,35 @@ public class DeploymentTest {
 
         Deployment deployment = result.getSuccessful().get(0).getDeployment();
         assertThat(apolloTestClient.getDeployment(deployment.getId())).isNotNull();
+    }
+
+    @Test
+    public void testDeploymentWithAdditionalParams() throws Exception {
+        HashMap<String, Object> params = new HashMap<>();
+
+        String deploymentValue = "deployment_value";
+        String serviceValue = "service_value";
+        String ingressValue = "ingress_value";
+
+        params.put("image", "great image");
+        params.put(deploymentValue, deploymentValue);
+        params.put(serviceValue, serviceValue);
+        params.put(ingressValue, ingressValue);
+
+        Environment env = createAndSubmitEnvironment(apolloTestClient, new JSONObject(params).toString());
+
+        RealDeploymentGenerator realDeploymentGenerator = new RealDeploymentGenerator
+                ("{{ image }}", null, null, 0, null, null, env, null, true);
+
+        Deployment deployment = realDeploymentGenerator.getDeployment();
+
+        ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
+
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(),
+                RealDeploymentGenerator.DEFAULT_DEPLOYMENT_LABLE_KEY, deploymentValue);
+        Fabric8TestMethods.assertServiceLabelExists(apolloToKubernetes.getKubernetesService(),
+                RealDeploymentGenerator.DEFAULT_SERVICE_LABLE_KEY, serviceValue);
+        Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(),
+                RealDeploymentGenerator.DEFAULT_INGRESS_LABLE_KEY, ingressValue);
     }
 }
