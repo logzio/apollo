@@ -251,8 +251,8 @@ public class ApolloToKubernetes {
     }
 
     private HashMap<String, String> fillDefaultParameters(HashMap<String, String> parameters) {
-        parameters.put(REGION, apolloEnvironment.getGeoRegion());
-        parameters.put(ENVIRONMENT, apolloEnvironment.getAvailability());
+        parameters.put(REGION, apolloEnvironment.getGeoRegion().toLowerCase());
+        parameters.put(ENVIRONMENT, apolloEnvironment.getAvailability().toLowerCase());
 
         return parameters;
     }
