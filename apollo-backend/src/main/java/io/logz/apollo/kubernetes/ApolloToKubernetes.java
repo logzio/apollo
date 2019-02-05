@@ -59,6 +59,9 @@ public class ApolloToKubernetes {
 
     private final TemplateInjector templateInjector;
 
+    private final String REGION = "region";
+    private final String ENVIRONMENT = "environment";
+
     public ApolloToKubernetes(DeploymentDao deploymentDao,
                               io.logz.apollo.models.DeployableVersion apolloDeployableVersion,
                               io.logz.apollo.models.Environment apolloEnvironment,
@@ -243,12 +246,15 @@ public class ApolloToKubernetes {
     }
 
     private <T> T getClassFromYamlWithParameters(String yaml, HashMap<String, String> parameters, Class<T> valueType) throws IOException {
-
-        if (!parameters.isEmpty()) {
-            yaml = fillYamlWithParams(yaml, parameters);
-        }
-
+        yaml = fillYamlWithParams(yaml, fillDefaultParameters(parameters));
         return mapper.readValue(yaml, valueType);
+    }
+
+    private HashMap<String, String> fillDefaultParameters(HashMap<String, String> parameters) {
+        parameters.put(REGION, apolloEnvironment.getGeoRegion());
+        parameters.put(ENVIRONMENT, apolloEnvironment.getAvailability());
+
+        return parameters;
     }
 
     private HashMap<String, String> jsonToMap(String deploymentParams) throws IOException {
