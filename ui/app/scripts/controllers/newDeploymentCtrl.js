@@ -142,14 +142,23 @@ angular.module('apollo')
             // Valid groups deployment
             if ($scope.selectedGroups.length > 0 && $scope.selectedServices.length == 1 && $scope.selectedServices[0].isPartOfGroup) {
                 $scope.selectedEnvironments.forEach(function(environment) {
+                    var groups = "";
                     $scope.selectedGroups.forEach(function(group) {
                         if(group.environmentId === environment.id) {
-                        apolloApiService.createNewDeploymentWithGroup(
-                            getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
-                            $scope.selectedServices[0].id,
-                            environment.id,
-                            $scope.deploymentMessage.text,
-                            group.id,
+                            if(groups === "") {
+                                groups = group.id;
+                            }
+                            else {
+                                groups = groups += ',' + group.id;
+                            }
+                        }
+                    });
+                    apolloApiService.createNewDeploymentWithGroup(
+                        getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
+                        $scope.selectedServices[0].id,
+                        environment.id,
+                        $scope.deploymentMessage.text,
+                        groups,
                         ).then(function (response) {
 
                             // Wait a bit to let the deployment be in the DB
@@ -180,8 +189,6 @@ angular.module('apollo')
                                     growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
                                 }
                         });
-                    }
-                });
                 });
             }
 
