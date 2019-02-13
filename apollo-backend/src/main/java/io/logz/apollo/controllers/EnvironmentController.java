@@ -48,19 +48,21 @@ public class EnvironmentController {
     @LoggedIn
     @POST("/environment")
     public void addEnvironment(String name, String geoRegion, String availability, String kubernetesMaster,
-                               String kubernetesToken, String kubernetesNamespace, Integer servicePortCoefficient,
-                               Boolean requireDeploymentMessage, Boolean requireHealthCheck, Integer concurrencyLimit, Req req) {
+                               String kubernetesToken, String kubernetesCaCert, String kubernetesNamespace, Integer servicePortCoefficient,
+                               Boolean requireDeploymentMessage, Boolean requireHealthCheck, Integer concurrencyLimit, String additionalParams, Req req) {
         Environment newEnvironment = new Environment();
         newEnvironment.setName(name);
         newEnvironment.setGeoRegion(geoRegion);
         newEnvironment.setAvailability(availability);
         newEnvironment.setKubernetesMaster(kubernetesMaster);
         newEnvironment.setKubernetesToken(kubernetesToken);
+        newEnvironment.setKubernetesCaCert(kubernetesCaCert);
         newEnvironment.setKubernetesNamespace(kubernetesNamespace);
         newEnvironment.setServicePortCoefficient(servicePortCoefficient);
         newEnvironment.setRequireDeploymentMessage(requireDeploymentMessage);
         newEnvironment.setRequireHealthCheck(requireHealthCheck);
         newEnvironment.setConcurrencyLimit(concurrencyLimit);
+        newEnvironment.setAdditionalParams(additionalParams);
 
         environmentDao.addEnvironment(newEnvironment);
         assignJsonResponseToReq(req, HttpStatus.CREATED, newEnvironment);

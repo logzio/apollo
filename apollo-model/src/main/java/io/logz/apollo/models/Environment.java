@@ -11,11 +11,13 @@ public class Environment {
     private String availability;
     private String kubernetesMaster;
     private String kubernetesToken;
+    private String kubernetesCaCert;
     private String kubernetesNamespace;
     private Integer servicePortCoefficient;
     private Boolean requireDeploymentMessage;
     private Boolean requireHealthCheck;
     private Integer concurrencyLimit;
+    private String additionalParams;
 
     public Environment() {
 
@@ -69,6 +71,14 @@ public class Environment {
         this.kubernetesToken = kubernetesToken;
     }
 
+    public String getKubernetesCaCert() {
+        return kubernetesCaCert;
+    }
+
+    public void setKubernetesCaCert(String kubernetesCaCert) {
+        this.kubernetesCaCert = kubernetesCaCert;
+    }
+
     public String getKubernetesNamespace() {
         return kubernetesNamespace;
     }
@@ -107,5 +117,13 @@ public class Environment {
 
     public void setConcurrencyLimit(Integer concurrencyLimit) {
         this.concurrencyLimit = concurrencyLimit;
+    }
+
+    public String getAdditionalParams() {
+        return additionalParams;
+    }
+
+    public void setAdditionalParams(String additionalParams) {
+        this.additionalParams = additionalParams;
     }
 }
