@@ -2,7 +2,7 @@
 
 angular.module('apollo')
   .controller('newDeploymentCtrl', ['apolloApiService', '$scope',
-                                    '$timeout' , '$state', 'growl', 'usSpinnerService', 'DTColumnDefBuilder', 'localStorageService', "hotkeys",
+                    '$timeout' , '$state', 'growl', 'usSpinnerService', 'DTColumnDefBuilder', 'localStorageService', "hotkeys",
             function (apolloApiService, $scope, $timeout, $state, growl, usSpinnerService, DTColumnDefBuilder, localStorageService, hotkeys) {
 
 
@@ -42,7 +42,7 @@ angular.module('apollo')
         // Scope variables
 		$scope.environmentSelected = null;
 		$scope.serviceSelected = null;
-		$scope.possibleGroups = null;
+		$scope.possibleGroups = [];
 		$scope.selectedGroups = [];
 		$scope.groupNames = null;
         $scope.possibleEnvironments = null;
@@ -54,6 +54,22 @@ angular.module('apollo')
 		$scope.versionSelected = null;
 		$scope.showNextStep = true;
 		$scope.isGroupDeployment = false;
+        $scope.possibleEnvironmentsStacks = null;
+        $scope.possibleServicesStacks = null;
+        $scope.servicesAndStackForDisplay = null;
+        $scope.environmentsAndStackForDisplay = null;
+        $scope.selectedServicesAndStacks = [];
+        $scope.selectedEnvironmentsAndStacks = [];
+        $scope.servicesNamesOfStacks = [];
+        $scope.environmentsNamesOfStacks = [];
+        $scope.servicesInStack = [];
+        $scope.environmentsInStack = [];
+
+        var groupsPromises = [];
+        var servicesAndStackForDisplayWorking = [];
+        var environmentsAndStackForDisplayWorking = [];
+        var allServices = [];
+        var allEnvironments = [];
 
 		// Angular can't ng-model to a variable which is not an object :(
 		$scope.deploymentMessage = {};
@@ -76,10 +92,8 @@ angular.module('apollo')
 
         // Visual change the next step
         $scope.nextStep = function() {
-
             // First validate the input
             if (deploymentValidators[$scope.currentStep]()) {
-
                 // Get the current index
                 var currIndex = deploymentSteps.indexOf($scope.currentStep);
 
@@ -101,6 +115,8 @@ angular.module('apollo')
                 if ($scope.currentStep == "choose-version") {
                     loadDeployableVersions($scope.selectedServices.map(function (service) { return service.id; }).join(','));
                 }
+
+                $scope.$apply();
             }
             else {
                 growl.error("You must select one!");
@@ -124,40 +140,49 @@ angular.module('apollo')
 
             // Valid groups deployment
             if ($scope.selectedGroups.length > 0 && $scope.selectedServices.length == 1 && $scope.selectedServices[0].isPartOfGroup) {
-                apolloApiService.createNewDeploymentWithGroup(
+                $scope.selectedEnvironments.forEach(function(environment) {
+                    var groups = [];
+                    $scope.selectedGroups.forEach(function(group) {
+                        if(group.environmentId === environment.id) {
+                            groups.push(group.id);
+                        }
+                    });
+                    apolloApiService.createNewDeploymentWithGroup(
                         getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
                         $scope.selectedServices[0].id,
-                        $scope.selectedEnvironments.map(function (environment) { return environment.id; }).join(','),
-                        $scope.deploymentMessage.text, $scope.selectedGroups.map(function (group) { return group.id; }).join(',')
-                    ).then(function (response) {
+                        environment.id,
+                        $scope.deploymentMessage.text,
+                        groups.join(','),
+                        ).then(function (response) {
 
-                    // Wait a bit to let the deployment be in the DB
-                    setTimeout(function () {
-                        usSpinnerService.stop('deployment-spinner');
+                            // Wait a bit to let the deployment be in the DB
+                            setTimeout(function () {
+                                usSpinnerService.stop('deployment-spinner');
 
-                        // Due to bug with angular-bootstrap and angular 1.4, the modal is not closing when redirecting.
-                        // So just forcing it to :)   TODO: after the bug is fixed, remove this shit
-                        $('#confirm-modal').modal('hide');
-                        $('body').removeClass('modal-open');
-                        $('.modal-backdrop').remove();
+                                // Due to bug with angular-bootstrap and angular 1.4, the modal is not closing when redirecting.
+                                // So just forcing it to :)   TODO: after the bug is fixed, remove this shit
+                                $('#confirm-modal').modal('hide');
+                                $('body').removeClass('modal-open');
+                                $('.modal-backdrop').remove();
 
-                        if (response.data.unsuccessful.length > 0) {
-                            showBlockedDeployments(response);
-                        } else if (response.data.successful.length > 0) {
-                            $scope.redirectToOngoing();
-                        } else {
-                            growl.error("An error occurred.", {ttl: 7000});
-                        }
-                    }, 500);
+                                if (response.data.unsuccessful.length > 0) {
+                                    showBlockedDeployments(response);
+                                } else if (response.data.successful.length > 0) {
+                                    $scope.redirectToOngoing();
+                                } else {
+                                    growl.error("An error occurred.", {ttl: 7000});
+                                }
+                            }, 500);
 
-                }, function (error) {
-                    // End spinner
-                    usSpinnerService.stop('deployment-spinner');
+                        }, function (error) {
+                                // End spinner
+                                usSpinnerService.stop('deployment-spinner');
 
-                    // 403 are handled generically on the interceptor
-                    if (error.status !== 403) {
-                        growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
-                    }
+                                // 403 are handled generically on the interceptor
+                                if (error.status !== 403) {
+                                    growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
+                                }
+                        });
                 });
             }
 
@@ -236,7 +261,7 @@ angular.module('apollo')
                 return '-';
             }
 
-            return $scope.possibleServices.filter(function(a){return a.id == id})[0].name;
+            return $scope.possibleServices[id].name;
         }
 
         var getEnvironmentNameById = function(id) {
@@ -291,6 +316,12 @@ angular.module('apollo')
                 });
         };
 
+        $scope.getGroupsNamesPerEnvironment = function(environmentId) {
+             var relevantGroups = $scope.selectedGroups.filter(group => group.environmentId === environmentId);
+             var groupsNamesPerEnvironment = relevantGroups.map(x => x.name).join(', ');
+             return groupsNamesPerEnvironment;
+        }
+
         $scope.toggleSelectedGroup = function(group) {
             var index = $scope.selectedGroups.indexOf(group);
 		    if (index > -1) {
@@ -303,40 +334,174 @@ angular.module('apollo')
         };
 
        $scope.toggleSelectedEnvironment = function(environment) {
-            var index = $scope.selectedEnvironments.indexOf(environment);
+            var index = $scope.selectedEnvironmentsAndStacks.indexOf(environment);
             if (index > -1) {
-                $scope.selectedEnvironments.splice(index, 1);
+            //already exists
+                $scope.selectedEnvironmentsAndStacks.splice(index, 1);
+                if(environment.isStack == true) { //stack case
+                    environment.environments.forEach(function(environmentId) {
+                         var environmentInStack = allEnvironments.find(x => x.id === environmentId);
+                         var index = $scope.selectedEnvironments.indexOf(environmentInStack);
+                         $scope.selectedEnvironments.splice(index, 1);
+                         index = $scope.selectedEnvironmentsAndStacks.indexOf(environmentInStack);
+                         $scope.selectedEnvironmentsAndStacks.splice(index, 1);
+                    });
+                }
+                else { //regular environment case
+                    var index = $scope.selectedEnvironments.indexOf(environment);
+                    if(index > -1) {
+                        $scope.selectedEnvironments.splice(index, 1);
+                    }
+                }
             }
             else {
-                if ($scope.isGroupDeployment) {
-                    $scope.selectedEnvironments = [];
+            //doesn't exist - want to add it
+                if(environment.isStack == true) { //stack case
+                    var stack = environment;
+                    var environmentsNames = [];
+                    $scope.selectedEnvironmentsAndStacks.push(stack);
+                    stack.environments.forEach(function(environmentId) {
+                        var environment = allEnvironments.find(x => x.id === environmentId);
+                        var environmentName = environment.name;
+                        environmentsNames = environmentsNames.concat(environmentName);
+                        if(($scope.selectedEnvironments).includes(environment) == false) {
+                            $scope.selectedEnvironments.push(environment);
+                            $scope.selectedEnvironmentsAndStacks.push(environment);
+                        }
+                    });
+                    $scope.environmentsNamesOfStacks[environment.id] = environmentsNames;
                 }
-                $scope.selectedEnvironments.push(environment);
+                else { //regular environment case
+                    var index = $scope.selectedEnvironments.indexOf(environment);
+                    if(index <= -1) {
+                        $scope.selectedEnvironmentsAndStacks.push(environment);
+                        $scope.selectedEnvironments.push(environment);
+                    }
+                }
             }
             if ($scope.isGroupDeployment && $scope.selectedServices !== null && $scope.selectedServices.length > 0 && $scope.selectedEnvironments.length > 0) {
-                loadGroups($scope.selectedEnvironments[0].id, $scope.selectedServices[0].id);
+                $scope.selectedEnvironments.forEach(function(environment) {
+                    groupsPromises.push(loadGroups(environment.id, $scope.selectedServices[0].id));
+                });
             }
             updateEnvironmentsNames();
         };
 
-       $scope.toggleSelectedService = function(service) {
-            var index = $scope.selectedServices.indexOf(service);
+        $scope.waitForGroupsBeforeNextStep = function() {
+            usSpinnerService.spin('deployment-spinner');
+            return Promise.all(groupsPromises).then(function (response) {
+                usSpinnerService.stop('deployment-spinner');
+            });
+        };
+
+        var filterGroups = function() {
+            var selectedEnvsIds = new Set($scope.selectedEnvironments.map(environment => environment.id));
+            var filteredGroupsByEnvs = $scope.possibleGroups.filter(group => selectedEnvsIds.has(group.environmentId));
+
+            var distinctGroups = [];
+            var mapGroups = new Map();
+
+            for (var group of filteredGroupsByEnvs) {
+                if(!mapGroups.has(group.id)){
+                    mapGroups.set(group.id, true);
+                    distinctGroups.push(group);
+                }
+            }
+
+            $scope.possibleGroups = distinctGroups;
+        }
+
+       $scope.handleEnvironmentDbClick = function() {
+           $scope.waitForGroupsBeforeNextStep().then(function() {
+                filterGroups();
+                $scope.nextStep();
+           });
+       }
+
+       $scope.toggleSelectedServiceOrStack = function(service) {
+            var index = $scope.selectedServicesAndStacks.indexOf(service);
             if (index > -1) {
-                $scope.selectedServices.splice(index, 1);
+            //already exists
+                $scope.selectedServicesAndStacks.splice(index, 1);
+                if(service.isStack == true) { //stack case
+                    service.services.forEach(function(serviceId) {
+                         var serviceInStack = allServices.find(x => x.id === serviceId);
+                         var index = $scope.selectedServices.indexOf(serviceInStack);
+                         $scope.selectedServices.splice(index, 1);
+                         index = $scope.selectedServicesAndStacks.indexOf(serviceInStack);
+                         $scope.selectedServicesAndStacks.splice(index, 1);
+                    });
+                }
+                else { //regular service case
+                    var index = $scope.selectedServices.indexOf(service);
+                    if(index > -1) {
+                        $scope.selectedServices.splice(index, 1);
+                    }
+                    $scope.isGroupDeployment = false;
+                }
+
             } else {
+            //doesn't exist - want to add it
+                if(service.isStack == true) { //stack case
+                    if($scope.isGroupDeployment == false) { //didn't select group service
+                        var stack = service;
+                        var servicesNames = [];
+                        $scope.selectedServicesAndStacks.push(stack);
+                        stack.services.forEach(function(serviceId) {
+                          var service = allServices.find(x => x.id === serviceId);
+                          var serviceName = service.name;
+                          servicesNames = servicesNames.concat(serviceName);
+                          if(($scope.selectedServices).includes(service) == false) {
+                              var index = $scope.selectedServicesAndStacks.indexOf(stack);
+                              toggleSelectedService(service, index);
+                          }
+                        });
+                    }
+                }
+                else { //regular service case
+                    if((service.isPartOfGroup === false && $scope.selectedServices.length > 0) || (service.isPartOfGroup && $scope.selectedServices.length === 0)) {
+                        var index = $scope.selectedServices.indexOf(service);
+                        if(index <= -1) {
+                            $scope.selectedServicesAndStacks.push(service);
+                            var index = $scope.selectedServicesAndStacks.indexOf(service);
+                            toggleSelectedService(service, index);
+                        }
+                    }
+                }
+            }
+            $scope.servicesNamesOfStacks[service.id] = servicesNames;
+            updateServicesNames();
+        };
+
+        function toggleSelectedService(service, index) {
+            if($scope.isGroupDeployment == false) {
                 if (service.isPartOfGroup) {
-                    $scope.selectedServices = [];
-                    deploymentSteps = ["choose-service", "choose-environment", "choose-groups", "choose-version", "confirmation"];
-                    $scope.selectedServices.push(service);
-                    $scope.isGroupDeployment = true;
+                    if($scope.selectedServices.length == 0) {
+                        $scope.selectedServices = [];
+                        deploymentSteps = ["choose-service", "choose-environment", "choose-groups", "choose-version", "confirmation"];
+                        $scope.selectedServices.push(service);
+                        $scope.isGroupDeployment = true;
+                    }
+                    else {
+                        $scope.selectedServicesAndStacks.splice(index, 1);
+                    }
+
                 } else {
                     $scope.selectedServices = $scope.selectedServices.filter(function(a){return !a.isPartOfGroup});
                     $scope.selectedServices.push(service);
-                    $scope.isGroupDeployment = false;
+                    $scope.selectedServicesAndStacks.push(service);
                     deploymentSteps = ["choose-service", "choose-environment", "choose-version", "confirmation"];
                 }
             }
-            updateServicesNames();
+            else {
+                if($scope.selectedServices.length == 0) {
+                    $scope.isGroupDeployment = false;
+                    toggleSelectedService(service, index);
+                }
+                else {
+                    $scope.selectedServicesAndStacks.splice(index, 1);
+                }
+            }
         };
 
        $scope.toggleMarkServiceAsFavorite = function(serviceName, event) {
@@ -406,7 +571,7 @@ angular.module('apollo')
             paginationType: 'simple_numbers',
             displayLength: 20,
             dom: '<"row"<"col-sm-6"i><"col-sm-6"f>>rt<"bottom"p>',
-            order: [[ 0, "desc" ], [ 2, "asc" ]] // Mark as favorite and name
+            order: [[ 0, "asc" ], [1, "desc"], [ 3, "asc" ]]
         };
 
         $scope.dtOptionsDeployableVersion = {
@@ -445,26 +610,113 @@ angular.module('apollo')
             return $scope.allDeployableVersions.filter(function(a){return a.gitCommitSha === sha})[0].id;
         }
 
-        // Data fetching
-		apolloApiService.getAllEnvironments().then(function(response) {
-            $scope.possibleEnvironments = response.data;
-			// Get selection from local storage
-            var previousEnvironmentIds = localStorageService.get(previouseEnvironmentLocalStorageKey);
+        apolloApiService.getAllEnvironments()
+         .then(parseAllEnvironments)
+         .then(() => {
+		     apolloApiService.getAllEnvironmentsStacks().then(function(response) {
+             var tempEnvironmentsStack = {};
+		     response.data.forEach(function(environmentsStack) {
+                tempEnvironmentsStack[environmentsStack.id] = environmentsStack;
+                addStackToDisplayEnvironments(environmentsStack);
 
-            if (previousEnvironmentIds !== null) {
-                $scope.selectedEnvironments = $scope.possibleEnvironments.filter(function(a){return previousEnvironmentIds.indexOf(a.id) > -1})
-            }
-		});
+                var environmentsNames = [];
+                environmentsStack.environments.forEach(function(environmentId) {
+                    var environment = allEnvironments.find(x => x.id === environmentId);
+                    var environmentName = environment.name;
+                    environmentsNames = environmentsNames.concat(environmentName);
+                });
 
-		apolloApiService.getAllServices().then(function(response) {
-            $scope.possibleServices = response.data;
-
-        	// Get selection from local storage
-            var previousServiceIds = localStorageService.get(previouseServiceLocalStorageKey);
-            if (previousServiceIds !== null) {
-                $scope.selectedServices = $scope.possibleServices.filter(function(a){return previousServiceIds.indexOf(a.id) > -1})
-            }
+                $scope.environmentsInStack[environmentsStack.id] = environmentsNames;
+             });
+             $scope.possibleEnvironmentsStacks = tempEnvironmentsStack;
+             updateFinalDisplayEnvironmentsAndStacks();
         });
+        })
+
+        function parseAllEnvironments(response) {
+            var tempEnvironment = {};
+            response.data.forEach(function(environment) {
+                tempEnvironment[environment.id] = environment;
+                addEnvironmentToDisplayEnvironments(environment);
+            });
+            $scope.possibleEnvironments = tempEnvironment;
+            allEnvironments = response.data;
+            updateFinalDisplayEnvironmentsAndStacks();
+
+           return Promise.resolve();
+        }
+
+		function addStackToDisplayEnvironments(stack) {
+            stack.isStack = true;
+            stack.orderId = -1;
+            environmentsAndStackForDisplayWorking = environmentsAndStackForDisplayWorking.concat(stack);
+        }
+
+        function addEnvironmentToDisplayEnvironments(environment) {
+            environment.isStack = false;
+            environment.orderId = 1;
+            environmentsAndStackForDisplayWorking = environmentsAndStackForDisplayWorking.concat(environment);
+        }
+
+         function updateFinalDisplayEnvironmentsAndStacks() {
+            if ($scope.possibleEnvironments !== null && $scope.possibleEnvironmentsStacks !== null) {
+                    $scope.environmentsAndStackForDisplay = environmentsAndStackForDisplayWorking;
+            }
+         }
+
+		apolloApiService.getAllServices()
+		    .then(parseAllServices)
+		    .then(() => {
+		        apolloApiService.getAllServicesStacks().then(function(response) {
+                    var tempServicesStack = {};
+                    response.data.forEach(function(servicesStack) {
+                       tempServicesStack[servicesStack.id] = servicesStack;
+                       addStackToDisplayServices(servicesStack);
+
+                       var servicesNames = [];
+                       servicesStack.services.forEach(function(serviceId) {
+                            var service = allServices.find(x => x.id === serviceId);
+                            var serviceName = service.name;
+                            servicesNames = servicesNames.concat(serviceName);
+                       });
+
+                       $scope.servicesInStack[servicesStack.id] = servicesNames;
+                    });
+                    $scope.possibleServicesStacks = tempServicesStack;
+                    updateFinalDisplayServicesAndStacks();
+		    })
+        })
+
+        function parseAllServices(response) {
+            var tempServices = {};
+            response.data.forEach(function(service) {
+                tempServices[service.id] = service;
+                addServiceToDisplayServices(service);
+            });
+            $scope.possibleServices = tempServices;
+            allServices = response.data;
+            updateFinalDisplayServicesAndStacks();
+
+            return Promise.resolve();
+        }
+
+        function addStackToDisplayServices(stack) {
+            stack.isStack = true;
+            stack.orderId = -1;
+            servicesAndStackForDisplayWorking = servicesAndStackForDisplayWorking.concat(stack);
+        }
+
+        function addServiceToDisplayServices(service) {
+            service.isStack = false;
+            service.orderId = 1;
+            servicesAndStackForDisplayWorking = servicesAndStackForDisplayWorking.concat(service);
+        }
+
+        function updateFinalDisplayServicesAndStacks() {
+            if ($scope.possibleServices !== null && $scope.possibleServicesStacks !== null) {
+                    $scope.servicesAndStackForDisplay = servicesAndStackForDisplayWorking;
+            }
+        }
 
 		function loadDeployableVersions(serviceIdsCsv) {
             apolloApiService.getDeployableVersionForMultiServices(serviceIdsCsv).then(function(response) {
@@ -476,10 +728,14 @@ angular.module('apollo')
 		    if (environmentId !== loadedGroupsEnvironmentId || serviceId !== loadedGroupsServiceId) {
 		        loadedGroupsEnvironmentId = environmentId;
 		        loadedGroupsServiceId = serviceId;
-                apolloApiService.getGroupsPerServiceAndEnvironment(environmentId, serviceId).then(function (response) {
-                    $scope.possibleGroups = response.data;
+                return apolloApiService.getGroupsPerServiceAndEnvironment(environmentId, serviceId).then(function (response) {
+                    response.data.forEach(function(group) {
+                        $scope.possibleGroups.push(group);
+                    });
                 });
             }
+
+            return Promise.resolve();
         }
 
         hotkeys.bindTo($scope)

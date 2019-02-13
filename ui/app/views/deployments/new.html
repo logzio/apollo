@@ -4,7 +4,6 @@
             <h1 class="page-header">New Deployment</h1>
         </div>
     </div>
-
     <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="deployment-spinner"></span>
     <div class="row" ng-switch on="currentStep">
 
@@ -16,22 +15,27 @@
                 </div>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                        <table class="table table-hover" datatable="ng" dt-options="dtOptions" >
                             <thead>
                             <tr>
+                                <th style="display: none;"></th>
                                 <th style="width: 20px"></th>
                                 <th style="width: 20px"></th>
                                 <th>Name</th>
                                 <th>Region</th>
                                 <th>Availability</th>
                                 <th>Kubernetes Master</th>
+                                <th>Type</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="environment in possibleEnvironments | filter:globalSearch"
+                            <tr ng-repeat="environment in environmentsAndStackForDisplay"
                                 ng-click="toggleSelectedEnvironment(environment)"
-                                ng-dblclick="toggleSelectedEnvironment(environment); nextStep()"
-                                ng-class="{ 'active':selectedEnvironments.indexOf(environment) > -1, 'marked-as-favorite': favoriteEnvironmentsNames.indexOf(environment.name) > -1 }">
+                                ng-dblclick="toggleSelectedEnvironment(environment); handleEnvironmentDbClick()"
+                                ng-class="{ 'active':selectedEnvironmentsAndStacks.indexOf(environment) > -1, 'marked-as-favorite': favoriteEnvironmentsNames.indexOf(environment.name) > -1 }">
+                                <td style="display: none;">
+                                    {{environment.orderId}}
+                                </td>
                                 <td>
                                     <!--ng-if instead of ng-class for data table order by-->
                                     <i class="mark-as-favorite-container fa fa-star" ng-if="favoriteEnvironmentsNames.indexOf(environment.name) > -1" ng-click="toggleMarkEnvironmentAsFavorite(environment.name, $event)"></i>
@@ -39,15 +43,20 @@
                                 </td>
                                 <td>
                                     <input type="checkbox"
-                                           name="selectedEnvironments[]"
+                                           name="selectedEnvironmentsAndStacks[]"
                                            value="{{environment}}"
-                                           ng-if="!isGroupDeployment"
-                                           ng-checked="selectedEnvironments.indexOf(environment) > -1">
+                                           ng-checked="selectedEnvironmentsAndStacks.indexOf(environment) > -1">
                                 </td>
-                                <td>{{environment.name}}</td>
+                                <td>
+                                    <i class="fa fa-clone" aria-hidden="true" style="margin-right: 5px" ng-if="environment.isStack == true" uib-tooltip-html="environmentsInStack[environment.id].join('<br>')"></i>
+                                    {{environment.name}}
+                                </td>
                                 <td>{{environment.geoRegion}}</td>
                                 <td>{{environment.availability}}</td>
                                 <td>{{environment.kubernetesMaster}}</td>
+                                <td>
+                                    {{environment.isStack ? "Stack" : "Environment"}}
+                                </td>
                             </tr>
                             </tbody>
                         </table>
@@ -55,7 +64,6 @@
                 </div>
             </div>
         </div>
-
 
         <!-- Service chooser div -->
         <div class="col-lg-12 col-sm-12 animate-switch-container" ng-switch-when="choose-service">
@@ -68,17 +76,22 @@
                         <table class="table table-hover" datatable="ng" dt-options="dtOptions">
                             <thead>
                             <tr>
+                                <th style="display: none;"></th>
                                 <th style="width: 20px"></th>
                                 <th style="width: 20px"></th>
                                 <th>Name</th>
                                 <th>YAMLs</th>
+                                <th>Type</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="service in possibleServices | filter:globalSearch"
-                                ng-click="toggleSelectedService(service)"
-                                ng-dblclick="toggleSelectedService(service); nextStep()"
-                                ng-class="{ 'active':selectedServices.indexOf(service) > -1, 'marked-as-favorite': favoriteServicesNames.indexOf(service.name) > -1 }">
+                            <tr ng-repeat="service in servicesAndStackForDisplay"
+                                ng-click="toggleSelectedServiceOrStack(service)"
+                                ng-dblclick="toggleSelectedServiceOrStack(service); nextStep()"
+                                ng-class="{ 'active':selectedServicesAndStacks.indexOf(service) > -1, 'marked-as-favorite': favoriteServicesNames.indexOf(service.name) > -1 }">
+                                <td style="display: none;">
+                                    {{service.orderId}}
+                                </td>
                                 <td>
                                     <!--ng-if instead of ng-class for data table order by-->
                                     <i class="mark-as-favorite-container fa fa-star" ng-if="favoriteServicesNames.indexOf(service.name) > -1" ng-click="toggleMarkServiceAsFavorite(service.name, $event)"></i>
@@ -89,9 +102,12 @@
                                            type="checkbox"
                                            name="selectedServices[]"
                                            value="{{service}}"
-                                           ng-checked="selectedServices.indexOf(service) > -1">
+                                           ng-checked="selectedServicesAndStacks.indexOf(service) > -1">
                                 </td>
-                                <td>{{service.name}}</td>
+                                <td>
+                                    <i class="fa fa-clone" aria-hidden="true" style="margin-right: 5px" ng-if="service.isStack == true" uib-tooltip-html="servicesInStack[service.id].join('<br>')"></i>
+                                    {{service.name}}
+                                </td>
                                 <td>
                                     <button type="button" class="btn btn-primary" uib-tooltip="See kubernetes deployment YAML"
                                         data-toggle="modal" data-target="#show-kubernetes-deployment-yaml">
@@ -105,6 +121,9 @@
                                             data-toggle="modal" data-target="#show-kubernetes-ingress-yaml">
                                         Ingress
                                     </button>
+                                </td>
+                                <td>
+                                    {{service.isStack ? "Stack" : "Service"}}
                                 </td>
                             </tr>
                             </tbody>
@@ -129,10 +148,11 @@
                                 <th>Name</th>
                                 <th>Scaling Factor</th>
                                 <th>Parameters</th>
+                                <th>Environment</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="group in possibleGroups | filter:globalSearch"
+                            <tr ng-repeat="group in possibleGroups"
                                 ng-click="toggleSelectedGroup(group)"
                                 ng-class="{'active':selectedGroups.contains(group)}">
                                 <td>
@@ -144,6 +164,7 @@
                                 <td>{{group.name}}</td>
                                 <td>{{group.scalingFactor}}</td>
                                 <td>{{group.jsonParams}}</td>
+                                <td>{{possibleEnvironments[group.environmentId].name}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -199,9 +220,12 @@
             <div class="well">
                 <h4>So just making sure</h4>
                 <p>You are going to deploy commit <b>{{versionSelected.gitCommitSha}}</b><br> </p>
-                <p>To service <b>{{serviceNames}}</b><br></p>
-                <p>On environment <b>{{environmentNames}}</b></p>
-                <p ng-if="selectedGroups.length > 0">On groups <b>{{groupNames}}</b></p><br>
+                <p>To services <b>{{serviceNames}}</b><br></p>
+                <div ng-repeat="environment in selectedEnvironments" ng-if="selectedGroups.length > 0">
+                    <br><p>On environment <b>{{environment.name}}</b></p>
+                    <p ng-if="getGroupsNamesPerEnvironment(environment.id).length > 0">On group <b>{{getGroupsNamesPerEnvironment(environment.id)}}</b></p>
+                </div>
+                <div ng-if="selectedGroups.length == 0"><p>On environments <b>{{environmentNames}}</b></p></div>
                 <button class="btn btn-default btn-lg center-block" data-toggle="modal" data-target="#confirm-modal">That is correct</button>
             </div>
 
@@ -237,7 +261,7 @@
     </div>
 
     <div class="pull-right">
-        <button type="button" ng-if="showNextStep" class="btn btn-success btn-circle btn-lg apollo-flow-button" ng-click="nextStep()">
+        <button type="button" ng-if="showNextStep" class="btn btn-success btn-circle btn-lg apollo-flow-button" ng-click="handleEnvironmentDbClick()">
             <i class="fa fa-arrow-right"></i>
         </button>
     </div>

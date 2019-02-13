@@ -29,6 +29,10 @@ public class ApolloClient {
 
     private final GenericApolloClient genericApolloClient;
 
+    private <T> String createCsvFromList(List<T> list) {
+        return StringUtils.join(list, ",");
+    }
+
     public ApolloClient(String userName, String plainPassword, String protocol, String hostname, int port) {
         genericApolloClient = new GenericApolloClient(userName, plainPassword, protocol, hostname, port, Optional.empty());
     }
@@ -259,7 +263,7 @@ public class ApolloClient {
     }
 
     public EnvironmentsStack addEnvironmentsStack(EnvironmentsStack environmentsStack) throws Exception {
-        String environmentsCsv = StringUtils.join(environmentsStack.getEnvironments(), ",");
+        String environmentsCsv = createCsvFromList(environmentsStack.getEnvironments());
         String requestBody = Common.generateJson(
                 "name", environmentsStack.getName(),
                 "isEnabled", String.valueOf(environmentsStack.isEnabled()),
@@ -268,7 +272,7 @@ public class ApolloClient {
     }
 
     public EnvironmentsStack updateEnvironmentsStack(EnvironmentsStack environmentsStack) throws ApolloClientException {
-        String environmentsCsv = StringUtils.join(environmentsStack.getEnvironments(), ",");
+        String environmentsCsv = createCsvFromList(environmentsStack.getEnvironments());
         String requestBody = Common.generateJson(
                 "id", String.valueOf(environmentsStack.getId()),
                 "name", environmentsStack.getName(),
@@ -306,7 +310,7 @@ public class ApolloClient {
     }
 
     public ServicesStack addServicesStack(ServicesStack servicesStack) throws Exception {
-        String servicesCsv = StringUtils.join(servicesStack.getServices(), ",");
+        String servicesCsv = createCsvFromList(servicesStack.getServices());
         String requestBody = Common.generateJson(
                 "name", servicesStack.getName(),
                 "isEnabled", String.valueOf(servicesStack.isEnabled()),
@@ -315,7 +319,7 @@ public class ApolloClient {
     }
 
     public ServicesStack updateServicesStack(ServicesStack servicesStack) throws ApolloClientException {
-        String servicesCsv = StringUtils.join(servicesStack.getServices(), ",");
+        String servicesCsv = createCsvFromList(servicesStack.getServices());
         String requestBody = Common.generateJson(
                 "id", String.valueOf(servicesStack.getId()),
                 "name", servicesStack.getName(),
