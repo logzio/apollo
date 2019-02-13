@@ -320,7 +320,7 @@ angular.module('apollo')
 
         $scope.getGroupsNamesPerEnvironment = function(environmentId) {
              var relevantGroups = $scope.selectedGroups.filter(group => group.environmentId === environmentId);
-             var groupsNamesPerEnvironment = a.map(x => x.name).join(', ');
+             var groupsNamesPerEnvironment = relevantGroups.map(x => x.name).join(', ');
              return groupsNamesPerEnvironment;
         }
 
