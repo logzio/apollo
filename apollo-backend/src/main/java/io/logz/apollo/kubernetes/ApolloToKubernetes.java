@@ -59,6 +59,9 @@ public class ApolloToKubernetes {
 
     private final TemplateInjector templateInjector;
 
+    private final String REGION = "region";
+    private final String ENVIRONMENT = "environment";
+
     public ApolloToKubernetes(DeploymentDao deploymentDao,
                               io.logz.apollo.models.DeployableVersion apolloDeployableVersion,
                               io.logz.apollo.models.Environment apolloEnvironment,
@@ -105,16 +108,22 @@ public class ApolloToKubernetes {
         try {
             // Update the deployment, as it could have changed since (Status)
             apolloDeployment = deploymentDao.getDeployment(apolloDeployment.getId());
-
             String deploymentYaml = apolloService.getDeploymentYaml();
 
+            // Fill deployment YAML with parameters if needed
+            HashMap<String, String> additionalParams = new HashMap<>();
+            String environmentAdditionalParams = apolloEnvironment.getAdditionalParams();
+
+            if (environmentAdditionalParams != null && !environmentAdditionalParams.isEmpty()) {
+                additionalParams.putAll(jsonToMap(environmentAdditionalParams));
+            }
+
             if (apolloService.getIsPartOfGroup()) {
-                String deploymentParams = apolloDeployment.getDeploymentParams();
-                deploymentYaml = fillDeploymentYamlWithParams(deploymentYaml, jsonToMap(deploymentParams));
+                additionalParams.putAll(jsonToMap(apolloDeployment.getDeploymentParams()));
             }
 
             // Convert the deployment object to fabric8 model
-            Deployment deployment = mapper.readValue(deploymentYaml, Deployment.class);
+            Deployment deployment = getClassFromYamlWithParameters(deploymentYaml, additionalParams, Deployment.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the deployment yaml of deployment id {}",
@@ -140,7 +149,7 @@ public class ApolloToKubernetes {
             }
 
             // Convert the service object to fabric8 model
-            Service service = mapper.readValue(apolloService.getServiceYaml(), Service.class);
+            Service service = getClassFromYamlWithParameters(apolloService.getServiceYaml(), jsonToMap(apolloEnvironment.getAdditionalParams()), Service.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the service yaml of deployment id {}",
@@ -167,7 +176,7 @@ public class ApolloToKubernetes {
             }
 
             // Convert the ingress object to fabric8 model
-            Ingress ingress = mapper.readValue(apolloService.getIngressYaml(), Ingress.class);
+            Ingress ingress = getClassFromYamlWithParameters(apolloService.getIngressYaml(), jsonToMap(apolloEnvironment.getAdditionalParams()), Ingress.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the ingress yaml of deployment id {}",
@@ -232,8 +241,20 @@ public class ApolloToKubernetes {
         return Encryptor.encryptString(LabelsNormalizer.normalize(naiveUniqueIdentofier));
     }
 
-    private String fillDeploymentYamlWithParams(String deploymentYaml, HashMap deploymentParams) {
-        return templateInjector.injectToTemplate(deploymentYaml, deploymentParams);
+    private String fillYamlWithParams(String yaml, HashMap parameters) {
+        return templateInjector.injectToTemplate(yaml, parameters);
+    }
+
+    private <T> T getClassFromYamlWithParameters(String yaml, HashMap<String, String> parameters, Class<T> valueType) throws IOException {
+        yaml = fillYamlWithParams(yaml, fillDefaultParameters(parameters));
+        return mapper.readValue(yaml, valueType);
+    }
+
+    private HashMap<String, String> fillDefaultParameters(HashMap<String, String> parameters) {
+        parameters.put(REGION, apolloEnvironment.getGeoRegion().toLowerCase());
+        parameters.put(ENVIRONMENT, apolloEnvironment.getAvailability().toLowerCase());
+
+        return parameters;
     }
 
     private HashMap<String, String> jsonToMap(String deploymentParams) throws IOException {

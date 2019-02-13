@@ -10,6 +10,7 @@ import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.excpetions.ApolloParseException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
+import io.logz.apollo.helpers.Fabric8TestMethods;
 import io.logz.apollo.helpers.RealDeploymentGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.kubernetes.ApolloToKubernetes;
@@ -54,34 +55,34 @@ public class TransformersTest {
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithRepoAndVersion, "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithRepoAndVersion);
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithRepoAndVersion);
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithRepoAndNoVersion, "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployableVersion().getGitCommitSha());
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployableVersion().getGitCommitSha());
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithSimpleRepoAndNoVersion, "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithSimpleRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployableVersion().getGitCommitSha());
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithSimpleRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployableVersion().getGitCommitSha());
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithNoRepoAndVersion, "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndVersion);
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndVersion);
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithNoRepoAndNoVersion, "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployableVersion().getGitCommitSha());
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployableVersion().getGitCommitSha());
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithNoRepoAndNoVersion, "key", "value", 0);
         realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.PENDING_CANCELLATION);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployment().getSourceVersion());
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployment().getSourceVersion());
 
         realDeploymentGenerator = new RealDeploymentGenerator(imageNameWithNoRepoAndNoVersion, "key", "value", 0);
         realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.CANCELING);
         realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.CANCELING);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployment().getSourceVersion());
+        Fabric8TestMethods.assertImageName(apolloToKubernetes.getKubernetesDeployment(), imageNameWithNoRepoAndNoVersion + ":" + realDeploymentGenerator.getDeployment().getSourceVersion());
     }
 
     @Test
@@ -94,18 +95,18 @@ public class TransformersTest {
 
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
 
         // Check for one of the default labels that the transformer assigns
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(),
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(),
                 sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
 
         // Check that the transformer does not override a given label with a default one
         realDeploymentGenerator = new RealDeploymentGenerator("image", sampleLabelFromTransformer, "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), sampleLabelFromTransformer, "value");
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), sampleLabelFromTransformer, "value");
     }
 
     @Test
@@ -118,11 +119,11 @@ public class TransformersTest {
 
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertServiceLabelExists(apolloToKubernetes.getKubernetesService(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
+        Fabric8TestMethods.assertServiceLabelExists(apolloToKubernetes.getKubernetesService(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
 
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertServiceLabelExists(apolloToKubernetes.getKubernetesService(),
+        Fabric8TestMethods.assertServiceLabelExists(apolloToKubernetes.getKubernetesService(),
                 sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
     }
 
@@ -136,8 +137,8 @@ public class TransformersTest {
 
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
-        assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
-        assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
+        Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), realDeploymentGenerator.getDefaultLabelKey(), realDeploymentGenerator.getDefaultLabelValue());
+        Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), sampleLabelFromTransformer, realDeploymentGenerator.getEnvironment().getName());
     }
 
     @Test
@@ -151,8 +152,8 @@ public class TransformersTest {
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
 
-        assertDeploymentEnvironmentVariableExists(apolloToKubernetes.getKubernetesDeployment(), regionEnvNameFromTransformer, realDeploymentGenerator.getEnvironment().getGeoRegion());
-        assertDeploymentEnvironmentVariableExists(apolloToKubernetes.getKubernetesDeployment(), realDeploymentGenerator.getDefaultEnvironmentVariableName(), realDeploymentGenerator.getDefaultEnvironmentVariableValue());
+        Fabric8TestMethods.assertDeploymentEnvironmentVariableExists(apolloToKubernetes.getKubernetesDeployment(), regionEnvNameFromTransformer, realDeploymentGenerator.getEnvironment().getGeoRegion());
+        Fabric8TestMethods.assertDeploymentEnvironmentVariableExists(apolloToKubernetes.getKubernetesDeployment(), realDeploymentGenerator.getDefaultEnvironmentVariableName(), realDeploymentGenerator.getDefaultEnvironmentVariableValue());
     }
 
     @Test
@@ -186,48 +187,13 @@ public class TransformersTest {
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "label", 0);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
 
-        assertServiceNodePort(apolloToKubernetes.getKubernetesService(), realDeploymentGenerator.getDefaultNodePort());
+        Fabric8TestMethods.assertServiceNodePort(apolloToKubernetes.getKubernetesService(), realDeploymentGenerator.getDefaultNodePort());
 
         int servicePortCoefficient = 200;
         realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "label", servicePortCoefficient);
         apolloToKubernetes = createForDeployment(realDeploymentGenerator.getDeployment());
 
-        assertServiceNodePort(apolloToKubernetes.getKubernetesService(), realDeploymentGenerator.getDefaultNodePort() + servicePortCoefficient);
-    }
-
-    private void assertImageName(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String imageName) {
-        assertThat(deployment.getSpec().getTemplate().getSpec().getContainers().stream().findFirst().get().getImage()).isEqualTo(imageName);
-    }
-
-    private void assertDeploymentLabelExists(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String labelKey, String labelValue) {
-        assertThat(deployment.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
-    }
-
-    private void assertServiceLabelExists(io.fabric8.kubernetes.api.model.Service service, String labelKey, String labelValue) {
-        assertThat(service.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
-    }
-
-    private void assertIngressLabelExists(io.fabric8.kubernetes.api.model.extensions.Ingress ingress, String labelKey, String labelValue) {
-        assertThat(ingress.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
-    }
-
-    private void assertDeploymentEnvironmentVariableExists(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String envName, String envValue) {
-        assertThat(
-                deployment.getSpec().getTemplate().getSpec().getContainers()
-                        .stream()
-                        .findFirst()
-                        .get()
-                        .getEnv()
-                            .stream()
-                            .filter(envVar -> envVar.getName().equals(envName))
-                            .findFirst()
-                            .orElse(null)
-                            .getValue()
-        ).isEqualTo(envValue);
-    }
-
-    private void assertServiceNodePort(io.fabric8.kubernetes.api.model.Service service, int port) {
-        assertThat(service.getSpec().getPorts().stream().anyMatch(servicePort -> servicePort.getNodePort().equals(port))).isTrue();
+        Fabric8TestMethods.assertServiceNodePort(apolloToKubernetes.getKubernetesService(), realDeploymentGenerator.getDefaultNodePort() + servicePortCoefficient);
     }
 
     private ApolloToKubernetes createForDeployment(Deployment deployment) {

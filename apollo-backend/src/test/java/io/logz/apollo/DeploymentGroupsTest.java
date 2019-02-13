@@ -1,6 +1,7 @@
 package io.logz.apollo;
 
 import io.logz.apollo.excpetions.ApolloDeploymentException;
+import io.logz.apollo.helpers.Fabric8TestMethods;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.helpers.ModelsGenerator;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitEnvironment;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,6 +32,8 @@ public class DeploymentGroupsTest {
 
     private static ApolloTestClient apolloTestClient;
     private static ApolloToKubernetesStore apolloToKubernetesStore;
+    private static ApolloToKubernetes apolloToKubernetes;
+    private static RealDeploymentGenerator realDeploymentGenerator;
 
     @BeforeClass
     public static void init() throws Exception {
@@ -40,9 +44,6 @@ public class DeploymentGroupsTest {
 
     @Test
     public void testApolloDeploymentGroupYaml() throws Exception {
-        RealDeploymentGenerator realDeploymentGenerator;
-        ApolloToKubernetes apolloToKubernetes;
-
         HashMap<String, Object> params = new HashMap<>();
 
         params.put("image", "great image");
@@ -56,8 +57,8 @@ public class DeploymentGroupsTest {
 
         apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
 
-        assertImageName(apolloToKubernetes.getKubernetesDeployment(), "great image");
-        assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), "such key", "much value");
+        Fabric8TestMethods.assertImageNameContains(apolloToKubernetes.getKubernetesDeployment(), "great image");
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), "such key", "much value");
     }
 
     @Test
@@ -101,11 +102,50 @@ public class DeploymentGroupsTest {
                 .isEqualTo(expectedResponse.getSuccessful().get(1).getGroupId());
     }
 
-    private void assertImageName(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String imageName) {
-        assertThat(deployment.getSpec().getTemplate().getSpec().getContainers().stream().findFirst().get().getImage()).contains(imageName);
-    }
+    @Test
+    public void testGroupDeploymentWithAdditionalParams() throws Exception {
+        // Create an environment with additional parameters
+        HashMap<String, Object> environmentParams = new HashMap<>();
 
-    private void assertDeploymentLabelExists(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String labelKey, String labelValue) {
-        assertThat(deployment.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
+        String deploymentValue = "deployment_value";
+        String serviceValue = "service_value";
+        String ingressValue = "ingress_value";
+
+        environmentParams.put(deploymentValue, deploymentValue);
+        environmentParams.put(serviceValue, serviceValue);
+        environmentParams.put(ingressValue, ingressValue);
+
+        Environment environment = createAndSubmitEnvironment(apolloTestClient, new JSONObject(environmentParams).toString());
+
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        service = apolloTestClient.updateService(service.getId(), service.getName(), service.getDeploymentYaml(), service.getServiceYaml(), service.getIngressYaml(), true);
+
+        // Create a group with additional parameters
+        HashMap<String, Object> groupParams = new HashMap<>();
+
+        groupParams.put("image", "great image");
+        groupParams.put("group_key", "such key");
+        groupParams.put("group_value", "much value");
+
+        Group group = ModelsGenerator.createAndSubmitGroup(apolloTestClient, service.getId(), environment.getId());
+        group.setJsonParams(new JSONObject(groupParams).toString());
+
+        realDeploymentGenerator = new RealDeploymentGenerator
+                ("{{ image }}", "{{ group_key }}", "{{ group_value }}", 0,
+                        new JSONObject(groupParams).toString(), service, environment, group.getName(), true);
+
+        Deployment deployment = realDeploymentGenerator.getDeployment();
+
+        apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
+
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(),
+                RealDeploymentGenerator.DEFAULT_DEPLOYMENT_LABLE_KEY, deploymentValue);
+        Fabric8TestMethods.assertServiceLabelExists(apolloToKubernetes.getKubernetesService(),
+                RealDeploymentGenerator.DEFAULT_SERVICE_LABLE_KEY, serviceValue);
+        Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(),
+                RealDeploymentGenerator.DEFAULT_INGRESS_LABLE_KEY, ingressValue);
+
+        Fabric8TestMethods.assertImageNameContains(apolloToKubernetes.getKubernetesDeployment(), "great image");
+        Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), "such key", "much value");
     }
 }
