@@ -60,7 +60,6 @@ angular.module('apollo')
         $scope.environmentsAndStackForDisplay = null;
         $scope.selectedServicesAndStacks = [];
         $scope.selectedEnvironmentsAndStacks = [];
-
         $scope.servicesNamesOfStacks = [];
         $scope.environmentsNamesOfStacks = [];
         $scope.servicesInStack = [];
