@@ -66,7 +66,6 @@ angular.module('apollo')
         $scope.servicesInStack = [];
         $scope.environmentsInStack = [];
 
-
         var groupsPromises = [];
         var servicesAndStackForDisplayWorking = [];
         var environmentsAndStackForDisplayWorking = [];
