@@ -466,7 +466,6 @@ angular.module('apollo')
                     if((service.isPartOfGroup === false && $scope.selectedServices.length >= 0 && $scope.isGroupDeployment === false) || (service.isPartOfGroup && $scope.selectedServices.length === 0)) {
                         var index = $scope.selectedServices.indexOf(service);
                         if(index <= -1) {
-//                            $scope.selectedServicesAndStacks.push(service);
                             var index = $scope.selectedServicesAndStacks.indexOf(service);
                             toggleSelectedService(service, index);
                         }
