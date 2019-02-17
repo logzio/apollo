@@ -273,7 +273,7 @@ angular.module('apollo')
                 return '-';
             }
 
-            return $scope.possibleEnvironments.filter(function(a){return a.id == id})[0].name;
+            return $scope.possibleEnvironments[id].name;
         }
 
         var getGroupNameById = function(id) {
