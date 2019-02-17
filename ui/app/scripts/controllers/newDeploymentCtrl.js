@@ -427,9 +427,13 @@ angular.module('apollo')
                     service.services.forEach(function(serviceId) {
                          var serviceInStack = allServices.find(x => x.id === serviceId);
                          var index = $scope.selectedServices.indexOf(serviceInStack);
-                         $scope.selectedServices.splice(index, 1);
+                         if(index > -1) {
+                            $scope.selectedServices.splice(index, 1);
+                         }
                          index = $scope.selectedServicesAndStacks.indexOf(serviceInStack);
-                         $scope.selectedServicesAndStacks.splice(index, 1);
+                         if(index > -1) {
+                            $scope.selectedServicesAndStacks.splice(index, 1);
+                         }
                     });
                 }
                 else { //regular service case
@@ -459,10 +463,9 @@ angular.module('apollo')
                     }
                 }
                 else { //regular service case
-                    if((service.isPartOfGroup === false && $scope.selectedServices.length > 0) || (service.isPartOfGroup && $scope.selectedServices.length === 0)) {
+                    if((service.isPartOfGroup === false && $scope.selectedServices.length >= 0 && $scope.isGroupDeployment === false) || (service.isPartOfGroup && $scope.selectedServices.length === 0)) {
                         var index = $scope.selectedServices.indexOf(service);
                         if(index <= -1) {
-                            $scope.selectedServicesAndStacks.push(service);
                             var index = $scope.selectedServicesAndStacks.indexOf(service);
                             toggleSelectedService(service, index);
                         }
@@ -479,6 +482,7 @@ angular.module('apollo')
                     if($scope.selectedServices.length == 0) {
                         $scope.selectedServices = [];
                         deploymentSteps = ["choose-service", "choose-environment", "choose-groups", "choose-version", "confirmation"];
+                        $scope.selectedServicesAndStacks.push(service);
                         $scope.selectedServices.push(service);
                         $scope.isGroupDeployment = true;
                     }
