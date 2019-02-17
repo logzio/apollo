@@ -45,7 +45,7 @@ angular.module('apollo')
 		$scope.possibleGroups = [];
 		$scope.selectedGroups = [];
 		$scope.groupNames = null;
-        $scope.possibleEnvironments = null;
+        $scope.possibleEnvironments = [];
         $scope.selectedEnvironments = [];
         $scope.environmentNames = null;
         $scope.possibleServices = null;
@@ -638,9 +638,9 @@ angular.module('apollo')
         })
 
         function parseAllEnvironments(response) {
-            var tempEnvironment = {};
+            var tempEnvironment = [];
             response.data.forEach(function(environment) {
-                tempEnvironment[environment.id] = environment;
+                tempEnvironment.push(environment);
                 addEnvironmentToDisplayEnvironments(environment);
             });
             $scope.possibleEnvironments = tempEnvironment;
