@@ -293,6 +293,17 @@ function ApiService($q, $http){
         return $http.delete(CONFIG.appUrl + "blocker-definition/" + id);
     };
 
+    var getAllDeploymentRoles = function () {
+        return $http.get(CONFIG.appUrl + "deployment-roles");
+    };
+
+    var addUserToDeploymentRole = function (userEmail, deploymentRoleId) {
+        return $http.post(CONFIG.appUrl + "deployment-roles/add-user", {
+            userEmail: userEmail,
+            deploymentRoleId: deploymentRoleId
+        });
+    };
+
     var getHawtioLink = function (environmentId, podName) {
         var port = document.location.port;
         var host = document.location.hostname;
@@ -364,6 +375,8 @@ function ApiService($q, $http){
         addBlocker: addBlocker,
         updateBlocker: updateBlocker,
         deleteBlocker: deleteBlocker,
-        getHawtioLink: getHawtioLink
+        getHawtioLink: getHawtioLink,
+        getAllDeploymentRoles: getAllDeploymentRoles,
+        addUserToDeploymentRole: addUserToDeploymentRole
     };
 }
