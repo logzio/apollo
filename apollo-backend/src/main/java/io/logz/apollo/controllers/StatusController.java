@@ -110,7 +110,7 @@ public class StatusController {
     }
 
     @GET("/status/environment/{envId}/service/{serviceId}/group/{groupName}")
-    public KubernetesDeploymentStatus getOneSpecificStatus(int envId, int serviceId, String groupName) {
+    public KubernetesDeploymentStatus getOneSpecificStatusWithGroup(int envId, int serviceId, String groupName) {
 
         Environment environment = environmentDao.getEnvironment(envId);
         KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(environment);
@@ -122,6 +122,25 @@ public class StatusController {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}, group {}!", service.getId(), envId, groupName, e);
+            }
+        }
+
+        return  kubernetesDeploymentStatus;
+    }
+
+    @GET("/status/environment/{envId}/service/{serviceId}")
+    public KubernetesDeploymentStatus getOneSpecificStatus(int envId, int serviceId) {
+
+        Environment environment = environmentDao.getEnvironment(envId);
+        KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(environment);
+        Service service = serviceDao.getService(serviceId);
+        KubernetesDeploymentStatus kubernetesDeploymentStatus = null;
+
+        if (service != null) {
+            try {
+                kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+            } catch (Exception e) {
+                logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
         }
 

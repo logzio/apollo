@@ -1,0 +1,252 @@
+<div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Live Status From Kubernetes</h1>
+        </div>
+    </div>
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="result-spinner"></span>
+
+    <div ng-switch on="currentScreen">
+        <div class="col-lg-12 col-sm-12" ng-switch-when="filters">
+            <div>
+                <h2 class="text-center">Select Service</h2>
+                <div class="row text-center">
+                    <button type="button" class="btn btn-outline btn-primary btn-lg apollo-version-selector" ng-repeat="service in allServices" ng-click="showByService(service)">
+                        {{service.name}}
+                    </button>
+                </div>
+            </div>
+
+
+            <div>
+                <hr>
+                <h4 class="text-center">or</h4>
+                <h2 class="text-center">Select Environment</h2>
+                <div class="row text-center">
+                    <button type="button" class="btn btn-outline btn-primary btn-lg apollo-version-selector" ng-repeat="environment in allEnvironments" ng-click="showByEnvironment(environment.id)">
+                        {{environment.name}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-sm-12" ng-switch-when="results">
+            <div class="row">
+                <div ng-repeat="status in filteredResults | filter:{serviceId: ''}">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-tasks fa-5x"></i>
+                                    </div>
+                                    <div class="col-xs-9 text right">
+                                        <div class="huge">{{allServices[status.serviceId].name}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table" ng-if="status.nestedKubeDeploymentStatuses.length === 0">
+                                    <tr><td colspan="2">Environment</td><td colspan="2">{{allEnvironments[status.environmentId].name}}</td></tr>
+                                    <tr><td colspan="2">Commit</td><td colspan="2"><a target="_blank" href="{{deployableVersions[status.gitCommitSha].commitUrl}}">{{status.gitCommitSha | limitTo: 7}}</a></td></tr>
+                                    <tr><td>Replicas</td><td>{{status.replicas || 0}}</td><td>Available Replicas</td><td>{{status.availableReplicas || 0}}</td></tr>
+                                    <tr><td>Updated Replicas</td><td>{{status.updatedReplicas || 0}}</td><td>Unavailable Replicas</td><td>{{status.unavailableReplicas || 0}}</td></tr>
+                                </table>
+                                <table class="table apollo-table" ng-if="status.nestedKubeDeploymentStatuses.length > 0">
+                                    <tr><td colspan="2">Environment</td><td colspan="2">{{allEnvironments[status.environmentId].name}}</td></tr>
+                                    <tr><td colspan="2"><b>Groups:</b></td><td></td></tr>
+                                </table>
+                                <div class="apollo-pic-container col-lg-12" ng-if="status.nestedKubeDeploymentStatuses.length > 0">
+                                    <div class="col-lg-4" ng-repeat="subStatus in status.nestedKubeDeploymentStatuses">
+                                        <a ng-click="setSelectedStatus(subStatus)" data-toggle="modal" data-target="#view-group">
+                                            <span>{{subStatus.groupName}}</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="panel-footer" ng-if="status.nestedKubeDeploymentStatuses.length === 0">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <a ng-click="setSelectedStatus(status)" data-toggle="modal" data-target="#view-pods">
+                                                <span class="pull-left">View Pods</span>
+                                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p ng-show="!filteredResults.length"><b>No results found!</b></p>
+        </div>
+        <div class="pull-right">
+            <button type="button" ng-show="currentScreen === 'results'" class="btn btn-success btn-circle btn-lg apollo-flow-button" ng-click="refreshStatus()" tooltip="Refresh Live Data">
+                <i class="fa fa-refresh"></i>
+            </button>
+            <button type="button" class="btn btn-primary btn-circle btn-lg apollo-flow-button" ng-click="backToFilter()" tooltip="back to filters">
+                <i class="fa fa-arrow-left"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="view-pods" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Pods Details</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Host IP</th>
+                                    <th>Pod IP</th>
+                                    <th>Phase</th>
+                                    <th>Reason</th>
+                                    <th>Start Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="podStatus in selectedStatus.podStatuses">
+                                    <td>{{podStatus.name}}</td>
+                                    <td>{{podStatus.hostIp}}</td>
+                                    <td>{{podStatus.podIp}}</td>
+                                    <td>{{podStatus.phase}}</td>
+                                    <td>{{podStatus.reason || "None"}}</td>
+                                    <td>{{podStatus.startTime | date:'dd/MM/yy H:mm:ss'}}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger btn-circle" uib-tooltip="Restart Pod"
+                                                ng-click="selectPod(podStatus)" data-toggle="modal" data-target="#confirm-modal">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-circle" uib-tooltip="Live Terminal" data-toggle="modal" data-target="#select-container"
+                                        ng-click="selectPod(podStatus);setWebsocketScope('exec')">
+                                            <i class="fa fa-terminal"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-circle" uib-tooltip="Live Tail" data-toggle="modal" data-target="#select-container"
+                                        ng-click="selectPod(podStatus);setWebsocketScope('logs')">
+                                            <i class="fa fa-binoculars"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-circle" uib-tooltip="Hawt.io" ng-click="openHawtio(podStatus)" ng-show="podStatus.hasJolokia">
+                                            <i class="fa fa-coffee"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="restartAllPods(selectedStatus.environmentId, selectedStatus.serviceId, selectedStatus.groupName)">Restart all pods gradually</button>
+                    <button type="button" class="btn btn-default" ng-click="refreshStatus()">Refresh</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="view-group" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">{{status.groupName}}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr><td colspan="2">Commit</td><td colspan="2">
+                                <a target="_blank" href="{{deployableVersions[selectedStatus.gitCommitSha].commitUrl}}">{{selectedStatus.gitCommitSha | limitTo: 7}}</a>
+                            </td></tr>
+                            <tr><td>Replicas</td><td>{{selectedStatus.replicas || 0}}</td><td>Available Replicas</td><td>{{selectedStatus.availableReplicas || 0}}</td></tr>
+                            <tr><td>Updated Replicas</td><td>{{selectedStatus.updatedReplicas || 0}}</td><td>Unavailable Replicas</td><td>{{selectedStatus.unavailableReplicas || 0}}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <a data-toggle="modal" data-dismiss="modal" data-target="#view-pods">
+                                <span class="pull-left">View Pods</span>
+                            </a>
+                            <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="select-container" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Select a container</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="row text-center">
+                            <button type="button" class="btn btn-outline btn-primary btn-lg apollo-version-selector"
+                                    ng-repeat="container in selectedPodStatus.containers" ng-click="startWebSocket(container)" data-toggle="modal" data-target="#select-container,#live-session">
+                                {{container}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="live-session" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="closeWebSocket()">×</button>
+                    <h4 class="modal-title" ng-bind-html="terminalHeader"></h4>
+                </div>
+                <div class="modal-body">
+                    <div id="terminal" class="apollo-live-session">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="closeWebSocket()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title" id="myModalLabel">Are you sure?</h4>
+                </div>
+                <div class="modal-body">
+                    This is a dangerous action! <br>
+                    Confirm here will delete the pod! <br>
+                    New pod will replace it soon, but there might be a moment without any pod running! <br>
+                    Maybe you'd prefer using the gradual, safe option...? <br>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="restartAllPods(selectedStatus.environmentId, selectedStatus.serviceId, selectedStatus.groupName)">Restart all pods gradually</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="restartPod(selectedPodStatus.name)">Restart the damn pod!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

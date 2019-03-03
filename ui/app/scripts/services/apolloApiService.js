@@ -161,6 +161,14 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/");
     };
 
+    var statusOfEnvironmentAndServiceWithGroup = function (environmentId, serviceId, groupName) {
+        return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId + "/group/" + groupName);
+    };
+
+    var statusOfEnvironmentAndService = function (environmentId, serviceId, groupName) {
+        return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId);
+    };
+
     var latestCreatedPod = function (environmentId, serviceId) {
         return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId + "/latestpod");
     };
@@ -377,6 +385,8 @@ function ApiService($q, $http){
         deleteBlocker: deleteBlocker,
         getHawtioLink: getHawtioLink,
         getAllDeploymentRoles: getAllDeploymentRoles,
-        addUserToDeploymentRole: addUserToDeploymentRole
+        addUserToDeploymentRole: addUserToDeploymentRole,
+        statusOfEnvironmentAndService: statusOfEnvironmentAndService,
+        statusOfEnvironmentAndServiceWithGroup: statusOfEnvironmentAndServiceWithGroup
     };
 }
