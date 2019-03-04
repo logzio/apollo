@@ -104,6 +104,14 @@ public class DeployableVersionController {
 
     @POST("/deployable-version")
     public void addDeployableVersion(String gitCommitSha, String githubRepositoryUrl, int serviceId, Req req) {
+
+        // Avoid duplicate entry errors
+        DeployableVersion existingDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(gitCommitSha, serviceId);
+        if (existingDeployableVersion != null) {
+            assignJsonResponseToReq(req, HttpStatus.CREATED, existingDeployableVersion);
+            return;
+        }
+
         DeployableVersion newDeployableVersion = new DeployableVersion();
 
         // Getting the commit details
@@ -153,13 +161,6 @@ public class DeployableVersionController {
                 assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, "Could not get commit details from GitHub, make sure your GitHub user is well defined.");
                 return;
             }
-        }
-
-        // Avoid duplicate entry errors
-        DeployableVersion existingDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(newDeployableVersion.getGitCommitSha(), newDeployableVersion.getServiceId());
-        if (existingDeployableVersion != null) {
-            assignJsonResponseToReq(req, HttpStatus.CREATED, existingDeployableVersion);
-            return;
         }
 
         deployableVersionDao.addDeployableVersion(newDeployableVersion);
