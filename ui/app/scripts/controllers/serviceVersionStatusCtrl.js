@@ -13,45 +13,74 @@ angular.module('apollo')
             $scope.selectedEnvironment = null;
             $scope.selectedGroup = null;
             $scope.serviceGroups = null;
-            $scope.kubernetesDeploymentStatus = null;
+            $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
+
+            $scope.setSelectedGroup = function(group) {
+                $scope.selectedGroup = group;
+            }
+
+            $scope.showAllGroupsOfService = function() {
+                if ($scope.selectedService != null && $scope.selectedEnvironment != null) { //selected service and environment
+                    if ($scope.selectedService.isPartOfGroup) { //service is part of group
+                        apolloApiService.allGroupsStatusesOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id).then(function (response) {
+                            $scope.kubernetesDeploymentStatus = response.data;
+                            $scope.currentScreen = "results";
+                            }, function (error) {
+                                growl.error("An error occurred in getting k8s status", {ttl:7000});
+                        });
+                    } else if ($scope.selectedEnvironment != null) { //error in case of unselected environment
+                        growl.error("Please unselect the environment you chose", {ttl:7000});
+                    } else if (!$scope.selectedService.isPartOfGroup) { //ungrouped service
+                        growl.error("Oh oh, you selected an ungrouped service", {ttl:7000});
+                    }
+                } else if ($scope.selectedService === null) { //error in case of unselected service
+                    growl.error("What do you want? You didn't select any service", {ttl:7000});
+                } else { //some unknown error
+                    growl.error("Something went wrong... Please try again", {ttl:7000});
+                }
+            }
 
             $scope.showByEnvironmentAndService = function() {
 
-                if ($scope.selectedService == null || $scope.selectedEnvironment == null) {
-                    growl.error("Please select a service and an environment!");
+                if ($scope.selectedService === null || $scope.selectedEnvironment === null) { //unselected service or environment
+                    growl.error("Please select a service and an environment!", {ttl:7000});
                     return;
-                }
-
-                if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup == null) {
-
-                    apolloApiService.getGroupsPerServiceAndEnvironment($scope.selectedService.id, $scope.selectedEnvironment.id).then(function (response) {
+                } else if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup === null) { //service is part of group but no group is selected -> show available groups
+                    if ($scope.currentScreen == "selectGroup") {
+                        growl.error("Please select a group... :)", {ttl:7000});
+                        return;
+                    }
+                    apolloApiService.getGroupsPerServiceAndEnvironment($scope.selectedEnvironment.id, $scope.selectedService.id).then(function (response) {
                         $scope.serviceGroups = response.data;
+                        if (response.data.length === 0) {
+                            growl.error("No available groups for the service and environment you selected", {ttl:7000});
+                            return;
+                        } else {
+                            $scope.currentScreen = "selectGroup";
+                            return;
+                        }
                     });
+                } else if ($scope.selectedService !== null && $scope.selectedEnvironment !== null) { //selected environment and service
 
-                    $scope.currentScreen = "selectGroup";
-                    return;
-                }
-
-                if ($scope.selectedService != null && $scope.selectedEnvironment != null) {
-
-                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup != null) {
+                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup !== null) { //service is part of group and selected group
                         apolloApiService.statusOfEnvironmentAndServiceWithGroup($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroup.name).then(
                             function (response) {
-                                $scope.kubernetesDeploymentStatus = response.data;
-                                $scope.currentScreen = "result";
+                                $scope.kubernetesDeploymentStatus.push(response.data);
+                                $scope.currentScreen = "results";
+
                             },
                             function (error) {
-                                growl.error("An error occurred in getting k8s status");
+                                growl.error("An error occurred in getting k8s status", {ttl:7000});
                             });
-                    } else {
+                    } else { //service is not part of group
                         apolloApiService.statusOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id).then(
                             function (response) {
-                                $scope.kubernetesDeploymentStatus = response.data;
-                                $scope.currentScreen = "result";
+                                $scope.kubernetesDeploymentStatus.push(response.data);
+                                $scope.currentScreen = "results";
                             },
                             function (error) {
-                                growl.error("An error occurred in getting k8s status");
+                                growl.error("An error occurred in getting k8s status", {ttl:7000});
                             });
                     }
                 }
@@ -70,7 +99,7 @@ angular.module('apollo')
                     growl.success("Successfully restarted pod " + podName + "!");
                 }, function (error) {
                     usSpinnerService.stop('result-spinner');
-                    growl.error("Could not restart pod! got: " + error.statusText);
+                    growl.error("Could not restart pod! got: " + error.statusText, {ttl:7000});
                 });
             };
 
@@ -85,7 +114,7 @@ angular.module('apollo')
                     growl.success("Successfully restarted all pods!");
                 }, function (error) {
                     usSpinnerService.stop('result-spinner');
-                    growl.error("Could not restart the pods! got: " + error.statusText);
+                    growl.error("Could not restart the pods! got: " + error.statusText, {ttl:7000});
                 });
             };
 
@@ -106,7 +135,7 @@ angular.module('apollo')
                     } else if ($scope.websocketScope === logsTypeName){
                         execUrl = apolloApiService.getWebsocketLogUrl(environmentId, serviceId, podName, containerName);
                     } else {
-                        growl.error("Unexpected error!");
+                        growl.error("Unexpected error!", {ttl:7000});
                         return;
                     }
 
@@ -186,9 +215,19 @@ angular.module('apollo')
             // Data fetching
             apolloApiService.getAllEnvironments().then(function(response) {
                 $scope.allEnvironments = response.data;
+                $scope.allEnvironments.sort(function(a, b) {
+                    if (a.name < b.name) { return -1; }
+                    if (a.name > b.name) { return 1; }
+                    return 0;
+                })
             });
 
             apolloApiService.getAllServices().then(function(response) {
                 $scope.allServices = response.data;
+                $scope.allServices.sort(function (a, b) {
+                    if (a.name < b.name) { return -1; }
+                    if (a.name > b.name) { return 1; }
+                    return 0;
+                })
             });
 }]);

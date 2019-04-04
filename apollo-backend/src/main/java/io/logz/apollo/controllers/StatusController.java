@@ -128,6 +128,27 @@ public class StatusController {
         return  kubernetesDeploymentStatus;
     }
 
+    @GET("/status/environment/{envId}/service/{serviceId}/all-groups")
+    public List<KubernetesDeploymentStatus> getStatusesWithGroups(int envId, int serviceId) {
+
+        Environment environment = environmentDao.getEnvironment(envId);
+        KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(environment);
+        Service service = serviceDao.getService(serviceId);
+        List<KubernetesDeploymentStatus> kubernetesDeploymentStatuses = new ArrayList<>();
+
+        List<Group> groups = groupDao.getGroupsPerServiceAndEnvironment(serviceId,envId);
+
+        if (service != null) {
+            try {
+                groups.forEach(group -> kubernetesDeploymentStatuses.add(kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()))));
+            } catch (Exception e) {
+                logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
+            }
+        }
+
+        return kubernetesDeploymentStatuses;
+    }
+
     @GET("/status/environment/{envId}/service/{serviceId}")
     public KubernetesDeploymentStatus getOneSpecificStatus(int envId, int serviceId) {
 

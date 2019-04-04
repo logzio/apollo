@@ -40,6 +40,10 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + 'group/environment/' + environmentId + '/service/' + serviceId);
     };
 
+    var getGroupsPerService = function (serviceId) {
+        return $http.get(CONFIG.appUrl + 'group/service/' + serviceId);
+    };
+
     var getDeployableVersionBasedOnSha = function (sha, serviceId) {
         return $http.get(CONFIG.appUrl + 'deployable-version/sha/' + sha + '/service/' + serviceId);
     };
@@ -165,9 +169,13 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId + "/group/" + groupName);
     };
 
-    var statusOfEnvironmentAndService = function (environmentId, serviceId, groupName) {
+    var statusOfEnvironmentAndService = function (environmentId, serviceId) {
         return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId);
     };
+
+    var allGroupsStatusesOfEnvironmentAndService = function (environmentId, serviceId) {
+            return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId + "/all-groups");
+        };
 
     var latestCreatedPod = function (environmentId, serviceId) {
         return $http.get(CONFIG.appUrl + "status/environment/" + environmentId + "/service/" + serviceId + "/latestpod");
@@ -339,6 +347,7 @@ function ApiService($q, $http){
         getAllDeployableVersions: getAllDeployableVersions,
         getAllGroups: getAllGroups,
         getGroupsPerServiceAndEnvironment: getGroupsPerServiceAndEnvironment,
+        getGroupsPerService: getGroupsPerService,
         getDeployableVersionBasedOnSha: getDeployableVersionBasedOnSha,
         getDeployableVersionForMultiServices : getDeployableVersionForMultiServices,
         getLatestDeployableVersionsByServiceId: getLatestDeployableVersionsByServiceId,
@@ -387,6 +396,7 @@ function ApiService($q, $http){
         getAllDeploymentRoles: getAllDeploymentRoles,
         addUserToDeploymentRole: addUserToDeploymentRole,
         statusOfEnvironmentAndService: statusOfEnvironmentAndService,
-        statusOfEnvironmentAndServiceWithGroup: statusOfEnvironmentAndServiceWithGroup
+        statusOfEnvironmentAndServiceWithGroup: statusOfEnvironmentAndServiceWithGroup,
+        allGroupsStatusesOfEnvironmentAndService : allGroupsStatusesOfEnvironmentAndService
     };
 }
