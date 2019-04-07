@@ -136,9 +136,8 @@ public class StatusController {
         Service service = serviceDao.getService(serviceId);
         List<KubernetesDeploymentStatus> kubernetesDeploymentStatuses = new ArrayList<>();
 
-        List<Group> groups = groupDao.getGroupsPerServiceAndEnvironment(serviceId,envId);
-
         if (service != null) {
+            List<Group> groups = groupDao.getGroupsPerServiceAndEnvironment(serviceId,envId);
             try {
                 groups.forEach(group -> kubernetesDeploymentStatuses.add(kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()))));
             } catch (Exception e) {

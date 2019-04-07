@@ -79,7 +79,7 @@
                         <div class="panel-body">
                             <table class="table">
                                 <tr><td colspan="2">Environment</td><td colspan="2">{{selectedEnvironment.name}}</td></tr>
-                                <tr><td colspan="2" ng-if="selectedService.isPartOfGroup">Group</td><td colspan="2"><!--{{selectedGroup.name}}-->{{status.groupName}}</td></tr>
+                                <tr><td colspan="2" ng-if="selectedService.isPartOfGroup">Group</td><td colspan="2">{{status.groupName}}</td></tr>
                                 <tr><td colspan="2">Commit</td><td colspan="2"><a target="_blank" href="{{deployableVersion.commitUrl}}">{{status.gitCommitSha | limitTo: 7}}</a></td></tr>
                                 <tr><td>Replicas</td><td>{{status.replicas || 0}}</td><td>Available Replicas</td><td>{{status.availableReplicas || 0}}</td></tr>
                                 <tr><td>Updated Replicas</td><td>{{status.updatedReplicas || 0}}</td><td>Unavailable Replicas</td><td>{{status.unavailableReplicas || 0}}</td></tr>

@@ -7,6 +7,7 @@ angular.module('apollo')
 
             var execTypeName = "exec";
             var logsTypeName = "logs";
+            var errorMessage = "An error occurred in getting k8s status";
 
             $scope.currentScreen = "selectServiceAndEnvironment";
             $scope.selectedService = null;
@@ -27,15 +28,11 @@ angular.module('apollo')
                             $scope.kubernetesDeploymentStatus = response.data;
                             $scope.currentScreen = "results";
                             }, function (error) {
-                                growl.error("An error occurred in getting k8s status", {ttl:7000});
+                                growl.error(errorMessage, {ttl:7000});
                         });
-                    } else if ($scope.selectedEnvironment != null) { //error in case of unselected environment
-                        growl.error("Please unselect the environment you chose", {ttl:7000});
-                    } else if (!$scope.selectedService.isPartOfGroup) { //ungrouped service
-                        growl.error("Oh oh, you selected an ungrouped service", {ttl:7000});
+                    } else { //some unknown error
+                        growl.error("Something went wrong... Please try again", {ttl:7000});
                     }
-                } else if ($scope.selectedService === null) { //error in case of unselected service
-                    growl.error("What do you want? You didn't select any service", {ttl:7000});
                 } else { //some unknown error
                     growl.error("Something went wrong... Please try again", {ttl:7000});
                 }
@@ -71,7 +68,7 @@ angular.module('apollo')
 
                             },
                             function (error) {
-                                growl.error("An error occurred in getting k8s status", {ttl:7000});
+                                growl.error(errorMessage, {ttl:7000});
                             });
                     } else { //service is not part of group
                         apolloApiService.statusOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id).then(
@@ -80,7 +77,7 @@ angular.module('apollo')
                                 $scope.currentScreen = "results";
                             },
                             function (error) {
-                                growl.error("An error occurred in getting k8s status", {ttl:7000});
+                                growl.error("An error occurred in getting k8s status, there is no status for this service in the current environment", {ttl:7000});
                             });
                     }
                 }
@@ -104,8 +101,6 @@ angular.module('apollo')
             };
 
             $scope.restartAllPods = function () {
-
-                console.log("serviceID: " + $scope.selectedService.id + ", envID: " + $scope.selectedEnvironment.id + ", group name: " + $scope.selectedGroup.name);
 
                 usSpinnerService.spin('result-spinner');
 
@@ -194,15 +189,6 @@ angular.module('apollo')
             $scope.openHawtio = function (podStatus) {
                 $window.open(apolloApiService.getHawtioLink($scope.selectedStatus.environmentId, podStatus.name));
             };
-
-            function populateDeployableVersions() {
-                $scope.deployableVersion;
-                if ($scope.kubernetesDeploymentStatus !== null) {
-                    apolloApiService.getDeployableVersionBasedOnSha($scope.kubernetesDeploymentStatus.gitCommitSha, $scope.kubernetesDeploymentStatus.serviceId).then(function (response) {
-                        $scope.deployableVersion = response.data;
-                    });
-                }
-            }
 
             $scope.setSelectedService = function (service) {
                 $scope.selectedService = service;
