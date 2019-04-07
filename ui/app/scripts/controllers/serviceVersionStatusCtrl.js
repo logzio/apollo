@@ -7,148 +7,110 @@ angular.module('apollo')
 
             var execTypeName = "exec";
             var logsTypeName = "logs";
+            var errorMessage = "An error occurred in getting k8s status";
 
-            $scope.filteredResults = [];
-            $scope.selectedStatus = null;
+            $scope.currentScreen = "selectServiceAndEnvironment";
+            $scope.selectedService = null;
+            $scope.selectedEnvironment = null;
+            $scope.selectedGroup = null;
+            $scope.serviceGroups = null;
+            $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
-            $scope.currentScreen = "filters";
-            $scope.showingBy = null;
-            $scope.showingByValue = null;
-            $scope.websocket = null;
-            $scope.term = null;
-            $scope.websocketScope = null;
-            $scope.terminalHeader = null;
 
-            $scope.showByService = function(service) {
-                usSpinnerService.spin('result-spinner');
-                $scope.filteredResults = [];
-                apolloApiService.serviceStatus(service.id).then(function (response) {
-                    $scope.filteredResults = response.data;
-                    $scope.filteredResults = $scope.filteredResults.filter(function(x){ return x !== null; });
-                    populateDeployableVersions();
-                    refreshPreSelectedStatus();
+            $scope.setSelectedGroup = function(group) {
+                $scope.selectedGroup = group;
+            }
 
-                    if (service.isPartOfGroup) {
-                        var groupedByEnvironment = [];
-                        $scope.filteredResults.forEach(function (kubeDeploymentStatus) {
-                            var first = true;
-                            groupedByEnvironment.forEach(function (existingKubeDeploymentStatus) {
-                                if (existingKubeDeploymentStatus.environmentId === kubeDeploymentStatus.environmentId) {
-                                    first = false;
-                                    existingKubeDeploymentStatus.nestedKubeDeploymentStatuses.push(kubeDeploymentStatus);
-                                }
-                            });
-                            if (first) {
-                                kubeDeploymentStatus.nestedKubeDeploymentStatuses = [kubeDeploymentStatus];
-                                groupedByEnvironment.push(kubeDeploymentStatus);
-                            }
+            $scope.showAllGroupsOfService = function() {
+                if ($scope.selectedService != null && $scope.selectedEnvironment != null) { //selected service and environment
+                    if ($scope.selectedService.isPartOfGroup) { //service is part of group
+                        apolloApiService.allGroupsStatusesOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id).then(function (response) {
+                            $scope.kubernetesDeploymentStatus = response.data;
+                            $scope.currentScreen = "results";
+                            }, function (error) {
+                                growl.error(errorMessage, {ttl:7000});
                         });
-                        $scope.filteredResults = groupedByEnvironment;
-                    } else {
-                        $scope.filteredResults.forEach(function (kubeDeploymentStatus) {
-                            kubeDeploymentStatus.nestedKubeDeploymentStatuses = [];
-                        });
+                    } else { //some unknown error
+                        growl.error("Something went wrong... Please try again", {ttl:7000});
                     }
+                } else { //some unknown error
+                    growl.error("Something went wrong... Please try again", {ttl:7000});
+                }
+            }
 
-                    usSpinnerService.stop('result-spinner');
-                });
-                $scope.currentScreen = "results";
-                $scope.showingBy = "service";
-                $scope.showingByValue = service;
-            };
+            $scope.showByEnvironmentAndService = function() {
 
-            $scope.showByEnvironment = function(environmentId) {
-                usSpinnerService.spin('result-spinner');
-                $scope.filteredResults = [];
-                apolloApiService.environmentStatus(environmentId).then(function (response) {
-                    $scope.filteredResults = response.data;
-                    $scope.filteredResults = $scope.filteredResults.filter(function(x){ return x !== null; });
-                    populateDeployableVersions();
-                    refreshPreSelectedStatus();
-
-                    var groupedByService = [];
-                    $scope.filteredResults.forEach(function (kubeDeploymentStatus) {
-                        if (kubeDeploymentStatus.groupName === null) {
-                            kubeDeploymentStatus.nestedKubeDeploymentStatuses = [];
-                            groupedByService.push(kubeDeploymentStatus);
+                if ($scope.selectedService === null || $scope.selectedEnvironment === null) { //unselected service or environment
+                    growl.error("Please select a service and an environment!", {ttl:7000});
+                    return;
+                } else if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup === null) { //service is part of group but no group is selected -> show available groups
+                    if ($scope.currentScreen == "selectGroup") {
+                        growl.error("Please select a group... :)", {ttl:7000});
+                        return;
+                    }
+                    apolloApiService.getGroupsPerServiceAndEnvironment($scope.selectedEnvironment.id, $scope.selectedService.id).then(function (response) {
+                        $scope.serviceGroups = response.data;
+                        if (response.data.length === 0) {
+                            growl.error("No available groups for the service and environment you selected", {ttl:7000});
+                            return;
                         } else {
-                            var first = true;
-                            groupedByService.forEach(function (existingKubeDeploymentStatus) {
-                                if (existingKubeDeploymentStatus.serviceId === kubeDeploymentStatus.serviceId) {
-                                    first = false;
-                                    existingKubeDeploymentStatus.nestedKubeDeploymentStatuses.push(kubeDeploymentStatus);
-                                }
-                            });
-                            if (first) {
-                                kubeDeploymentStatus.nestedKubeDeploymentStatuses = [kubeDeploymentStatus];
-                                groupedByService.push(kubeDeploymentStatus);
-                            }
+                            $scope.currentScreen = "selectGroup";
+                            return;
                         }
                     });
-                    $scope.filteredResults = groupedByService;
-                    usSpinnerService.stop('result-spinner');
-                });
-                $scope.currentScreen = "results";
-                $scope.showingBy = "environment";
-                $scope.showingByValue = environmentId;
-            };
+                } else if ($scope.selectedService !== null && $scope.selectedEnvironment !== null) { //selected environment and service
 
-            $scope.backToFilter = function() {
-                $scope.currentScreen = "filters";
-            };
+                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup !== null) { //service is part of group and selected group
+                        apolloApiService.statusOfEnvironmentAndServiceWithGroup($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroup.name).then(
+                            function (response) {
+                                $scope.kubernetesDeploymentStatus.push(response.data);
+                                $scope.currentScreen = "results";
 
-            $scope.setSelectedStatus = function (status) {
-                $scope.selectedStatus = status;
-            };
-
-            $scope.setWebsocketScope = function (scope) {
-                $scope.websocketScope = scope;
-
-                if (scope === execTypeName) {
-                    $scope.terminalHeader = "Live Session to " + $scope.selectedPodStatus.name;
-                } else if (scope === logsTypeName) {
-                    $scope.terminalHeader = "Live Tail on " + $scope.selectedPodStatus.name;
+                            },
+                            function (error) {
+                                growl.error(errorMessage, {ttl:7000});
+                            });
+                    } else { //service is not part of group
+                        apolloApiService.statusOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id).then(
+                            function (response) {
+                                $scope.kubernetesDeploymentStatus.push(response.data);
+                                $scope.currentScreen = "results";
+                            },
+                            function (error) {
+                                growl.error("An error occurred in getting k8s status, there is no status for this service in the current environment", {ttl:7000});
+                            });
+                    }
                 }
+            }
+
+            $scope.selectPod = function (podStatus) {
+                $scope.selectedPodStatus = podStatus;
             };
 
             $scope.restartPod = function (podName) {
 
                 usSpinnerService.spin('result-spinner');
 
-                apolloApiService.restartPod($scope.selectedStatus.environmentId, podName).then(function (response) {
+                apolloApiService.restartPod($scope.selectedEnvironment.id, podName).then(function (response) {
                     usSpinnerService.stop('result-spinner');
                     growl.success("Successfully restarted pod " + podName + "!");
                 }, function (error) {
                     usSpinnerService.stop('result-spinner');
-                    growl.error("Could not restart pod! got: " + error.statusText);
+                    growl.error("Could not restart pod! got: " + error.statusText, {ttl:7000});
                 });
             };
 
-            $scope.restartAllPods = function (environmentId, serviceId, groupName) {
-
-                console.log("serviceID: " + serviceId + ", envID: " + environmentId + ", group name: " + groupName);
+            $scope.restartAllPods = function () {
 
                 usSpinnerService.spin('result-spinner');
 
-                apolloApiService.restartAllPods(environmentId, serviceId, groupName).then(function (response) {
+                apolloApiService.restartAllPods($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroup.name).then(function (response) {
                     usSpinnerService.stop('result-spinner');
                     growl.success("Successfully restarted all pods!");
                 }, function (error) {
                     usSpinnerService.stop('result-spinner');
-                    growl.error("Could not restart the pods! got: " + error.statusText);
+                    growl.error("Could not restart the pods! got: " + error.statusText, {ttl:7000});
                 });
-            };
-
-            $scope.refreshStatus = function () {
-                if ($scope.showingBy === "service") {
-                    $scope.showByService($scope.showingByValue);
-                } else {
-                    $scope.showByEnvironment($scope.showingByValue);
-                }
-            };
-
-            $scope.selectPod = function (podStatus) {
-                $scope.selectedPodStatus = podStatus;
             };
 
             $scope.startWebSocket = function (containerName) {
@@ -157,8 +119,8 @@ angular.module('apollo')
                         scrollback: 3000
                     });
 
-                    var environmentId = $scope.selectedStatus.environmentId;
-                    var serviceId = $scope.selectedStatus.serviceId;
+                    var environmentId = $scope.selectedEnvironment.id;
+                    var serviceId = $scope.selectedService.id;
                     var podName = $scope.selectedPodStatus.name;
 
                     var execUrl = null;
@@ -168,7 +130,7 @@ angular.module('apollo')
                     } else if ($scope.websocketScope === logsTypeName){
                         execUrl = apolloApiService.getWebsocketLogUrl(environmentId, serviceId, podName, containerName);
                     } else {
-                        growl.error("Unexpected error!");
+                        growl.error("Unexpected error!", {ttl:7000});
                         return;
                     }
 
@@ -214,55 +176,44 @@ angular.module('apollo')
                 }
             };
 
+            $scope.setWebsocketScope = function (scope) {
+                $scope.websocketScope = scope;
+
+                if (scope === execTypeName) {
+                    $scope.terminalHeader = "Live Session to " + $scope.selectedPodStatus.name;
+                } else if (scope === logsTypeName) {
+                    $scope.terminalHeader = "Live Tail on " + $scope.selectedPodStatus.name;
+                }
+            };
+
             $scope.openHawtio = function (podStatus) {
                 $window.open(apolloApiService.getHawtioLink($scope.selectedStatus.environmentId, podStatus.name));
             };
 
-            function refreshPreSelectedStatus() {
-                if ($scope.selectedStatus) {
-
-                    // Refresh the view for the user
-                    $scope.selectedStatus = $scope.filteredResults.filter(function (filtered) {
-                        if (filtered) {
-                            return (filtered.serviceId === $scope.selectedStatus.serviceId && filtered.environmentId === $scope.selectedStatus.environmentId);
-                        }
-                    })[0];
-                }
+            $scope.setSelectedService = function (service) {
+                $scope.selectedService = service;
             }
 
-            function fetchLatestLogs() {
-                apolloApiService.logsFromStatus($scope.selectedStatus.environmentId, $scope.selectedStatus.serviceId).then(function(response) {
-                    $scope.dockerLogs = response.data;
-                });
-            }
-
-            function populateDeployableVersions(service) {
-                $scope.deployableVersions = [];
-                $scope.filteredResults.forEach(function (status) {
-                    if (status !== null) {
-                        apolloApiService.getDeployableVersionBasedOnSha(status.gitCommitSha, status.serviceId).then(function (response) {
-                            $scope.deployableVersions[response.data.gitCommitSha] = response.data;
-                        });
-                    }
-                });
+            $scope.setSelectedEnvironment = function (environment) {
+                $scope.selectedEnvironment = environment;
             }
 
             // Data fetching
             apolloApiService.getAllEnvironments().then(function(response) {
-                var tempEnvironment = {};
-                response.data.forEach(function(environment) {
-                    tempEnvironment[environment.id] = environment;
-                });
-
-                $scope.allEnvironments = tempEnvironment;
+                $scope.allEnvironments = response.data;
+                $scope.allEnvironments.sort(function(a, b) {
+                    if (a.name < b.name) { return -1; }
+                    if (a.name > b.name) { return 1; }
+                    return 0;
+                })
             });
 
             apolloApiService.getAllServices().then(function(response) {
-                var tempServices = {};
-                response.data.forEach(function(service) {
-                    tempServices[service.id] = service;
-                });
-
-                $scope.allServices = tempServices;
+                $scope.allServices = response.data;
+                $scope.allServices.sort(function (a, b) {
+                    if (a.name < b.name) { return -1; }
+                    if (a.name > b.name) { return 1; }
+                    return 0;
+                })
             });
 }]);

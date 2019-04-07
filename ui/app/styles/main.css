@@ -269,3 +269,7 @@ table.table.table-hover tbody tr td .mark-as-favorite-container:hover {
 table.table.table-hover tbody tr td .mark-as-favorite-container:active {
     color: #ca7302;
 }
+
+.apollo-form-control-ident-follow-h2 {
+    margin-top: 20px;
+}
