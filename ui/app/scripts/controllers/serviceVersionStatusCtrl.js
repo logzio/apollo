@@ -17,6 +17,7 @@ angular.module('apollo')
             $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
 
+
             $scope.setSelectedGroup = function(group) {
                 $scope.selectedGroup = group;
             }
@@ -188,6 +189,10 @@ angular.module('apollo')
 
             $scope.openHawtio = function (podStatus) {
                 $window.open(apolloApiService.getHawtioLink($scope.selectedStatus.environmentId, podStatus.name));
+            };
+
+            $scope.setSelectedStatus = function (status) {
+                $scope.selectedStatus = status;
             };
 
             $scope.setSelectedService = function (service) {
