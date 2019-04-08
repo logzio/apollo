@@ -90,7 +90,7 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <a data-toggle="modal" data-target="#view-pods">
-                                            <span class="pull-left">View Pods</span>
+                                            <span ng-click="setSelectedStatus(status)" class="pull-left">View Pods</span>
                                             <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                         </a>
                                     </div>
@@ -113,7 +113,7 @@
                     <h4 class="modal-title">Pods Details</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="table-responsive" ng-repeat="status in kubernetesDeploymentStatus">
+                    <div class="table-responsive" ng-repeat="podStatus in selectedStatus.podStatuses">
                         <table class="table">
                             <thead>
                             <tr>
@@ -127,7 +127,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="podStatus in status.podStatuses">
+                            <tr>
                                 <td>{{podStatus.name}}</td>
                                 <td>{{podStatus.hostIp}}</td>
                                 <td>{{podStatus.podIp}}</td>
