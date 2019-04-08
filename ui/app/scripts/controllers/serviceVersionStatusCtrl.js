@@ -17,6 +17,7 @@ angular.module('apollo')
             $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
 
+
             $scope.setSelectedGroup = function(group) {
                 $scope.selectedGroup = group;
             }
