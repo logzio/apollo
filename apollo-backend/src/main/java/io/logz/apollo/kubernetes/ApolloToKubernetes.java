@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.HashMap;
 
 import static java.util.Objects.requireNonNull;
-
 /**
  * Created by roiravhon on 1/31/17.
  */
