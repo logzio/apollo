@@ -190,6 +190,10 @@ angular.module('apollo')
                 $window.open(apolloApiService.getHawtioLink($scope.selectedStatus.environmentId, podStatus.name));
             };
 
+            $scope.setSelectedStatus = function (status) {
+                $scope.selectedStatus = status;
+            };
+
             $scope.setSelectedService = function (service) {
                 $scope.selectedService = service;
             }
