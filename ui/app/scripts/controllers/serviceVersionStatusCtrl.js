@@ -1,7 +1,6 @@
 'use strict';
 
 angular.module('apollo')
-
   .controller('serviceVersionStatusCtrl', ['apolloApiService', '$scope',
                                     '$timeout', '$state', '$interval', '$window','growl', 'usSpinnerService',
             function (apolloApiService, $scope, $timeout, $state, $interval, $window, growl, usSpinnerService) {
