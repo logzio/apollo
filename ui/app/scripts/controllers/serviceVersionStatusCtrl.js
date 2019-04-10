@@ -8,7 +8,6 @@ angular.module('apollo')
             var execTypeName = "exec";
             var logsTypeName = "logs";
             var errorMessage = "An error occurred in getting k8s status";
-
             $scope.currentScreen = "selectServiceAndEnvironment";
             $scope.selectedService = null;
             $scope.selectedEnvironment = null;
