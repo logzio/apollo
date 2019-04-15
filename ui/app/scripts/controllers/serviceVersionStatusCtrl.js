@@ -115,6 +115,10 @@ angular.module('apollo')
                 });
             };
 
+            $scope.refreshStatus = function() {
+                $scope.showByEnvironmentAndService();
+            }
+
             $scope.startWebSocket = function (containerName) {
                 setTimeout(function () {
                     $scope.term = new Terminal({
