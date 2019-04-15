@@ -116,6 +116,7 @@ angular.module('apollo')
             };
 
             $scope.refreshStatus = function() {
+                $scope.kubernetesDeploymentStatus = [];
                 $scope.showByEnvironmentAndService();
             }
 
