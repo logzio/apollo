@@ -104,7 +104,7 @@ angular.module('apollo')
 
                 usSpinnerService.spin('result-spinner');
 
-                groupName = $scope.selectedGroup == null ? null : $scope.selectedGroup.name
+                var groupName = $scope.selectedGroup === null ? null : $scope.selectedGroup.name
 
                 apolloApiService.restartAllPods($scope.selectedEnvironment.id, $scope.selectedService.id, groupName).then(function (response) {
                     usSpinnerService.stop('result-spinner');
