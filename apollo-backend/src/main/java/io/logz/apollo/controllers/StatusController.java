@@ -76,7 +76,9 @@ public class StatusController {
                 });
             } else {
                 try {
-                    kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service));
+                    KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+                    kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                    kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                 } catch (Exception e) {
                     logger.warn("Could not get status of service {}, on environment {}! trying others..", id, environment.getId(), e);
                 }
