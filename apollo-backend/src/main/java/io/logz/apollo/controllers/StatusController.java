@@ -143,7 +143,11 @@ public class StatusController {
         if (service != null) {
             List<Group> groups = groupDao.getGroupsPerServiceAndEnvironment(serviceId,envId);
             try {
-                groups.forEach(group -> kubernetesDeploymentStatuses.add(kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()))));
+                groups.forEach(group -> {
+                    KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()));
+                    kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, serviceId);
+                    kubernetesDeploymentStatuses.add(kubernetesDeploymentStatus);
+                });
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
@@ -163,12 +167,7 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
-                if (kubernetesDeploymentStatus != null && kubernetesDeploymentStatus.getGitCommitSha() != null) {
-                    DeployableVersion deployableVersion = deployableVersionController.getDeployableVersionFromSha(kubernetesDeploymentStatus.getGitCommitSha(), serviceId);
-                    if (deployableVersion != null) {
-                        kubernetesDeploymentStatus.setGitCommitUrl(deployableVersion.getCommitUrl());
-                    }
-                }
+                kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, serviceId);
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
@@ -239,5 +238,15 @@ public class StatusController {
             throw new IllegalArgumentException("Please pass timeUnit parameter in TimeUnit type template", e.getCause());
         }
         return serviceStatusHandler.getUndeployedServicesByAvailability(availability, timeUnitEnum, duration);
+    }
+
+    private KubernetesDeploymentStatus addCommitUrlToStatus(KubernetesDeploymentStatus kubernetesDeploymentStatus, int serviceId) {
+        if (kubernetesDeploymentStatus != null && kubernetesDeploymentStatus.getGitCommitSha() != null) {
+            DeployableVersion deployableVersion = deployableVersionController.getDeployableVersionFromSha(kubernetesDeploymentStatus.getGitCommitSha(), serviceId);
+            if (deployableVersion != null) {
+                kubernetesDeploymentStatus.setGitCommitUrl(deployableVersion.getCommitUrl());
+            }
+        }
+        return kubernetesDeploymentStatus;
     }
 }
