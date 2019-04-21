@@ -67,7 +67,9 @@ public class StatusController {
                 relatedGroups.forEach(group -> {
                     String groupName = group.getName();
                     try {
-                        kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service, Optional.of(groupName)));
+                        KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
+                        kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                        kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                     } catch (Exception e) {
                         logger.warn("Could not get status of service {}, on environment {}, group {}! trying others..", id, environment.getId(), groupName, e);
                     }
@@ -96,14 +98,18 @@ public class StatusController {
                 relatedGroups.forEach(group -> {
                     String groupName = group.getName();
                     try {
-                        kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service, Optional.of(groupName)));
+                        KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
+                        kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                        kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                     } catch (Exception e) {
                         logger.warn("Could not get status of service {}, on environment {}, group {}! trying others..", service.getId(), id, groupName, e);
                     }
                 });
             } else {
                 try {
-                    kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service));
+                    KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+                    kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                    kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                 } catch (Exception e) {
                     logger.warn("Could not get status of service {} on environment {}! trying others..", service.getId(), id, e);
                 }
@@ -124,12 +130,13 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
+                kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, serviceId);
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}, group {}!", service.getId(), envId, groupName, e);
             }
         }
 
-        return  kubernetesDeploymentStatus;
+        return kubernetesDeploymentStatus;
     }
 
     @GET("/status/environment/{envId}/service/{serviceId}/all-groups")
