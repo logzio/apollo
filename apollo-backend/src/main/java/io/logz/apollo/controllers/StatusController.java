@@ -7,6 +7,7 @@ import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
+import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
@@ -40,15 +41,18 @@ public class StatusController {
     private final ServiceDao serviceDao;
     private final GroupDao groupDao;
     private final ServiceStatusHandler serviceStatusHandler;
+    private final DeployableVersionController deployableVersionController;
 
     @Inject
     public StatusController(KubernetesHandlerStore kubernetesHandlerStore, EnvironmentDao environmentDao,
-                            ServiceDao serviceDao, GroupDao groupDao, ServiceStatusHandler serviceStatusHandler) {
+                            ServiceDao serviceDao, GroupDao groupDao, ServiceStatusHandler serviceStatusHandler,
+                            DeployableVersionController deployableVersionController) {
         this.kubernetesHandlerStore = requireNonNull(kubernetesHandlerStore);
         this.environmentDao = requireNonNull(environmentDao);
         this.serviceDao = requireNonNull(serviceDao);
         this.groupDao = requireNonNull(groupDao);
         this.serviceStatusHandler = requireNonNull(serviceStatusHandler);
+        this.deployableVersionController = deployableVersionController;
     }
 
     @GET("/status/service/{id}")
@@ -159,6 +163,12 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+                if (kubernetesDeploymentStatus != null && kubernetesDeploymentStatus.getGitCommitSha() != null) {
+                    DeployableVersion deployableVersion = deployableVersionController.getDeployableVersionFromSha(kubernetesDeploymentStatus.getGitCommitSha(), serviceId);
+                    if (deployableVersion != null) {
+                        kubernetesDeploymentStatus.setGitCommitUrl(deployableVersion.getCommitUrl());
+                    }
+                }
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
