@@ -68,7 +68,7 @@ public class StatusController {
                     String groupName = group.getName();
                     try {
                         KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
-                        kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                        kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
                         kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                     } catch (Exception e) {
                         logger.warn("Could not get status of service {}, on environment {}, group {}! trying others..", id, environment.getId(), groupName, e);
@@ -77,7 +77,7 @@ public class StatusController {
             } else {
                 try {
                     KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
-                    kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                    kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
                     kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                 } catch (Exception e) {
                     logger.warn("Could not get status of service {}, on environment {}! trying others..", id, environment.getId(), e);
@@ -101,7 +101,7 @@ public class StatusController {
                     String groupName = group.getName();
                     try {
                         KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
-                        kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                        kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
                         kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                     } catch (Exception e) {
                         logger.warn("Could not get status of service {}, on environment {}, group {}! trying others..", service.getId(), id, groupName, e);
@@ -110,7 +110,7 @@ public class StatusController {
             } else {
                 try {
                     KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
-                    kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, service.getId());
+                    kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
                     kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                 } catch (Exception e) {
                     logger.warn("Could not get status of service {} on environment {}! trying others..", service.getId(), id, e);
@@ -132,7 +132,7 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
-                kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, serviceId);
+                kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, serviceId));
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}, group {}!", service.getId(), envId, groupName, e);
             }
@@ -154,7 +154,7 @@ public class StatusController {
             try {
                 groups.forEach(group -> {
                     KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()));
-                    kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, serviceId);
+                    kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, serviceId));
                     kubernetesDeploymentStatuses.add(kubernetesDeploymentStatus);
                 });
             } catch (Exception e) {
@@ -176,7 +176,7 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
-                kubernetesDeploymentStatus = addCommitUrlToStatus(kubernetesDeploymentStatus, serviceId);
+                kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, serviceId));
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
@@ -249,13 +249,14 @@ public class StatusController {
         return serviceStatusHandler.getUndeployedServicesByAvailability(availability, timeUnitEnum, duration);
     }
 
-    private KubernetesDeploymentStatus addCommitUrlToStatus(KubernetesDeploymentStatus kubernetesDeploymentStatus, int serviceId) {
+    private String getCommitUrl(KubernetesDeploymentStatus kubernetesDeploymentStatus, int serviceId) {
+        String gitCommitUrl = null;
         if (kubernetesDeploymentStatus != null && kubernetesDeploymentStatus.getGitCommitSha() != null) {
             DeployableVersion deployableVersion = deployableVersionController.getDeployableVersionFromSha(kubernetesDeploymentStatus.getGitCommitSha(), serviceId);
             if (deployableVersion != null) {
-                kubernetesDeploymentStatus.setGitCommitUrl(deployableVersion.getCommitUrl());
+                gitCommitUrl = deployableVersion.getCommitUrl();
             }
         }
-        return kubernetesDeploymentStatus;
+        return gitCommitUrl;
     }
 }
