@@ -12,13 +12,13 @@ angular.module('apollo')
             $scope.currentScreen = "selectServiceAndEnvironment";
             $scope.selectedService = null;
             $scope.selectedEnvironment = null;
-            $scope.selectedGroup = null;
+            $scope.selectedGroupName = null;
             $scope.serviceGroups = null;
             $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
 
-            $scope.setSelectedGroup = function(group) {
-                $scope.selectedGroup = group;
+            $scope.setSelectedGroupName = function(groupName) {
+                $scope.selectedGroupName = groupName;
             }
 
             $scope.showAllGroupsOfService = function() {
@@ -43,7 +43,7 @@ angular.module('apollo')
                 if ($scope.selectedService === null || $scope.selectedEnvironment === null) { //unselected service or environment
                     growl.error("Please select a service and an environment!", {ttl:7000});
                     return;
-                } else if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup === null) { //service is part of group but no group is selected -> show available groups
+                } else if ($scope.selectedService.isPartOfGroup && $scope.selectedGroupName === null) { //service is part of group but no group is selected -> show available groups
                     if ($scope.currentScreen == "selectGroup") {
                         growl.error("Please select a group... :)", {ttl:7000});
                         return;
@@ -70,8 +70,8 @@ angular.module('apollo')
                           $scope.currentScreen = "results";
                           resolve();
                       }
-                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup !== null) { //service is part of group and selected group
-                        apolloApiService.statusOfEnvironmentAndServiceWithGroup($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroup.name)
+                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroupName !== null) { //service is part of group and selected group
+                        apolloApiService.statusOfEnvironmentAndServiceWithGroup($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroupName)
                         .then(responseReceived, handleError)
                     } else { //service is not part of group
                         apolloApiService.statusOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id)
@@ -102,9 +102,7 @@ angular.module('apollo')
 
                 usSpinnerService.spin('result-spinner');
 
-                var groupName = $scope.selectedGroup === null ? null : $scope.selectedGroup.name
-
-                apolloApiService.restartAllPods($scope.selectedEnvironment.id, $scope.selectedService.id, groupName).then(function (response) {
+                apolloApiService.restartAllPods($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroupName).then(function (response) {
                     usSpinnerService.stop('result-spinner');
                     growl.success("Successfully restarted all pods!");
                 }, function (error) {
@@ -212,12 +210,8 @@ angular.module('apollo')
                 getService(status.serviceId)
                 .then(service => {
                     if (service.isPartOfGroup) {
-                        getGroup(status.groupName)
-                        .then(group => {
-                            $scope.selectedGroup = group;
-                        });
+                        $scope.selectedGroupName = status.groupName;
                     }
-
                 });
             };
 
@@ -225,13 +219,6 @@ angular.module('apollo')
                 return apolloApiService.getAllServices()
                     .then((response) => {
                         return response.data.find(currService => currService.id === serviceId);
-                    });
-            }
-
-            var getGroup = function (groupName) {
-                return apolloApiService.getGroupByName(groupName)
-                    .then((response) => {
-                        return response.data;
                     });
             }
 

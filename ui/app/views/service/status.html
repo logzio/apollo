@@ -40,7 +40,7 @@
             <div>
                 <h2 class="text-left col-lg-3">Select Group</h2>
                     <div class="text-center col-lg-6 col-lg-offset-1">
-                        <select class="form-control apollo-form-control-ident-follow-h2"  ng-model="group" ng-change="setSelectedGroup(group)" ng-options="group.name for group in serviceGroups">
+                        <select class="form-control apollo-form-control-ident-follow-h2"  ng-model="group" ng-change="setSelectedGroupName(group.name)" ng-options="group.name for group in serviceGroups">
                             <option value="">Choose group</option>
                         </select>
                     </div>
