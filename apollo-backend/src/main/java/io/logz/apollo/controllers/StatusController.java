@@ -7,6 +7,7 @@ import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.kubernetes.KubernetesHandler;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
+import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
@@ -40,15 +41,18 @@ public class StatusController {
     private final ServiceDao serviceDao;
     private final GroupDao groupDao;
     private final ServiceStatusHandler serviceStatusHandler;
+    private final DeployableVersionController deployableVersionController;
 
     @Inject
     public StatusController(KubernetesHandlerStore kubernetesHandlerStore, EnvironmentDao environmentDao,
-                            ServiceDao serviceDao, GroupDao groupDao, ServiceStatusHandler serviceStatusHandler) {
+                            ServiceDao serviceDao, GroupDao groupDao, ServiceStatusHandler serviceStatusHandler,
+                            DeployableVersionController deployableVersionController) {
         this.kubernetesHandlerStore = requireNonNull(kubernetesHandlerStore);
         this.environmentDao = requireNonNull(environmentDao);
         this.serviceDao = requireNonNull(serviceDao);
         this.groupDao = requireNonNull(groupDao);
         this.serviceStatusHandler = requireNonNull(serviceStatusHandler);
+        this.deployableVersionController = deployableVersionController;
     }
 
     @GET("/status/service/{id}")
@@ -63,14 +67,18 @@ public class StatusController {
                 relatedGroups.forEach(group -> {
                     String groupName = group.getName();
                     try {
-                        kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service, Optional.of(groupName)));
+                        KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
+                        kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
+                        kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                     } catch (Exception e) {
                         logger.warn("Could not get status of service {}, on environment {}, group {}! trying others..", id, environment.getId(), groupName, e);
                     }
                 });
             } else {
                 try {
-                    kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service));
+                    KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+                    kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
+                    kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                 } catch (Exception e) {
                     logger.warn("Could not get status of service {}, on environment {}! trying others..", id, environment.getId(), e);
                 }
@@ -92,14 +100,18 @@ public class StatusController {
                 relatedGroups.forEach(group -> {
                     String groupName = group.getName();
                     try {
-                        kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service, Optional.of(groupName)));
+                        KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
+                        kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
+                        kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                     } catch (Exception e) {
                         logger.warn("Could not get status of service {}, on environment {}, group {}! trying others..", service.getId(), id, groupName, e);
                     }
                 });
             } else {
                 try {
-                    kubernetesDeploymentStatusList.add(kubernetesHandler.getCurrentStatus(service));
+                    KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+                    kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, service.getId()));
+                    kubernetesDeploymentStatusList.add(kubernetesDeploymentStatus);
                 } catch (Exception e) {
                     logger.warn("Could not get status of service {} on environment {}! trying others..", service.getId(), id, e);
                 }
@@ -120,12 +132,13 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(groupName));
+                kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, serviceId));
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}, group {}!", service.getId(), envId, groupName, e);
             }
         }
 
-        return  kubernetesDeploymentStatus;
+        return kubernetesDeploymentStatus;
     }
 
     @GET("/status/environment/{envId}/service/{serviceId}/all-groups")
@@ -139,7 +152,11 @@ public class StatusController {
         if (service != null) {
             List<Group> groups = groupDao.getGroupsPerServiceAndEnvironment(serviceId,envId);
             try {
-                groups.forEach(group -> kubernetesDeploymentStatuses.add(kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()))));
+                groups.forEach(group -> {
+                    KubernetesDeploymentStatus kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service, Optional.of(group.getName()));
+                    kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, serviceId));
+                    kubernetesDeploymentStatuses.add(kubernetesDeploymentStatus);
+                });
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
@@ -159,6 +176,7 @@ public class StatusController {
         if (service != null) {
             try {
                 kubernetesDeploymentStatus = kubernetesHandler.getCurrentStatus(service);
+                kubernetesDeploymentStatus.setGitCommitUrl(getCommitUrl(kubernetesDeploymentStatus, serviceId));
             } catch (Exception e) {
                 logger.warn("Could not get status of service {}, on environment {}!", service.getId(), envId, e);
             }
@@ -229,5 +247,16 @@ public class StatusController {
             throw new IllegalArgumentException("Please pass timeUnit parameter in TimeUnit type template", e.getCause());
         }
         return serviceStatusHandler.getUndeployedServicesByAvailability(availability, timeUnitEnum, duration);
+    }
+
+    private String getCommitUrl(KubernetesDeploymentStatus kubernetesDeploymentStatus, int serviceId) {
+        String gitCommitUrl = null;
+        if (kubernetesDeploymentStatus != null && kubernetesDeploymentStatus.getGitCommitSha() != null) {
+            DeployableVersion deployableVersion = deployableVersionController.getDeployableVersionFromSha(kubernetesDeploymentStatus.getGitCommitSha(), serviceId);
+            if (deployableVersion != null) {
+                gitCommitUrl = deployableVersion.getCommitUrl();
+            }
+        }
+        return gitCommitUrl;
     }
 }

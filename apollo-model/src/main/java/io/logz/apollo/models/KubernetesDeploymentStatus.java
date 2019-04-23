@@ -10,6 +10,7 @@ public class KubernetesDeploymentStatus {
     private int serviceId;
     private int environmentId;
     private String gitCommitSha;
+    private String gitCommitUrl;
     private Integer replicas;
     private Integer availableReplicas;
     private Integer updatedReplicas;
@@ -90,5 +91,13 @@ public class KubernetesDeploymentStatus {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public String getGitCommitUrl() {
+        return gitCommitUrl;
+    }
+
+    public void setGitCommitUrl(String gitCommitUrl) {
+        this.gitCommitUrl = gitCommitUrl;
     }
 }
