@@ -127,6 +127,7 @@ angular.module('apollo')
                    alert(err);
                 })
             }
+
             $scope.startWebSocket = function (containerName) {
                 setTimeout(function () {
                     $scope.term = new Terminal({
