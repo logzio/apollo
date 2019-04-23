@@ -207,20 +207,10 @@ angular.module('apollo')
             $scope.setSelectedStatus = function (status) {
                 $scope.selectedStatus = status;
 
-                getService(status.serviceId)
-                .then(service => {
-                    if (service.isPartOfGroup) {
-                        $scope.selectedGroupName = status.groupName;
-                    }
-                });
+                if ($scope.selectedService.isPartOfGroup) {
+                    $scope.selectedGroupName = status.groupName;
+                }
             };
-
-            var getService = function (serviceId) {
-                return apolloApiService.getAllServices()
-                    .then((response) => {
-                        return response.data.find(currService => currService.id === serviceId);
-                    });
-            }
 
             $scope.setSelectedService = function (service) {
                 $scope.selectedService = service;
