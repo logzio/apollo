@@ -239,4 +239,5 @@ angular.module('apollo')
                     return 0;
                 })
             });
+
 }]);
