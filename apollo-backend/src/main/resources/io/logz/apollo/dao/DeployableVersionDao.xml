@@ -21,6 +21,13 @@
         WHERE git_commit_sha = #{gitCommitSha} AND service_id = #{serviceId}
     </select>
 
+    <select id="getSuitableDeployableVersionsFromPartialSha" resultType="io.logz.apollo.models.DeployableVersion">
+        SELECT *
+        FROM deployable_version
+        WHERE git_commit_sha LIKE CONCAT(#{gitCommitSha}, '%')
+        LIMIT 50
+    </select>
+
     <select id="getLatestDeployableVersionsByServiceId" resultType="io.logz.apollo.models.DeployableVersion">
         SELECT *
         FROM deployable_version

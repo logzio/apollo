@@ -66,6 +66,12 @@ public class DeployableVersionController {
     }
 
     @LoggedIn
+    @GET("/deployable-version/sha/{sha}")
+    public List<DeployableVersion> getSuitableDeployableVersionsFromPartialSha(String sha) {
+        return deployableVersionDao.getSuitableDeployableVersionsFromPartialSha(sha);
+    }
+
+    @LoggedIn
     @GET("/deployable-version/latest/service/{serviceId}")
     public List<DeployableVersion> getLatestDeployableVersionsByServiceId(int serviceId) {
         return deployableVersionDao.getLatestDeployableVersionsByServiceId(serviceId, LATEST_DEPLOYABLE_VERSIONS_COUNT);

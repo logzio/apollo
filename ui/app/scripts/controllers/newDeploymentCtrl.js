@@ -31,13 +31,14 @@ angular.module('apollo')
         });
 
         // Define the flow steps
-        var deploymentSteps = ["choose-service", "choose-environment", "choose-version", "confirmation"];
+        var deploymentSteps = ["choose-service", "choose-environment", "choose-version", "choose-commit", "confirmation"];
 
         // Define validation functions.. //TODO: something better?
         var deploymentValidators = {"choose-environment" : validateEnvironment,
                                     "choose-service" : validateService,
                                     "choose-groups" : validateGroups,
-                                    "choose-version" : validateVersion};
+                                    "choose-version" : validateVersion,
+                                    "choose-commit" : validateCommits};
 
         // Scope variables
 		$scope.environmentSelected = null;
@@ -64,6 +65,8 @@ angular.module('apollo')
         $scope.environmentsNamesOfStacks = [];
         $scope.servicesInStack = [];
         $scope.environmentsInStack = [];
+        $scope.myDeployableVersions = [];
+        $scope.allDeployableVersions = [];
 
         var groupsPromises = [];
         var servicesAndStackForDisplayWorking = [];
@@ -112,7 +115,7 @@ angular.module('apollo')
                 }
 
                 // Load deployableVersions
-                if ($scope.currentStep == "choose-version") {
+                if ($scope.currentStep === "choose-version") {
                     loadDeployableVersions($scope.selectedServices.map(function (service) { return service.id; }).join(','));
                 }
 
@@ -610,6 +613,14 @@ angular.module('apollo')
             return true;
         }
 
+        function validateCommits() {
+            return true;
+        }
+
+        function validateCommits() {
+            return true;
+        }
+
         function getDeployableVersionFromCommit(sha) {
             return $scope.allDeployableVersions.filter(function(a){return a.gitCommitSha === sha})[0].id;
         }
@@ -726,6 +737,18 @@ angular.module('apollo')
             apolloApiService.getDeployableVersionForMultiServices(serviceIdsCsv).then(function(response) {
                 $scope.allDeployableVersions = response.data;
             });
+        }
+
+        $scope.chooseCommitPage = function() {
+            $scope.currentStep = "choose-commit";
+            deploymentSteps = ["choose-service", "choose-environment", "choose-commit", "confirmation"];
+        }
+
+        $scope.getSuitableDeployableVersionsFromPartialSha = function(commitSha) {
+            apolloApiService.getSuitableDeployableVersionsFromPartialSha(commitSha).then(function(response) {
+                $scope.myDeployableVersions = [];
+                $scope.myDeployableVersions = response.data;
+            })
         }
 
         function loadGroups(environmentId, serviceId) {

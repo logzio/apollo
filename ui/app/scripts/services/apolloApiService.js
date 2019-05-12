@@ -48,6 +48,10 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + 'deployable-version/sha/' + sha + '/service/' + serviceId);
     };
 
+    var getSuitableDeployableVersionsFromPartialSha =  function (sha) {
+        return $http.get(CONFIG.appUrl + 'deployable-version/sha/' + sha);
+    }
+
     var getDeployableVersionForMultiServices = function (serviceIdsCsv) {
         return $http.get(CONFIG.appUrl + 'deployable-version/multi-service/' + serviceIdsCsv);
     };
@@ -349,6 +353,7 @@ function ApiService($q, $http){
         getGroupsPerServiceAndEnvironment: getGroupsPerServiceAndEnvironment,
         getGroupsPerService: getGroupsPerService,
         getDeployableVersionBasedOnSha: getDeployableVersionBasedOnSha,
+        getSuitableDeployableVersionsFromPartialSha: getSuitableDeployableVersionsFromPartialSha,
         getDeployableVersionForMultiServices : getDeployableVersionForMultiServices,
         getLatestDeployableVersionsByServiceId: getLatestDeployableVersionsByServiceId,
         createNewDeployment: createNewDeployment,
