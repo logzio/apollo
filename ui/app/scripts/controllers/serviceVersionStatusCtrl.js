@@ -12,13 +12,13 @@ angular.module('apollo')
             $scope.currentScreen = "selectServiceAndEnvironment";
             $scope.selectedService = null;
             $scope.selectedEnvironment = null;
-            $scope.selectedGroup = null;
+            $scope.selectedGroupName = null;
             $scope.serviceGroups = null;
             $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
 
-            $scope.setSelectedGroup = function(group) {
-                $scope.selectedGroup = group;
+            $scope.setSelectedGroupName = function(groupName) {
+                $scope.selectedGroupName = groupName;
             }
 
             $scope.showAllGroupsOfService = function() {
@@ -39,11 +39,11 @@ angular.module('apollo')
             }
 
             $scope.showByEnvironmentAndService = function() {
-
+                return new Promise((resolve, reject) => {
                 if ($scope.selectedService === null || $scope.selectedEnvironment === null) { //unselected service or environment
                     growl.error("Please select a service and an environment!", {ttl:7000});
                     return;
-                } else if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup === null) { //service is part of group but no group is selected -> show available groups
+                } else if ($scope.selectedService.isPartOfGroup && $scope.selectedGroupName === null) { //service is part of group but no group is selected -> show available groups
                     if ($scope.currentScreen == "selectGroup") {
                         growl.error("Please select a group... :)", {ttl:7000});
                         return;
@@ -60,27 +60,25 @@ angular.module('apollo')
                     });
                 } else if ($scope.selectedService !== null && $scope.selectedEnvironment !== null) { //selected environment and service
 
-                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroup !== null) { //service is part of group and selected group
-                        apolloApiService.statusOfEnvironmentAndServiceWithGroup($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroup.name).then(
-                            function (response) {
-                                $scope.kubernetesDeploymentStatus.push(response.data);
-                                $scope.currentScreen = "results";
 
-                            },
-                            function (error) {
-                                growl.error(errorMessage, {ttl:7000});
-                            });
+                       function handleError(error) {
+                           growl.error(errorMessage, {ttl:7000});
+                           reject(null);
+                       }
+                      function responseReceived(response) {
+                          $scope.kubernetesDeploymentStatus.push(response.data);
+                          $scope.currentScreen = "results";
+                          resolve();
+                      }
+                    if ($scope.selectedService.isPartOfGroup && $scope.selectedGroupName !== null) { //service is part of group and selected group
+                        apolloApiService.statusOfEnvironmentAndServiceWithGroup($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroupName)
+                        .then(responseReceived, handleError)
                     } else { //service is not part of group
-                        apolloApiService.statusOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id).then(
-                            function (response) {
-                                $scope.kubernetesDeploymentStatus.push(response.data);
-                                $scope.currentScreen = "results";
-                            },
-                            function (error) {
-                                growl.error("An error occurred in getting k8s status, there is no status for this service in the current environment", {ttl:7000});
-                            });
+                        apolloApiService.statusOfEnvironmentAndService($scope.selectedEnvironment.id, $scope.selectedService.id)
+                        .then(responseReceived, handleError)
                     }
-                }
+                  }
+                })
             }
 
             $scope.selectPod = function (podStatus) {
@@ -104,9 +102,7 @@ angular.module('apollo')
 
                 usSpinnerService.spin('result-spinner');
 
-                var groupName = $scope.selectedGroup === null ? null : $scope.selectedGroup.name
-
-                apolloApiService.restartAllPods($scope.selectedEnvironment.id, $scope.selectedService.id, groupName).then(function (response) {
+                apolloApiService.restartAllPods($scope.selectedEnvironment.id, $scope.selectedService.id, $scope.selectedGroupName).then(function (response) {
                     usSpinnerService.stop('result-spinner');
                     growl.success("Successfully restarted all pods!");
                 }, function (error) {
@@ -115,9 +111,21 @@ angular.module('apollo')
                 });
             };
 
+            var setSelectedStatusAfterRefresh = function() {
+                $scope.selectedStatus = $scope.kubernetesDeploymentStatus.filter(status =>
+                    status.environmentId === $scope.selectedStatus.environmentId && status.serviceId === $scope.selectedStatus.serviceId)[0];
+            }
+
             $scope.refreshStatus = function() {
                 $scope.kubernetesDeploymentStatus = [];
-                $scope.showByEnvironmentAndService();
+                usSpinnerService.spin('result-spinner');
+                return $scope.showByEnvironmentAndService().then(() => {
+                    setSelectedStatusAfterRefresh();
+                    usSpinnerService.stop('result-spinner');
+                    return $scope.$apply();
+                }).catch(err => {
+                   alert(err);
+                })
             }
 
             $scope.startWebSocket = function (containerName) {
@@ -199,6 +207,10 @@ angular.module('apollo')
 
             $scope.setSelectedStatus = function (status) {
                 $scope.selectedStatus = status;
+
+                if ($scope.selectedService.isPartOfGroup) {
+                    $scope.selectedGroupName = status.groupName;
+                }
             };
 
             $scope.setSelectedService = function (service) {
@@ -227,4 +239,5 @@ angular.module('apollo')
                     return 0;
                 })
             });
+
 }]);
