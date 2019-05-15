@@ -64,6 +64,7 @@ angular.module('apollo')
         $scope.environmentsNamesOfStacks = [];
         $scope.servicesInStack = [];
         $scope.environmentsInStack = [];
+        $scope.findMyCommitFlag = false;
 
         var groupsPromises = [];
         var servicesAndStackForDisplayWorking = [];
@@ -722,9 +723,18 @@ angular.module('apollo')
             }
         }
 
+        $scope.getSuitableDeployableVersionsFromPartialSha = function(commitSha) {
+            apolloApiService.getSuitableDeployableVersionsFromPartialSha(commitSha).then(function(response) {
+                $scope.findMyCommitFlag = true;
+                $scope.allDeployableVersions = response.data;
+            })
+        }
+
 		function loadDeployableVersions(serviceIdsCsv) {
             apolloApiService.getDeployableVersionForMultiServices(serviceIdsCsv).then(function(response) {
-                $scope.allDeployableVersions = response.data;
+                if (!$scope.findMyCommitFlag) {
+                    $scope.allDeployableVersions = response.data;
+                }
             });
         }
 

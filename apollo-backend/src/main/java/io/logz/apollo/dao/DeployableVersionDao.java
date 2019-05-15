@@ -12,6 +12,7 @@ public interface DeployableVersionDao {
     DeployableVersion getDeployableVersion(int id);
     List<DeployableVersion> getAllDeployableVersions();
     DeployableVersion getDeployableVersionFromSha(@Param("gitCommitSha") String gitCommitSha, @Param("serviceId") int serviceId);
+    List<DeployableVersion> getSuitableDeployableVersionsFromPartialSha(@Param("gitCommitSha") String gitCommitSha);
     List<DeployableVersion> getLatestDeployableVersionsByServiceId(@Param("serviceId") int serviceId, @Param("count") int count);
     DeployableVersion getLatestDeployableVersionByServiceId(@Param("serviceId") int serviceId);
     void addDeployableVersion(DeployableVersion deployableVersion);

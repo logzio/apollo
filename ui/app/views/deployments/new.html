@@ -184,6 +184,9 @@
                             <button class="btn btn-outline btn-primary pull-right" data-toggle="modal" data-target="#latest-commit-from-branch">
                                 Deploy latest commit from branch
                             </button>
+                            <button class="btn btn-outline btn-primary pull-right" data-toggle="modal" style="margin-right:10px" data-target="#find-my-commit">
+                                Find my commit
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -345,6 +348,32 @@
                                     <strong>OK</strong>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="find-my-commit" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-find-commit">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Enter your commit sha</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <input class="apollo-form-control" type="text" placeholder="Commit sha" ng-model="commitSha" style="width: 500px;">
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-circle btn-primary" data-dismiss="modal" ng-click="getSuitableDeployableVersionsFromPartialSha(commitSha)" style="margin-top: 2px;">
+                                <strong>OK</strong>
+                            </button>
                         </div>
                     </div>
                 </div>
