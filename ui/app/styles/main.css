@@ -218,6 +218,20 @@ a.navbar-brand {
     max-height: 90vh;
 }
 
+.modal-find-commit {
+    width: 700px;
+    margin: 0 auto;
+    margin-top: 60px;
+}
+
+.find-my-commit-input {
+    width: 500px;
+}
+
+.find-my-commit-button {
+    margin-top: 2px;
+}
+
 /* Pretty logs block */
 pre {
     font-size: 90%;
