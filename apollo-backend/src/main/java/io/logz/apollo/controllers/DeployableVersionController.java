@@ -79,6 +79,12 @@ public class DeployableVersionController {
     }
 
     @LoggedIn
+    @GET("/deployable-version/sha/{sha}")
+    public List<DeployableVersion> getSuitableDeployableVersionsFromPartialSha(String sha) {
+        return deployableVersionDao.getSuitableDeployableVersionsFromPartialSha(sha);
+    }
+
+    @LoggedIn
     @GET("/deployable-version/latest/branch/{branchName}/repofrom/{deployableVersionId}")
     public DeployableVersion getLatestDeployableVersionOnBranchBasedOnOtherDeployableVersion(String branchName, int deployableVersionId, Req req) {
         DeployableVersion referenceDeployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
