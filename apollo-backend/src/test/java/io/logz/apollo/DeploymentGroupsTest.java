@@ -59,6 +59,8 @@ public class DeploymentGroupsTest {
 
         Fabric8TestMethods.assertImageNameContains(apolloToKubernetes.getKubernetesDeployment(), "great image");
         Fabric8TestMethods.assertDeploymentLabelExists(apolloToKubernetes.getKubernetesDeployment(), "such key", "much value");
+        Fabric8TestMethods.assertServiceLabelExists(apolloToKubernetes.getKubernetesService(), "such key", "much value");
+        Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(), "such key", "much value");
     }
 
     @Test

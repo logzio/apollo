@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashMap;
@@ -42,6 +44,10 @@ public class ApolloToKubernetes {
     private static final Logger logger = LoggerFactory.getLogger(ApolloToKubernetes.class);
     private static final String APOLLO_UNIQUE_IDENTIFIER_KEY = "apollo_unique_identifier";
     private static final String APOLLO_COMMIT_SHA_KEY = "current_commit_sha";
+
+    private static final String REGION = "region";
+    private static final String ENVIRONMENT = "environment";
+
     private final io.logz.apollo.models.Service apolloService;
     private final io.logz.apollo.models.Environment apolloEnvironment;
     private final io.logz.apollo.models.DeployableVersion apolloDeployableVersion;
@@ -57,9 +63,6 @@ public class ApolloToKubernetes {
     private final GroupDao groupDao;
 
     private final TemplateInjector templateInjector;
-
-    private final String REGION = "region";
-    private final String ENVIRONMENT = "environment";
 
     public ApolloToKubernetes(DeploymentDao deploymentDao,
                               io.logz.apollo.models.DeployableVersion apolloDeployableVersion,
@@ -96,33 +99,21 @@ public class ApolloToKubernetes {
         ));
 
         // Define the set of transformers the ingress object will go through
-        ingressTransformers = Sets.newHashSet(Arrays.asList(
+        ingressTransformers = Sets.newHashSet(Collections.singletonList(
                 new IngressLabelTransformer()
         ));
 
         templateInjector = new TemplateInjector();
     }
 
-    public Deployment getKubernetesDeployment() throws ApolloParseException, IOException {
+    public Deployment getKubernetesDeployment() throws ApolloParseException {
         try {
             // Update the deployment, as it could have changed since (Status)
             apolloDeployment = deploymentDao.getDeployment(apolloDeployment.getId());
             String deploymentYaml = apolloService.getDeploymentYaml();
 
-            // Fill deployment YAML with parameters if needed
-            HashMap<String, String> additionalParams = new HashMap<>();
-            String environmentAdditionalParams = apolloEnvironment.getAdditionalParams();
-
-            if (environmentAdditionalParams != null && !environmentAdditionalParams.isEmpty()) {
-                additionalParams.putAll(jsonToMap(environmentAdditionalParams));
-            }
-
-            if (apolloService.getIsPartOfGroup()) {
-                additionalParams.putAll(jsonToMap(apolloDeployment.getDeploymentParams()));
-            }
-
             // Convert the deployment object to fabric8 model
-            Deployment deployment = getClassFromYamlWithParameters(deploymentYaml, additionalParams, Deployment.class);
+            Deployment deployment = getClassFromYamlWithParameters(deploymentYaml, getAdditionalParamsFromEnvAndGroup(), Deployment.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the deployment yaml of deployment id {}",
@@ -148,7 +139,7 @@ public class ApolloToKubernetes {
             }
 
             // Convert the service object to fabric8 model
-            Service service = getClassFromYamlWithParameters(apolloService.getServiceYaml(), jsonToMap(apolloEnvironment.getAdditionalParams()), Service.class);
+            Service service = getClassFromYamlWithParameters(apolloService.getServiceYaml(), getAdditionalParamsFromEnvAndGroup(), Service.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the service yaml of deployment id {}",
@@ -175,7 +166,7 @@ public class ApolloToKubernetes {
             }
 
             // Convert the ingress object to fabric8 model
-            Ingress ingress = getClassFromYamlWithParameters(apolloService.getIngressYaml(), jsonToMap(apolloEnvironment.getAdditionalParams()), Ingress.class);
+            Ingress ingress = getClassFromYamlWithParameters(apolloService.getIngressYaml(), getAdditionalParamsFromEnvAndGroup(), Ingress.class);
 
             // Programmatically access to change all the stuff we need
             logger.debug("About to run {} transformations on the ingress yaml of deployment id {}",
@@ -240,16 +231,16 @@ public class ApolloToKubernetes {
         return Encryptor.encryptString(LabelsNormalizer.normalize(naiveUniqueIdentofier));
     }
 
-    private String fillYamlWithParams(String yaml, HashMap parameters) {
+    private String fillYamlWithParams(String yaml, Map<String, String> parameters) {
         return templateInjector.injectToTemplate(yaml, parameters);
     }
 
-    private <T> T getClassFromYamlWithParameters(String yaml, HashMap<String, String> parameters, Class<T> valueType) throws IOException {
+    private <T> T getClassFromYamlWithParameters(String yaml, Map<String, String> parameters, Class<T> valueType) throws IOException {
         yaml = fillYamlWithParams(yaml, fillDefaultParameters(parameters));
         return mapper.readValue(yaml, valueType);
     }
 
-    private HashMap<String, String> fillDefaultParameters(HashMap<String, String> parameters) {
+    private Map<String, String> fillDefaultParameters(Map<String, String> parameters) {
         parameters.put(REGION, apolloEnvironment.getGeoRegion().toLowerCase());
         parameters.put(ENVIRONMENT, apolloEnvironment.getAvailability().toLowerCase());
 
@@ -263,4 +254,19 @@ public class ApolloToKubernetes {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(deploymentParams, new TypeReference<HashMap<String, String>>() {});
     }
+
+    private Map<String, String> getAdditionalParamsFromEnvAndGroup() throws IOException {
+        Map<String, String> additionalParams = new HashMap<>();
+        String environmentAdditionalParams = apolloEnvironment.getAdditionalParams();
+
+        if (environmentAdditionalParams != null && !environmentAdditionalParams.isEmpty()) {
+            additionalParams.putAll(jsonToMap(environmentAdditionalParams));
+        }
+
+        if (apolloService.getIsPartOfGroup()) {
+            additionalParams.putAll(jsonToMap(apolloDeployment.getDeploymentParams()));
+        }
+        return additionalParams;
+    }
+
 }
