@@ -1,7 +1,7 @@
 package io.logz.apollo.transformers.deployment;
 
 import com.google.common.collect.ImmutableMap;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.logz.apollo.kubernetes.ApolloToKubernetes;
 import io.logz.apollo.transformers.LabelsNormalizer;
 
