@@ -307,7 +307,10 @@ public class KubernetesHandlerTest {
                                 .build()
                 ).build();
 
-        server.expect().post().withPath("dsf3                                                                                                                                                                             sdf").andReturn(HttpStatus.OK,
+        server.expect()
+              .post()
+              .withPath(String.format("/apis/apps/v1/namespaces/%s/deployments", realDeploymentGenerator.getEnvironment().getKubernetesNamespace()))
+              .andReturn(HttpStatus.OK,
                       new DeploymentListBuilder()
                               .withItems(
                                       new DeploymentBuilder()
@@ -376,7 +379,10 @@ public class KubernetesHandlerTest {
             .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentPodUniqueIdentifierValue())
             .list();
 
-        server.expect().post().withPath("sdhfjhsd").andReturn(HttpStatus.OK,
+        server.expect()
+              .post()
+              .withPath(String.format("/api/v1/namespaces/%s/pods", realDeploymentGenerator.getEnvironment().getKubernetesNamespace()))
+              .andReturn(HttpStatus.OK,
                 new PodListBuilder()
                         .withItems(pod)
                         .build()
@@ -399,7 +405,10 @@ public class KubernetesHandlerTest {
             .withName(podStatus.getName())
             .getLog(true);
 
-        server.expect().post().withPath("sdhfjhsd").andReturn(HttpStatus.OK,
+        server.expect()
+              .post()
+              .withPath(String.format("/api/v1/namespaces/%s/pods/%s/log", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
+              .andReturn(HttpStatus.OK,
              log
         );
 
@@ -421,7 +430,10 @@ public class KubernetesHandlerTest {
             .get();
 
 
-        server.expect().post().withPath("sdhfjhsd").andReturn(HttpStatus.OK,
+        server.expect()
+              .post()
+              .withPath(String.format("/api/v1/namespaces/%s/pods/%s", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
+              .andReturn(HttpStatus.OK,
                 pod
         );
 
