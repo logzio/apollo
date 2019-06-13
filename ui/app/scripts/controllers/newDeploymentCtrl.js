@@ -727,7 +727,9 @@ angular.module('apollo')
             apolloApiService.getSuitableDeployableVersionsFromPartialSha(commitSha).then(function(response) {
                 $scope.findMyCommitFlag = true;
                 $scope.allDeployableVersions = [];
-                $scope.allDeployableVersions.push(response.data[0]);
+                if (response.data.length > 0) {
+                    $scope.allDeployableVersions.push(response.data[0]);
+                }
             })
         }
 
