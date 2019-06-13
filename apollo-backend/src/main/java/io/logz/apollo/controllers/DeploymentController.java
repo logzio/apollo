@@ -93,6 +93,12 @@ public class DeploymentController {
     @LoggedIn
     @POST("/deployment")
     public void addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String deploymentMessage, String groupName, Req req) {
+        addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, deploymentMessage, groupName, 0, req);
+    }
+
+    @LoggedIn
+    @POST("/deployment")
+    public void addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String deploymentMessage, String groupName, int isEmergencyRollback, Req req) {
         Iterable<String> environmentIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(environmentIdsCsv);
         Iterable<String> serviceIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(serviceIdsCsv);
 

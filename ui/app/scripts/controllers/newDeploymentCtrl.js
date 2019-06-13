@@ -124,7 +124,41 @@ angular.module('apollo')
             }
         };
 
-        $scope.deploy = function() {
+        function afterCreatingNewDeploymentWithGroup(response) {
+            // Wait a bit to let the deployment be in the DB
+            return new Promise((resolve, reject) =>  {
+                setTimeout(function () {
+                    usSpinnerService.stop('deployment-spinner');
+
+                    // Due to bug with angular-bootstrap and angular 1.4, the modal is not closing when redirecting.
+                    // So just forcing it to :)   TODO: after the bug is fixed, remove this shit
+                    $('#confirm-modal').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+
+                    if (response.data.unsuccessful.length > 0) {
+                        showBlockedDeployments(response);
+                    } else if (response.data.successful.length > 0) {
+                        $scope.redirectToOngoing();
+                    } else {
+                        growl.error("An error occurred.", {ttl: 7000});
+                        reject("An error occurred")
+                    }
+                    resolve("done");
+                }, 500);
+            })
+        }
+
+        function afterCreatingNewDeploymentWithGroupInCaseOfError(error) {
+            usSpinnerService.stop('deployment-spinner');
+
+           // 403 are handled generically on the interceptor
+           if (error.status !== 403) {
+               growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
+           }
+        }
+
+        $scope.deploy = function(isEmergencyRollback) {
 
             // Just running the validators first, to make sure nothing has changed
             angular.forEach(deploymentValidators, function(validateFunction, name) {
@@ -148,42 +182,26 @@ angular.module('apollo')
                             groups.push(group.id);
                         }
                     });
-                    apolloApiService.createNewDeploymentWithGroup(
-                        getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
-                        $scope.selectedServices[0].id,
-                        environment.id,
-                        $scope.deploymentMessage.text,
-                        groups.join(','),
-                        ).then(function (response) {
-
-                            // Wait a bit to let the deployment be in the DB
-                            setTimeout(function () {
-                                usSpinnerService.stop('deployment-spinner');
-
-                                // Due to bug with angular-bootstrap and angular 1.4, the modal is not closing when redirecting.
-                                // So just forcing it to :)   TODO: after the bug is fixed, remove this shit
-                                $('#confirm-modal').modal('hide');
-                                $('body').removeClass('modal-open');
-                                $('.modal-backdrop').remove();
-
-                                if (response.data.unsuccessful.length > 0) {
-                                    showBlockedDeployments(response);
-                                } else if (response.data.successful.length > 0) {
-                                    $scope.redirectToOngoing();
-                                } else {
-                                    growl.error("An error occurred.", {ttl: 7000});
-                                }
-                            }, 500);
-
-                        }, function (error) {
-                                // End spinner
-                                usSpinnerService.stop('deployment-spinner');
-
-                                // 403 are handled generically on the interceptor
-                                if (error.status !== 403) {
-                                    growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000});
-                                }
-                        });
+                    if (isEmergencyRollback === 0) {
+                        apolloApiService.createNewDeploymentWithGroup(
+                            getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
+                            $scope.selectedServices[0].id,
+                            environment.id,
+                            $scope.deploymentMessage.text,
+                            groups.join(','))
+                            .then(afterCreatingNewDeploymentWithGroup)
+                            .catch(afterCreatingNewDeploymentWithGroupInCaseOfError)
+                    }
+                    else {
+                        apolloApiService.createEmergencyRollbackWithGroup(
+                            getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
+                            $scope.selectedServices[0].id,
+                            environment.id,
+                            $scope.deploymentMessage.text,
+                            groups.join(','))
+                            .then(afterCreatingNewDeploymentWithGroup)
+                            .catch(afterCreatingNewDeploymentWithGroupInCaseOfError)
+                    }
                 });
             }
 

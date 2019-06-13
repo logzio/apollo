@@ -105,7 +105,7 @@ public class KubernetesMonitor {
 
                 switch (deployment.getStatus()) {
                     case PENDING:
-                        if (isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment)) {
+                        if (isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment) || deployment.getEmergencyRollback()) {
                             returnedDeployment = kubernetesHandler.startDeployment(deployment);
                         } else {
                             logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());

@@ -29,6 +29,7 @@ public class Deployment {
     private String groupName;
     private String deploymentParams;
     private String deploymentMessage;
+    private boolean isEmergencyRollback;
 
     public Deployment() {
     }
@@ -127,5 +128,13 @@ public class Deployment {
 
     public void setDeploymentMessage(String deploymentMessage) {
         this.deploymentMessage = deploymentMessage;
+    }
+
+    public boolean getEmergencyRollback() {
+        return isEmergencyRollback;
+    }
+
+    public void setEmergencyRollback(boolean isEmergencyRollback) {
+        this.isEmergencyRollback = isEmergencyRollback;
     }
 }

@@ -66,6 +66,10 @@ public class DeploymentHandler {
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Req req) throws ApolloDeploymentException {
+        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, 0, req);
+    }
+
+    public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, int isEmergencyRollback, Req req) throws ApolloDeploymentException {
         // Get the username from the token
         String userEmail = req.token().get("_user").toString();
         String sourceVersion = null;
@@ -73,6 +77,7 @@ public class DeploymentHandler {
         try {
             // Get the current commit sha from kubernetes so we can revert if necessary
             Environment environment = environmentDao.getEnvironment(environmentId);
+
             Service service = serviceDao.getService(serviceId);
             KubernetesDeploymentStatus kubernetesDeploymentStatus;
 
@@ -95,6 +100,7 @@ public class DeploymentHandler {
         MDC.put("userEmail", userEmail);
         MDC.put("sourceVersion", sourceVersion);
         MDC.put("groupName", groupName);
+        MDC.put("isEmergencyRollback", String.valueOf(isEmergencyRollback));
 
         logger.info("Got request for a new deployment");
 
@@ -136,6 +142,7 @@ public class DeploymentHandler {
             newDeployment.setSourceVersion(sourceVersion);
             newDeployment.setDeploymentMessage(deploymentMessage);
             newDeployment.setGroupName(groupName);
+            newDeployment.setEmergencyRollback(isEmergencyRollback == 1);
 
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());

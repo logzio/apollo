@@ -109,7 +109,8 @@ function ApiService($q, $http){
             serviceIdsCsv: deployedService,
             environmentIdsCsv: deployedEnvironment,
             deployableVersionId: deployableVersionId,
-            deploymentMessage: deploymentMessage
+            deploymentMessage: deploymentMessage,
+            isEmergencyRollback: 0
         });
     };
 
@@ -120,12 +121,35 @@ function ApiService($q, $http){
             environmentId: deployedEnvironment,
             deployableVersionId: deployableVersionId,
             deploymentMessage: deploymentMessage,
-            groupIdsCsv: groupIdsCsv
+            groupIdsCsv: groupIdsCsv,
+            isEmergencyRollback: 0
         });
     };
 
     var revertDeployment = function(deploymentId) {
         return $http.delete(CONFIG.appUrl + "deployment/" + deploymentId + "/");
+    };
+
+    var createEmergencyRollback = function(deployableVersionId, deployedService, deployedEnvironment, deploymentMessage) {
+        return $http.post(CONFIG.appUrl + "deployment/", {
+            serviceIdsCsv: deployedService,
+            environmentIdsCsv: deployedEnvironment,
+            deployableVersionId: deployableVersionId,
+            deploymentMessage: deploymentMessage,
+            isEmergencyRollback: 1
+        });
+    };
+
+    var createEmergencyRollbackWithGroup = function(deployableVersionId, deployedService, deployedEnvironment,
+                                                    deploymentMessage, groupIdsCsv) {
+        return $http.post(CONFIG.appUrl + "deployment-groups/", {
+            serviceId: deployedService,
+            environmentId: deployedEnvironment,
+            deployableVersionId: deployableVersionId,
+            deploymentMessage: deploymentMessage,
+            groupIdsCsv: groupIdsCsv,
+            isEmergencyRollback: 1
+        });
     };
 
     var matchLabelToDeploymentStatus = function(deploymentStatus) {
@@ -358,6 +382,8 @@ function ApiService($q, $http){
         getLatestDeployableVersionsByServiceId: getLatestDeployableVersionsByServiceId,
         createNewDeployment: createNewDeployment,
         createNewDeploymentWithGroup: createNewDeploymentWithGroup,
+        createEmergencyRollback: createEmergencyRollback,
+        createEmergencyRollbackWithGroup: createEmergencyRollbackWithGroup,
         getAllRunningDeployments: getAllRunningDeployments,
         getRunningAndJustFinishedDeployments: getRunningAndJustFinishedDeployments,
         getAllDeployments: getAllDeployments,

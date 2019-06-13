@@ -32,9 +32,16 @@ public class DeploymentGroupsController {
         this.groupDao = requireNonNull(groupDao);
     }
 
+
     @LoggedIn
     @POST("/deployment-groups")
     public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, Req req) throws NumberFormatException {
+        addDeployment(environmentId,serviceId, deployableVersionId, groupIdsCsv, deploymentMessage, 0, req);
+    }
+
+    @LoggedIn
+    @POST("/deployment-groups")
+    public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, int isEmergencyRollback, Req req) throws NumberFormatException {
 
         MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
 
@@ -61,7 +68,7 @@ public class DeploymentGroupsController {
 
             try {
                 Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, deployableVersionId,
-                        deploymentMessage, group.getName(), Optional.of(group), req);
+                        deploymentMessage, group.getName(), Optional.of(group), isEmergencyRollback, req);
                 responseObject.addSuccessful(groupId, deployment);
             } catch (ApolloDeploymentException e) {
                 responseObject.addUnsuccessful(groupId, e);
