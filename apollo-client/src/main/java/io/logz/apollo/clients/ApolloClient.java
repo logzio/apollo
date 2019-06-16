@@ -124,7 +124,8 @@ public class ApolloClient {
                 "serviceIdsCsv", serviceIdsCsv,
                 "deployableVersionId", String.valueOf(deployableVersionId),
                 "deploymentMessage", "this is a deployment message",
-                "groupName", groupName);
+                "groupName", groupName,
+                "isEmergencyRollback", String.valueOf(0));
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }
