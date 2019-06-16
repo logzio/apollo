@@ -32,7 +32,6 @@ public class DeploymentGroupsController {
         this.groupDao = requireNonNull(groupDao);
     }
 
-
     @LoggedIn
     @POST("/deployment-groups")
     public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, Req req) throws NumberFormatException {

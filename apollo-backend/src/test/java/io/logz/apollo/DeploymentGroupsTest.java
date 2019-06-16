@@ -94,7 +94,6 @@ public class DeploymentGroupsTest {
         // Get results
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(deployment, groupIdsCsv);
 
-
         assertThat(result.getUnsuccessful().size()).isEqualTo(expectedResponse.getUnsuccessful().size());
         assertThat(result.getSuccessful().get(0).getGroupId())
                 .isEqualTo(expectedResponse.getSuccessful().get(0).getGroupId());
