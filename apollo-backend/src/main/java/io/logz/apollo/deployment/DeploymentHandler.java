@@ -77,7 +77,6 @@ public class DeploymentHandler {
         try {
             // Get the current commit sha from kubernetes so we can revert if necessary
             Environment environment = environmentDao.getEnvironment(environmentId);
-
             Service service = serviceDao.getService(serviceId);
             KubernetesDeploymentStatus kubernetesDeploymentStatus;
 
