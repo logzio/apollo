@@ -1,5 +1,6 @@
 package io.logz.apollo;
 
+import io.logz.apollo.blockers.BlockerService;
 import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.helpers.Fabric8TestMethods;
 import io.logz.apollo.models.DeploymentPermission;
@@ -19,6 +20,8 @@ import io.logz.apollo.models.Service;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -29,6 +32,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class DeploymentGroupsTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentGroupsTest.class);
 
     private static ApolloTestClient apolloTestClient;
     private static ApolloToKubernetesStore apolloToKubernetesStore;
@@ -68,9 +73,12 @@ public class DeploymentGroupsTest {
         Group goodGroup2 = createAndSubmitGroup(apolloTestClient, apolloTestClient.getService(goodGroup1.getServiceId()).getId(),
                 apolloTestClient.getEnvironment(goodGroup1.getEnvironmentId()).getId());
         Group groupWithDifferentServiceId = createAndSubmitGroup(apolloTestClient);
+        logger.info("@@@ group1 id - "+goodGroup1.getId());
+        logger.info("@@@ group2 id - "+goodGroup2.getId());
 
         String[] groupIdsArr = {"0", String.valueOf(goodGroup1.getId()), String.valueOf(goodGroup2.getId()), String.valueOf(groupWithDifferentServiceId.getId())};
         String groupIdsCsv = String.join(",", groupIdsArr);
+        logger.info("@@@ groupIdsCsv ids - "+groupIdsCsv);
 
         // Prepare deployment
         Service service = apolloTestClient.getService(goodGroup1.getServiceId());
@@ -94,6 +102,11 @@ public class DeploymentGroupsTest {
 
         // Get results
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(deployment, groupIdsCsv);
+
+        logger.info("@@@ result getUnsuccessful size - "+result.getUnsuccessful().size());
+        logger.info("@@@ result getSuccessful size - "+result.getSuccessful().size());
+        logger.info("@@@ result Successful.get(0).groupId() - "+result.getSuccessful().get(0).getGroupId());
+        logger.info("@@@ result Successful.get(1).groupId() - "+result.getSuccessful().get(1).getGroupId());
 
         assertThat(result.getUnsuccessful().size()).isEqualTo(expectedResponse.getUnsuccessful().size());
         assertThat(result.getSuccessful().get(0).getGroupId())
