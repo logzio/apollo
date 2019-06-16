@@ -147,4 +147,18 @@ public class DeploymentTest {
         Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(),
                 RealDeploymentGenerator.DEFAULT_INGRESS_LABLE_KEY, ingressValue);
     }
+
+    @Test
+    public void testInjectionOfResourcesAsEnvVariables() throws Exception {
+        Environment env = createAndSubmitEnvironment(apolloTestClient);
+        RealDeploymentGenerator realDeploymentGenerator = new RealDeploymentGenerator("test-image", null, null, 0, null, null, env, null, true);
+        Deployment deployment = realDeploymentGenerator.getDeployment();
+
+        ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
+
+        io.fabric8.kubernetes.api.model.extensions.Deployment k8sDeployment = apolloToKubernetes.getKubernetesDeployment();
+        Fabric8TestMethods.assertDeploymentEnvironmentVariableHasValueFromResource(k8sDeployment, "CONTAINER_REQUESTS_MEMORY", "requests.memory");
+        Fabric8TestMethods.assertDeploymentEnvironmentVariableHasValueFromResource(k8sDeployment, "CONTAINER_LIMITS_CPU", "limits.cpu");
+    }
+
 }

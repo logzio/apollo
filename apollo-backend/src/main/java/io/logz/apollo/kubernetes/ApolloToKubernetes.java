@@ -14,6 +14,7 @@ import io.logz.apollo.excpetions.ApolloParseException;
 import io.logz.apollo.notifications.mustache.TemplateInjector;
 import io.logz.apollo.transformers.LabelsNormalizer;
 import io.logz.apollo.transformers.deployment.BaseDeploymentTransformer;
+import io.logz.apollo.transformers.deployment.DeploymentContainerResourcesToEnvInjectorTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentEnvironmentVariableTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentImageNameTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentLabelsTransformer;
@@ -81,7 +82,8 @@ public class ApolloToKubernetes {
         deploymentTransformers = Sets.newHashSet(Arrays.asList(
                 new DeploymentImageNameTransformer(),
                 new DeploymentLabelsTransformer(),
-                new DeploymentEnvironmentVariableTransformer()
+                new DeploymentEnvironmentVariableTransformer(),
+                new DeploymentContainerResourcesToEnvInjectorTransformer()
         ));
 
         if (apolloService.getIsPartOfGroup() != null && apolloService.getIsPartOfGroup()) {

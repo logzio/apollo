@@ -211,13 +211,17 @@ public class RealDeploymentGenerator {
                 "      - image: " + imageName + "\n" +
                 "        imagePullPolicy: Always\n" +
                 "        name: roi-apollo-test\n" +
+                "        resources:\n" +
+                "          requests:\n" +
+                "            memory: 1500Mi\n" +
+                "          limits:\n" +
+                "            cpu: 50m\n" +
                 "        env:\n" +
                 "        -  name: " + DEFAULT_ENVIRONMENT_VARIABLE_NAME + "\n" +
                 "           value: " + DEFAULT_ENVIRONMENT_VARIABLE_VALUE + "\n" +
                 "        ports:\n" +
                 "        - containerPort: 80\n" +
                 "          protocol: TCP\n" +
-                "        resources: {}\n" +
                 "      dnsPolicy: ClusterFirst\n" +
                 "      restartPolicy: Always\n" +
                 "      securityContext: {}\n" +
