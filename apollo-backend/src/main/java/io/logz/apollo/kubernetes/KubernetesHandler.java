@@ -129,7 +129,7 @@ public class KubernetesHandler {
         try {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
             Optional<io.fabric8.kubernetes.api.model.apps.Deployment> returnedDeployment = kubernetesClient
-                    .extensions()
+                    .apps()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
