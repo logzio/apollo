@@ -88,7 +88,8 @@ public class BlockerDefinitionController {
 
     @Administrator
     @POST("/blocker-definition")
-    public void addBlockerDefinition(String name, String environmentId, String serviceId, Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
+    public void addBlockerDefinition(String name, String environmentId, String serviceId, String stackId,
+                                     Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
 
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
             logger.warn("Could not find proper class that annotated with {}", blockerTypeName);
@@ -98,6 +99,7 @@ public class BlockerDefinitionController {
 
         Integer environmentIdParsed = null;
         Integer serviceIdParsed = null;
+        Integer stackIdParsed = null;
 
         if (environmentId != null && !environmentId.equals("null"))
             environmentIdParsed = Integer.parseInt(environmentId);
@@ -105,11 +107,15 @@ public class BlockerDefinitionController {
         if (serviceId != null && !serviceId.equals("null"))
             serviceIdParsed = Integer.parseInt(serviceId);
 
+        if (stackId != null && !stackId.equals("null"))
+            stackIdParsed = Integer.parseInt(stackId);
+
         BlockerDefinition blockerDefinition = new BlockerDefinition();
 
         blockerDefinition.setName(name);
         blockerDefinition.setEnvironmentId(environmentIdParsed);
         blockerDefinition.setServiceId(serviceIdParsed);
+        blockerDefinition.setStackId(stackIdParsed);
         blockerDefinition.setBlockerTypeName(blockerTypeName);
         blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
         blockerDefinition.setActive(isActive);
@@ -120,7 +126,8 @@ public class BlockerDefinitionController {
 
     @Administrator
     @PUT("/blocker-definition/{id}")
-    public void updateBlockerDefinition(int id, String name, String environmentId, String serviceId, Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
+    public void updateBlockerDefinition(int id, String name, String environmentId, String serviceId, String stackId,
+                                        Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
 
         BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
 
@@ -132,6 +139,7 @@ public class BlockerDefinitionController {
 
         Integer environmentIdParsed = null;
         Integer serviceIdParsed = null;
+        Integer stackIdParsed = null;
 
         if (environmentId != null && !environmentId.equals("null"))
             environmentIdParsed = Integer.parseInt(environmentId);
@@ -139,9 +147,13 @@ public class BlockerDefinitionController {
         if (serviceId != null && !serviceId.equals("null"))
             serviceIdParsed = Integer.parseInt(serviceId);
 
+        if (stackId != null && !stackId.equals("null"))
+            stackIdParsed = Integer.parseInt(stackId);
+
         blockerDefinition.setName(name);
         blockerDefinition.setEnvironmentId(environmentIdParsed);
         blockerDefinition.setServiceId(serviceIdParsed);
+        blockerDefinition.setStackId(stackIdParsed);
         blockerDefinition.setBlockerTypeName(blockerTypeName);
         blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
         blockerDefinition.setActive(isActive);
