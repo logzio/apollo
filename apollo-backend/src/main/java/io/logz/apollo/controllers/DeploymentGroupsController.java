@@ -34,13 +34,7 @@ public class DeploymentGroupsController {
 
     @LoggedIn
     @POST("/deployment-groups")
-    public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, Req req) throws NumberFormatException {
-        addDeployment(environmentId,serviceId, deployableVersionId, groupIdsCsv, deploymentMessage, 0, req);
-    }
-
-    @LoggedIn
-    @POST("/deployment-groups")
-    public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, int isEmergencyRollback, Req req) throws NumberFormatException {
+    public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, Boolean isEmergencyRollback, Req req) throws NumberFormatException {
 
         MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
 

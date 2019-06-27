@@ -56,7 +56,7 @@ public class ApolloClient {
                 "servicePortCoefficient", String.valueOf(environment.getServicePortCoefficient()),
                 "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
                 "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()),
-                "concurrentLimit", String.valueOf(environment.getConcurrencyLimit()),
+                "concurrencyLimit", String.valueOf(environment.getConcurrencyLimit()),
                 "additionalParams", environment.getAdditionalParams());
 
         return genericApolloClient.postAndGetResult("/environment", requestBody, new TypeReference<Environment>(){});
@@ -125,7 +125,7 @@ public class ApolloClient {
                 "deployableVersionId", String.valueOf(deployableVersionId),
                 "deploymentMessage", "this is a deployment message",
                 "groupName", groupName,
-                "isEmergencyRollback", String.valueOf(0));
+                "isEmergencyRollback", String.valueOf(false));
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }
@@ -136,7 +136,7 @@ public class ApolloClient {
                 "deployableVersionId", String.valueOf(deployment.getDeployableVersionId()),
                 "groupIdsCsv", groupIdsCsv,
                 "deploymentMessage", deployment.getDeploymentMessage(),
-                "isEmergencyRollback", String.valueOf(0));
+                "isEmergencyRollback", String.valueOf(false));
 
         return genericApolloClient.postAndGetResult("/deployment-groups", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }

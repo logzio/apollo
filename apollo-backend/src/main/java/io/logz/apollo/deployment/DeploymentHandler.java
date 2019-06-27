@@ -66,10 +66,10 @@ public class DeploymentHandler {
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Req req) throws ApolloDeploymentException {
-        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, 0, req);
+        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, false  , req);
     }
 
-    public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, int isEmergencyRollback, Req req) throws ApolloDeploymentException {
+    public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Boolean isEmergencyRollback, Req req) throws ApolloDeploymentException {
         // Get the username from the token
         String userEmail = req.token().get("_user").toString();
         String sourceVersion = null;
@@ -141,7 +141,7 @@ public class DeploymentHandler {
             newDeployment.setSourceVersion(sourceVersion);
             newDeployment.setDeploymentMessage(deploymentMessage);
             newDeployment.setGroupName(groupName);
-            newDeployment.setEmergencyRollback(isEmergencyRollback == 1);
+            newDeployment.setEmergencyRollback(isEmergencyRollback);
 
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());

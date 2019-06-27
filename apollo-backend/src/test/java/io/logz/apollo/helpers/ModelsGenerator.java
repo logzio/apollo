@@ -69,6 +69,13 @@ public class ModelsGenerator {
         return testEnvironment;
     }
 
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, int concurrencyLimit) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment();
+        testEnvironment.setConcurrencyLimit(concurrencyLimit);
+        testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
+        return testEnvironment;
+    }
+
     public static EnvironmentsStack createEnvironmentsStack() {
         EnvironmentsStack testEnvironmentsStack = new EnvironmentsStack();
         testEnvironmentsStack.setName("environments-stack-" + Common.randomStr(5));
@@ -298,6 +305,27 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
+
+        if (result.getSuccessful().size() > 0) {
+            Deployment deployment = result.getSuccessful().get(0).getDeployment();
+            testDeployment.setId(deployment.getId());
+        } else {
+            throw result.getUnsuccessful().get(0).getException();
+        }
+
+        return testDeployment;
+    }
+
+    public static Deployment createAndSubmitEmergencyRollback(ApolloTestClient apolloTestClient, Environment environment,
+                                                       Service service, DeployableVersion deployableVersion) throws Exception {
+
+        // Give the user permissions to deploy
+        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, environment);
+
+        // Now we have enough to create a deployment
+        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
+        testDeployment.setEmergencyRollback(true);
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
         if (result.getSuccessful().size() > 0) {

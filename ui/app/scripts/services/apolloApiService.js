@@ -104,52 +104,30 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + 'latest-deployments/');
     };
 
-    var createNewDeployment = function(deployableVersionId, deployedService, deployedEnvironment, deploymentMessage) {
+    var createNewDeployment = function(deployableVersionId, deployedService, deployedEnvironment, deploymentMessage, isEmergencyRollback) {
         return $http.post(CONFIG.appUrl + "deployment/", {
             serviceIdsCsv: deployedService,
             environmentIdsCsv: deployedEnvironment,
             deployableVersionId: deployableVersionId,
             deploymentMessage: deploymentMessage,
-            isEmergencyRollback: 0
+            isEmergencyRollback: isEmergencyRollback
         });
     };
 
     var createNewDeploymentWithGroup = function(deployableVersionId, deployedService, deployedEnvironment,
-                                                deploymentMessage, groupIdsCsv) {
+                                                deploymentMessage, groupIdsCsv, isEmergencyRollback) {
         return $http.post(CONFIG.appUrl + "deployment-groups/", {
             serviceId: deployedService,
             environmentId: deployedEnvironment,
             deployableVersionId: deployableVersionId,
             deploymentMessage: deploymentMessage,
             groupIdsCsv: groupIdsCsv,
-            isEmergencyRollback: 0
+            isEmergencyRollback: isEmergencyRollback
         });
     };
 
     var revertDeployment = function(deploymentId) {
         return $http.delete(CONFIG.appUrl + "deployment/" + deploymentId + "/");
-    };
-
-    var createEmergencyRollback = function(deployableVersionId, deployedService, deployedEnvironment, deploymentMessage) {
-        return $http.post(CONFIG.appUrl + "deployment/", {
-            serviceIdsCsv: deployedService,
-            environmentIdsCsv: deployedEnvironment,
-            deployableVersionId: deployableVersionId,
-            deploymentMessage: deploymentMessage,
-            isEmergencyRollback: 1
-        });
-    };
-
-    var createEmergencyRollbackWithGroup = function(deployableVersionId, deployedService, deployedEnvironment,
-                                                    deploymentMessage, groupIdsCsv) {
-        return $http.post(CONFIG.appUrl + "deployment-groups/", {
-            serviceId: deployedService,
-            environmentId: deployedEnvironment,
-            deployableVersionId: deployableVersionId,
-            deploymentMessage: deploymentMessage,
-            groupIdsCsv: groupIdsCsv,
-            isEmergencyRollback: 1
-        });
     };
 
     var matchLabelToDeploymentStatus = function(deploymentStatus) {
@@ -382,8 +360,6 @@ function ApiService($q, $http){
         getLatestDeployableVersionsByServiceId: getLatestDeployableVersionsByServiceId,
         createNewDeployment: createNewDeployment,
         createNewDeploymentWithGroup: createNewDeploymentWithGroup,
-        createEmergencyRollback: createEmergencyRollback,
-        createEmergencyRollbackWithGroup: createEmergencyRollbackWithGroup,
         getAllRunningDeployments: getAllRunningDeployments,
         getRunningAndJustFinishedDeployments: getRunningAndJustFinishedDeployments,
         getAllDeployments: getAllDeployments,
