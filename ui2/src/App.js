@@ -1,13 +1,16 @@
 import React from 'react';
-import Navbar from './common/Navbar';
-import './App.css';
+import Main from './components/app/Main';
+import { Provider } from 'react-redux';
+import store from './store/store';
 
-function App() {
-  return (
-    <div className="App">
-      <Navbar/>
-    </div>
-  );
+
+export default class App extends React.Component {
+
+    render(){
+        return (
+            <Provider store={store}>
+                <Main/>
+            </Provider>
+        );
+    };
 }
-
-export default App;

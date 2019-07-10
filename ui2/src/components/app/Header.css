@@ -1,0 +1,20 @@
+.header{
+    display: flex;
+    height: 50px;
+}
+
+.logo{
+    width: 256px;
+}
+
+img{
+    width: 70%;
+    height: 70%;
+}
+
+.header-content{
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    flex-grow: 1;
+}
