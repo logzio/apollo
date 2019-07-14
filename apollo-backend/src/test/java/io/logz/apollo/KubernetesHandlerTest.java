@@ -6,12 +6,9 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.api.model.PodListBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
-import io.fabric8.kubernetes.api.model.apps.DeploymentList;
 import io.fabric8.kubernetes.api.model.apps.DeploymentListBuilder;
 import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.kubernetes.client.mock.KubernetesMockClient;
 import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.common.HttpStatus;
@@ -38,9 +35,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.script.ScriptException;
@@ -81,6 +79,9 @@ public class KubernetesHandlerTest {
 
     private static KubernetesClient client;
 
+    private static final Logger logger = LoggerFactory.getLogger(KubernetesHandlerTest.class);
+
+
     @BeforeClass
     public static void initialize() throws ScriptException, IOException, SQLException, ApolloClientException {
         client = server.getClient();
@@ -94,7 +95,6 @@ public class KubernetesHandlerTest {
         deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
         groupDao = standaloneApollo.getInstance(GroupDao.class);
 
-//        kubernetesMockClient = new KubernetesMockClient();
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
 
         // Create deployments
@@ -289,83 +289,36 @@ public class KubernetesHandlerTest {
             deploymentStatus = new DeploymentStatus(1, 1, new ArrayList<>(), 1L, 1, totalReplicas, 0, 0);
         }
 
-
-//        try {
-//            DeploymentList deploymentList = client
-//                    .apps()
-//                    .deployments()
-//                    .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//                    .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
-//                    .list();
-//        } catch (KubernetesClientException e) {
-//            throw new RuntimeException("Code = "+e.getCode() +", status = "+e.getStatus() + ", message = "+e.getMessage(), e);
-//        }
-
-//        DeploymentList build = new DeploymentListBuilder()
-//                .withItems(
-//                        new DeploymentBuilder()
-//                                .withStatus(deploymentStatus)
-//                                .withNewMetadata()
-//                                .withLabels(
-//                                        ImmutableMap.of(ApolloToKubernetes.getApolloCommitShaKey(),
-//                                                realDeploymentGenerator.getDeployableVersion().getGitCommitSha())
-//                                )
-//                                .endMetadata()
-//                                .build()
-//                ).build();
-
-//        DeploymentList deploymentList = server.getClient().apps().deployments().inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace()).withLabel(getUrlEscapedLabel(ApolloToKubernetes.getApolloCommitShaKey(), realDeploymentGenerator.getDeployableVersion().getGitCommitSha())).list();
-
         server.expect()
-              .post()
-              .withPath(String.format("/apis/apps/v1/namespaces/%s/deployments?%s",
+              .get()
+              .withPath(String.format("/apis/apps/v1/namespaces/%s/deployments?labelSelector=%s",
                       realDeploymentGenerator.getEnvironment().getKubernetesNamespace(),
-                      getUrlEscapedLabel(ApolloToKubernetes.getApolloCommitShaKey(), realDeploymentGenerator.getDeployableVersion().getGitCommitSha())))
+                      getUrlEscapedLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
+                              apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())))
               .andReturn(HttpStatus.OK,
                       new DeploymentListBuilder()
                               .withItems(
                                       new DeploymentBuilder()
                                               .withStatus(deploymentStatus)
                                               .withNewMetadata()
-                                              .withLabels(
-                                                      ImmutableMap.of(ApolloToKubernetes.getApolloCommitShaKey(),
-                                                              realDeploymentGenerator.getDeployableVersion().getGitCommitSha())
-                                              )
+                                                  .withLabels(
+                                                          ImmutableMap.of(ApolloToKubernetes.getApolloCommitShaKey(),
+                                                                  realDeploymentGenerator.getDeployableVersion().getGitCommitSha())
+                                                  )
                                               .endMetadata()
-                                              .build()
-                              ).addNewItem().and().addNewItem().and().build()
-              );
+                                              .build())
+                              .build())
+              .always();
 
-//        kubernetesMockClient
-//                .extensions()
-//                .deployments()
-//                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//                .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
-//                .list()
-//                .andReturn(
-//                        new DeploymentListBuilder()
-//                                .withItems(
-//                                        new DeploymentBuilder()
-//                                                .withStatus(deploymentStatus)
-//                                                .withNewMetadata()
-//                                                .withLabels(
-//                                                        ImmutableMap.of(ApolloToKubernetes.getApolloCommitShaKey(),
-//                                                                realDeploymentGenerator.getDeployableVersion().getGitCommitSha())
-//                                                )
-//                                                .endMetadata()
-//                                                .build()
-//                                ).build()
-//                ).anyTimes();
+        logger.info("");
     }
 
     private static String getUrlEscapedLabel(String labelName, String labelValue) {
-        return UrlEscapers.urlPathSegmentEscaper().escape(String.format("%s=%s", labelName, labelValue));
+        return UrlEscapers.urlFormParameterEscaper().escape(String.format("%s=%s", labelName, labelValue));
     }
 
     private static void setMockPodLogsAndStatus(RealDeploymentGenerator realDeploymentGenerator,
                                                 String log, PodStatus podStatus, ApolloToKubernetes apolloToKubernetes) {
-
-//        KubernetesClient client = server.getClient();
 
         String containerName = podStatus.getName() + "-container";
         Pod pod = new PodBuilder()
@@ -387,77 +340,32 @@ public class KubernetesHandlerTest {
                 .withStartTime(podStatus.getStartTime())
                 .endStatus()
                 .build();
-//
-//        client
-//            .pods()
-//            .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//            .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentPodUniqueIdentifierValue())
-//            .list();
 
         server.expect()
-              .post()
-              .withPath(String.format("/api/v1/namespaces/%s/pods", realDeploymentGenerator.getEnvironment().getKubernetesNamespace()))
+              .get()
+              .withPath(String.format("/api/v1/namespaces/%s/pods?labelSelector=%s",
+                      realDeploymentGenerator.getEnvironment().getKubernetesNamespace(),
+                      getUrlEscapedLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
+                              apolloToKubernetes.getApolloDeploymentPodUniqueIdentifierValue())))
               .andReturn(HttpStatus.OK,
-                new PodListBuilder()
-                        .withItems(pod)
-                        .build()
-        );
-//
-//        kubernetesMockClient
-//                .pods()
-//                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//                .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentPodUniqueIdentifierValue())
-//                .list()
-//                .andReturn(
-//                        new PodListBuilder()
-//                                .withItems(pod)
-//                                .build()
-//                ).anyTimes();
-//
-//        client
-//            .pods()
-//            .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//            .withName(podStatus.getName())
-//            .getLog(true);
+                      new PodListBuilder()
+                              .withItems(pod)
+                              .build()
+              )
+              .always();
 
         server.expect()
-              .post()
+              .get()
               .withPath(String.format("/api/v1/namespaces/%s/pods/%s/log", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
-              .andReturn(HttpStatus.OK,
-             log
-        );
-
-
-//        kubernetesMockClient
-//                .pods()
-//                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//                .withName(podStatus.getName())
-//                //.inContainer(containerName)        //TODO: not mockable :(   Adding to the technical debt.
-//                //.tailingLines(EasyMock.anyInt())
-//                .getLog(true)
-//                .andReturn(log)
-//                .anyTimes();
-
-//        client
-//            .pods()
-//            .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//            .withName(podStatus.getName())
-//            .get();
-
+              .andReturn(HttpStatus.OK, log)
+              .always();
 
         server.expect()
-              .post()
+              .get()
               .withPath(String.format("/api/v1/namespaces/%s/pods/%s", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
-              .andReturn(HttpStatus.OK,
-                pod
-        );
+              .andReturn(HttpStatus.OK, pod)
+              .always();
 
-//        kubernetesMockClient
-//                .pods()
-//                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-//                .withName(podStatus.getName())
-//                .get()
-//                .andReturn(pod)
-//                .anyTimes();
+        logger.info("");
     }
 }

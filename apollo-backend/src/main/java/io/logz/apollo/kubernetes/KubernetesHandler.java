@@ -109,7 +109,7 @@ public class KubernetesHandler {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
             io.fabric8.kubernetes.api.model.apps.Deployment kubernetesDeployment = apolloToKubernetes.getKubernetesDeployment();
             kubernetesClient
-                    .extensions()
+                    .apps()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .createOrReplace(kubernetesDeployment);
@@ -243,7 +243,7 @@ public class KubernetesHandler {
             }
             // There's no option to force kubernetes deployment to restart all pods gradually, so we have to edit an innocuous field of the deployment
             kubernetesClient
-                    .extensions()
+                    .apps()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .withName(deployment.getMetadata().getName())
@@ -464,7 +464,7 @@ public class KubernetesHandler {
         }
 
         kubernetesClient
-                .extensions()
+                .apps()
                 .deployments()
                 .inNamespace(environment.getKubernetesNamespace())
                 .withName(kubernetesDeployment.getMetadata().getName())
@@ -474,7 +474,7 @@ public class KubernetesHandler {
     private io.fabric8.kubernetes.api.model.apps.Deployment getKubernetesDeployment(Service service, Optional<String> groupName) {
 
         return kubernetesClient
-                .extensions()
+                .apps()
                 .deployments()
                 .inNamespace(environment.getKubernetesNamespace())
                 .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
@@ -489,7 +489,7 @@ public class KubernetesHandler {
     public Boolean isEnvironmentHealthy() {
         try {
             kubernetesClient
-                    .extensions()
+                    .apps()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .list();
