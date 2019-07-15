@@ -1,0 +1,29 @@
+.container{
+    height: 100vh;
+}
+
+.container-title{
+    font-size: 28px;
+    font-weight: bold;
+    padding-left: 24px;
+    /*color: black;*/
+}
+
+.container-breadcrumbs{
+    position: relative;
+
+}
+
+.container-breadcrumbs:after{
+    content:"";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0.5em;
+    border-top: 1px solid gray;
+}
+
+.container-content{
+    margin-top: 70px;
+}

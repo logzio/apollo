@@ -5,37 +5,50 @@ import React from 'react';
 import 'antd/dist/antd.css';
 import './Navbar.css';
 
-const Navbar = ({collapsed}) => (
+const Navbar = ({toggleCollapsed, collapsed}) => {
 
-    <div className="navbar">
+    const navItems = [
+        {title: 'New Deployment', iconType: 'edit'},
+        {title: 'Ongoing Deployment', iconType: 'unordered-list'},
+        {title: 'Deployment History', iconType: 'history'},
+    ];
+
+    return(
         <Menu
             className="navbar-menu"
-            defaultSelectedKeys={['1']}
+            defaultSelectedKeys={['0']}
             mode="inline"
-            theme="light"
-            inlineCollapsed={collapsed}
+            theme="dark"
         >
-            <div>
+            <div className="menu-header">
                 {collapsed ?
-                    <img src={Symbol}/>
+                    <img className="symbol" src={Symbol} alt="Apollo logo"/>
                 :
-                    <img src={Logo}/>
+                    <img className="logo" src={Logo} alt="Apollo logo"/>
                 }
             </div>
-            <Menu.Item key="1">
-                <Icon type="pie-chart" />
-                <span>Option 1</span>
+            {navItems.map((navItem, index)=>(
+                <Menu.Item key={index}>
+                <Icon type={navItem.iconType} />
+                <span>{navItem.title}</span>
             </Menu.Item>
-            <Menu.Item key="2">
-                <Icon type="desktop" />
-                <span>Option 2</span>
+            ))}
+            <Menu.Item
+                className="menu-footer"
+                id="menu-footer-test"
+            >
+                <Icon type="logout" />
+                <span>Logout</span>
             </Menu.Item>
-            <Menu.Item key="3">
-                <Icon type="inbox" />
-                <span>Option 3</span>
+            <Menu.Item
+
+                onClick={()=>toggleCollapsed()}
+            >
+                <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'} />
+                <span>Collapse</span>
             </Menu.Item>
         </Menu>
-    </div>
-);
+    );
+};
 
 export default Navbar;

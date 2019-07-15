@@ -1,5 +1,6 @@
 import React from "react";
 import {Form, Input, Icon } from 'antd';
+import './FormField.css';
 
 export const FormField = ({
                                   field, // { name, value, onChange, onBlur }
@@ -10,23 +11,15 @@ export const FormField = ({
                               }) => (
     <Form.Item>
         <Input
-            prefix={<Icon type={type} style={{ color: 'rgba(0,0,0,.25)' }} />}
+            className="field-input"
+            name={field.name}
+            type={"string"}
+            prefix={<Icon type={type} className="field-icon"/>}
             placeholder={placeholder}
+            onChange={field.onChange}
+            onBlur={field.onBlur}
+            value={field.value}
         />
+        {touched[field.name] && errors[field.name] && <div className="field-error">{errors[field.name]}</div>}
     </Form.Item>
 );
-
-
-{/*<input*/}
-    // type="email"
-    // name="email"
-    // onChange={handleChange}
-    // onBlur={handleBlur}
-    // value={values.email}
-// />
-// {errors.email && touched.email && errors.email}
-
-
-{/*<input type={type} {...field} {...props} />*/}
-// {touched[field.name] &&
-// errors[field.name] && <div className="error">{errors[field.name]}</div>}

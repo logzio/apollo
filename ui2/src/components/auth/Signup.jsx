@@ -1,14 +1,33 @@
 import React from 'react';
-import { PageHeader } from 'antd';
 import SignupForm from './SignupForm';
 import './Signup.css';
+import {connect} from "react-redux";
+import {signup} from "./authActions";
 
-const Signup = () => (
+const Signup = ({signup, isLoading}) => {
+    const handleSubmit = (userDetails) => {
+        signup(userDetails);
+    };
 
-    <div className="signup">
-        {/*<PageHeader/>*/}
-        <SignupForm/>
-    </div>
-);
+    return (
+        <div className="signup">
+            <SignupForm handleSubmit={handleSubmit}/>
+        </div>
+    );
+};
 
-export default Signup;
+const mapStateToProps = (state) => {
+    const {auth} = state;
+    return({
+        isLoading: auth.isLoading
+    })
+};
+
+
+export const SignupComponent = connect(
+    mapStateToProps,
+    {signup},
+)(Signup);
+
+
+export default SignupComponent;

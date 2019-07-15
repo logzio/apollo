@@ -1,19 +1,19 @@
 import React from 'react';
 import { Formik, Field } from 'formik';
 import {SignupSchema} from '../../utils/validations/authValidation';
-import {FormField} from '../../utils/FormField';
+import {FormField} from '../../common/FormField';
 import { Form } from 'antd';
-import Button from '../../utils/Button';
+import Button from '../../common/Button';
 import './SignupForm.css';
 
-const SignupForm = () => (
+const SignupForm = ({handleSubmit}) => (
         <Formik
             className="signup-form"
-            initialValues={{ email: '', password: '' }}
+            initialValues={{ firstName: '', lastName: '', userEmail: '', password: '' }}
             validationSchema={SignupSchema}
-            onSubmit={values => {
-                console.log(values);
-            }}
+            onSubmit={(values)=>{
+                handleSubmit(values)}
+            }
         >
             {({
                   values,
@@ -21,14 +21,14 @@ const SignupForm = () => (
                   touched,
                   handleChange,
                   handleBlur,
-                  handleSubmit,
+                  handleSubmit
               }) => (
                 <Form onSubmit={handleSubmit} className="signup-form">
                     <Field name="firstName" type="user" placeholder={"First Name"} component={FormField} />
                     <Field name="lastName" type="user" placeholder={"Last Name"}  component={FormField} />
-                    <Field name="email" type="mail" placeholder={"Email"}  component={FormField} />
+                    <Field name="userEmail" type="mail" placeholder={"Email"}  component={FormField} />
                     <Field name="password" type="lock" placeholder={"Password"}  component={FormField} />
-                    <Button label="Add me!" type="primary" htmlType="submit" className="login-form-button" />
+                    <Button label="Add user" type="primary" htmlType="submit" className="submit-form" />
                 </Form>
             )}
         </Formik>

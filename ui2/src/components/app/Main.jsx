@@ -1,41 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './Navbar';
-import Header from "./Header";
+import {Layout} from 'antd';
+import { Route, Redirect } from "react-router-dom";
+import Container from "../../common/Container";
 import Signup from '../auth/Signup';
-import {Row, Col } from 'antd';
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import './Main.css';
 
 
-export default class Main extends React.Component {
+const routes = [
+    {
+        path: 'index',
+        breadcrumbName: 'First-level Menu',
+    },
+    {
+        path: 'first',
+        breadcrumbName: 'Second-level Menu',
+    },
+    {
+        path: 'second',
+        breadcrumbName: 'Third-level Menu',
+    },
+];
 
-    state = {
-        collapsed: false,
-    };
+const Main = () => {
 
-    toggleCollapsed = () => {
-        this.setState({
-            collapsed: !this.state.collapsed
-        });
-    };
+    const [collapsed, toggleCollapse] = useState(false);
 
-    render(){
-        const {collapsed} = this.state;
+    return(
+        <Layout className="main">
+            <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
+                <Navbar toggleCollapsed={()=>toggleCollapse(!collapsed)} collapsed={collapsed}/>
+            </Layout.Sider>
+            <Layout>
+                <Layout.Content className="main-content">
+                    <Route path="/auth/signup" render={()=> <Container title={"Add a new user"} content={<Signup/>} routes={routes}/>} />
+                    <Redirect to="/auth/signup" />
+                </Layout.Content>
+            </Layout>
+        </Layout>
+    );
 
-        return (
-            <Router>
-                <Switch>
-                    <Row>
-                        <Col span={collapsed ? 1 : 4}>
-                            <Navbar collapsed={collapsed}/>
-                        </Col>
-                        <Col span={20}>
-                            <Header toggleCollapsed={this.toggleCollapsed} collapsed={collapsed}/>
-                            <Route path="/auth/signup" component={Signup} />
-                            <Redirect to="/auth/signup" />
-                        </Col>
-                    </Row>
-                </Switch>
-            </Router>
-        );
-    };
-}
+};
+
+export default Main;

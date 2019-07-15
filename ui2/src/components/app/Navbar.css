@@ -1,8 +1,40 @@
-.navbar{
-    width: 256px;
+.navbar-menu{
+    display: flex;
+    flex-direction: column;
     height: 100vh;
 }
 
-.navbar-menu{
-    height: 100vh;
+.menu-header {
+    height: 108px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*transition: all 0.3ms;*/
+}
+
+.menu-footer{
+    position: relative;
+}
+
+.menu-footer:before{
+    content:"";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 0.5em;
+    border-top: 1px solid white;
+}
+
+#menu-footer-test{
+    margin-top: auto;
+}
+
+.logo{
+    max-width: 70%;
+    max-height: 90%;
+}
+
+.symbol{
+    max-height: 40%;
 }
