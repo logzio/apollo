@@ -2,14 +2,16 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    width: 100%;
 }
 
 .menu-header {
     height: 108px;
+    width: inherit;
     display: flex;
     justify-content: center;
     align-items: center;
-    /*transition: all 0.3ms;*/
+    /*overflow: hidden;*/
 }
 
 .menu-footer{
@@ -30,11 +32,24 @@
     margin-top: auto;
 }
 
-.logo{
-    max-width: 70%;
-    max-height: 90%;
+.logo {
+    /*max-width: 70%;*/
+    /*max-height: 90%;*/
+
+    margin: 20px;
+    max-height: 40%;
+
 }
 
 .symbol{
     max-height: 40%;
+}
+
+
+.menu-title{
+    color: white;
+    width: 140px;
+    font-size: 28px;
+    font-weight: bolder;
+    font-family: "Courier 10 Pitch", Courier, monospace;
 }

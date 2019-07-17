@@ -1,17 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import SignupForm from './SignupForm';
-import './Signup.css';
+import { notification } from 'antd';
 import {connect} from "react-redux";
-import {signup} from "./authActions";
+import {signup, getDeploymentRoles} from "./authActions";
+import Spinner from "../../common/Spinner";
+import './Signup.css';
 
-const Signup = ({signup, isLoading}) => {
-    const handleSubmit = (userDetails) => {
-        signup(userDetails);
+
+const SignupComponent = ({signup, getDeploymentRoles, isLoading, depRoles, error}) => {
+
+    const handleSubmit = async(userDetails, resetForm, setSubmitting) => {
+        try {
+            await signup(userDetails);
+            resetForm();
+            notification.open({
+                message: `${userDetails.firstName} ${userDetails.lastName} was added`
+        });
+        }catch(error) {
+            setSubmitting(false);
+        }
     };
+
+    useEffect(() => {
+        getDeploymentRoles();
+    }, [error]);
+
+    if(isLoading){
+        return <Spinner/>;
+    }
 
     return (
         <div className="signup">
-            <SignupForm handleSubmit={handleSubmit}/>
+            <div className="form-error">{error}</div>
+            <SignupForm handleSubmit={handleSubmit} options={depRoles}/>
         </div>
     );
 };
@@ -19,15 +40,17 @@ const Signup = ({signup, isLoading}) => {
 const mapStateToProps = (state) => {
     const {auth} = state;
     return({
-        isLoading: auth.isLoading
+        isLoading: auth.isLoading,
+        depRoles: auth.depRoles,
+        error: auth.error
     })
 };
 
 
-export const SignupComponent = connect(
+const Signup = connect(
     mapStateToProps,
-    {signup},
-)(Signup);
+    {signup, getDeploymentRoles},
+)(SignupComponent);
 
 
-export default SignupComponent;
+export default Signup;

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-
+//TODO: change according to server validations
 export const SignupSchema = Yup.object().shape({
     firstName: Yup.string()
         .min(2, 'Too Short')

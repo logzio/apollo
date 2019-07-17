@@ -10,10 +10,22 @@ export const signup = async(user) => {
 
     } catch (error) {
         console.error(error);
+        throw error.response.data.error;
     }
 };
 
+export const getDeploymentRoles = async() => {
+    try {
+        const response = await axios.get(`${baseUrl}/deployment-roles/`);
+        return response.data;
 
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+//TODO: error handler
 // axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
-//set errorhandler
-//set env
+// set env
+// CORS

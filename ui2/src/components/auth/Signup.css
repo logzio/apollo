@@ -1,4 +1,12 @@
 .signup{
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
+}
+
+.form-error{
+    color: red;
+    font-size: 14px;
+    height: 30px;
 }

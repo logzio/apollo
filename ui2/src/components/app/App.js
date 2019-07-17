@@ -1,14 +1,12 @@
 import React from 'react';
 import Main from './Main';
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
-
+import { BrowserRouter as Router } from "react-router-dom";
+import history from '../../utils/history';
 
 
 const App = () => (
-    <Router>
-        <Switch>
-            <Main />
-        </Switch>
+    <Router history={history}>
+        <Main/>
     </Router>
 );
 
