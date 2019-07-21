@@ -1,6 +1,8 @@
 import axios from 'axios';
+import {logout} from '../components/auth/authActions';
 
 const baseUrl = "http://localhost:8081";
+const AUTH_TOKEN = 'token';
 
 export const signup = async (user) => {
     try {
@@ -29,7 +31,7 @@ export const getDeploymentRoles = async () => {
 export const login = async (user) => {
     try {
         const response = await axios.post(`${baseUrl}/_login/`, user);
-        axios.defaults.headers.common['Authorization'] = response.data.token;
+        localStorage.setItem(AUTH_TOKEN, response.data.token);
         return response.data;
 
     } catch (error) {
@@ -38,6 +40,24 @@ export const login = async (user) => {
         throw new Error('User credentials are incorrect'); //temp until an error notification will return from the server
 
     }
+};
+
+export const appInit = () => {
+    const token = localStorage.getItem(AUTH_TOKEN);
+    let loggedIn = false;
+    if(token) {
+        axios.defaults.headers.common['Authorization'] = token;
+        loggedIn = true;
+    }else{
+        logout();
+    }
+
+    return loggedIn;
+};
+
+
+export const appLogout = () => {
+    localStorage.removeItem(AUTH_TOKEN);
 };
 
 //TODO: error handler

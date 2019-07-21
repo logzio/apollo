@@ -7,3 +7,5 @@ export const LOGIN_FAILURE = "LOGIN_FAILURE";
 export const GET_DEP_ROLE_REQUEST = "GET_DEP_ROLE_REQUEST";
 export const GET_DEP_ROLE_SUCCESS = "GET_DEP_ROLE_SUCCESS";
 export const GET_DEP_ROLE_FAILURE = "GET_DEP_ROLE_FAILURE";
+export const LOUGOUT = "LOUGOUT";
+export const APP_INIT = "APP_INIT";

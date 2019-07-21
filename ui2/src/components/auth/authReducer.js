@@ -5,9 +5,11 @@ import {
     LOGIN_REQUEST,
     LOGIN_SUCCESS,
     LOGIN_FAILURE,
+    LOUGOUT,
     GET_DEP_ROLE_REQUEST,
     GET_DEP_ROLE_SUCCESS,
-    GET_DEP_ROLE_FAILURE
+    GET_DEP_ROLE_FAILURE,
+    APP_INIT
 } from '../../actions';
 
 const initialState = {
@@ -16,7 +18,7 @@ const initialState = {
     isAdmin: false,
     depRoles: null,
     error: null,
-    loggedIn: false //temp until I set up Login screen + action + api
+    loggedIn: false
 };
 
 export default function authReducer(state = initialState, action) {
@@ -30,15 +32,19 @@ export default function authReducer(state = initialState, action) {
         case LOGIN_REQUEST:
             return {...state, isLoading: true};
         case LOGIN_SUCCESS:
-            return {...state, error: null, isLoading: false};
+            return {...state, error: null, isLoading: false, loggedIn: true};
         case LOGIN_FAILURE:
             return {...state, error: action.error.message, isLoading: false};
+        case LOUGOUT:
+            return {...state, loggedIn: false};
         case GET_DEP_ROLE_REQUEST:
             return {...state, isLoading: true};
         case GET_DEP_ROLE_SUCCESS:
             return {...state, depRoles: action.payload, isLoading: false};
         case GET_DEP_ROLE_FAILURE:
             return {...state, isLoading: false};
+        case APP_INIT:
+            return {...state, loggedIn: action.payload};
         default:
             return state;
     }

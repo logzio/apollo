@@ -7,7 +7,9 @@ import {
     GET_DEP_ROLE_FAILURE,
     LOGIN_REQUEST,
     LOGIN_SUCCESS,
-    LOGIN_FAILURE
+    LOGIN_FAILURE,
+    LOUGOUT,
+    APP_INIT
 } from '../../actions';
 import * as API from '../../api/api';
 
@@ -71,5 +73,25 @@ export const login = (userDetails) => {
             });
             throw error;
         }
+    };
+};
+
+export const logout = () => {
+    return dispatch => {
+        API.appLogout();
+        dispatch({
+            type: LOUGOUT,
+        });
+    };
+};
+
+
+export const appInit = () => {
+    return dispatch => {
+        const loggedIn = API.appInit();
+        dispatch({
+            type: APP_INIT,
+            payload:loggedIn
+        });
     };
 };
