@@ -35,26 +35,6 @@ export const signup = (userDetails) => {
     };
 };
 
-export const getDeploymentRoles = () => {
-    return async dispatch => {
-        dispatch({
-            type: GET_DEP_ROLE_REQUEST
-        });
-        try {
-            const data = await API.getDeploymentRoles();
-            dispatch({
-                type: GET_DEP_ROLE_SUCCESS,
-                payload: data
-            });
-        } catch (error) {
-            dispatch({
-                type: GET_DEP_ROLE_FAILURE,
-                error
-            });
-        }
-    };
-};
-
 export const login = (userDetails) => {
     return async dispatch => {
         dispatch({
@@ -93,5 +73,25 @@ export const appInit = () => {
             type: APP_INIT,
             payload:loggedIn
         });
+    };
+};
+
+export const getDeploymentRoles = () => {
+    return async dispatch => {
+        dispatch({
+            type: GET_DEP_ROLE_REQUEST
+        });
+        try {
+            const data = await API.getDeploymentRoles();
+            dispatch({
+                type: GET_DEP_ROLE_SUCCESS,
+                payload: data
+            });
+        } catch (error) {
+            dispatch({
+                type: GET_DEP_ROLE_FAILURE,
+                error
+            });
+        }
     };
 };

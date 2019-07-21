@@ -15,7 +15,7 @@ const PrivateRouteEl = ({loggedIn, path, component: Component, title}) => {
 
 const PublicRouteEl = ({loggedIn}) => {
     return loggedIn ? (
-        <Redirect to="/auth/signup"/>
+        <Redirect to="/auth/addUser"/>
     ) : (
         <Route path="/auth/login" component={Login}/>
     );
@@ -24,7 +24,8 @@ const PublicRouteEl = ({loggedIn}) => {
 const mapStateToProps = (state) => {
     const {auth} = state;
     return ({
-        loggedIn: auth.loggedIn
+        loggedIn: auth.loggedIn,
+        isAdmin: auth.isAdmin
     })
 };
 

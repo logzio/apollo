@@ -32,11 +32,11 @@ export default function authReducer(state = initialState, action) {
         case LOGIN_REQUEST:
             return {...state, isLoading: true};
         case LOGIN_SUCCESS:
-            return {...state, error: null, isLoading: false, loggedIn: true};
+            return {...state, error: null, isLoading: false, loggedIn: true, isAdmin: true};    //temp hardcoded - isAdmin is true
         case LOGIN_FAILURE:
             return {...state, error: action.error.message, isLoading: false};
         case LOUGOUT:
-            return {...state, loggedIn: false};
+            return initialState;
         case GET_DEP_ROLE_REQUEST:
             return {...state, isLoading: true};
         case GET_DEP_ROLE_SUCCESS:

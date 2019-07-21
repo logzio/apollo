@@ -3,26 +3,26 @@ import {connect} from "react-redux";
 import {login} from "./authActions";
 import Spinner from "../../common/Spinner";
 import LoginForm from "./LoginForm";
+import Logo from "../../assets/images/apollo-logo.svg";
 import './Login.css';
 
 
 const LoginComponent = ({isLoading, error, login}) => {
 
-    const handleSubmit = async (userDetails, resetForm, setSubmitting) => {
+    const handleSubmit = async (userDetails, setSubmitting) => {
         try {
             await login(userDetails);
-            resetForm();
         } catch (error) {
             setSubmitting(false);
         }
     };
 
-    if (isLoading) {
-        return <Spinner/>;
-    }
-
     return (
         <div className="login">
+
+            <div className="login-title">
+                <img className="logo" src={Logo} alt="Apollo logo"/>
+            </div>
             <div className="form-error">{error}</div>
             <LoginForm handleSubmit={handleSubmit} />
         </div>

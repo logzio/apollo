@@ -5,6 +5,19 @@
     align-items: center;
 }
 
+.login-title{
+    height: 145px;
+    width: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+}
+
+.logo{
+    margin: 0;
+}
+
 .form-error {
     color: red;
     font-size: 14px;

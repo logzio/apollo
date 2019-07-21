@@ -9,10 +9,10 @@ import './LoginForm.css';
 const LoginForm = ({handleSubmit}) => (
     <Formik
         className="login-form"
-        initialValues={{userEmail: '', password: ''}}
+        initialValues={{username: '', password: ''}}
         validationSchema={loginSchema}
-        onSubmit={(values, {resetForm, setSubmitting}) => {
-            handleSubmit(values, resetForm, setSubmitting);
+        onSubmit={(values, {setSubmitting}) => {
+            handleSubmit(values, setSubmitting);
         }}
     >
         {({
