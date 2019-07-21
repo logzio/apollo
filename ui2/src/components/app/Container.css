@@ -1,20 +1,20 @@
-.container{
+.container {
     height: 100vh;
 }
 
-.container-title{
+.container-title {
     font-size: 28px;
     font-weight: bold;
     padding-left: 24px;
 }
 
-.container-breadcrumbs{
+.container-breadcrumbs {
     position: relative;
 
 }
 
-.container-breadcrumbs:after{
-    content:"";
+.container-breadcrumbs:after {
+    content: "";
     position: absolute;
     bottom: 0;
     left: 0;
@@ -23,6 +23,6 @@
     border-top: 1px solid gray;
 }
 
-.container-content{
+.container-content {
     margin-top: 70px;
 }

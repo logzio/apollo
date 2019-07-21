@@ -1,37 +1,41 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import SignupForm from './SignupForm';
-import { notification } from 'antd';
+import {notification} from 'antd';
 import {connect} from "react-redux";
-import {signup, getDeploymentRoles} from "./authActions";
+import {signup, getDeploymentRoles, login} from "./authActions";
 import Spinner from "../../common/Spinner";
 import './Signup.css';
 
 
-const SignupComponent = ({signup, getDeploymentRoles, isLoading, depRoles, error}) => {
+const SignupComponent = ({signup, getDeploymentRoles, isLoading, depRoles, error, login}) => {
 
-    const handleSubmit = async(userDetails, resetForm, setSubmitting) => {
+    const handleSubmit = async (userDetails, resetForm, setSubmitting) => {
         try {
             await signup(userDetails);
             resetForm();
             notification.open({
                 message: `${userDetails.firstName} ${userDetails.lastName} was added`
-        });
-        }catch(error) {
+            });
+        } catch (error) {
             setSubmitting(false);
         }
     };
 
     useEffect(() => {
-        getDeploymentRoles();
-    }, [error]);
+        const temp = () => {
+             // login();
+             getDeploymentRoles();
+        };
+        temp();
+    }, [login, getDeploymentRoles]);
 
-    if(isLoading){
+    if (isLoading) {
         return <Spinner/>;
     }
 
     return (
         <div className="signup">
-            <div className="form-error">{error}</div>
+            {error && <div className="form-error">{error}</div>}
             <SignupForm handleSubmit={handleSubmit} options={depRoles}/>
         </div>
     );
@@ -39,7 +43,7 @@ const SignupComponent = ({signup, getDeploymentRoles, isLoading, depRoles, error
 
 const mapStateToProps = (state) => {
     const {auth} = state;
-    return({
+    return ({
         isLoading: auth.isLoading,
         depRoles: auth.depRoles,
         error: auth.error
@@ -49,7 +53,7 @@ const mapStateToProps = (state) => {
 
 const Signup = connect(
     mapStateToProps,
-    {signup, getDeploymentRoles},
+    {signup, getDeploymentRoles, login},
 )(SignupComponent);
 
 

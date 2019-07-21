@@ -1,15 +1,15 @@
-.field-input{
+.field-input {
     position: relative;
 }
 
-.field-error{
+.field-error {
     position: absolute;
     top: 15px;
     left: 5px;
     color: red;
-    font-size:13px;
+    font-size: 13px;
 }
 
-.field-icon{
-    color: rgba(0,0,0,.25);
+.field-icon {
+    color: rgba(0, 0, 0, .25);
 }

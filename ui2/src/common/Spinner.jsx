@@ -1,5 +1,5 @@
 import React from 'react';
-import { Spin } from 'antd';
+import {Spin} from 'antd';
 import './Spinner.css';
 
 const Spinner = () => (

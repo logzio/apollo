@@ -1,16 +1,16 @@
 import React from "react";
-import {Form, Input, Icon, Select } from 'antd';
+import {Form, Input, Icon, Select} from 'antd';
 import './FormFields.css';
 
 export const InputField = ({
-                                  field,
-                                  form: { touched, errors },
-                                  type,
-                                  placeholder
-                              }) => (
+                               field,
+                               form: {touched, errors},
+                               type,
+                               placeholder
+                           }) => (
     <Form.Item>
         <Input
-            className="field-input"
+            className={`field-input input-${field.name}`}
             name={field.name}
             type={"string"}
             prefix={<Icon type={type} className="field-icon"/>}
@@ -26,11 +26,11 @@ export const InputField = ({
 export const SelectField = ({
                                 field,
                                 options
-                           }) => (
+                            }) => (
     <Form.Item>
-        <Select name={field.name} defaultValue={options && options[0]}>
-            {options && options.map((option)=>(
-                <Select.Option value={option}>{option}</Select.Option>
+        <Select name={field.name} defaultValue={options && options[0].name}>
+            {options && options.map((option) => (
+                    <Select.Option value={option.id} key={option.id}>{option.name}</Select.Option>
                 )
             )}
         </Select>

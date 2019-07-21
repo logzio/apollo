@@ -1,4 +1,4 @@
-.navbar-menu{
+.navbar-menu {
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -14,12 +14,12 @@
     /*overflow: hidden;*/
 }
 
-.menu-footer{
+.menu-footer {
     position: relative;
 }
 
-.menu-footer:before{
-    content:"";
+.menu-footer:before {
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -28,7 +28,7 @@
     border-top: 1px solid white;
 }
 
-#menu-footer-test{
+#menu-footer-test {
     margin-top: auto;
 }
 
@@ -41,12 +41,12 @@
 
 }
 
-.symbol{
+.symbol {
     max-height: 40%;
 }
 
 
-.menu-title{
+.menu-title {
     color: white;
     width: 140px;
     font-size: 28px;
