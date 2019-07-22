@@ -6,14 +6,15 @@ export const InputField = ({
                                field,
                                form: {touched, errors},
                                type,
+                               iconType,
                                placeholder
                            }) => (
     <Form.Item>
         <Input
             className={`field-input input-${field.name}`}
             name={field.name}
-            type={"string"}
-            prefix={<Icon type={type} className="field-icon"/>}
+            type={type}
+            prefix={<Icon type={iconType} className="field-icon"/>}
             placeholder={placeholder}
             onChange={field.onChange}
             onBlur={field.onBlur}

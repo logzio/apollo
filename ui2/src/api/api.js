@@ -22,6 +22,7 @@ export const getDeploymentRoles = async () => {
         return response.data;
 
     } catch (error) {
+        console.log(error.response.status)
         console.error(error);
         throw error;
     }
@@ -59,6 +60,13 @@ export const appInit = () => {
 export const appLogout = () => {
     localStorage.removeItem(AUTH_TOKEN);
 };
+
+
+// const errorHandler = (httpStatus) => {
+//     if(httpStatus >= 400){
+//
+//     }
+// };
 
 //TODO: error handler
 // set env

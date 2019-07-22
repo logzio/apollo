@@ -5,29 +5,27 @@ import React from 'react';
 import {Link} from 'react-router-dom';
 import './Navbar.css';
 
-const Navbar = ({toggleCollapsed, collapsed, handleLogout}) => {
+const Navbar = ({toggleCollapsed, collapsed, handleLogout, isAdmin}) => {
 
     const navItems = [
-        {title: 'New Deployment', iconType: 'edit', path: '/deployment/new'},
-        {title: 'Ongoing Deployment', iconType: 'unordered-list', path: '/deployment/ongoing'},
-        {title: 'Deployment History', iconType: 'history', path: '/deployment/history'},
-        {title: 'Service Status', iconType: 'eye', path: '/service/status'},
-        {title: 'Configure Service', iconType: 'setting', path: '/configure/service'},
-        {title: 'Configure Blocker', iconType: 'stop', path: '/configure/block'},
-        {title: 'Configure Groups', iconType: 'cluster', path: '/configure/group'},
-        {title: 'Add User', iconType: 'user-add', path: '/auth/addUser'}
+        {title: 'New Deployment', iconType: 'edit', path: '/deployment/new', isAdmin: false},
+        {title: 'Ongoing Deployment', iconType: 'unordered-list', path: '/deployment/ongoing', isAdmin: false},
+        {title: 'Deployment History', iconType: 'history', path: '/deployment/history', isAdmin: false},
+        {title: 'Service Status', iconType: 'eye', path: '/service/status', isAdmin: false},
+        {title: 'Configure Service', iconType: 'setting', path: '/configure/service', isAdmin: false},
+        {title: 'Configure Blocker', iconType: 'stop', path: '/configure/block', isAdmin: false},
+        {title: 'Configure Groups', iconType: 'cluster', path: '/configure/group', isAdmin: false},
+        {title: 'Add User', iconType: 'user-add', path: '/auth/addUser', isAdmin: true}
     ];
 
     return (
         <Menu
             className="navbar-menu"
-            defaultSelectedKeys={['7']} //temp
+            defaultSelectedKeys={['7']} //temp until we have a home screen
             mode="inline"
             theme="dark"
         >
             <div className="menu-header">
-                {/*<img className="logo" src={Symbol} alt="Apollo logo"/>*/}
-                {/*{!collapsed && <div className="menu-title">Apollo</div>}*/}
                 {collapsed ?
                     <img className="symbol" src={Symbol} alt="Apollo logo"/>
                     :
@@ -35,6 +33,7 @@ const Navbar = ({toggleCollapsed, collapsed, handleLogout}) => {
                 }
             </div>
             {navItems.map((navItem, index) => (
+                (!navItem.isAdmin || navItem.isAdmin && navItem.isAdmin === isAdmin) &&
                 <Menu.Item key={index}>
                     <Link to={navItem.path}>
                         <Icon type={navItem.iconType}/>

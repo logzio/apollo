@@ -20,10 +20,10 @@ const SignupForm = ({handleSubmit, options, isLoading}) => (
               isSubmitting
           }) => (
             <Form onSubmit={handleSubmit} className="signup-form">
-                <Field name="firstName" type="user" placeholder={"First Name"} component={InputField}/>
-                <Field name="lastName" type="user" placeholder={"Last Name"} component={InputField}/>
-                <Field name="userEmail" type="mail" placeholder={"Email"} component={InputField}/>
-                <Field name="password" type="lock" placeholder={"Password"} component={InputField}/>
+                <Field name="firstName" iconType="user" placeholder={"First Name"} component={InputField}/>
+                <Field name="lastName" iconType="user" placeholder={"Last Name"} component={InputField}/>
+                <Field name="userEmail" iconType="mail" placeholder={"Email"} component={InputField}/>
+                <Field name="password" iconType="lock" placeholder={"Password"} component={InputField}/>
                 <Field name="roleDeployment" component={SelectField} options={options}/>
                 <Button label="Add user" type="primary" htmlType="submit" className="submit-form"
                         disabled={isSubmitting} isLoading={isLoading}/>

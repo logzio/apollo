@@ -25,15 +25,17 @@ const AppComponent = ({loggedIn, appInit, logout, isAdmin}) => {
             <Layout className="app">
                 {loggedIn &&
                 <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
-                    <Navbar toggleCollapsed={() => toggleCollapse(!collapsed)} collapsed={collapsed} handleLogout={logout} isAdmin={isAdmin}/>
+                    <Navbar toggleCollapsed={() => toggleCollapse(!collapsed)} collapsed={collapsed}
+                            handleLogout={logout} isAdmin={isAdmin}/>
                 </Layout.Sider>
                 }
                 <Layout>
                     <Layout.Content className="app-content">
                         <Switch>
-                            <PrivateRoute path="/auth/addUser" title={"Add a new user"} component={Signup}/>
+                            {isAdmin &&
+                                <PrivateRoute path="/auth/addUser" title={"Add a new user"} component={Signup}/>}
                             <PublicRoute path="/auth/login" component={Login}/>
-                            <Redirect to={"/auth/addUser"}/>
+                            <Redirect to={"/auth/home"}/>
                         </Switch>
                     </Layout.Content>
                 </Layout>

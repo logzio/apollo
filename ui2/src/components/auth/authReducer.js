@@ -15,7 +15,7 @@ import {
 const initialState = {
     user: null,
     isLoading: false,
-    isAdmin: false,
+    isAdmin: true,  //temp
     depRoles: null,
     error: null,
     loggedIn: false

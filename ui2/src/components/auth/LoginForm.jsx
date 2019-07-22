@@ -20,8 +20,8 @@ const LoginForm = ({handleSubmit, isLoading}) => (
               isSubmitting
           }) => (
             <Form onSubmit={handleSubmit} className="login-form">
-                <Field name="username" type="mail" placeholder={"Email"} component={InputField}/>
-                <Field name="password" type="lock" placeholder={"Password"} component={InputField}/>
+                <Field name="username" type="email" iconType="mail" placeholder={"Email"} component={InputField}/>
+                <Field name="password" type="password" iconType="lock" placeholder={"Password"} component={InputField}/>
                 <Button label="Login" type="primary" htmlType="submit" className="submit-form"
                         disabled={isSubmitting} isLoading={isLoading}/>
             </Form>

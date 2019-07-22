@@ -15,7 +15,7 @@ const PrivateRouteEl = ({loggedIn, path, component: Component, title}) => {
 
 const PublicRouteEl = ({loggedIn}) => {
     return loggedIn ? (
-        <Redirect to="/auth/addUser"/>
+        <Redirect to="/auth/addUser"/>  //temp, will be directed to home
     ) : (
         <Route path="/auth/login" component={Login}/>
     );
