@@ -11,7 +11,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /*overflow: hidden;*/
 }
 
 .menu-footer {
@@ -33,9 +32,6 @@
 }
 
 .logo {
-    /*max-width: 70%;*/
-    /*max-height: 90%;*/
-
     margin: 20px;
     max-height: 40%;
 
@@ -43,13 +39,4 @@
 
 .symbol {
     max-height: 40%;
-}
-
-
-.menu-title {
-    color: white;
-    width: 140px;
-    font-size: 28px;
-    font-weight: bolder;
-    font-family: "Courier 10 Pitch", Courier, monospace;
 }

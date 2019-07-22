@@ -6,7 +6,7 @@ import {Form} from 'antd';
 import Button from '../../common/Button';
 import './SignupForm.css';
 
-const SignupForm = ({handleSubmit, options}) => (
+const SignupForm = ({handleSubmit, options, isLoading}) => (
     <Formik
         className="signup-form"
         initialValues={{firstName: '', lastName: '', userEmail: '', password: ''}}
@@ -26,7 +26,7 @@ const SignupForm = ({handleSubmit, options}) => (
                 <Field name="password" type="lock" placeholder={"Password"} component={InputField}/>
                 <Field name="roleDeployment" component={SelectField} options={options}/>
                 <Button label="Add user" type="primary" htmlType="submit" className="submit-form"
-                        disabled={isSubmitting}/>
+                        disabled={isSubmitting} isLoading={isLoading}/>
             </Form>
         )}
     </Formik>

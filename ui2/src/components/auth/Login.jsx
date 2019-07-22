@@ -1,7 +1,6 @@
 import React from 'react';
 import {connect} from "react-redux";
 import {login} from "./authActions";
-import Spinner from "../../common/Spinner";
 import LoginForm from "./LoginForm";
 import Logo from "../../assets/images/apollo-logo.svg";
 import './Login.css';
@@ -19,12 +18,11 @@ const LoginComponent = ({isLoading, error, login}) => {
 
     return (
         <div className="login">
-
             <div className="login-title">
-                <img className="logo" src={Logo} alt="Apollo logo"/>
+                <img className="login-logo" src={Logo} alt="Apollo logo"/>
             </div>
             <div className="form-error">{error}</div>
-            <LoginForm handleSubmit={handleSubmit} />
+            <LoginForm handleSubmit={handleSubmit} isLoading={isLoading}/>
         </div>
     );
 };

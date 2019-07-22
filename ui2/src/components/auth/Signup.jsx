@@ -7,7 +7,7 @@ import Spinner from "../../common/Spinner";
 import './Signup.css';
 
 
-const SignupComponent = ({signup, getDeploymentRoles, depRoles, error}) => {
+const SignupComponent = ({signup, getDeploymentRoles, depRoles, error, isLoading}) => {
 
     const handleSubmit = async (userDetails, resetForm, setSubmitting) => {
         try {
@@ -33,7 +33,7 @@ const SignupComponent = ({signup, getDeploymentRoles, depRoles, error}) => {
     return (
         <div className="signup">
             <div className="form-error">{error}</div>
-            <SignupForm handleSubmit={handleSubmit} options={depRoles}/>
+            <SignupForm handleSubmit={handleSubmit} options={depRoles} isLoading={isLoading}/>
         </div>
     );
 };
@@ -42,7 +42,8 @@ const mapStateToProps = (state) => {
     const {auth} = state;
     return ({
         depRoles: auth.depRoles,
-        error: auth.error
+        error: auth.error,
+        isLoading: auth.isLoading
     })
 };
 

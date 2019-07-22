@@ -28,7 +28,7 @@ const Container = ({title, content, match}) => {
 
     return (
         <div className="container">
-            <div className="container-title">
+            <div className="container-title large-title">
                 {title}
             </div>
             <PageHeader className="container-breadcrumbs" breadcrumb={{routes}}/>
