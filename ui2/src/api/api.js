@@ -60,14 +60,3 @@ export const appInit = () => {
 export const appLogout = () => {
     localStorage.removeItem(AUTH_TOKEN);
 };
-
-
-// const errorHandler = (httpStatus) => {
-//     if(httpStatus >= 400){
-//
-//     }
-// };
-
-//TODO: error handler
-// set env
-// {password: "test", username:"test@gmail.com"}

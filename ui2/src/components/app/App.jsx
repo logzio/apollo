@@ -35,7 +35,7 @@ const AppComponent = ({loggedIn, appInit, logout, isAdmin}) => {
                             {isAdmin &&
                                 <PrivateRoute path="/auth/addUser" title={"Add a new user"} component={Signup}/>}
                             <PublicRoute path="/auth/login" component={Login}/>
-                            <Redirect to={"/auth/home"}/>
+                            <Redirect to={"/home"}/>
                         </Switch>
                     </Layout.Content>
                 </Layout>

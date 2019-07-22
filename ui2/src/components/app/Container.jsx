@@ -1,39 +1,36 @@
-import React from 'react';
-import {PageHeader, Breadcrumb} from 'antd';
+import React, {useState} from 'react';
+import {Breadcrumb} from 'antd';
+import {Link} from 'react-router-dom';
 import './Container.css';
 
 
-//TODO: breadcrumbs
-const Container = ({title, content, match}) => {
+const Container = ({title, component: Component, match, ...props}) => {
 
     const routes = [
-        {
-            path: ``,
-            breadcrumbName: 'First-level Menu',
-        },
-        {
-            path: 'first',
-            breadcrumbName: 'Second-level Menu',
-        },
-        {
-            path: 'second',
-            breadcrumbName: 'Third-level Menu',
-        },
+        {path: '/home', title: 'Home'},
+        {path: `${match.path}`, title: title}
     ];
 
-
-    const setBreadcrumbs = () => {
-
-    };
+    const [breadcrumbs, setBreadcrumb] = useState(routes);  //temp setBreadcrumb wasn't used
 
     return (
         <div className="container">
             <div className="container-title large-title">
                 {title}
             </div>
-            <PageHeader className="container-breadcrumbs" breadcrumb={{routes}}/>
+            <div className="container-breadcrumbs">
+                <Breadcrumb>
+                    {breadcrumbs.map((breadcrumb, index) => (
+                        <Breadcrumb.Item key={index}  className="container-breadcrumb">
+                            <Link to={breadcrumb.path}>
+                                {breadcrumb.title}
+                            </Link>
+                        </Breadcrumb.Item>
+                    ))}
+                </Breadcrumb>
+            </div>
             <div className="container-content">
-                {content}
+                <Component setBreadcrumb={setBreadcrumb} {...props}/>
             </div>
         </div>
     );

@@ -33,7 +33,7 @@ const Navbar = ({toggleCollapsed, collapsed, handleLogout, isAdmin}) => {
                 }
             </div>
             {navItems.map((navItem, index) => (
-                (!navItem.isAdmin || navItem.isAdmin && navItem.isAdmin === isAdmin) &&
+                (!navItem.isAdmin || navItem.isAdmin === isAdmin) &&
                 <Menu.Item key={index}>
                     <Link to={navItem.path}>
                         <Icon type={navItem.iconType}/>

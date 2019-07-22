@@ -4,10 +4,9 @@ import {connect} from "react-redux";
 import Container from "../components/app/Container";
 import Login from '../components/auth/Login';
 
-const PrivateRouteEl = ({loggedIn, path, component: Component, title}) => {
+const PrivateRouteEl = ({loggedIn, path, component, title}) => {
     return loggedIn ? (
-        <Route path={path} render={({match, ...props}) => <Container title={title} content={<Component {...props}/>}
-                                                                     match={match}/>}/>
+        <Route path={path} render={({match, ...props}) => <Container title={title} component={component} match={match}/>}/>
     ) : (
         <Redirect to="/auth/login"/>
     );

@@ -1,20 +1,21 @@
 .container {
     height: 100vh;
+    padding-top: 8px;
 }
 
-.container-title {
+.container-title, .container-breadcrumbs {
     padding-left: 24px;
 }
 
 .container-breadcrumbs {
     position: relative;
-
+    margin-top: 5px;
 }
 
 .container-breadcrumbs:after {
     content: "";
     position: absolute;
-    bottom: 0;
+    top: 30px;
     left: 0;
     right: 0;
     height: 0.5em;
@@ -23,4 +24,8 @@
 
 .container-content {
     margin-top: 70px;
+}
+
+.container-breadcrumb:last-of-type{
+    cursor: not-allowed;
 }
