@@ -14,6 +14,7 @@ import { Container } from './Container';
 import { NewDeployment } from '../deployment/new/NewDeployment';
 import { getAuthToken } from '../../api/api';
 
+
 const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
   useEffect(() => {
     appInit();
