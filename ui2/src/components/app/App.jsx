@@ -7,12 +7,12 @@ import { Signup } from '../auth/Signup';
 import { Login } from '../auth/Login';
 import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from 'antd';
-
 import { Navbar } from './Navbar';
 import './App.css';
 import { Container } from './Container';
 import { NewDeployment } from '../deployment/new/NewDeployment';
 import { getAuthToken } from '../../api/api';
+
 
 
 const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
@@ -49,6 +49,7 @@ const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
               {loggedIn && <Route path="/deployment/new" title={'New deployment'} component={NewDeployment} />}
               {!loggedIn && <Route path="/auth/login" component={Login} />}
               {loggedIn ? <Redirect to={'/auth/addUser'} /> : <Redirect to={'/auth/login'} />}
+
             </Switch>
           </Layout.Content>
         </Layout>

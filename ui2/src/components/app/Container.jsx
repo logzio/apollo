@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 import './Container.css';
@@ -40,6 +40,7 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         ? setBreadcrumbs([...breadcrumbs, ...prevBreadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }])
         : setBreadcrumbs([...breadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }]);
     }
+
   };
 
   return (
@@ -56,6 +57,7 @@ export const Container = ({ title, component: Component, match, ...props }) => {
       </div>
       <div className="container-content">
         <Component setBreadcrumb={handleBreadcrumbs} {...props} />
+
       </div>
     </div>
   );

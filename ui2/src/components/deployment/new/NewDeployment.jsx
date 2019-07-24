@@ -1,72 +1,36 @@
-import React from 'react';
-import { Tag } from 'antd';
-import TableTransfer from '../../../common/TableTransfer';
+import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { Switch, Redirect, Route } from 'react-router-dom';
+import { PrivateRoute } from '../../../utils/routes';
+import SelectService from './SelectService';
+import SelectEnv from './SelectEnv';
+import { getServices } from '../deploymentActions';
+import Signup from '../../auth/Signup';
 
-export default class NewDeployment extends React.Component {
-  state = {
-    targetKeys: originTargetKeys,
-    disabled: false,
-    showSearch: false,
+const NewDeploymentComponent = ({ addBreadcrumb, getServices, services, match }) => {
+  return (
+    <Switch>
+      <Route
+        path={`${match.url}/service`}
+        render={() => <SelectService getServices={getServices} services={services} addBreadcrumb={addBreadcrumb} />}
+      />
+      <Route path={`${match.url}/environment`} render={() => <SelectEnv addBreadcrumb={addBreadcrumb} />} />
+      <Redirect to={`${match.url}/service`} />
+    </Switch>
+  );
+};
+
+const mapStateToProps = state => {
+  const { deploy } = state;
+  return {
+    services: deploy.services,
+    isLoading: deploy.isLoading,
   };
+};
 
-  onChange = nextTargetKeys => {
-    this.setState({ targetKeys: nextTargetKeys });
-  };
+const NewDeployment = connect(
+  mapStateToProps,
+  { getServices },
+)(NewDeploymentComponent);
 
-  render() {
-    const { targetKeys, disabled, showSearch } = this.state;
-    return (
-      <div>
-        <TableTransfer
-          dataSource={mockData}
-          targetKeys={targetKeys}
-          disabled={disabled}
-          showSearch={showSearch}
-          onChange={this.onChange}
-          filterOption={(inputValue, item) =>
-            item.title.indexOf(inputValue) !== -1 || item.tag.indexOf(inputValue) !== -1
-          }
-          leftColumns={leftTableColumns}
-          rightColumns={rightTableColumns}
-        />
-      </div>
-    );
-  }
-}
-
-const leftTableColumns = [
-  {
-    dataIndex: 'title',
-    title: 'Name',
-  },
-  {
-    dataIndex: 'tag',
-    title: 'Tag',
-    render: tag => <Tag>{tag}</Tag>,
-  },
-  {
-    dataIndex: 'description',
-    title: 'Description',
-  },
-];
-const rightTableColumns = [
-  {
-    dataIndex: 'title',
-    title: 'Name',
-  },
-];
-
-const mockTags = ['cat', 'dog', 'bird'];
-
-const mockData = [];
-for (let i = 0; i < 20; i++) {
-  mockData.push({
-    key: i.toString(),
-    title: `content${i + 1}`,
-    description: `description of content${i + 1}`,
-    disabled: i % 4 === 0,
-    tag: mockTags[i % 3],
-  });
-}
-
-const originTargetKeys = mockData.filter(item => +item.key % 3 > 1).map(item => item.key);
+export default NewDeployment;

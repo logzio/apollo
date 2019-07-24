@@ -53,3 +53,13 @@ export const appInit = () => {
 export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
+
+export const getServices = async () => {
+  try {
+    const response = await axios.get(`${baseUrl}/service/`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

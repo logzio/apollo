@@ -20,7 +20,7 @@ export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) =>
   return (
     <Menu
       className="navbar-menu"
-      defaultSelectedKeys={['7']} //temp until we have a home screen
+      defaultSelectedKeys={['0']} //temp until we have a home screen
       mode="inline"
       theme="dark"
     >
