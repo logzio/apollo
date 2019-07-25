@@ -1,20 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { Switch, Redirect, Route } from 'react-router-dom';
-import { PrivateRoute } from '../../../utils/routes';
-import SelectService from './SelectService';
-import SelectEnv from './SelectEnv';
 import { getServices } from '../deploymentActions';
-import Signup from '../../auth/Signup';
+import SelectService from './SelectService';
+import SelectEnv from './SelectEnv'; //temp placeholder
+import SelectGrourp from './SelectGroup'; //temp placeholder
 
-const NewDeploymentComponent = ({ addBreadcrumb, getServices, services, match }) => {
+const NewDeploymentComponent = ({ handleBreadcrumbs, getServices, services, match }) => {
   return (
     <Switch>
       <Route
         path={`${match.url}/service`}
-        render={() => <SelectService getServices={getServices} services={services} addBreadcrumb={addBreadcrumb} />}
+        render={({ match }) => (
+          <SelectService getServices={getServices} services={services} handleBreadcrumbs={handleBreadcrumbs} match={match} />
+        )}
       />
-      <Route path={`${match.url}/environment`} render={() => <SelectEnv addBreadcrumb={addBreadcrumb} />} />
+      <Route
+        path={`${match.url}/environment`}
+        render={({ match }) => <SelectEnv handleBreadcrumbs={handleBreadcrumbs} match={match} />}
+      />
+      <Route
+        path={`${match.url}/group`}
+        render={({ match }) => <SelectGrourp handleBreadcrumbs={handleBreadcrumbs} match={match} />}
+      />
       <Redirect to={`${match.url}/service`} />
     </Switch>
   );

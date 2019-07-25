@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import {Link} from "react-router-dom";
 
-const NewDeploymentComponent = ({ addBreadcrumb }) => {
+const NewDeploymentComponent = ({ handleBreadcrumbs, match }) => {
   useEffect(() => {
-    addBreadcrumb('/environment', 'env');
+    handleBreadcrumbs(`${match.url}`, 'env');
   }, []);
 
-  return <div>hi</div>;
+  return <div><button><Link to={'group'}>NEXT</Link></button> hi</div>;
 };
 
 export default NewDeploymentComponent;

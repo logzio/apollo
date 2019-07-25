@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Tag } from 'antd';
 import TableTransfer from '../../../common/TableTransfer';
 import Spinner from '../../../common/Spinner';
-import Button from "antd/es/button";
-import {Link} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
-const SelectService = ({ getServices, services, addBreadcrumb }) => {
-  // debugger
+const SelectService = ({ getServices, services, handleBreadcrumbs, match }) => {
   const [targetKeys, setTargetKeys] = useState(originTargetKeys);
   const [disabled, setDisabled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
@@ -16,7 +14,7 @@ const SelectService = ({ getServices, services, addBreadcrumb }) => {
   }, [getServices]);
 
   useEffect(() => {
-    addBreadcrumb('/service', 'service');
+    handleBreadcrumbs(`${match.url}`, 'service');
   }, []);
 
   const onChange = nextTargetKeys => {
@@ -29,7 +27,9 @@ const SelectService = ({ getServices, services, addBreadcrumb }) => {
 
   return (
     <div>
-      <button><Link to={'environment'}>NEXT</Link></button>
+      <button>
+        <Link to={'environment'}>NEXT</Link>
+      </button>
       <TableTransfer
         dataSource={mockData}
         targetKeys={targetKeys}

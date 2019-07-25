@@ -14,7 +14,6 @@ import { NewDeployment } from '../deployment/new/NewDeployment';
 import { getAuthToken } from '../../api/api';
 
 
-
 const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
   useEffect(() => {
     appInit();
@@ -49,6 +48,7 @@ const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
               {loggedIn && <Route path="/deployment/new" title={'New deployment'} component={NewDeployment} />}
               {!loggedIn && <Route path="/auth/login" component={Login} />}
               {loggedIn ? <Redirect to={'/auth/addUser'} /> : <Redirect to={'/auth/login'} />}
+
 
             </Switch>
           </Layout.Content>
