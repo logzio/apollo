@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 
-const SelectGrourp = ({ handleBreadcrumbs }) => {
+const SelectGrourp = ({ handleBreadcrumbs, match }) => {
   useEffect(() => {
-    handleBreadcrumbs('/group', 'group');
+    handleBreadcrumbs(`${match.url}`, 'group');
   }, []);
 
   return <div>hi</div>;

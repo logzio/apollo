@@ -1,21 +1,18 @@
 import React from 'react';
 import { Table } from 'antd';
-import Spinner from './Spinner';
+// import AppTable from './Spinner';
 // import './Table.css';
 
-const AppTable = ({ columns, filteredItems, rowSelection, listDisabled, listSelectedKeys, onItemSelect }) => {
-  // debugger;
+const AppTable = ({ columns, filteredItems, rowSelection, listSelectedKeys, onItemSelect }) => {
   return (
     <Table
       columns={columns}
       dataSource={filteredItems}
       rowSelection={rowSelection}
-      size="small"
-      style={{ pointerEvents: listDisabled ? 'none' : null }}
-      onRow={({ key, disabled: itemDisabled }) => ({
+      size={"small"}
+      onRow={item => ({
         onClick: () => {
-          if (itemDisabled || listDisabled) return;
-          onItemSelect(key, !listSelectedKeys.includes(key));
+          onItemSelect(item.key, !listSelectedKeys.includes(item.key));
         },
       })}
     />
