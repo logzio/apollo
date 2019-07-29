@@ -63,3 +63,13 @@ export const getServices = async () => {
     throw error;
   }
 };
+
+export const getServicesStack = async () => {
+  try {
+    const response = await axios.get(`${baseUrl}/services-stack/`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

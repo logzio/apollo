@@ -1,18 +1,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Switch, Redirect, Route } from 'react-router-dom';
-import { getServices } from '../deploymentActions';
+import { getServices, getServicesStack } from '../deploymentActions';
 import SelectService from './SelectService';
 import SelectEnv from './SelectEnv'; //temp placeholder
 import SelectGrourp from './SelectGroup'; //temp placeholder
 
-const NewDeploymentComponent = ({ handleBreadcrumbs, getServices, services, match }) => {
+const NewDeploymentComponent = ({
+  handleBreadcrumbs,
+  getServices,
+  services,
+  getServicesStack,
+  match,
+  servicesStacks,
+}) => {
   return (
     <Switch>
       <Route
         path={`${match.url}/service`}
         render={({ match }) => (
-          <SelectService getServices={getServices} services={services} handleBreadcrumbs={handleBreadcrumbs} match={match} />
+          <SelectService
+            getServices={getServices}
+            services={services}
+            getServicesStack={getServicesStack}
+            servicesStacks={servicesStacks}
+            handleBreadcrumbs={handleBreadcrumbs}
+            match={match}
+          />
         )}
       />
       <Route
@@ -33,12 +47,13 @@ const mapStateToProps = state => {
   return {
     services: deploy.services,
     isLoading: deploy.isLoading,
+    servicesStacks: deploy.servicesStacks,
   };
 };
 
 const NewDeployment = connect(
   mapStateToProps,
-  { getServices },
+  { getServices, getServicesStack },
 )(NewDeploymentComponent);
 
 export default NewDeployment;
