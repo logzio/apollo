@@ -1,5 +1,5 @@
-import { GET_SERVICES_REQUEST, GET_SERVICES_SUCCESS, GET_SERVICES_FAILURE } from '../../actions';
-import { GET_SERVICES_STACK_REQUEST, GET_SERVICES_STACK_SUCCESS, GET_SERVICES_STACK_FAILURE } from './constants';
+import {GET_SERVICES_REQUEST, GET_SERVICES_SUCCESS, GET_SERVICES_FAILURE} from '../../actions';
+import { GET_SERVICES_STACK_REQUEST, GET_SERVICES_STACK_SUCCESS, GET_SERVICES_STACK_FAILURE, SELECT_SERVICE } from './constants';
 import * as API from '../../api/api';
 
 export const getServices = () => {
@@ -41,5 +41,14 @@ export const getServicesStack = () => {
         error,
       });
     }
+  };
+};
+
+export const selectServices = (servicesId) => {
+  return dispatch => {
+    dispatch({
+      type: SELECT_SERVICE,
+      payload: servicesId,
+    });
   };
 };

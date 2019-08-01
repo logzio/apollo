@@ -16,13 +16,9 @@ const TableTransfer = ({
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [showSearch] = useState(!!searchColumns);
-  const [isSelectAll, toggleSelectAll] = useState(false);
   const formattedData = data.map(dataItem => ({ ...dataItem, key: dataItem.id.toString() }));
-
   const handleSearch = (inputValue, item) => {
-    let searchedItem = false;
-    searchColumns.map(searchCol => (searchedItem = searchedItem || item[searchCol].indexOf(inputValue) !== -1));
-    return searchedItem;
+    return searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
   };
 
   return (
@@ -35,17 +31,6 @@ const TableTransfer = ({
         targetKeys={targetKeys}
         showSearch={showSearch}
         onChange={targetKeys => setTargetKeys(targetKeys)}
-        // onSelectChange={(sourceSelectedKeys, targetSelectedKeys) => {
-        //   const diffe = _.difference(targetSelectedKeys, targetKeys);
-        //   targetSelectedKeys = [];
-        //   return targetSelectedKeys;
-        //
-        // }}
-        // footer={() => (
-        //   <button size="small" style={{ float: 'right', margin: 5 }} onClick={() => setTargetKeys([])}>
-        //     reload
-        //   </button>
-        // )}
         {...props}
       >
         {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
@@ -55,7 +40,7 @@ const TableTransfer = ({
               // debugger;
               const currentKeysSelection = isSelected
                 ? _.difference(allRowsKeys, selectedKeys)
-                : _.difference(selectedKeys, allRowsKeys); //here change the selected keys and remove the group if needed
+                : _.difference(selectedKeys, allRowsKeys);
               onItemSelectAll(currentKeysSelection, isSelected);
             },
             onSelect: (item, isSelected) => onItemSelect(item.key, isSelected),
@@ -67,15 +52,11 @@ const TableTransfer = ({
             const addedKeys = _.difference(keys, targetKeys);
             if (addedKeys.length) {
               setTargetKeys([...targetKeys, ...addedKeys]);
-              // toggleSelectAll(false);
             } else {
               setTargetKeys(_.difference(targetKeys, keys));
-              // toggleSelectAll(true);
             }
           };
           const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
-
-          // debugger
 
           return (
             <div>
@@ -85,7 +66,6 @@ const TableTransfer = ({
                     key={predefinedGroup.id}
                     onClick={() => {
                       handleGroupSelection(predefinedGroup);
-                      // debugger;
                     }}
                   >
                     {predefinedGroup.name}

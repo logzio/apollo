@@ -3,9 +3,15 @@ import TableTransfer from '../../../common/TableTransfer';
 import Spinner from '../../../common/Spinner';
 import { Link } from 'react-router-dom';
 
-const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStack, servicesStacks, match }) => {
-  // const [filteredServices, setFilteredServices] = useState();
-
+const SelectService = ({
+  getServices,
+  services,
+  handleBreadcrumbs,
+  getServicesStack,
+  servicesStacks,
+  match,
+  selectServices,
+}) => {
   useEffect(() => {
     handleBreadcrumbs(`${match.url}`, 'service');
     getServices();
@@ -26,7 +32,9 @@ const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesSt
   return (
     <div>
       <button>
-        <Link to={'environment'}>NEXT</Link>
+        <Link to={'environment'} onClick={() => (selectServices(2))}>
+          NEXT
+        </Link>
       </button>
       <TableTransfer
         data={services}
