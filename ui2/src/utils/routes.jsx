@@ -31,5 +31,6 @@ const mapStateToProps = state => {
   };
 };
 
+
 export const PrivateRoute = connect(mapStateToProps)(PrivateRouteEl);
 export const PublicRoute = connect(mapStateToProps)(PublicRouteEl);
