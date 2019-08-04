@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { logout } from '../components/auth/authActions';
+import { logout } from '../store/actions/authActions';
 
 const baseUrl = 'http://localhost:8081';
 const AUTH_TOKEN = 'token';
 
 export const signup = async user => {
   try {
-    const response = await axios.post(`${baseUrl}/signup/`, user);
-    return response.data;
+    const { data = null } = await axios.post(`${baseUrl}/signup/`, user);
+    return data;
   } catch (error) {
     console.error(error);
     throw error.response.data.error;
@@ -16,8 +16,8 @@ export const signup = async user => {
 
 export const getDeploymentRoles = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/deployment-roles/`);
-    return response.data;
+    const { data = null } = await axios.get(`${baseUrl}/deployment-roles/`);
+    return data;
   } catch (error) {
     console.log(error.response.status);
     console.error(error);
@@ -27,9 +27,9 @@ export const getDeploymentRoles = async () => {
 
 export const login = async user => {
   try {
-    const response = await axios.post(`${baseUrl}/_login/`, user);
-    localStorage.setItem(AUTH_TOKEN, response.data.token);
-    return response.data;
+    const { data = null } = await axios.post(`${baseUrl}/_login/`, user);
+    localStorage.setItem(AUTH_TOKEN, data.token);
+    return data;
   } catch (error) {
     console.error(error);
     // throw error.response.data.error;

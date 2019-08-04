@@ -10,7 +10,7 @@ import {
   LOGIN_FAILURE,
   LOUGOUT,
   APP_INIT,
-} from '../../actions';
+} from './index';
 import * as API from '../../api/api';
 
 export const signup = userDetails => {

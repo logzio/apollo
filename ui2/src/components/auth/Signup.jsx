@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
-import SignupForm from './SignupForm';
+import { SignupForm } from './SignupForm';
 import { notification } from 'antd';
 import { connect } from 'react-redux';
-import { signup, getDeploymentRoles, login } from './authActions';
-import Spinner from '../../common/Spinner';
+import { signup, getDeploymentRoles, login } from '../../store/actions/authActions';
+import { Spinner } from '../../common/Spinner';
 import './Signup.css';
 
 const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoading }) => {
@@ -35,18 +35,9 @@ const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoadin
   );
 };
 
-const mapStateToProps = state => {
-  const { auth } = state;
-  return {
-    depRoles: auth.depRoles,
-    error: auth.error,
-    isLoading: auth.isLoading,
-  };
-};
+const mapStateToProps = ({ auth: { depRoles, isLoading, error } }) => ({ depRoles, isLoading, error });
 
-const Signup = connect(
+export const Signup = connect(
   mapStateToProps,
   { signup, getDeploymentRoles, login },
 )(SignupComponent);
-
-export default Signup;

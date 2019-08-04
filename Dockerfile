@@ -10,6 +10,6 @@ ADD https://oss.sonatype.org/content/repositories/public/io/hawt/hawtio-app/1.4.
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/go.sh /go.sh
 
-#COPY ui/dist /usr/share/nginx/html
+COPY ui/dist /usr/share/nginx/html
 COPY apollo-backend/target/apollo-backend-jar-with-dependencies.jar /apollo-backend-jar-with-dependencies.jar
 CMD /go.sh

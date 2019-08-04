@@ -10,7 +10,7 @@ import {
   GET_DEP_ROLE_SUCCESS,
   GET_DEP_ROLE_FAILURE,
   APP_INIT,
-} from '../../actions';
+} from '../actions';
 
 const initialState = {
   user: null,

@@ -5,7 +5,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) => {
+export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) => {
   const navItems = [
     { title: 'New Deployment', iconType: 'edit', path: '/deployment/new', isAdmin: false },
     { title: 'Ongoing Deployment', iconType: 'unordered-list', path: '/deployment/ongoing', isAdmin: false },
@@ -32,12 +32,12 @@ const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) => {
         )}
       </div>
       {navItems.map(
-        (navItem, index) =>
-          (!navItem.isAdmin || navItem.isAdmin === isAdmin) && (
+        ({ isAdmin: isAdminNav, path, iconType, title }, index) =>
+          (!isAdminNav || isAdminNav === isAdmin) && (
             <Menu.Item key={index}>
-              <Link to={navItem.path}>
-                <Icon type={navItem.iconType} />
-                <span>{navItem.title}</span>
+              <Link to={path}>
+                <Icon type={iconType} />
+                <span>{title}</span>
               </Link>
             </Menu.Item>
           ),
@@ -53,5 +53,3 @@ const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) => {
     </Menu>
   );
 };
-
-export default Navbar;
