@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Router } from 'react-router-dom';
+import { Router, Route } from 'react-router-dom';
 import history from '../../utils/history';
 import { connect } from 'react-redux';
-import { appInit, logout } from '../auth/authActions';
-import { PrivateRoute, PublicRoute } from '../../utils/routes';
-import Signup from '../auth/Signup';
-import Login from '../auth/Login';
+import { appInit, logout } from '../../store/actions/authActions';
+import { Signup } from '../auth/Signup';
+import { Login } from '../auth/Login';
 import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from 'antd';
-import Navbar from './Navbar';
+import { Navbar } from './Navbar';
 import './App.css';
+import { Container } from './Container';
 
 const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
   useEffect(() => {
@@ -34,9 +34,16 @@ const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
         <Layout>
           <Layout.Content className="app-content">
             <Switch>
-              {isAdmin && <PrivateRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
-              <PublicRoute path="/auth/login" component={Login} />
-              <Redirect to={'/home'} />
+              {loggedIn && isAdmin && (
+                <Route
+                  path="/auth/addUser"
+                  render={({ match, ...props }) => (
+                    <Container title={'Add a new user'} component={Signup} match={match} {...props} />
+                  )}
+                />
+              )}
+              {!loggedIn && <Route path="/auth/login" component={Login} />}
+              {loggedIn ? <Redirect to={'/auth/addUser'} /> : <Redirect to={'/auth/login'} />}
             </Switch>
           </Layout.Content>
         </Layout>
@@ -45,18 +52,9 @@ const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
   );
 };
 
-const mapStateToProps = state => {
-  const { auth } = state;
-  return {
-    loggedIn: auth.loggedIn,
-    isLoading: auth.isLoading,
-    isAdmin: auth.isAdmin,
-  };
-};
+const mapStateToProps = ({ auth: { loggedIn, isAdmin } }) => ({ loggedIn, isAdmin });
 
-const App = connect(
+export const App = connect(
   mapStateToProps,
   { appInit, logout },
 )(AppComponent);
-
-export default App;

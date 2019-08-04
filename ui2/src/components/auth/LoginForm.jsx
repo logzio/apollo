@@ -3,10 +3,10 @@ import { Formik, Field } from 'formik';
 import { loginSchema } from '../../utils/validations/authValidation';
 import { InputField } from '../../common/FormFields';
 import { Form } from 'antd';
-import Button from '../../common/Button';
+import { AppButton } from '../../common/Button';
 import './LoginForm.css';
 
-const LoginForm = ({ handleSubmit, isLoading }) => (
+export const LoginForm = ({ handleSubmit, isLoading }) => (
   <Formik
     className="login-form"
     initialValues={{ username: '', password: '' }}
@@ -19,7 +19,7 @@ const LoginForm = ({ handleSubmit, isLoading }) => (
       <Form onSubmit={handleSubmit} className="login-form">
         <Field name="username" type="email" iconType="mail" placeholder={'Email'} component={InputField} />
         <Field name="password" type="password" iconType="lock" placeholder={'Password'} component={InputField} />
-        <Button
+        <AppButton
           label="Login"
           type="primary"
           htmlType="submit"
@@ -31,5 +31,3 @@ const LoginForm = ({ handleSubmit, isLoading }) => (
     )}
   </Formik>
 );
-
-export default LoginForm;

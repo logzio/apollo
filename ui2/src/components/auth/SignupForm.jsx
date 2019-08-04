@@ -3,10 +3,10 @@ import { Formik, Field } from 'formik';
 import { signupSchema } from '../../utils/validations/authValidation';
 import { InputField, SelectField } from '../../common/FormFields';
 import { Form } from 'antd';
-import Button from '../../common/Button';
+import { AppButton } from '../../common/Button';
 import './SignupForm.css';
 
-const SignupForm = ({ handleSubmit, options, isLoading }) => (
+export const SignupForm = ({ handleSubmit, options, isLoading }) => (
   <Formik
     className="signup-form"
     initialValues={{ firstName: '', lastName: '', userEmail: '', password: '' }}
@@ -22,7 +22,7 @@ const SignupForm = ({ handleSubmit, options, isLoading }) => (
         <Field name="userEmail" iconType="mail" placeholder={'Email'} component={InputField} />
         <Field name="password" iconType="lock" placeholder={'Password'} component={InputField} />
         <Field name="roleDeployment" component={SelectField} options={options} />
-        <Button
+        <AppButton
           label="Add user"
           type="primary"
           htmlType="submit"
@@ -34,5 +34,3 @@ const SignupForm = ({ handleSubmit, options, isLoading }) => (
     )}
   </Formik>
 );
-
-export default SignupForm;

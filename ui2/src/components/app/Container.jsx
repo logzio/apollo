@@ -3,10 +3,10 @@ import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 import './Container.css';
 
-const Container = ({ title, component: Component, match, ...props }) => {
-  const routes = [{ path: '/home', title: 'Home' }, { path: `${match.path}`, title: title }];
+export const Container = ({ title, component: Component, match, ...props }) => {
+  const breadcrumbHomePath = [{ path: '/home', title: 'Home' }, { path: `${match.path}`, title: title }];
 
-  const [breadcrumbs, setBreadcrumb] = useState(routes); //temp setBreadcrumb wasn't used
+  const [breadcrumbs, setBreadcrumb] = useState(breadcrumbHomePath);
 
   return (
     <div className="container">
@@ -26,5 +26,3 @@ const Container = ({ title, component: Component, match, ...props }) => {
     </div>
   );
 };
-
-export default Container;
