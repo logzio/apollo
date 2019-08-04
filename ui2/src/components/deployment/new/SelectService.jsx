@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import TableTransfer from '../../../common/TableTransfer';
 import Spinner from '../../../common/Spinner';
-import { Link } from 'react-router-dom';
 
 const SelectService = ({
   getServices,
@@ -31,18 +30,15 @@ const SelectService = ({
 
   return (
     <div>
-      <button>
-        <Link to={'environment'} onClick={() => (selectServices(2))}>
-          NEXT
-        </Link>
-      </button>
       <TableTransfer
         data={services}
         searchColumns={['name']}
-        rightColTitles={['name']}
         leftColTitles={['name']}
+        rightColTitles={['name']}
         predefinedGroups={servicesStacks}
         selectGroup={stackSelection}
+        linkTo={'environment'}
+        addSearch={'services'}
       />
     </div>
   );

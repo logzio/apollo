@@ -4,6 +4,8 @@ import _ from 'lodash';
 import Table from './Table';
 import tableColumns from '../utils/tableColumns';
 import './TableTransfer.css';
+import { Link } from 'react-router-dom';
+import Button from '../common/Button';
 
 const TableTransfer = ({
   data,
@@ -12,6 +14,8 @@ const TableTransfer = ({
   leftColTitles,
   selectGroup,
   predefinedGroups,
+  linkTo,
+  addSearch,
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
@@ -37,7 +41,6 @@ const TableTransfer = ({
           let rowSelection = {
             onSelectAll: (isSelected, allRows) => {
               const allRowsKeys = allRows && allRows.map(item => item.key);
-              // debugger;
               const currentKeysSelection = isSelected
                 ? _.difference(allRowsKeys, selectedKeys)
                 : _.difference(selectedKeys, allRowsKeys);
@@ -50,6 +53,7 @@ const TableTransfer = ({
           const handleGroupSelection = predefinedGroup => {
             const keys = selectGroup(predefinedGroup.id);
             const addedKeys = _.difference(keys, targetKeys);
+            // debugger;
             if (addedKeys.length) {
               setTargetKeys([...targetKeys, ...addedKeys]);
             } else {
@@ -71,7 +75,19 @@ const TableTransfer = ({
                     {predefinedGroup.name}
                   </button>
                 ))}
-              {direction === 'right' && <button onClick={() => setTargetKeys([])}>Reset</button>}
+              {direction === 'right' && (
+                <div>
+                  <button onClick={() => setTargetKeys([])}>Reset</button>
+                  <Link
+                    to={{
+                      pathname: linkTo,
+                      search: `${addSearch}=${targetKeys}`,
+                    }}
+                  >
+                    <Button label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
+                  </Link>
+                </div>
+              )}
               <Table
                 columns={columns}
                 filteredItems={filteredItems}

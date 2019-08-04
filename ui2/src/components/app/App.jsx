@@ -50,6 +50,7 @@ const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
               {loggedIn ? <Redirect to={'/auth/addUser'} /> : <Redirect to={'/auth/login'} />}
 
 
+
             </Switch>
           </Layout.Content>
         </Layout>

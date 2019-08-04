@@ -73,3 +73,23 @@ export const getServicesStack = async () => {
     throw error;
   }
 };
+
+export const getEnvironment = async () => {
+  try {
+    const response = await axios.get(`${baseUrl}/environment/`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getEnvironmentsStack = async () => {
+  try {
+    const response = await axios.get(`${baseUrl}/environments-stack/`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

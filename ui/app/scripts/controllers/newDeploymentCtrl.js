@@ -12,7 +12,7 @@ angular.module('apollo')
         var previouseEnvironmentLocalStorageKey = 'previous-run-environment-id';
 
 
-        var favoriteServicesLocalStorageKey = 'favorite-services-names';
+        var favoriteServicesLocalStorageKey = 'favorite-servicesMock-names';
         $scope.favoriteServicesNames = localStorageService.get(favoriteServicesLocalStorageKey) || [];
 
         var previouseServiceLocalStorageKey = 'previous-run-service-id';
