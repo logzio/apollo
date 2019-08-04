@@ -1,0 +1,9 @@
+.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.bright .ant-spin-dot-item{
+    background-color: white;
+}

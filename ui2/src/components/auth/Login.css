@@ -1,0 +1,21 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-title{
+    height: 145px;
+    width: inherit;
+    display: flex;
+    flex-direction: column;
+    padding-top: 20px;
+    justify-content: flex-end;
+    margin: 0 0 20px -35px;
+}
+
+.login-logo{
+    margin: 0;
+    max-height: 40%;
+}

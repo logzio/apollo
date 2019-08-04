@@ -1,11 +1,31 @@
 version: '3'
 
 services:
+  apollo-backend:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    image: apollo-backend
+    container_name: apollo-backend
+    ports:
+      - "8081:8081"
+    networks:
+      - apollo-network
+
+
   db:
     image: mysql
     ports:
       - "3306:3306"
     restart: always
+    networks:
+      - apollo-network
 
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
+
+
+
+networks:
+  apollo-network:
+    external: true
