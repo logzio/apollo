@@ -1,10 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Switch, Redirect, Route } from 'react-router-dom';
-import { getServices, getServicesStack, getEnvironment, getEnvironmentsStack } from '../deploymentActions';
-import SelectService from './SelectService';
-import SelectEnv from './SelectEnv';
-import SelectGrourp from './SelectGroup'; //temp placeholder
+import {
+  getServices,
+  getServicesStack,
+  getEnvironment,
+  getEnvironmentsStack,
+} from '../../../store/actions/deploymentActions';
+import { SelectService } from './SelectService';
+import { SelectEnvironment } from './SelectEnv';
+import { SelectGrourp } from './SelectGroup'; //temp placeholder
 
 const NewDeploymentComponent = ({
   handleBreadcrumbs,
@@ -36,7 +41,7 @@ const NewDeploymentComponent = ({
       <Route
         path={`${match.url}/environment`}
         render={({ match }) => (
-          <SelectEnv
+          <SelectEnvironment
             handleBreadcrumbs={handleBreadcrumbs}
             match={match}
             getEnvironment={getEnvironment}
@@ -55,23 +60,11 @@ const NewDeploymentComponent = ({
   );
 };
 
-const mapStateToProps = state => {
-  const {
-    deploy: { services, isLoading, servicesStacks, selectedServices, environment, environmentsStacks },
-  } = state;
-  return {
-    services,
-    isLoading,
-    servicesStacks,
-    selectedServices,
-    environment,
-    environmentsStacks,
-  };
-};
+const mapStateToProps = ({
+  deploy: { services, isLoading, servicesStacks, selectedServices, environment, environmentsStacks },
+}) => ({ services, isLoading, servicesStacks, selectedServices, environment, environmentsStacks });
 
-const NewDeployment = connect(
+export const NewDeployment = connect(
   mapStateToProps,
   { getServices, getServicesStack, getEnvironment, getEnvironmentsStack },
 )(NewDeploymentComponent);
-
-export default NewDeployment;

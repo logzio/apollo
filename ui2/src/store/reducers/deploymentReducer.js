@@ -1,5 +1,7 @@
-import { GET_SERVICES_REQUEST, GET_SERVICES_SUCCESS, GET_SERVICES_FAILURE } from '../../actions';
 import {
+  GET_SERVICES_REQUEST,
+  GET_SERVICES_SUCCESS,
+  GET_SERVICES_FAILURE,
   GET_SERVICES_STACK_REQUEST,
   GET_SERVICES_STACK_SUCCESS,
   GET_SERVICES_STACK_FAILURE,
@@ -10,7 +12,7 @@ import {
   GET_ENV_REQUEST,
   GET_ENV_SUCCESS,
   GET_ENV_FAILURE,
-} from './constants';
+} from '../actions';
 
 const initialState = {
   services: null,

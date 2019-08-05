@@ -41,8 +41,7 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         ? setBreadcrumbs([...breadcrumbs, ...prevBreadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }])
         : setBreadcrumbs([...breadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }]);
     }
-
-
+  };
 
   return (
     <div className="container">

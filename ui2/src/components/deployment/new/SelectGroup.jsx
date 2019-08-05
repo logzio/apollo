@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
 
-const SelectGrourp = ({ handleBreadcrumbs, match }) => {
+export const SelectGrourp = ({ handleBreadcrumbs }) => {
   useEffect(() => {
     handleBreadcrumbs(`${window.location.href}`, 'group');
   }, []);
 
   return <div>hi</div>;
 };
-
-export default SelectGrourp;

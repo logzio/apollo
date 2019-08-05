@@ -1,14 +1,13 @@
 import React, { useEffect } from 'react';
-import TableTransfer from '../../../common/TableTransfer';
-import Spinner from '../../../common/Spinner';
+import { TableTransfer } from '../../../common/TableTransfer';
+import { Spinner } from '../../../common/Spinner';
 
-const SelectEnvironment = ({
+export const SelectEnvironment = ({
   getEnvironment,
   getEnvironmentsStack,
   handleBreadcrumbs,
   environment,
   environmentsStacks,
-  match,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${window.location.href}`, 'environment');
@@ -22,7 +21,6 @@ const SelectEnvironment = ({
       .filter(env => selectedStack.environments && selectedStack.environments.includes(env.id))
       .map(selectedEnv => selectedEnv.id.toString());
   };
-  // debugger
 
   if (!environment || !environmentsStacks) {
     return <Spinner />;
@@ -43,5 +41,3 @@ const SelectEnvironment = ({
     </div>
   );
 };
-
-export default SelectEnvironment;

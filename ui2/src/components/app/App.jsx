@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Router, Route } from 'react-router-dom';
-import history from '../../utils/history';
+import { history } from '../../utils/history';
 import { connect } from 'react-redux';
 import { appInit, logout } from '../../store/actions/authActions';
 import { Signup } from '../auth/Signup';
@@ -8,12 +8,10 @@ import { Login } from '../auth/Login';
 import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from 'antd';
 import { Navbar } from './Navbar';
-import {getAuthToken} from '../../api/api';
-import './App.css';
+import { getAuthToken } from '../../api/api';
 import { Container } from './Container';
 import { NewDeployment } from '../deployment/new/NewDeployment';
-import { getAuthToken } from '../../api/api';
-
+import './App.css';
 
 const AppComponent = ({ appInit, logout, isAdmin }) => {
   useEffect(() => {
@@ -50,9 +48,6 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
               {loggedIn && <Route path="/deployment/new" title={'New deployment'} component={NewDeployment} />}
               {!loggedIn && <Route path="/auth/login" component={Login} />}
               {loggedIn ? <Redirect to={'/auth/addUser'} /> : <Redirect to={'/auth/login'} />}
-
-
-
             </Switch>
           </Layout.Content>
         </Layout>

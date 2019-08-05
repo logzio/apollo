@@ -5,9 +5,9 @@ import Table from './Table';
 import tableColumns from '../utils/tableColumns';
 import './TableTransfer.css';
 import { Link } from 'react-router-dom';
-import Button from '../common/Button';
+import { AppButton } from '../common/Button';
 
-const TableTransfer = ({
+export const TableTransfer = ({
   data,
   searchColumns,
   rightColTitles,
@@ -83,7 +83,7 @@ const TableTransfer = ({
                       search: `${addSearch}=${targetKeys}`,
                     }}
                   >
-                    <Button label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
+                    <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
                   </Link>
                 </div>
               )}
@@ -101,5 +101,3 @@ const TableTransfer = ({
     </div>
   );
 };
-
-export default TableTransfer;
