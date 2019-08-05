@@ -8,18 +8,20 @@ import { Login } from '../auth/Login';
 import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from 'antd';
 import { Navbar } from './Navbar';
+import {getAuthToken} from '../../api/api';
 import './App.css';
 import { Container } from './Container';
 import { NewDeployment } from '../deployment/new/NewDeployment';
 import { getAuthToken } from '../../api/api';
 
 
-const AppComponent = ({ loggedIn, appInit, logout, isAdmin }) => {
+const AppComponent = ({ appInit, logout, isAdmin }) => {
   useEffect(() => {
     appInit();
   }, [appInit]);
 
   const [collapsed, toggleCollapse] = useState(false);
+  const loggedIn = !!getAuthToken();
 
   return (
     <Router history={history}>

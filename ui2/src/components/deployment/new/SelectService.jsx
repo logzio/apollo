@@ -9,7 +9,6 @@ const SelectService = ({
   getServicesStack,
   servicesStacks,
   match,
-  selectServices,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${match.url}`, 'service');
@@ -38,7 +37,7 @@ const SelectService = ({
         predefinedGroups={servicesStacks}
         selectGroup={stackSelection}
         linkTo={'environment'}
-        addSearch={'services'}
+        addSearch={'service'}
       />
     </div>
   );

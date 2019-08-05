@@ -38,7 +38,7 @@ const TableTransfer = ({
         {...props}
       >
         {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-          let rowSelection = {
+          const rowSelection = {
             onSelectAll: (isSelected, allRows) => {
               const allRowsKeys = allRows && allRows.map(item => item.key);
               const currentKeysSelection = isSelected
@@ -53,7 +53,6 @@ const TableTransfer = ({
           const handleGroupSelection = predefinedGroup => {
             const keys = selectGroup(predefinedGroup.id);
             const addedKeys = _.difference(keys, targetKeys);
-            // debugger;
             if (addedKeys.length) {
               setTargetKeys([...targetKeys, ...addedKeys]);
             } else {

@@ -11,7 +11,7 @@ const SelectEnvironment = ({
   match,
 }) => {
   useEffect(() => {
-    handleBreadcrumbs(`${match.url}`, 'environment');
+    handleBreadcrumbs(`${window.location.href}`, 'environment');
     getEnvironment();
     getEnvironmentsStack();
   }, []);
@@ -22,6 +22,7 @@ const SelectEnvironment = ({
       .filter(env => selectedStack.environments && selectedStack.environments.includes(env.id))
       .map(selectedEnv => selectedEnv.id.toString());
   };
+  // debugger
 
   if (!environment || !environmentsStacks) {
     return <Spinner />;
@@ -37,7 +38,7 @@ const SelectEnvironment = ({
         predefinedGroups={environmentsStacks}
         selectGroup={stackSelection}
         linkTo={'group'}
-        addSearch={'environment'}
+        addSearch={`${window.location.search}&environment`}
       />
     </div>
   );

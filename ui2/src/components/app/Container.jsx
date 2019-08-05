@@ -23,6 +23,7 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         path: searchParams[index - 1]
           ? `${match.url}/${searchTitle}?${searchParams[index - 1]}`
           : `${match.url}/${searchTitle}`,
+
         title: searchTitle,
       }));
       prevBreadcrumbs.map(prevBreadcrumb => {
@@ -56,8 +57,7 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         </Breadcrumb>
       </div>
       <div className="container-content">
-
-        <Component handleBreadcrumbs={handleBreadcrumbs} {...props} />
+        <Component handleBreadcrumbs={handleBreadcrumbs} match={match} {...props} />
       </div>
     </div>
   );

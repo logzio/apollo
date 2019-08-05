@@ -2,7 +2,7 @@ import axios from 'axios';
 import { logout } from '../store/actions/authActions';
 
 const baseUrl = 'http://localhost:8081';
-const AUTH_TOKEN = 'token';
+export const AUTH_TOKEN = 'token';
 
 export const signup = async user => {
   try {
@@ -37,17 +37,17 @@ export const login = async user => {
   }
 };
 
+export const getAuthToken = () => localStorage.getItem(AUTH_TOKEN);
+
 export const appInit = () => {
-  const token = localStorage.getItem(AUTH_TOKEN);
-  let loggedIn = false;
+  const token = getAuthToken();
   if (token) {
     axios.defaults.headers.common['Authorization'] = token;
-    loggedIn = true;
   } else {
     logout();
   }
 
-  return loggedIn;
+  return !!token;
 };
 
 export const appLogout = () => {
