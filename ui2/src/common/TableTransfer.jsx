@@ -21,76 +21,68 @@ export const TableTransfer = ({
   const [targetKeys, setTargetKeys] = useState([]);
   const [showSearch] = useState(!!searchColumns);
   const formattedData = data.map(dataItem => ({ ...dataItem, key: dataItem.id.toString() }));
+
   const handleSearch = (inputValue, item) => {
     return searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
   };
+  const handleGroupSelection = predefinedGroupId => {
+    const keys = selectGroup(predefinedGroupId);
+    const addedKeys = _.difference(keys, targetKeys);
+    if (addedKeys.length) {
+      setTargetKeys([...targetKeys, ...addedKeys]);
+    } else {
+      setTargetKeys(_.difference(targetKeys, keys));
+    }
+  };
 
   return (
-    <div className="table-transfer">
-      <Transfer
-        className="transfer"
-        dataSource={formattedData}
-        filterOption={(inputValue, item) => handleSearch(inputValue, item)}
-        showSelectAll={false}
-        targetKeys={targetKeys}
-        showSearch={showSearch}
-        onChange={targetKeys => setTargetKeys(targetKeys)}
-        {...props}
-      >
-        {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-          const rowSelection = {
-            onSelectAll: (isSelected, allRows) => {
-              const allRowsKeys = allRows && allRows.map(item => item.key);
-              const currentKeysSelection = isSelected
-                ? _.difference(allRowsKeys, selectedKeys)
-                : _.difference(selectedKeys, allRowsKeys);
-              onItemSelectAll(currentKeysSelection, isSelected);
-            },
-            onSelect: (item, isSelected) => onItemSelect(item.key, isSelected),
-            selectedRowKeys: selectedKeys,
-          };
+    <Transfer
+      className="table-transfer"
+      dataSource={formattedData}
+      filterOption={(inputValue, item) => handleSearch(inputValue, item)}
+      showSelectAll={false}
+      targetKeys={targetKeys}
+      showSearch={showSearch}
+      onChange={targetKeys => setTargetKeys(targetKeys)}
+      {...props}
+    >
+      {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
+        const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
+        const scroll = direction === 'left' ? { x: 1000, y: 600 } : { x: 500, y: 600 };
 
-          const handleGroupSelection = predefinedGroupId => {
-            const keys = selectGroup(predefinedGroupId);
-            const addedKeys = _.difference(keys, targetKeys);
-            if (addedKeys.length) {
-              setTargetKeys([...targetKeys, ...addedKeys]);
-            } else {
-              setTargetKeys(_.difference(targetKeys, keys));
-            }
-          };
-          const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
-
-          return (
-            <div>
-              {direction === 'left' &&
-                predefinedGroups.map(({ id, name }) => (
+        return (
+          <div>
+            {direction === 'left' && (
+              <>
+                {predefinedGroups.map(({ id, name }) => (
                   <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
                 ))}
-              {direction === 'right' && (
-                <div>
-                  <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
-                  <Link
-                    to={{
-                      pathname: linkTo,
-                      search: `${addSearch}=${targetKeys}`,
-                    }}
-                  >
-                    <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
-                  </Link>
-                </div>
-              )}
-              <AppTable
-                columns={columns}
-                filteredItems={filteredItems}
-                rowSelection={rowSelection}
-                listSelectedKeys={selectedKeys}
-                onItemSelect={onItemSelect}
-              />
-            </div>
-          );
-        }}
-      </Transfer>
-    </div>
+                <Link
+                  to={{
+                    pathname: linkTo,
+                    search: `${addSearch}=${targetKeys}`,
+                  }}
+                >
+                  <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
+                </Link>
+              </>
+            )}
+            {direction === 'right' && (
+              <div>
+                <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
+              </div>
+            )}
+            <AppTable
+              columns={columns}
+              filteredItems={filteredItems}
+              onItemSelectAll={onItemSelectAll}
+              onItemSelect={onItemSelect}
+              selectedKeys={selectedKeys}
+              scroll={scroll}
+            />
+          </div>
+        );
+      }}
+    </Transfer>
   );
 };

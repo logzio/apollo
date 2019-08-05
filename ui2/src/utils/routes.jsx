@@ -1,11 +1,10 @@
 import React from 'react';
 import { Route, Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import Container from '../components/app/Container';
-import Login from '../components/auth/Login';
+import { Container } from '../components/app/Container';
+import { Login } from '../components/auth/Login';
 
-const PrivateRouteEl = ({path, loggedIn, component, title }) => {
-  return !!localStorage.getItem('token') ? (
+export const PrivateRoute = ({ path, component, title }) => {
+  return localStorage.getItem('token') ? (
     <Route
       path={path}
       render={({ match, ...props }) => <Container title={title} component={component} match={match} {...props} />}
@@ -15,11 +14,10 @@ const PrivateRouteEl = ({path, loggedIn, component, title }) => {
   );
 };
 
-const PublicRouteEl = ({loggedIn}) => {
-  return !!localStorage.getItem('token') ? (
-    <Redirect to="/deployment/new" /> //temp, will be directed to home
+export const PublicRoute = () => {
+  return localStorage.getItem('token') ? (
+    <Redirect to="/auth/addUser" /> //TODO: temp, will be directed to home
   ) : (
     <Route path="/auth/login" component={Login} />
   );
 };
-

@@ -5,7 +5,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) => {
+export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin, setIsNavbarClicked }) => {
   const navItems = [
     { title: 'New Deployment', iconType: 'edit', path: '/deployment/new', isAdmin: false },
     { title: 'Ongoing Deployment', iconType: 'unordered-list', path: '/deployment/ongoing', isAdmin: false },
@@ -20,7 +20,7 @@ export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) =>
   return (
     <Menu
       className="navbar-menu"
-      defaultSelectedKeys={['0']} //temp until we have a home screen
+      defaultSelectedKeys={['7']} //temp until we have a home screen
       mode="inline"
       theme="dark"
     >

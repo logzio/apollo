@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 import './Container.css';
 
 export const Container = ({ title, component: Component, match, ...props }) => {
-  const breadcrumbHomePath = [{ path: '/home', title: 'Home' }, { path: `${match.path}`, title: title }];
+  const breadcrumbHomePath = [{ path: '/home', title: 'Home' }];
 
   const [breadcrumbs, setBreadcrumbs] = useState(breadcrumbHomePath);
 
-  // useEffect(() => setBreadcrumbs(breadcrumbsInit), [Component]);
+  // useEffect(() => setBreadcrumbs(breadcrumbHomePath), [Component]);
 
   const handleBreadcrumbs = (path, title) => {
     const pathSearch = path.split('?')[1];
@@ -47,9 +47,9 @@ export const Container = ({ title, component: Component, match, ...props }) => {
       <div className="container-title large-title">{title}</div>
       <div className="container-breadcrumbs">
         <Breadcrumb>
-          {breadcrumbs.map((breadcrumb, index) => (
+          {breadcrumbs.map(({ path, title }, index) => (
             <Breadcrumb.Item key={index} className="container-breadcrumb">
-              <Link to={breadcrumb.path}>{breadcrumb.title}</Link>
+              <Link to={path}>{title}</Link>
             </Breadcrumb.Item>
           ))}
         </Breadcrumb>
