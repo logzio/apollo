@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Transfer } from 'antd';
 import _ from 'lodash';
-import Table from './Table';
-import tableColumns from '../utils/tableColumns';
-import './TableTransfer.css';
+import { AppTable } from './Table';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
+import { tableColumns } from '../utils/tableColumns';
+import './TableTransfer.css';
 
 export const TableTransfer = ({
   data,
@@ -50,8 +50,8 @@ export const TableTransfer = ({
             selectedRowKeys: selectedKeys,
           };
 
-          const handleGroupSelection = predefinedGroup => {
-            const keys = selectGroup(predefinedGroup.id);
+          const handleGroupSelection = predefinedGroupId => {
+            const keys = selectGroup(predefinedGroupId);
             const addedKeys = _.difference(keys, targetKeys);
             if (addedKeys.length) {
               setTargetKeys([...targetKeys, ...addedKeys]);
@@ -64,19 +64,12 @@ export const TableTransfer = ({
           return (
             <div>
               {direction === 'left' &&
-                predefinedGroups.map(predefinedGroup => (
-                  <button
-                    key={predefinedGroup.id}
-                    onClick={() => {
-                      handleGroupSelection(predefinedGroup);
-                    }}
-                  >
-                    {predefinedGroup.name}
-                  </button>
+                predefinedGroups.map(({ id, name }) => (
+                  <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
                 ))}
               {direction === 'right' && (
                 <div>
-                  <button onClick={() => setTargetKeys([])}>Reset</button>
+                  <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
                   <Link
                     to={{
                       pathname: linkTo,
@@ -87,7 +80,7 @@ export const TableTransfer = ({
                   </Link>
                 </div>
               )}
-              <Table
+              <AppTable
                 columns={columns}
                 filteredItems={filteredItems}
                 rowSelection={rowSelection}

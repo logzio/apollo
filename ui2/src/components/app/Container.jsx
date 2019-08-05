@@ -23,7 +23,6 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         path: searchParams[index - 1]
           ? `${match.url}/${searchTitle}?${searchParams[index - 1]}`
           : `${match.url}/${searchTitle}`,
-
         title: searchTitle,
       }));
       prevBreadcrumbs.map(prevBreadcrumb => {

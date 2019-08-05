@@ -18,13 +18,13 @@ export const InputField = ({ field, form: { touched, errors }, type, iconType, p
   </Form.Item>
 );
 
-export const SelectField = ({ field, options }) => (
+export const SelectField = ({ field: { name }, options }) => (
   <Form.Item>
-    <Select name={field.name} defaultValue={options && options[0].name}>
+    <Select name={name} defaultValue={options && options[0].name}>
       {options &&
-        options.map(option => (
-          <Select.Option value={option.id} key={option.id}>
-            {option.name}
+        options.map(({ id, name }) => (
+          <Select.Option value={id} key={id}>
+            {name}
           </Select.Option>
         ))}
     </Select>

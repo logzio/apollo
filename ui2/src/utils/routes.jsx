@@ -23,12 +23,3 @@ const PublicRouteEl = ({loggedIn}) => {
   );
 };
 
-const mapStateToProps = state => {
-  const { auth } = state;
-  return {
-    loggedIn: auth.loggedIn,
-  };
-};
-
-export const PrivateRoute = connect(mapStateToProps)(PrivateRouteEl);
-export const PublicRoute = connect(mapStateToProps)(PublicRouteEl);

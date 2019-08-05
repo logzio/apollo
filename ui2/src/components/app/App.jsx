@@ -37,15 +37,24 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
         <Layout>
           <Layout.Content className="app-content">
             <Switch>
-              {loggedIn && isAdmin && (
-                <Route
-                  path="/auth/addUser"
-                  render={({ match, ...props }) => (
-                    <Container title={'Add a new user'} component={Signup} match={match} {...props} />
+              {loggedIn && (
+                <>
+                  {isAdmin && (
+                    <Route
+                      path="/auth/addUser"
+                      render={({ match, ...props }) => (
+                        <Container title={'Add a new user'} component={Signup} match={match} {...props} />
+                      )}
+                    />
                   )}
-                />
+                  <Route
+                    path="/deployment/new"
+                    render={({ match, ...props }) => (
+                      <Container title={'New deployment'} component={NewDeployment} match={match} {...props} />
+                    )}
+                  />
+                </>
               )}
-              {loggedIn && <Route path="/deployment/new" title={'New deployment'} component={NewDeployment} />}
               {!loggedIn && <Route path="/auth/login" component={Login} />}
               {loggedIn ? <Redirect to={'/auth/addUser'} /> : <Redirect to={'/auth/login'} />}
             </Switch>

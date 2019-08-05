@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import './Table.css';
 
-const AppTable = ({ columns, filteredItems, rowSelection, listSelectedKeys, onItemSelect }) => {
+export const AppTable = ({ columns, filteredItems, rowSelection, listSelectedKeys, onItemSelect }) => {
   return (
     <Table
       className="app-table"
@@ -18,5 +18,3 @@ const AppTable = ({ columns, filteredItems, rowSelection, listSelectedKeys, onIt
     />
   );
 };
-
-export default AppTable;
