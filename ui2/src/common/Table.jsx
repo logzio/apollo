@@ -2,8 +2,19 @@ import React from 'react';
 import { Table } from 'antd';
 import _ from 'lodash';
 import './Table.css';
+import { Link } from 'react-router-dom';
+import { historyBrowser } from '../utils/history';
 
-export const AppTable = ({ columns, filteredItems, onItemSelectAll, onItemSelect, selectedKeys, scroll }) => {
+export const AppTable = ({
+  columns,
+  filteredItems,
+  onItemSelectAll,
+  onItemSelect,
+  selectedKeys,
+  scroll,
+  linkTo,
+}) => {
+  // debugger;
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -26,6 +37,11 @@ export const AppTable = ({ columns, filteredItems, onItemSelectAll, onItemSelect
       pagination={false}
       onRow={item => ({
         onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
+        onDoubleClick: () => {
+          onItemSelect(item.key, !selectedKeys.includes(item.key));
+          console.log('hi')
+          historyBrowser.push(`${linkTo}`);
+        },
       })}
       scroll={scroll}
     />

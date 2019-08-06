@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
-import { history } from '../../utils/history';
+import { historyBrowser } from '../../utils/history';
 import { connect } from 'react-redux';
 import { appInit, logout } from '../../store/actions/authActions';
 import { Signup } from '../auth/Signup';
@@ -28,7 +28,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   };
 
   return (
-    <Router history={history}>
+    <Router history={historyBrowser}>
       <Layout className="app">
         {isSession && (
           <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
