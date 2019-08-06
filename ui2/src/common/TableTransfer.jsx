@@ -48,7 +48,7 @@ export const TableTransfer = ({
     >
       {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
         const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
-        const scroll = direction === 'left' ? { x: 1000, y: 600 } : { x: 500, y: 600 };
+        const scroll = direction === 'left' ? { x: 900, y: 600 } : { x: 400, y: 600 };
 
         return (
           <div>
@@ -79,6 +79,7 @@ export const TableTransfer = ({
               onItemSelect={onItemSelect}
               selectedKeys={selectedKeys}
               scroll={scroll}
+              linkTo={linkTo}
             />
           </div>
         );

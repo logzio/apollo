@@ -148,9 +148,9 @@ angular
         }
     })
       .state('deployments.history',{
-            templateUrl:'views/deployments/history.html',
+            templateUrl:'views/deployments/historyBrowser.html',
             controller: 'deploymentHistoryCtrl',
-            url:'/history',
+            url:'/historyBrowser',
             resolve: {
                       loadMyFiles:function($ocLazyLoad) {
                         return $ocLazyLoad.load({

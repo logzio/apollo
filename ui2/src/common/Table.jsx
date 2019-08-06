@@ -2,6 +2,8 @@ import React from 'react';
 import { Table } from 'antd';
 import _ from 'lodash';
 import './Table.css';
+import { Link } from 'react-router-dom';
+import { historyBrowser } from '../utils/history';
 
 export const AppTable = ({ filteredItems, onItemSelectAll, onItemSelect, selectedKeys, ...props }) => {
   const rowSelection = {
@@ -25,6 +27,11 @@ export const AppTable = ({ filteredItems, onItemSelectAll, onItemSelect, selecte
       pagination={false}
       onRow={item => ({
         onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
+        onDoubleClick: () => {
+          onItemSelect(item.key, !selectedKeys.includes(item.key));
+          console.log('hi')
+          historyBrowser.push(`${linkTo}`);
+        },
       })}
       {...props}
     />
