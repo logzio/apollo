@@ -37,74 +37,54 @@ export const TableTransfer = ({
   };
   const currentTable = match.url.split('/').pop();
   return (
-    <>
-      <div className="submit-transfer-table">
-        <Link
-          to={{
-            pathname: linkTo,
-            search: `${addSearch}=${targetKeys}`,
-          }}
-        >
-          <AppButton
-            label={`Select your ${currentTable}`}
-            disabled={!targetKeys.length}
-            className={'table-submit-button'}
-            type="primary"
-          />
-        </Link>
-      </div>
-      <Transfer
-        className="table-transfer"
-        dataSource={formattedData}
-        filterOption={handleSearch}
-        showSelectAll={false}
-        targetKeys={targetKeys}
-        showSearch={showSearch}
-        onChange={targetKeys => setTargetKeys(targetKeys)}
-        titles={[`Please select at least one ${currentTable}`, `Selected items`]}
-        {...props}
-      >
-        {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-          const columns =
-            direction === 'left' ? transferTableColumns(leftColTitles) : transferTableColumns(rightColTitles);
-          const scroll = direction === 'left' ? { x: 900, y: 580 } : { x: 400, y: 580 };
-          return (
-            <div>
-              {direction === 'left' && (
-                <div className="header-left-transfer-table">
-                  {predefinedGroups.map(({ id, name }) => (
-                    <AppButton
-                      key={id}
-                      label={name}
-                      className={'table-button'}
-                      onClick={() => handleGroupSelection(id)}
-                      icon={'block'}
-                    />
-                  ))}
-                </div>
-              )}
-              {direction === 'right' && (
-                <div>
-                  <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
-                </div>
-              )}
-              <AppTable
-                columns={columns}
-                data={filteredItems}
-                onItemSelectAll={onItemSelectAll}
-                onItemSelect={onItemSelect}
-                selectedKeys={selectedKeys}
-                scroll={scroll}
-                linkTo={linkTo}
-                addSearch={`${addSearch}=`}
-                setTargetKeys={setTargetKeys}
-                targetKeys={targetKeys}
-                showSelection={true}
-              />
-            </div>
-          );
-        }}
-      </Transfer>
-    </>
+    <Transfer
+      className="table-transfer"
+      dataSource={formattedData}
+      filterOption={(inputValue, item) => handleSearch(inputValue, item)}
+      showSelectAll={false}
+      targetKeys={targetKeys}
+      showSearch={showSearch}
+      onChange={targetKeys => setTargetKeys(targetKeys)}
+      {...props}
+    >
+      {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
+        const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
+        const scroll = direction === 'left' ? { x: 900, y: 600 } : { x: 400, y: 600 };
+
+        return (
+          <div>
+            {direction === 'left' && (
+              <>
+                {predefinedGroups.map(({ id, name }) => (
+                  <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
+                ))}
+                <Link
+                  to={{
+                    pathname: linkTo,
+                    search: `${addSearch}=${targetKeys}`,
+                  }}
+                >
+                  <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
+                </Link>
+              </>
+            )}
+            {direction === 'right' && (
+              <div>
+                <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
+              </div>
+            )}
+            <AppTable
+              columns={columns}
+              filteredItems={filteredItems}
+              onItemSelectAll={onItemSelectAll}
+              onItemSelect={onItemSelect}
+              selectedKeys={selectedKeys}
+              scroll={scroll}
+              linkTo={linkTo}
+            />
+          </div>
+        );
+      }}
+    </Transfer>
   );
 };

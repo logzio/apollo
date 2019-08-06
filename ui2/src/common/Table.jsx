@@ -4,25 +4,19 @@ import _ from 'lodash';
 import { historyBrowser } from '../utils/history';
 import { AppSearch } from '../common/Search';
 import './Table.css';
+import { Link } from 'react-router-dom';
+import { historyBrowser } from '../utils/history';
 
 export const AppTable = ({
   columns,
-  data,
+  filteredItems,
   onItemSelectAll,
   onItemSelect,
   selectedKeys,
   scroll,
-  linkTo,
-  addSearch,
-  setTargetKeys,
-  targetKeys,
-  showSelection,
-  searchColumns,
-  showSearch
-    , ...props
+  linkTo,   ...props
 }) => {
-  const [searchValue, setSearchValue] = useState(null);
-  const [filteredData, setFilteredData] = useState(data);
+  // debugger;
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -49,37 +43,22 @@ export const AppTable = ({
   };
 
   return (
-    <>
-      {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
-      <Table
-        className="app-table"
-        columns={columns}
-        dataSource={filteredData}
-        rowSelection={showSelection ? rowSelection : null}
-        size={'small'}
-        pagination={false}
-        onRow={({ key }) => ({
-          onClick: () => {
-            onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
-            // setTargetKeys && setTargetKeys([...targetKeys, key]);
-          },
-          onDoubleClick: () => {
-            const keys = targetKeys ? targetKeys : [];
-            setTargetKeys && setTargetKeys([...keys, key]);
-            onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
-            setTimeout(
-              () =>
-                historyBrowser.push({
-                  pathname: `${linkTo}`,
-                  search: `${addSearch}${[...keys, key]}`,
-                }),
-              100,
-            );
-          },
-        })}
-        scroll={scroll}
-        {...props}
-      />
-    </>
+    <Table
+      className="app-table"
+      columns={columns}
+      dataSource={filteredItems}
+      rowSelection={rowSelection}
+      size={'small'}
+      pagination={false}
+      onRow={item => ({
+        onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
+        onDoubleClick: () => {
+          onItemSelect(item.key, !selectedKeys.includes(item.key));
+          console.log('hi')
+          historyBrowser.push(`${linkTo}`);
+        },
+      })}
+      scroll={scroll}
+    />
   );
 };
