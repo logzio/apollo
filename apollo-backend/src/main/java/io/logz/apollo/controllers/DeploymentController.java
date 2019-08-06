@@ -119,7 +119,7 @@ public class DeploymentController {
                 responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId));
             } else {
                 try {
-                    Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), req);
+                        Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), isEmergencyRollback, req);
                     responseObject.addSuccessful(environmentId, serviceId, deployment);
                 } catch (ApolloDeploymentException e) {
                     responseObject.addUnsuccessful(environmentId, serviceId, e);
