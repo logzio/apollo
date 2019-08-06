@@ -58,3 +58,13 @@ export const getServices = async () => await fetchData('service');
 export const getServicesStack = async () => await fetchData('services-stack');
 export const getEnvironment = async () => await fetchData('environment');
 export const getEnvironmentsStack = async () => await fetchData('environments-stack');
+
+export const getDeployableVersion = async servicesId => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
