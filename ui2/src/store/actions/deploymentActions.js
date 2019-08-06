@@ -12,8 +12,12 @@ import {
   GET_ENV_REQUEST,
   GET_ENV_SUCCESS,
   GET_ENV_FAILURE,
+  GET_DEPLOYABLE_VERSION_REQUEST,
+  GET_DEPLOYABLE_VERSION_SUCCESS,
+  GET_DEPLOYABLE_VERSION_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
+import { servicesMock, stackServicesMock, envMock, stackEnvironmentsMock, depVersionMock } from './tempMock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -95,11 +99,32 @@ export const getEnvironmentsStacks = () => {
   };
 };
 
-export const selectServices = (servicesId) => {
+export const selectServices = servicesId => {
   return dispatch => {
     dispatch({
       type: SELECT_SERVICE,
       payload: servicesId,
     });
+  };
+};
+
+export const getDeployableVersion = (servicesId) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_DEPLOYABLE_VERSION_REQUEST,
+    });
+    try {
+      const data = await API.getDeployableVersion(servicesId);
+      dispatch({
+        type: GET_DEPLOYABLE_VERSION_SUCCESS,
+        // payload: data,
+        payload: depVersionMock,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_DEPLOYABLE_VERSION_FAILURE,
+        error,
+      });
+    }
   };
 };

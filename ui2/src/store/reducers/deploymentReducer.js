@@ -12,6 +12,9 @@ import {
   GET_ENV_REQUEST,
   GET_ENV_SUCCESS,
   GET_ENV_FAILURE,
+  GET_DEPLOYABLE_VERSION_REQUEST,
+  GET_DEPLOYABLE_VERSION_SUCCESS,
+  GET_DEPLOYABLE_VERSION_FAILURE,
 } from '../actions';
 
 const initialState = {
@@ -21,6 +24,7 @@ const initialState = {
   selectedServices: null,
   environment: null,
   environmentsStacks: null,
+  versions: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -50,6 +54,12 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_ENV_STACK_SUCCESS:
       return { ...state, environmentsStacks: action.payload, isLoading: false };
     case GET_ENV_STACK_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_DEPLOYABLE_VERSION_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_DEPLOYABLE_VERSION_SUCCESS:
+      return { ...state, versions: action.payload, isLoading: false };
+    case GET_DEPLOYABLE_VERSION_FAILURE:
       return { ...state, isLoading: false };
     default:
       return state;

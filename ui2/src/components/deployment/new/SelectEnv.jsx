@@ -27,17 +27,15 @@ export const SelectEnvironment = ({
   }
 
   return (
-    <div>
-      <TableTransfer
-        data={environment}
-        searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
-        leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
-        rightColTitles={['name']}
-        predefinedGroups={environmentsStacks}
-        selectGroup={stackSelection}
-        linkTo={'group'}
-        addSearch={`${window.location.search}&environment`}
-      />
-    </div>
+    <TableTransfer
+      data={environment}
+      searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
+      leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
+      rightColTitles={['name']}
+      predefinedGroups={environmentsStacks}
+      selectGroup={stackSelection}
+      linkTo={'version'}
+      addSearch={`${window.location.search}&environment`}
+    />
   );
 };
