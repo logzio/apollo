@@ -87,3 +87,13 @@ export const getLastCommitFromBranch = async (branchName, deployableVersionId) =
     throw error;
   }
 };
+
+export const getDeployableVersion = async servicesId => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
