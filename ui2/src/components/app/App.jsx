@@ -9,9 +9,9 @@ import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from 'antd';
 import { Navbar } from './Navbar';
 import { getAuthToken } from '../../api/api';
-import { PrivateRoute, PublicRoute } from '../../utils/routes';
 import { NewDeployment } from '../deployment/new/NewDeployment';
 import './App.css';
+import { Container } from './Container';
 
 const AppComponent = ({ appInit, logout, isAdmin }) => {
   useEffect(() => {
@@ -20,6 +20,13 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
 
   const [collapsed, toggleCollapse] = useState(false);
   const loggedIn = !!getAuthToken();
+  const PrivateRoute = ({ path, ...props }) => {
+    return loggedIn ? (
+      <Route path={path} render={({ match }) => <Container match={match} {...props} />} />
+    ) : (
+      <Redirect to="/auth/login" />
+    );
+  };
 
   return (
     <Router history={history}>
@@ -39,7 +46,7 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
             <Switch>
               {isAdmin && <PrivateRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
               <PrivateRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
-              <PublicRoute path="/auth/login" component={Login} />
+              {!loggedIn && <Route path="/auth/login" component={Login} />}
               <Redirect to={`/auth/addUser`} />
             </Switch>
           </Layout.Content>
@@ -49,7 +56,7 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
   );
 };
 
-const mapStateToProps = ({ auth: { loggedIn, isAdmin } }) => ({ loggedIn, isAdmin });
+const mapStateToProps = ({ auth: { isAdmin } }) => ({ isAdmin });
 
 export const App = connect(
   mapStateToProps,

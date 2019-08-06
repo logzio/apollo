@@ -6,7 +6,7 @@ import { signup, getDeploymentRoles, login } from '../../store/actions/authActio
 import { Spinner } from '../../common/Spinner';
 import './Signup.css';
 
-const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoading }) => {
+const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoading, resetBreadcrumbs }) => {
   const handleSubmit = async (userDetails, resetForm, setSubmitting) => {
     try {
       await signup(userDetails);
@@ -20,6 +20,7 @@ const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoadin
   };
 
   useEffect(() => {
+    resetBreadcrumbs();
     getDeploymentRoles();
   }, [getDeploymentRoles]);
 

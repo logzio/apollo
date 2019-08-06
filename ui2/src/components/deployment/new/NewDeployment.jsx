@@ -11,50 +11,12 @@ import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
 import { SelectGrourp } from './SelectGroup'; //temp placeholder
 
-const NewDeploymentComponent = ({
-  handleBreadcrumbs,
-  getServices,
-  services,
-  getServicesStack,
-  match,
-  servicesStacks,
-  getEnvironment,
-  getEnvironmentsStack,
-  environment,
-  environmentsStacks,
-}) => {
+const NewDeploymentComponent = ({ match, ...props }) => {
   return (
     <Switch>
-      <Route
-        path={`${match.url}/service`}
-        render={({ match }) => (
-          <SelectService
-            handleBreadcrumbs={handleBreadcrumbs}
-            match={match}
-            getServices={getServices}
-            services={services}
-            getServicesStack={getServicesStack}
-            servicesStacks={servicesStacks}
-          />
-        )}
-      />
-      <Route
-        path={`${match.url}/environment`}
-        render={({ match }) => (
-          <SelectEnvironment
-            handleBreadcrumbs={handleBreadcrumbs}
-            match={match}
-            getEnvironment={getEnvironment}
-            getEnvironmentsStack={getEnvironmentsStack}
-            environment={environment}
-            environmentsStacks={environmentsStacks}
-          />
-        )}
-      />
-      <Route
-        path={`${match.url}/group`}
-        render={({ match }) => <SelectGrourp handleBreadcrumbs={handleBreadcrumbs} match={match} />}
-      />
+      <Route path={`${match.url}/service`} render={({ match }) => <SelectService match={match} {...props} />} />
+      <Route path={`${match.url}/environment`} render={({ match }) => <SelectEnvironment match={match} {...props} />} />
+      <Route path={`${match.url}/group`} render={({ match }) => <SelectGrourp match={match} {...props}/>} />
       <Redirect to={`${match.url}/service`} />
     </Switch>
   );

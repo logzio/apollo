@@ -56,8 +56,8 @@ export const appLogout = () => {
 
 export const getServices = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/service/`);
-    return response.data;
+    const { data = null } = await axios.get(`${baseUrl}/service/`);
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -66,8 +66,8 @@ export const getServices = async () => {
 
 export const getServicesStack = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/services-stack/`);
-    return response.data;
+    const { data = null } = await axios.get(`${baseUrl}/services-stack/`);
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -76,8 +76,8 @@ export const getServicesStack = async () => {
 
 export const getEnvironment = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/environment/`);
-    return response.data;
+    const { data = null } = await axios.get(`${baseUrl}/environment/`);
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -86,8 +86,8 @@ export const getEnvironment = async () => {
 
 export const getEnvironmentsStack = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/environments-stack/`);
-    return response.data;
+    const { data = null } = await axios.get(`${baseUrl}/environments-stack/`);
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
