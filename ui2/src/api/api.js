@@ -93,3 +93,13 @@ export const getEnvironmentsStack = async () => {
     throw error;
   }
 };
+
+export const getDeployableVersion = async servicesId => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
