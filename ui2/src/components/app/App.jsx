@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Router, Route } from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { history } from '../../utils/history';
 import { connect } from 'react-redux';
 import { appInit, logout } from '../../store/actions/authActions';
 import { Signup } from '../auth/Signup';
 import { Login } from '../auth/Login';
-import { Switch, Redirect } from 'react-router-dom';
 import { Layout } from 'antd';
 import { Navbar } from './Navbar';
 import { getAuthToken } from '../../api/api';
@@ -13,15 +12,15 @@ import { NewDeployment } from '../deployment/new/NewDeployment';
 import './App.css';
 import { Container } from './Container';
 
-const AppComponent = ({ appInit, logout, isAdmin }) => {
+const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   useEffect(() => {
     appInit();
-  }, [appInit]);
+  }, [appInit, loggedIn]);
 
   const [collapsed, toggleCollapse] = useState(false);
-  const loggedIn = !!getAuthToken();
-  const PrivateRoute = ({ path, ...props }) => {
-    return loggedIn ? (
+  const isSession = !!getAuthToken();
+  const AppRoute = ({ path, ...props }) => {
+    return isSession ? (
       <Route path={path} render={({ match }) => <Container match={match} {...props} />} />
     ) : (
       <Redirect to="/auth/login" />
@@ -31,7 +30,7 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
   return (
     <Router history={history}>
       <Layout className="app">
-        {loggedIn && (
+        {isSession && (
           <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
             <Navbar
               toggleCollapsed={() => toggleCollapse(!collapsed)}
@@ -44,10 +43,10 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
         <Layout>
           <Layout.Content className="app-content">
             <Switch>
-              {isAdmin && <PrivateRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
-              <PrivateRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
-              {!loggedIn && <Route path="/auth/login" component={Login} />}
-              <Redirect to={`/auth/addUser`} />
+              {isAdmin && <AppRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
+              <AppRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
+              {!isSession && <Route path="/auth/login" component={Login} />}
+              {isSession ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
             </Switch>
           </Layout.Content>
         </Layout>
@@ -56,7 +55,7 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
   );
 };
 
-const mapStateToProps = ({ auth: { isAdmin } }) => ({ isAdmin });
+const mapStateToProps = ({ auth: { isAdmin, loggedIn } }) => ({ isAdmin, loggedIn });
 
 export const App = connect(
   mapStateToProps,
