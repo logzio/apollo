@@ -59,7 +59,7 @@ export const getServicesStacks = async () => await fetchData('services-stack');
 export const getEnvironments = async () => await fetchData('environment');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack');
 
-export const getDeployableVersion = async servicesId => {
+export const getDeployableVersionById = async servicesId => {
   try {
     const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
     return data;
@@ -68,3 +68,14 @@ export const getDeployableVersion = async servicesId => {
     throw error;
   }
 };
+
+export const getDeployableVersionBySha = async gitCommitSha => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/deployable-version/sha/${gitCommitSha}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+

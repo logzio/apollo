@@ -6,7 +6,8 @@ import {
   getServicesStacks,
   getEnvironments,
   getEnvironmentsStacks,
-    getDeployableVersion
+    getDeployableVersionById,
+    getDeployableVersionBySha,
 } from '../../../store/actions/deploymentActions';
 import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
@@ -31,5 +32,7 @@ const mapStateToProps = ({
 
 export const NewDeployment = connect(
   mapStateToProps,
-  { getServices, getServicesStacks, getEnvironments, getEnvironmentsStacks, getDeployableVersion },
+  { getServices, getServicesStacks, getEnvironments, getEnvironmentsStacks,
+      getDeployableVersionById,
+      getDeployableVersionBySha, },
 )(NewDeploymentComponent);
