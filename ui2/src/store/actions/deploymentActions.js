@@ -12,9 +12,12 @@ import {
   GET_ENV_REQUEST,
   GET_ENV_SUCCESS,
   GET_ENV_FAILURE,
-  GET_DEPLOYABLE_VERSION_REQUEST,
-  GET_DEPLOYABLE_VERSION_SUCCESS,
-  GET_DEPLOYABLE_VERSION_FAILURE,
+  GET_DEPLOYABLE_VERSION_ID_REQUEST,
+  GET_DEPLOYABLE_VERSION_ID_SUCCESS,
+  GET_DEPLOYABLE_VERSION_ID_FAILURE,
+  GET_DEPLOYABLE_VERSION_SHA_REQUEST,
+  GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
+  GET_DEPLOYABLE_VERSION_SHA_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
 import { servicesMock, stackServicesMock, envMock, stackEnvironmentsMock, depVersionMock } from './tempMock';
@@ -112,21 +115,42 @@ export const selectServices = servicesId => {
   };
 };
 
-export const getDeployableVersion = (servicesId) => {
+export const getDeployableVersionById = servicesId => {
   return async dispatch => {
     dispatch({
-      type: GET_DEPLOYABLE_VERSION_REQUEST,
+      type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
     });
     try {
-      const data = await API.getDeployableVersion(servicesId);
+      // const data = await API.getDeployableVersionById(servicesId);
       dispatch({
-        type: GET_DEPLOYABLE_VERSION_SUCCESS,
+        type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
         // payload: data,
         payload: depVersionMock,
       });
     } catch (error) {
       dispatch({
-        type: GET_DEPLOYABLE_VERSION_FAILURE,
+        type: GET_DEPLOYABLE_VERSION_ID_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getDeployableVersionBySha = gitCommitSha => {
+  return async dispatch => {
+    dispatch({
+      type: GET_DEPLOYABLE_VERSION_SHA_REQUEST,
+    });
+    try {
+      // const data = await API.getDeployableVersionBySha(gitCommitSha);
+      dispatch({
+        type: GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
+        // payload: data,
+        payload: depVersionMock,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_DEPLOYABLE_VERSION_SHA_FAILURE,
         error,
       });
     }
