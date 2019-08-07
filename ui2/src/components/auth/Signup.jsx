@@ -30,6 +30,7 @@ const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoadin
 
   return (
     <div className="signup">
+      <div className="signup-title med-title">Please add new user details...</div>
       <div className="form-error">{error}</div>
       <SignupForm handleSubmit={handleSubmit} options={depRoles} isLoading={isLoading} />
     </div>

@@ -8,6 +8,7 @@ export const SelectEnvironment = ({
   handleBreadcrumbs,
   environment,
   environmentsStacks,
+  match,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${window.location.href}`, 'environment');
@@ -36,6 +37,7 @@ export const SelectEnvironment = ({
       selectGroup={stackSelection}
       linkTo={'version'}
       addSearch={`${window.location.search}&environment`}
+      match={match}
     />
   );
 };

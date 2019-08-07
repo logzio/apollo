@@ -20,7 +20,7 @@ import {
   GET_DEPLOYABLE_VERSION_SHA_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
-import { servicesMock, stackServicesMock, envMock, stackEnvironmentsMock, depVersionMock } from './tempMock';
+import { servicesMock, stackServicesMock, envMock, stackEnvironmentsMock, depVersionMock, depShaVersionMock } from './tempMock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -142,7 +142,7 @@ export const getDeployableVersionBySha = gitCommitSha => {
       dispatch({
         type: GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
         // payload: data,
-        payload: depVersionMock,
+        payload: depShaVersionMock,
       });
     } catch (error) {
       dispatch({
