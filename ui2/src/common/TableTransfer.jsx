@@ -16,6 +16,7 @@ export const TableTransfer = ({
   predefinedGroups,
   linkTo,
   addSearch,
+  match,
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
@@ -47,29 +48,32 @@ export const TableTransfer = ({
       {...props}
     >
       {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-        const columns = direction === 'left' ? transferTableColumns(leftColTitles) : transferTableColumns(rightColTitles);
+        const currentPath = match.url.split('/').pop();
+        const columns =
+          direction === 'left' ? transferTableColumns(leftColTitles) : transferTableColumns(rightColTitles);
         const scroll = direction === 'left' ? { x: 900, y: 600 } : { x: 400, y: 600 };
-
         return (
           <div>
-            {direction === 'left' && (
-              <>
-                {predefinedGroups.map(({ id, name }) => (
-                  <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
-                ))}
+            {direction === 'left' &&
+              predefinedGroups.map(({ id, name }) => (
+                <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
+              ))}
+            {direction === 'right' && (
+              <div>
+                <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
                 <Link
                   to={{
                     pathname: linkTo,
                     search: `${addSearch}=${targetKeys}`,
                   }}
                 >
-                  <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
+                  <AppButton
+                    label={`Select your ${currentPath}`}
+                    disabled={!targetKeys.length}
+                    className={'table-button'}
+                    type="primary"
+                  />
                 </Link>
-              </>
-            )}
-            {direction === 'right' && (
-              <div>
-                <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
               </div>
             )}
             <AppTable
