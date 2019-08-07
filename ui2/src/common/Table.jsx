@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { historyBrowser } from '../utils/history';
 import { AppSearch } from '../common/Search';
 import './Table.css';
-import { Link } from 'react-router-dom';
 import { historyBrowser } from '../utils/history';
 
 export const AppTable = ({
@@ -14,7 +13,7 @@ export const AppTable = ({
   onItemSelect,
   selectedKeys,
   scroll,
-  linkTo,   ...props
+  linkTo, addSearch,  ...props
 }) => {
   // debugger;
   const rowSelection = {
@@ -46,16 +45,18 @@ export const AppTable = ({
     <Table
       className="app-table"
       columns={columns}
-      dataSource={filteredItems}
+      dataSource={data}
       rowSelection={rowSelection}
       size={'small'}
       pagination={false}
-      onRow={item => ({
-        onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
+      onRow={({key}) => ({
+        onClick: () => onItemSelect && onItemSelect(key, !selectedKeys.includes(key)),
         onDoubleClick: () => {
-          onItemSelect(item.key, !selectedKeys.includes(item.key));
-          console.log('hi')
-          historyBrowser.push(`${linkTo}`);
+          onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
+          historyBrowser.push({
+            pathname: `${linkTo}`,
+            search: `${addSearch}${key}`,
+          });
         },
       })}
       scroll={scroll}

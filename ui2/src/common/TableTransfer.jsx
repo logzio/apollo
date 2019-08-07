@@ -48,7 +48,7 @@ export const TableTransfer = ({
       {...props}
     >
       {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-        const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
+        const columns = direction === 'left' ? transferTableColumns(leftColTitles) : transferTableColumns(rightColTitles);
         const scroll = direction === 'left' ? { x: 900, y: 600 } : { x: 400, y: 600 };
 
         return (
@@ -75,12 +75,13 @@ export const TableTransfer = ({
             )}
             <AppTable
               columns={columns}
-              filteredItems={filteredItems}
+              data={filteredItems}
               onItemSelectAll={onItemSelectAll}
               onItemSelect={onItemSelect}
               selectedKeys={selectedKeys}
               scroll={scroll}
               linkTo={linkTo}
+              addSearch={`${addSearch}=`}
             />
           </div>
         );
