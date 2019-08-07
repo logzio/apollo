@@ -12,9 +12,12 @@ import {
   GET_ENV_REQUEST,
   GET_ENV_SUCCESS,
   GET_ENV_FAILURE,
-  GET_DEPLOYABLE_VERSION_REQUEST,
-  GET_DEPLOYABLE_VERSION_SUCCESS,
-  GET_DEPLOYABLE_VERSION_FAILURE,
+  GET_DEPLOYABLE_VERSION_ID_REQUEST,
+  GET_DEPLOYABLE_VERSION_ID_SUCCESS,
+  GET_DEPLOYABLE_VERSION_ID_FAILURE,
+  GET_DEPLOYABLE_VERSION_SHA_REQUEST,
+  GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
+  GET_DEPLOYABLE_VERSION_SHA_FAILURE,
 } from '../actions';
 
 const initialState = {
@@ -55,11 +58,17 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, environmentsStacks: action.payload, isLoading: false };
     case GET_ENV_STACK_FAILURE:
       return { ...state, isLoading: false };
-    case GET_DEPLOYABLE_VERSION_REQUEST:
+    case GET_DEPLOYABLE_VERSION_ID_REQUEST:
       return { ...state, isLoading: true };
-    case GET_DEPLOYABLE_VERSION_SUCCESS:
+    case GET_DEPLOYABLE_VERSION_ID_SUCCESS:
       return { ...state, versions: action.payload, isLoading: false };
-    case GET_DEPLOYABLE_VERSION_FAILURE:
+    case GET_DEPLOYABLE_VERSION_ID_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_DEPLOYABLE_VERSION_SHA_REQUEST:
+      return { ...state, isLoading: true, versions: null };
+    case GET_DEPLOYABLE_VERSION_SHA_SUCCESS:
+      return { ...state, versions: action.payload, isLoading: false };
+    case GET_DEPLOYABLE_VERSION_SHA_FAILURE:
       return { ...state, isLoading: false };
     default:
       return state;

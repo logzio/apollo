@@ -1,20 +1,10 @@
 import React from 'react';
-import { Table } from 'antd';
+import { Table, Search } from 'antd';
 import _ from 'lodash';
 import './Table.css';
-import { Link } from 'react-router-dom';
 import { historyBrowser } from '../utils/history';
 
-export const AppTable = ({
-  columns,
-  filteredItems,
-  onItemSelectAll,
-  onItemSelect,
-  selectedKeys,
-  scroll,
-  linkTo,
-}) => {
-  // debugger;
+export const AppTable = ({ columns, data, onItemSelectAll, onItemSelect, selectedKeys, scroll, linkTo, addSearch }) => {
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -31,16 +21,18 @@ export const AppTable = ({
     <Table
       className="app-table"
       columns={columns}
-      dataSource={filteredItems}
+      dataSource={data}
       rowSelection={rowSelection}
       size={'small'}
       pagination={false}
-      onRow={item => ({
-        onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
+      onRow={({key}) => ({
+        onClick: () => onItemSelect && onItemSelect(key, !selectedKeys.includes(key)),
         onDoubleClick: () => {
-          onItemSelect(item.key, !selectedKeys.includes(item.key));
-          console.log('hi')
-          historyBrowser.push(`${linkTo}`);
+          onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
+          historyBrowser.push({
+            pathname: `${linkTo}`,
+            search: `${addSearch}${key}`,
+          });
         },
       })}
       scroll={scroll}
