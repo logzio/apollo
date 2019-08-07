@@ -16,3 +16,8 @@ export const AppModal = ({ title, children, visible, toggleModal, customFooter, 
     </Modal>
   );
 };
+
+// onOk={({target: {value}}) => {
+//     toggleModal(false);
+//     onOk(value);
+// }}

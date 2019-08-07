@@ -3,3 +3,7 @@
     flex-direction: row;
     justify-content: flex-end;
 }
+
+.table-transfer{
+    margin-top: 80px;
+}

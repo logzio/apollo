@@ -1,9 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppTable } from '../../../common/Table';
 import { AppSearch } from '../../../common/Search';
+import { AppModal } from '../../../common/Modal';
+import { InputField } from '../../../common/FormFields';
+import { AppButton } from '../../../common/Button';
 import { Spinner } from '../../../common/Spinner';
 import { tableColumns } from '../../../utils/tableColumns';
 import moment from 'moment';
+import { Input } from 'antd';
+import './SelectVersion.css';
 
 export const SelectVersion = ({
   handleBreadcrumbs,
@@ -18,6 +23,9 @@ export const SelectVersion = ({
     handleBreadcrumbs(`${window.location.href}`, 'version');
     getDeployableVersionById(servicesId);
   }, []);
+  const [showModal, toggleShowModal] = useState(false);
+  const [gitCommitSha, setGitCommitSha] = useState(null);
+  const [branchName, setBranchName] = useState(null);
 
   const formattedData =
     versions &&
@@ -29,6 +37,11 @@ export const SelectVersion = ({
       commitMessage: commitMessage.split('*').shift(),
     }));
 
+  const handleShaSubmission = () => {
+    getDeployableVersionBySha(gitCommitSha);
+    setGitCommitSha(null);
+  };
+
   if (!versions) {
     return <Spinner />;
   }
@@ -36,6 +49,39 @@ export const SelectVersion = ({
   return (
     <>
       {/*<AppSearch />*/}
+      {/*<AppButton type="primary" onClick={() => toggleShowModal(true)} label="Find my commit" className="table-button" />*/}
+      <div className="header">
+        <AppButton
+          type="primary"
+          onClick={() => toggleShowModal(true)}
+          label="Find latest commit from branch"
+          className="table-button"
+        />
+        <AppButton type="primary" label="Find latest commit on master" className="table-button" />
+      </div>
+      <AppModal visible={showModal} toggleModal={toggleShowModal} title="Find my commit" onOk={handleShaSubmission}>
+        <Input
+          placeholder="Enter commit Sha"
+          onChange={({ target: { value } }) => setGitCommitSha(value)}
+          value={gitCommitSha}
+        />
+      </AppModal>
+      {/*<AppModal*/}
+      {/*  visible={showModal}*/}
+      {/*  toggleModal={toggleShowModal}*/}
+      {/*  title="Deploy latest commit from branch"*/}
+      {/*  onOk={handleShaSubmission}*/}
+      {/*  customFooter={[*/}
+      {/*    <AppButton onClick={toggleShowModal} label={'Find'} className="table-button" />,*/}
+      {/*    <AppButton type="primary" onClick={toggleShowModal} label={'Submit'} className="table-button" />,*/}
+      {/*  ]}*/}
+      {/*>*/}
+      {/*  <Input*/}
+      {/*    placeholder="Branch name"*/}
+      {/*    onChange={({ target: { value } }) => setBranchName(value)}*/}
+      {/*    value={branchName}*/}
+      {/*  />*/}
+      {/*</AppModal>*/}
       <AppTable
         columns={tableColumns(
           ['commitDate', 'gitCommitSha', 'commitMessage', 'committerAvatarUrl', 'committerName'],
@@ -51,3 +97,13 @@ export const SelectVersion = ({
     </>
   );
 };
+/*
+<AppModal
+    visible={showModal}
+    toggleModal={toggleShowModal}
+    title="TESTTTTTTT"
+    customFooter={[
+        <AppButton onClick={toggleShowModal} label={'Find'} className="table-button"/>,
+        <AppButton type="primary" onClick={toggleShowModal} label={'Submit'} className="table-button"/>,
+    ]}
+>*/
