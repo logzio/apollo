@@ -4,4 +4,7 @@
 
 .table-button{
     width: initial;
+    margin: 10px 5px;
+    height: 40px;
+    font-weight: bold;
 }

@@ -32,6 +32,7 @@ export const SelectService = ({ getServices, services, handleBreadcrumbs, getSer
         selectGroup={stackSelection}
         linkTo={'environment'}
         addSearch={'service'}
+        match={match}
       />
     </div>
   );
