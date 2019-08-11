@@ -4,18 +4,22 @@ import _ from 'lodash';
 import { historyBrowser } from '../utils/history';
 import { AppSearch } from '../common/Search';
 import './Table.css';
-import { historyBrowser } from '../utils/history';
 
 export const AppTable = ({
   columns,
-  filteredItems,
+  data,
   onItemSelectAll,
   onItemSelect,
   selectedKeys,
   scroll,
-  linkTo, addSearch,  ...props
+  linkTo,
+  addSearch,
+  setTargetKeys,
+  targetKeys,
+  searchColumns,
+  showSearch,  ...props
 }) => {
-  // debugger;
+  const [searchValue, setSearchValue] = useState(null);
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -42,24 +46,35 @@ export const AppTable = ({
   };
 
   return (
-    <Table
-      className="app-table"
-      columns={columns}
-      dataSource={data}
-      rowSelection={rowSelection}
-      size={'small'}
-      pagination={false}
-      onRow={({key}) => ({
-        onClick: () => onItemSelect && onItemSelect(key, !selectedKeys.includes(key)),
-        onDoubleClick: () => {
-          onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
-          historyBrowser.push({
-            pathname: `${linkTo}`,
-            search: `${addSearch}${key}`,
-          });
-        },
-      })}
-      scroll={scroll}
-    />
+    <>
+      {showSearch && <AppSearch onSearch={handleSearch} onChange={setSearchValue} value={searchValue} />}
+      <Table
+        className="app-table"
+        columns={columns}
+        dataSource={data}
+        rowSelection={rowSelection}
+        size={'small'}
+        pagination={false}
+        onRow={({ key }) => ({
+          onClick: () => {
+            onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
+            // setTargetKeys && setTargetKeys([...targetKeys, key]);
+          },
+          onDoubleClick: () => {
+            setTargetKeys && setTargetKeys([...targetKeys, key]);
+            onItemSelect && onItemSelect([...targetKeys, key], !selectedKeys.includes(key));
+            setTimeout(
+              () =>
+                historyBrowser.push({
+                  pathname: `${linkTo}`,
+                  search: `${addSearch}${[...targetKeys, key]}`,
+                }),
+              100,
+            );
+          },
+        })}
+        scroll={scroll}
+      />
+    </>
   );
 };
