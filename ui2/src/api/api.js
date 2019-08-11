@@ -46,7 +46,6 @@ export const appInit = () => {
   } else {
     logout();
   }
-
   return !!token;
 };
 
