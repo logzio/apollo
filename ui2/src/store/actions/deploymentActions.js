@@ -18,9 +18,19 @@ import {
   GET_DEPLOYABLE_VERSION_SHA_REQUEST,
   GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
   GET_DEPLOYABLE_VERSION_SHA_FAILURE,
+  GET_BRANCH_LATEST_VERSION_REQUEST,
+  GET_BRANCH_LATEST_VERSION_SUCCESS,
+  GET_BRANCH_LATEST_VERSION_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
-import { servicesMock, stackServicesMock, envMock, stackEnvironmentsMock, depVersionMock, depShaVersionMock } from './tempMock';
+import {
+  servicesMock,
+  stackServicesMock,
+  envMock,
+  stackEnvironmentsMock,
+  depVersionMock,
+  depShaVersionMock,
+} from './tempMock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -151,6 +161,27 @@ export const getDeployableVersionBySha = gitCommitSha => {
     } catch (error) {
       dispatch({
         type: GET_DEPLOYABLE_VERSION_SHA_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_BRANCH_LATEST_VERSION_REQUEST,
+    });
+    try {
+      // const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
+      dispatch({
+        type: GET_BRANCH_LATEST_VERSION_SUCCESS,
+        // payload: data,
+        payload: depShaVersionMock,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_BRANCH_LATEST_VERSION_FAILURE,
         error,
       });
     }

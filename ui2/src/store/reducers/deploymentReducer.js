@@ -18,6 +18,9 @@ import {
   GET_DEPLOYABLE_VERSION_SHA_REQUEST,
   GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
   GET_DEPLOYABLE_VERSION_SHA_FAILURE,
+  GET_BRANCH_LATEST_VERSION_REQUEST,
+  GET_BRANCH_LATEST_VERSION_SUCCESS,
+  GET_BRANCH_LATEST_VERSION_FAILURE,
 } from '../actions';
 
 const initialState = {
@@ -69,6 +72,12 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_DEPLOYABLE_VERSION_SHA_SUCCESS:
       return { ...state, versions: action.payload, isLoading: false };
     case GET_DEPLOYABLE_VERSION_SHA_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_BRANCH_LATEST_VERSION_REQUEST:
+      return { ...state, isLoading: true, versions: null };
+    case GET_BRANCH_LATEST_VERSION_SUCCESS:
+      return { ...state, versions: action.payload, isLoading: false };
+    case GET_BRANCH_LATEST_VERSION_FAILURE:
       return { ...state, isLoading: false };
     default:
       return state;

@@ -1,0 +1,14 @@
+.app-search{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+.ant-input-wrapper{
+    width: 34.3%;
+    margin: 10px 5px;
+}
+
+.ant-input-search-button{
+    font-weight: bold;
+    font-size: 14px;
+}

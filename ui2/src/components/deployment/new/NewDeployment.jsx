@@ -8,6 +8,7 @@ import {
   getEnvironmentsStack,
   getDeployableVersionById,
   getDeployableVersionBySha,
+  getLastCommitFromBranch,
 } from '../../../store/actions/deploymentActions';
 import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
@@ -39,5 +40,6 @@ export const NewDeployment = connect(
     getEnvironmentsStack,
     getDeployableVersionById,
     getDeployableVersionBySha,
+    getLastCommitFromBranch,
   },
 )(NewDeploymentComponent);
