@@ -21,6 +21,9 @@ import {
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
+  GET_GROUPS_REQUEST,
+  GET_GROUPS_SUCCESS,
+  GET_GROUPS_FAILURE,
 } from '../actions';
 
 const initialState = {
@@ -31,6 +34,7 @@ const initialState = {
   environment: null,
   environmentsStacks: null,
   versions: null,
+  groups: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -78,6 +82,12 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_BRANCH_LATEST_VERSION_SUCCESS:
       return { ...state, versions: action.payload, isLoading: false };
     case GET_BRANCH_LATEST_VERSION_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_GROUPS_REQUEST:
+      return { ...state, isLoading: true};
+    case GET_GROUPS_SUCCESS:
+      return { ...state, groups: action.payload, isLoading: false };
+    case GET_GROUPS_FAILURE:
       return { ...state, isLoading: false };
     default:
       return state;

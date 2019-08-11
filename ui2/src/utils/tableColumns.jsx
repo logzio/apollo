@@ -1,9 +1,9 @@
 import React from 'react';
 
-export const transferTableColumns = dataCategories =>
-  dataCategories.map(dataCategory => ({
+export const transferTableColumns = (dataCategories, columnTitles) =>
+  dataCategories.map((dataCategory, index) => ({
     dataIndex: dataCategory,
-    title: dataCategory.charAt(0).toUpperCase() + dataCategory.substring(1),
+    title: columnTitles[index],
   }));
 
 export const tableColumns = (dataCategories, columnTitles, imgIndex) =>

@@ -122,3 +122,15 @@ export const getLastCommitFromBranch = async (branchName, deployableVersionId) =
     throw error;
   }
 };
+
+export const getGroups = async (environmentId, serviceId) => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/group/environment/${environmentId}/service/${serviceId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+
