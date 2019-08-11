@@ -1,10 +1,25 @@
-import React from 'react';
-import { Table, Search } from 'antd';
+import React, { useState } from 'react';
+import { Table } from 'antd';
 import _ from 'lodash';
-import './Table.css';
 import { historyBrowser } from '../utils/history';
+import { AppSearch } from '../common/Search';
+import './Table.css';
 
-export const AppTable = ({ columns, data, onItemSelectAll, onItemSelect, selectedKeys, scroll, linkTo, addSearch }) => {
+export const AppTable = ({
+  columns,
+  data,
+  onItemSelectAll,
+  onItemSelect,
+  selectedKeys,
+  scroll,
+  linkTo,
+  addSearch,
+  setTargetKeys,
+  targetKeys,
+  searchColumns,
+  showSearch,
+}) => {
+  const [searchValue, setSearchValue] = useState(null);
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -17,25 +32,43 @@ export const AppTable = ({ columns, data, onItemSelectAll, onItemSelect, selecte
     selectedRowKeys: selectedKeys,
   };
 
+  const handleSearch = () => {
+    data.map(test => {
+      debugger;
+      console.log(test[searchColumns[0]]);
+    });
+  };
+
   return (
-    <Table
-      className="app-table"
-      columns={columns}
-      dataSource={data}
-      rowSelection={rowSelection}
-      size={'small'}
-      pagination={false}
-      onRow={({key}) => ({
-        onClick: () => onItemSelect && onItemSelect(key, !selectedKeys.includes(key)),
-        onDoubleClick: () => {
-          onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
-          historyBrowser.push({
-            pathname: `${linkTo}`,
-            search: `${addSearch}${key}`,
-          });
-        },
-      })}
-      scroll={scroll}
-    />
+    <>
+      {showSearch && <AppSearch onSearch={handleSearch} onChange={setSearchValue} value={searchValue} />}
+      <Table
+        className="app-table"
+        columns={columns}
+        dataSource={data}
+        rowSelection={rowSelection}
+        size={'small'}
+        pagination={false}
+        onRow={({ key }) => ({
+          onClick: () => {
+            onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
+            // setTargetKeys && setTargetKeys([...targetKeys, key]);
+          },
+          onDoubleClick: () => {
+            setTargetKeys && setTargetKeys([...targetKeys, key]);
+            onItemSelect && onItemSelect([...targetKeys, key], !selectedKeys.includes(key));
+            setTimeout(
+              () =>
+                historyBrowser.push({
+                  pathname: `${linkTo}`,
+                  search: `${addSearch}${[...targetKeys, key]}`,
+                }),
+              100,
+            );
+          },
+        })}
+        scroll={scroll}
+      />
+    </>
   );
 };

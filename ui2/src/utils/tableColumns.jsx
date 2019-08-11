@@ -10,5 +10,13 @@ export const tableColumns = (dataCategories, columnTitles, imgIndex) =>
   dataCategories.map((dataCategory, index) => ({
     dataIndex: dataCategory,
     title: columnTitles[index],
-    render: imgIndex === index && (dataCategory => <img className="image-table" src={dataCategory} />),
+    width: '140px',
+    render:
+      imgIndex === index &&
+      (dataCategory => (
+        <div className="user-profile">
+          <img className="image-table" src={dataCategory[0]} />
+          <div>{dataCategory[1]}</div>
+        </div>
+      )),
   }));

@@ -1,3 +1,5 @@
-.table-transfer{
-    margin-top: 80px;
+.submit-transfer-table{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
 }
