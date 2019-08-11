@@ -165,16 +165,17 @@ export const getDeployableVersionBySha = gitCommitSha => {
 
 //Supply one of the service deployable versions ID's
 export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
+  // debugger
   return async dispatch => {
     dispatch({
       type: GET_BRANCH_LATEST_VERSION_REQUEST,
     });
     try {
-      // const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
+      const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
       dispatch({
         type: GET_BRANCH_LATEST_VERSION_SUCCESS,
-        // payload: data,
-        payload: depShaVersionMock,
+        payload: data,
+        // payload: depShaVersionMock,
       });
     } catch (error) {
       dispatch({
