@@ -21,6 +21,9 @@ import {
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
+  GET_GROUPS_REQUEST,
+  GET_GROUPS_SUCCESS,
+  GET_GROUPS_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
 import {
@@ -183,6 +186,26 @@ export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
     } catch (error) {
       dispatch({
         type: GET_BRANCH_LATEST_VERSION_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getGroups = (environmentId, serviceId) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_GROUPS_REQUEST,
+    });
+    try {
+      const data = await API.getGroups(environmentId, serviceId);
+      dispatch({
+        type: GET_GROUPS_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_GROUPS_FAILURE,
         error,
       });
     }

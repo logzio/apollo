@@ -17,6 +17,7 @@ export const TableTransfer = ({
   linkTo,
   addSearch,
   match,
+  columnTitles,
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
@@ -66,7 +67,7 @@ export const TableTransfer = ({
       >
         {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
           const columns =
-            direction === 'left' ? transferTableColumns(leftColTitles) : transferTableColumns(rightColTitles);
+            direction === 'left' ? transferTableColumns(leftColTitles, columnTitles) : transferTableColumns(rightColTitles, columnTitles);
           const scroll = direction === 'left' ? { x: 900, y: 580 } : { x: 400, y: 580 };
           return (
             <div>

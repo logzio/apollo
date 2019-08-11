@@ -9,9 +9,10 @@ export const SelectEnvironment = ({
   environment,
   environmentsStacks,
   match,
+  location,
 }) => {
   useEffect(() => {
-    handleBreadcrumbs(`${window.location.href}`, 'environment');
+    handleBreadcrumbs(`${location.pathname}${location.search}`, 'environment');
     getEnvironment();
     getEnvironmentsStack();
   }, []);
@@ -32,11 +33,12 @@ export const SelectEnvironment = ({
       data={environment}
       searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
       leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
+      columnTitles={['Name', 'Region', 'Availability', 'Kubernetes Master']}
       rightColTitles={['name']}
       predefinedGroups={environmentsStacks}
       selectGroup={stackSelection}
-      linkTo={'version'}
-      addSearch={`${window.location.search}&environment`}
+      linkTo={'group'}
+      addSearch={`${location.search}&environment`}
       match={match}
     />
   );

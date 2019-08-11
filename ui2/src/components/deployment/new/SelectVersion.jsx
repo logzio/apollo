@@ -23,7 +23,7 @@ export const SelectVersion = ({
     .split('=');
 
   useEffect(() => {
-    handleBreadcrumbs(`${window.location.href}`, 'version');
+    handleBreadcrumbs(`${location.pathname}${location.search}`, 'version');
     getDeployableVersionById(servicesId);
   }, []);
 
@@ -93,7 +93,7 @@ export const SelectVersion = ({
           3,
         )}
         data={formattedData}
-        linkTo={'group'}
+        linkTo={'verification'}
         scroll={{ y: 750 }}
         addSearch={`${location.search}&version=`}
         showSearch={true}
