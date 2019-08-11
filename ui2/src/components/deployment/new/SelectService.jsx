@@ -28,6 +28,7 @@ export const SelectService = ({ getServices, services, handleBreadcrumbs, getSer
         searchColumns={['name']}
         leftColTitles={['name']}
         rightColTitles={['name']}
+        columnTitles={['Name']}
         predefinedGroups={servicesStacks}
         selectGroup={stackSelection}
         linkTo={'environment'}

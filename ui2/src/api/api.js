@@ -61,3 +61,15 @@ export const getDeployableVersionById = async (servicesId) => await fetchData(`d
 export const getDeployableVersionBySha = async (gitCommitSha) => await fetchData(`deployable-version/sha/${gitCommitSha}/`);
 // Double encoding, as nginx is opening the first one
 export const getLastCommitFromBranch = async (branchName, deployableVersionId) => await fetchData(`deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
+
+export const getGroups = async (environmentId, serviceId) => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/group/environment/${environmentId}/service/${serviceId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+
