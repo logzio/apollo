@@ -1,5 +1,46 @@
+.ant-table-thead tr {
+    display: flex;
+    width: 100%;
+    padding: 0 5px;
+}
+.ant-table-thead th {
+    width: 100%;
+}
+
+.ant-table-row {
+    display: flex;
+    padding: 0 5px;
+}
+
+.ant-table-row td {
+    /*width: 100%;*/
+    padding:  0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /*flex-basis: 15%;*/
+    flex: 1;
+}
+
+.ant-table-row td:hover {
+    overflow: visible;
+}
+
+
+.ant-table-tbody > tr > td.ant-table-selection-column{
+    max-width: 70px;
+}
+
+.ant-table-thead > tr > th.ant-table-selection-column{
+    max-width: 70px;
+}
+
+.user-profile{
+    display: flex;
+    flex-direction: row;
+}
 
 .image-table{
     width: 24px;
     height: 24px;
+    margin-right: 10px;
 }

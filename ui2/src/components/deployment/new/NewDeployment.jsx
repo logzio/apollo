@@ -7,7 +7,7 @@ import {
   getEnvironments,
   getEnvironmentsStacks,
     getDeployableVersionById,
-    getDeployableVersionBySha,
+    getDeployableVersionBySha,getLastCommitFromBranch
 } from '../../../store/actions/deploymentActions';
 import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
@@ -34,5 +34,5 @@ export const NewDeployment = connect(
   mapStateToProps,
   { getServices, getServicesStacks, getEnvironments, getEnvironmentsStacks,
       getDeployableVersionById,
-      getDeployableVersionBySha, },
+      getDeployableVersionBySha,getLastCommitFromBranch },
 )(NewDeploymentComponent);

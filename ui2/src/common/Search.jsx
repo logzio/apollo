@@ -1,13 +1,17 @@
 import React from 'react';
 import { Input } from 'antd';
+import './Search.css';
 
-export const AppSearch = () => {
+export const AppSearch = ({ onSearch, onChange, value }) => {
   return (
     <Input.Search
+      className="app-search"
       placeholder="input search text"
       enterButton="Search"
+      onSearch={onSearch}
+      onChange={({ target: { value } }) => onChange(value)}
+      value={value}
       size="large"
-      onSearch={(value, event) => console.log(value)}
     />
   );
 };
