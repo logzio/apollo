@@ -16,11 +16,13 @@ export const AppTable = ({
   addSearch,
   setTargetKeys,
   targetKeys,
+  showSelection,
   searchColumns,
   showSearch
     , ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
+  const [filteredData, setFilteredData] = useState(data);
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -33,21 +35,26 @@ export const AppTable = ({
     selectedRowKeys: selectedKeys,
   };
 
-  const handleSearch = () => {
-    data.map(test => {
-      debugger;
-      console.log(test[searchColumns[0]]);
-    });
-  };
+  // const handleSearch = (value,searchColumns) => {
+  //   setSearchValue(value);
+  //   const f = filteredData.filter((dataItem)={
+  //     searchColumns.map((col)=>{
+  //       if(dataItem[col].includes(value)){
+  //         console.log('hi');
+  //       }
+  //     })
+  //   });
+  //   debugger;
+  // };
 
   return (
     <>
-      {showSearch && <AppSearch onSearch={handleSearch} onChange={setSearchValue} value={searchValue} />}
+      {/*{showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}*/}
       <Table
         className="app-table"
         columns={columns}
         dataSource={data}
-        rowSelection={rowSelection}
+        rowSelection={showSelection && rowSelection}
         size={'small'}
         pagination={false}
         onRow={({ key }) => ({
@@ -56,13 +63,14 @@ export const AppTable = ({
             // setTargetKeys && setTargetKeys([...targetKeys, key]);
           },
           onDoubleClick: () => {
-            setTargetKeys && setTargetKeys([...targetKeys, key]);
-            onItemSelect && onItemSelect([...targetKeys, key], !selectedKeys.includes(key));
+            const keys = targetKeys ? targetKeys : [];
+            setTargetKeys && setTargetKeys([...keys, key]);
+            onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
             setTimeout(
               () =>
                 historyBrowser.push({
                   pathname: `${linkTo}`,
-                  search: `${addSearch}${[...targetKeys, key]}`,
+                  search: `${addSearch}${[...keys, key]}`,
                 }),
               100,
             );

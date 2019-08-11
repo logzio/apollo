@@ -99,6 +99,7 @@ export const TableTransfer = ({
                 addSearch={`${addSearch}=`}
                 setTargetKeys={setTargetKeys}
                 targetKeys={targetKeys}
+                showSelection={true}
               />
             </div>
           );
