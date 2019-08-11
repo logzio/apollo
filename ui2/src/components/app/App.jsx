@@ -9,8 +9,8 @@ import { Layout } from 'antd';
 import { Navbar } from './Navbar';
 import { getAuthToken } from '../../api/api';
 import { NewDeployment } from '../deployment/new/NewDeployment';
-import './App.css';
 import { Container } from './Container';
+import './App.css';
 
 const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   useEffect(() => {

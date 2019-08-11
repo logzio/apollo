@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { AppTable } from '../../../common/Table';
-import { AppSearch } from '../../../common/Search';
 import { AppModal } from '../../../common/Modal';
 import { AppInput } from '../../../common/FormFields';
 import { AppButton } from '../../../common/Button';
@@ -12,12 +11,9 @@ import './SelectVersion.css';
 export const SelectVersion = ({
   handleBreadcrumbs,
   getDeployableVersionById,
-  getDeployableVersionBySha,
   getLastCommitFromBranch,
   versions,
-  match,
   location,
-
 }) => {
   const [, servicesId] = location.search.split('&')[0].split('=');
   useEffect(() => {
@@ -26,6 +22,7 @@ export const SelectVersion = ({
   }, []);
   const [showModal, toggleShowModal] = useState(false);
   const [branchName, setBranchName] = useState(null);
+  const [selectedVersion, setSelectedVersion] = useState(null);
 
   const formattedData =
     versions &&
@@ -68,7 +65,6 @@ export const SelectVersion = ({
           }}
         />
       </div>
-      {/*<AppSearch />*/}
       <AppModal
         visible={showModal}
         toggleModal={toggleShowModal}
@@ -93,12 +89,12 @@ export const SelectVersion = ({
           3,
         )}
         data={formattedData}
-        // searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
         linkTo={'group'}
         scroll={{ y: 750 }}
         addSearch={`${location.search}&version=`}
         showSearch={true}
         searchColumns={['commitDate', 'shortendCommitSha', 'commitMessage', 'commitAuthor']}
+        showSelection={false}
       />
     </>
   );
