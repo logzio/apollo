@@ -64,7 +64,7 @@ export const SelectVersion = ({
           label="Find latest commit on master"
           className="table-submit-button"
           onClick={() => {
-            handleBranchSelection('master', versions[0]);
+            handleBranchSelection('master', versions[0].id);
           }}
         />
       </div>
@@ -74,7 +74,7 @@ export const SelectVersion = ({
         toggleModal={toggleShowModal}
         title="Find my commit"
         onOk={() => {
-          handleBranchSelection(branchName, versions[0]);
+          handleBranchSelection(branchName, versions[0].id);
           toggleShowModal(false);
           setBranchName(null);
         }}

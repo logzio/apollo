@@ -127,11 +127,11 @@ export const getDeployableVersionById = servicesId => {
       type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
     });
     try {
-      // const data = await API.getDeployableVersionById(servicesId);
+      const data = await API.getDeployableVersionById(servicesId);
       dispatch({
         type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
-        // payload: data,
-        payload: depVersionMock,
+        payload: data,
+        // payload: depVersionMock,
       });
     } catch (error) {
       dispatch({
@@ -164,16 +164,17 @@ export const getDeployableVersionBySha = gitCommitSha => {
 };
 
 export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
+  // debugger
   return async dispatch => {
     dispatch({
       type: GET_BRANCH_LATEST_VERSION_REQUEST,
     });
     try {
-      // const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
+      const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
       dispatch({
         type: GET_BRANCH_LATEST_VERSION_SUCCESS,
-        // payload: data,
-        payload: depShaVersionMock,
+        payload: data,
+        // payload: depShaVersionMock,
       });
     } catch (error) {
       dispatch({
