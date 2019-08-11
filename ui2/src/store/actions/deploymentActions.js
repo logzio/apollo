@@ -41,8 +41,8 @@ export const getServices = () => {
       const data = await API.getServices();
       dispatch({
         type: GET_SERVICES_SUCCESS,
-        // payload: data,
-        payload: servicesMock,
+        payload: data,
+        // payload: servicesMock,
       });
     } catch (error) {
       dispatch({
@@ -62,8 +62,8 @@ export const getServicesStack = () => {
       const data = await API.getServicesStack();
       dispatch({
         type: GET_SERVICES_STACK_SUCCESS,
-        // payload: data,
-        payload: stackServicesMock,
+        payload: data,
+        // payload: stackServicesMock,
       });
     } catch (error) {
       dispatch({
@@ -83,8 +83,8 @@ export const getEnvironment = () => {
       const data = await API.getEnvironment();
       dispatch({
         type: GET_ENV_SUCCESS,
-        // payload: data,
-        payload: envMock,
+        payload: data,
+        // payload: envMock,
       });
     } catch (error) {
       dispatch({
@@ -104,8 +104,8 @@ export const getEnvironmentsStack = () => {
       const data = await API.getEnvironmentsStack();
       dispatch({
         type: GET_ENV_STACK_SUCCESS,
-        // payload: data,
-        payload: stackEnvironmentsMock,
+        payload: data,
+        // payload: stackEnvironmentsMock,
       });
     } catch (error) {
       dispatch({
@@ -131,11 +131,11 @@ export const getDeployableVersionById = servicesId => {
       type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
     });
     try {
-      // const data = await API.getDeployableVersionById(servicesId);
+      const data = await API.getDeployableVersionById(servicesId);
       dispatch({
         type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
-        // payload: data,
-        payload: depVersionMock,
+        payload: data,
+        // payload: depVersionMock,
       });
     } catch (error) {
       dispatch({
@@ -168,16 +168,17 @@ export const getDeployableVersionBySha = gitCommitSha => {
 };
 
 export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
+  // debugger
   return async dispatch => {
     dispatch({
       type: GET_BRANCH_LATEST_VERSION_REQUEST,
     });
     try {
-      // const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
+      const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
       dispatch({
         type: GET_BRANCH_LATEST_VERSION_SUCCESS,
-        // payload: data,
-        payload: depShaVersionMock,
+        payload: data,
+        // payload: depShaVersionMock,
       });
     } catch (error) {
       dispatch({
