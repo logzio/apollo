@@ -174,11 +174,11 @@ export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
       type: GET_BRANCH_LATEST_VERSION_REQUEST,
     });
     try {
-      // const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
+      const data = await API.getLastCommitFromBranch(branchName, deployableVersionId);
       dispatch({
         type: GET_BRANCH_LATEST_VERSION_SUCCESS,
-        // payload: data,
-        payload: depShaVersionMock,
+        payload: data,
+        // payload: depShaVersionMock,
       });
     } catch (error) {
       dispatch({

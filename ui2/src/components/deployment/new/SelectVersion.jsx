@@ -61,7 +61,7 @@ export const SelectVersion = ({
         />
         <AppButton
           type="primary"
-          label="Find latest commit on master"
+          label="Find latest commit from master"
           className="table-submit-button"
           onClick={() => {
             handleBranchSelection('master');

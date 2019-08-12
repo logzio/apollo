@@ -70,7 +70,7 @@ export const TableTransfer = ({
           const scroll = direction === 'left' ? { x: 900, y: 580 } : { x: 400, y: 580 };
           return (
             <div>
-              {direction === 'left' && (
+              {predefinedGroups && direction === 'left' && (
                 <div className="header-left-transfer-table">
                   {predefinedGroups.map(({ id, name }) => (
                     <AppButton

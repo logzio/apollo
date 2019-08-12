@@ -5,7 +5,7 @@ export const AUTH_TOKEN = 'token';
 
 export const fetchData = async (endPoint, customError) => {
   try {
-    const { data = null } = await axios.get(`${baseUrl}/${endPoint}/`);
+    const { data = null } = await axios.get(`${baseUrl}/${endPoint}`);
     return data;
   } catch (error) {
     console.error(error);
@@ -53,67 +53,11 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
-export const getServices = async () => await fetchData('service');
-export const getServicesStack = async () => await fetchData('services-stack');
-export const getEnvironment = async () => await fetchData('environment');
-export const getEnvironmentsStack = async () => await fetchData('environments-stack');
-
-export const getDeployableVersionById = async servicesId => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-//
-// export const getDeployableVersionBySha = async gitCommitSha => {
-//   try {
-//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/sha/${gitCommitSha}`);
-//     return data;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
-//
-// export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
-//   try {
-//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
-//     return data;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
-//
-// export const getDeployableVersionById = async servicesId => {
-//   try {
-//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
-//     return data;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
-//
-// export const getDeployableVersionBySha = async gitCommitSha => {
-//   try {
-//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/sha/${gitCommitSha}`);
-//     return data;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
-//
-// export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
-//   try {
-//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
-//     return data;
-//   } catch (error) {
-//     console.error(error);
-//     throw error;
-//   }
-// };
+export const getServices = async () => await fetchData('service/');
+export const getServicesStack = async () => await fetchData('services-stack/');
+export const getEnvironment = async () => await fetchData('environment/');
+export const getEnvironmentsStack = async () => await fetchData('environments-stack/');
+export const getDeployableVersionById = async (servicesId) => await fetchData(`deployable-version/multi-service/${servicesId}/`);
+export const getDeployableVersionBySha = async (gitCommitSha) => await fetchData(`deployable-version/sha/${gitCommitSha}/`);
+// Double encoding, as nginx is opening the first one
+export const getLastCommitFromBranch = async (branchName, deployableVersionId) => await fetchData(`deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
