@@ -76,7 +76,7 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_BRANCH_LATEST_VERSION_REQUEST:
       return { ...state, isLoading: true, versions: null };
     case GET_BRANCH_LATEST_VERSION_SUCCESS:
-      return { ...state, versions: action.payload, isLoading: false };
+      return { ...state, versions: [action.payload], isLoading: false };
     case GET_BRANCH_LATEST_VERSION_FAILURE:
       return { ...state, isLoading: false };
     default:
