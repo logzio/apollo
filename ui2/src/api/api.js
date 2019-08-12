@@ -67,23 +67,53 @@ export const getDeployableVersionById = async servicesId => {
     throw error;
   }
 };
-
-export const getDeployableVersionBySha = async gitCommitSha => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/deployable-version/sha/${gitCommitSha}`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
+//
+// export const getDeployableVersionBySha = async gitCommitSha => {
+//   try {
+//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/sha/${gitCommitSha}`);
+//     return data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
+//
+// export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
+//   try {
+//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
+//     return data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
+//
+// export const getDeployableVersionById = async servicesId => {
+//   try {
+//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/multi-service/${servicesId}`);
+//     return data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
+//
+// export const getDeployableVersionBySha = async gitCommitSha => {
+//   try {
+//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/sha/${gitCommitSha}`);
+//     return data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
+//
+// export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
+//   try {
+//     const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
+//     return data;
+//   } catch (error) {
+//     console.error(error);
+//     throw error;
+//   }
+// };
