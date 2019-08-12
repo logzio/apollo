@@ -1,8 +1,17 @@
 import axios from 'axios';
 import { logout } from '../store/actions/authActions';
-
 const baseUrl = 'http://localhost:8081';
 export const AUTH_TOKEN = 'token';
+
+export const fetchData = async (endPoint, customError) => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/${endPoint}/`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw customError ? customError : error;
+  }
+};
 
 export const signup = async user => {
   try {
@@ -14,17 +23,6 @@ export const signup = async user => {
   }
 };
 
-export const getDeploymentRoles = async () => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/deployment-roles/`);
-    return data;
-  } catch (error) {
-    console.log(error.response.status);
-    console.error(error);
-    throw error;
-  }
-};
-
 export const login = async user => {
   try {
     const { data = null } = await axios.post(`${baseUrl}/_login/`, user);
@@ -33,9 +31,11 @@ export const login = async user => {
   } catch (error) {
     console.error(error);
     // throw error.response.data.error;
-    throw new Error('User credentials are incorrect'); //temp until an error notification will return from the server
+    throw new Error('User credentials are incorrect'); //temp until an error notification will be returned from the server
   }
 };
+
+export const getDeploymentRoles = async () => await fetchData('deployment-roles');
 
 export const getAuthToken = () => localStorage.getItem(AUTH_TOKEN);
 
@@ -54,42 +54,7 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
-export const getServices = async () => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/service/`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export const getServicesStack = async () => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/services-stack/`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export const getEnvironment = async () => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/environment/`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export const getEnvironmentsStack = async () => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/environments-stack/`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
+export const getServices = async () => await fetchData('service');
+export const getServicesStack = async () => await fetchData('services-stack');
+export const getEnvironment = async () => await fetchData('environment');
+export const getEnvironmentsStack = async () => await fetchData('environments-stack');
