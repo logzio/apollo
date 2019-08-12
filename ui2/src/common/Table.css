@@ -10,15 +10,15 @@
 .ant-table-row {
     display: flex;
     padding: 0 5px;
+
 }
 
 .ant-table-row td {
-    /*width: 100%;*/
     padding:  0;
     overflow: hidden;
     text-overflow: ellipsis;
-    /*flex-basis: 15%;*/
     flex: 1;
+
 }
 
 .ant-table-row td:hover {
@@ -28,6 +28,7 @@
 
 .ant-table-tbody > tr > td.ant-table-selection-column{
     max-width: 70px;
+
 }
 
 .ant-table-thead > tr > th.ant-table-selection-column{
