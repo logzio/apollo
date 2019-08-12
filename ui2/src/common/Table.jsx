@@ -49,12 +49,12 @@ export const AppTable = ({
 
   return (
     <>
-      {/*{showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}*/}
+      {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
       <Table
         className="app-table"
         columns={columns}
-        dataSource={data}
-        rowSelection={showSelection && rowSelection}
+        dataSource={filteredData}
+        rowSelection={showSelection ? rowSelection : null}
         size={'small'}
         pagination={false}
         onRow={({ key }) => ({

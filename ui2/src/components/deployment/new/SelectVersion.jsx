@@ -15,14 +15,16 @@ export const SelectVersion = ({
   versions,
   location,
 }) => {
-  const [, servicesId] = location.search.split('&')[0].split('=');
+  const [, servicesId] = location.search
+    .split('&')
+    .shift()
+    .split('=');
   useEffect(() => {
     handleBreadcrumbs(`${window.location.href}`, 'version');
     getDeployableVersionById(servicesId);
   }, []);
   const [showModal, toggleShowModal] = useState(false);
   const [branchName, setBranchName] = useState(null);
-  const [selectedVersion, setSelectedVersion] = useState(null);
 
   const formattedData =
     versions &&
@@ -39,8 +41,9 @@ export const SelectVersion = ({
       };
     });
 
-  const handleBranchSelection = (branchName, deployableVersionId) => {
-    getLastCommitFromBranch(branchName, deployableVersionId);
+  const handleBranchSelection = branchName => {
+    const versionSampleId = versions[0].id;
+    getLastCommitFromBranch(branchName, versionSampleId);
     setBranchName(null);
   };
 
@@ -61,7 +64,7 @@ export const SelectVersion = ({
           label="Find latest commit on master"
           className="table-submit-button"
           onClick={() => {
-            handleBranchSelection('master', versions[0].id);
+            handleBranchSelection('master');
           }}
         />
       </div>
@@ -70,7 +73,7 @@ export const SelectVersion = ({
         toggleModal={toggleShowModal}
         title="Find my commit"
         onOk={() => {
-          handleBranchSelection(branchName, versions[0].id);
+          handleBranchSelection(branchName);
           toggleShowModal(false);
           setBranchName(null);
         }}
@@ -93,7 +96,7 @@ export const SelectVersion = ({
         scroll={{ y: 750 }}
         addSearch={`${location.search}&version=`}
         showSearch={true}
-        searchColumns={['commitDate', 'shortendCommitSha', 'commitMessage', 'commitAuthor']}
+        searchColumns={['commitDate', 'gitCommitSha', 'commitMessage', 'commitAuthor']}
         showSelection={false}
       />
     </>
