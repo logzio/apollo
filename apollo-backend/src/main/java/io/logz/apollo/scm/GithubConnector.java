@@ -3,7 +3,6 @@ package io.logz.apollo.scm;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.github.GHCommit;
-import org.kohsuke.github.GHBranch;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -64,8 +63,7 @@ public class GithubConnector {
 
     public Optional<String> getLatestCommitShaOnBranch(String githubRepo, String branchName) {
         try {
-            GHBranch test = gitHub.getRepository(githubRepo).getBranch(branchName);
-            return Optional.of(test.getSHA1());
+            return Optional.of(gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1());
         } catch (Exception e) {
             logger.warn("Could not get latest commit on branch from Github!", e);
             return Optional.empty();
