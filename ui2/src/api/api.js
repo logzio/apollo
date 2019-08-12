@@ -73,3 +73,27 @@ export const getGroups = async (environmentId, serviceId) => {
 };
 
 
+<<<<<<< HEAD
+=======
+export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getGroups = async (environmentId, serviceId) => {
+  try {
+    const { data = null } = await axios.get(`${baseUrl}/group/environment/${environmentId}/service/${serviceId}`);
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+
+>>>>>>> 180933fe629790a55fac01a2dc9e029257daace7
