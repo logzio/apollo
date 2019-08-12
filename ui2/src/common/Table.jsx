@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table } from 'antd';
 import _ from 'lodash';
 import { historyBrowser } from '../utils/history';
@@ -22,6 +22,9 @@ export const AppTable = ({
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
