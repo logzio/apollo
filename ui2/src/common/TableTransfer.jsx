@@ -24,8 +24,17 @@ export const TableTransfer = ({
   const [showSearch] = useState(!!searchColumns);
   const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
-  const handleSearch = (inputValue, item) =>
-    searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
+  // const handleSearch = (inputValue, item) =>
+  //   searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
+
+    const handleSearch = (inputValue, item) => {
+        return searchColumns
+            .map(searchCol => {
+                const stringifiedItem = item[searchCol].toString();
+                return stringifiedItem && stringifiedItem.indexOf(inputValue) !== -1;
+            })
+            .includes(true);
+    };
 
   const handleGroupSelection = predefinedGroupId => {
     const keys = selectGroup(predefinedGroupId);
@@ -67,21 +76,30 @@ export const TableTransfer = ({
       >
         {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
           const columns =
-            direction === 'left' ? transferTableColumns(leftColTitles, columnTitles) : transferTableColumns(rightColTitles, columnTitles);
+            direction === 'left'
+              ? transferTableColumns(leftColTitles, columnTitles)
+              : transferTableColumns(rightColTitles, columnTitles);
           const scroll = direction === 'left' ? { x: 900, y: 580 } : { x: 400, y: 580 };
           return (
             <div>
-              {predefinedGroups && direction === 'left' && (
+              {direction === 'left' && (
                 <div className="header-left-transfer-table">
-                  {predefinedGroups.map(({ id, name }) => (
-                    <AppButton
-                      key={id}
-                      label={name}
-                      className={'table-button'}
-                      onClick={() => handleGroupSelection(id)}
-                      icon={'block'}
-                    />
-                  ))}
+                  {predefinedGroups &&
+                    predefinedGroups.map(({ id, name }) => (
+                      <AppButton
+                        key={id}
+                        label={name}
+                        className={'table-button'}
+                        onClick={() => handleGroupSelection(id)}
+                        icon={'block'}
+                      />
+                    ))}
+                  <AppButton
+                    label={'Select all'}
+                    className={'table-button'}
+                    onClick={() => setTargetKeys(formattedData.map(({ key }) => key))}
+                    icon={'block'}
+                  />
                 </div>
               )}
               {direction === 'right' && (

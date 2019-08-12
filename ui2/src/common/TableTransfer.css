@@ -3,3 +3,7 @@
     flex-direction: row;
     justify-content: flex-end;
 }
+
+.header-left-transfer-table{
+    min-height: 60px;
+}
