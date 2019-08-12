@@ -15,16 +15,17 @@ export const SelectVersion = ({
   versions,
   location,
 }) => {
+  const [showModal, toggleShowModal] = useState(false);
+  const [branchName, setBranchName] = useState(null);
   const [, servicesId] = location.search
     .split('&')
     .shift()
     .split('=');
+
   useEffect(() => {
     handleBreadcrumbs(`${window.location.href}`, 'version');
     getDeployableVersionById(servicesId);
   }, []);
-  const [showModal, toggleShowModal] = useState(false);
-  const [branchName, setBranchName] = useState(null);
 
   const formattedData =
     versions &&
