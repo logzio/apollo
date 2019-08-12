@@ -8,7 +8,10 @@ export const SelectGrourp = ({ handleBreadcrumbs, resetBreadcrumbs, match, locat
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'group');
     const [serviceParams, environmentParams] = location.search.split('&');
     const serviceId = serviceParams.split('=').pop();
-    const environmentsId = environmentParams.split('=').pop().split(',');
+    const environmentsId = environmentParams
+      .split('=')
+      .pop()
+      .split(',');
     environmentsId.map(environmentId => {
       getGroups(environmentId, serviceId);
     });

@@ -24,6 +24,9 @@ import {
   GET_GROUPS_REQUEST,
   GET_GROUPS_SUCCESS,
   GET_GROUPS_FAILURE,
+  NEW_DEPLOYMENT_REQUEST,
+  NEW_DEPLOYMENT_SUCCESS,
+  NEW_DEPLOYMENT_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
 import {
@@ -34,6 +37,7 @@ import {
   depVersionMock,
   depShaVersionMock,
 } from './tempMock';
+import { historyBrowser } from '../../utils/history';
 
 export const getServices = () => {
   return async dispatch => {
@@ -206,6 +210,29 @@ export const getGroups = (environmentId, serviceId) => {
     } catch (error) {
       dispatch({
         type: GET_GROUPS_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const deploy = newDeployment => {
+  return async dispatch => {
+    dispatch({
+      type: NEW_DEPLOYMENT_REQUEST,
+    });
+    try {
+      const data = await API.deploy(newDeployment);
+      // historyBrowser.push({
+      //   pathname: '/ongoingDeployment',
+      // });
+      dispatch({
+        type: NEW_DEPLOYMENT_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: NEW_DEPLOYMENT_FAILURE,
         error,
       });
     }

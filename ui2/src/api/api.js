@@ -57,43 +57,31 @@ export const getServices = async () => await fetchData('service/');
 export const getServicesStack = async () => await fetchData('services-stack/');
 export const getEnvironment = async () => await fetchData('environment/');
 export const getEnvironmentsStack = async () => await fetchData('environments-stack/');
-export const getDeployableVersionById = async (servicesId) => await fetchData(`deployable-version/multi-service/${servicesId}/`);
-export const getDeployableVersionBySha = async (gitCommitSha) => await fetchData(`deployable-version/sha/${gitCommitSha}/`);
+export const getDeployableVersionById = async servicesId =>
+  await fetchData(`deployable-version/multi-service/${servicesId}/`);
+export const getDeployableVersionBySha = async gitCommitSha =>
+  await fetchData(`deployable-version/sha/${gitCommitSha}/`);
 // Double encoding, as nginx is opening the first one
-export const getLastCommitFromBranch = async (branchName, deployableVersionId) => await fetchData(`deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
+export const getLastCommitFromBranch = async (branchName, deployableVersionId) =>
+  await fetchData(
+    `deployable-version/latest/branch/${encodeURIComponent(
+      encodeURIComponent(branchName),
+    )}/repofrom/${deployableVersionId}`,
+  );
+export const getGroups = async (environmentId, serviceId) =>
+  await fetchData(`group/environment/${environmentId}/service/${serviceId}`);
 
-export const getGroups = async (environmentId, serviceId) => {
+export const deploy = async newDeployment => {
   try {
-    const { data = null } = await axios.get(`${baseUrl}/group/environment/${environmentId}/service/${serviceId}`);
+    const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
+      serviceIdsCsv: newDeployment,
+      environmentIdsCsv: newDeployment,
+      deployableVersionId: newDeployment,
+      deploymentMessage: newDeployment,
+    });
     return data;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
-
-
-<<<<<<< HEAD
-=======
-export const getLastCommitFromBranch = async (branchName, deployableVersionId) => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/deployable-version/latest/branch/${encodeURIComponent(encodeURIComponent(branchName))}/repofrom/${deployableVersionId}`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export const getGroups = async (environmentId, serviceId) => {
-  try {
-    const { data = null } = await axios.get(`${baseUrl}/group/environment/${environmentId}/service/${serviceId}`);
-    return data;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-
->>>>>>> 180933fe629790a55fac01a2dc9e029257daace7
