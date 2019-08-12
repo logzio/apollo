@@ -163,6 +163,7 @@ export const getDeployableVersionBySha = gitCommitSha => {
   };
 };
 
+//Supply one of the service deployable versions ID's
 export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
   return async dispatch => {
     dispatch({

@@ -35,26 +35,27 @@ export const AppTable = ({
     selectedRowKeys: selectedKeys,
   };
 
-  // const handleSearch = (value,searchColumns) => {
-  //   setSearchValue(value);
-  //   const f = filteredData.filter((dataItem)={
-  //     searchColumns.map((col)=>{
-  //       if(dataItem[col].includes(value)){
-  //         console.log('hi');
-  //       }
-  //     })
-  //   });
-  //   debugger;
-  // };
+  const handleSearch = value => {
+    setSearchValue(value);
+    const filteredData = data.filter(dataItem => {
+      const test = searchColumns.map(colName => {
+        if (dataItem[colName].includes(value)) {
+          return true;
+        }
+      });
+      return test.includes(true);
+    });
+    setFilteredData(filteredData);
+  };
 
   return (
     <>
-      {/*{showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}*/}
+      {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
       <Table
         className="app-table"
         columns={columns}
-        dataSource={data}
-        rowSelection={showSelection && rowSelection}
+        dataSource={filteredData}
+        rowSelection={showSelection ? rowSelection : null}
         size={'small'}
         pagination={false}
         onRow={({ key }) => ({
