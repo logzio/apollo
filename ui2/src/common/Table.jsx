@@ -36,15 +36,27 @@ export const AppTable = ({
   const handleSearch = value => {
     setSearchValue(value);
     const filteredData = data.filter(dataItem => {
-      return searchColumns
-        .map(colName => {
-          return !!dataItem[colName].includes(value);
-        })
-        .includes(true);
+      const test = searchColumns.map(colName => {
+        if (dataItem[colName].toString().includes(value)) {
+          return true;
+        }
+      });
+      return test.includes(true);
     });
     setFilteredData(filteredData);
   };
 
+    // const handleSearch = value => {
+    //     setSearchValue(value);
+    //     const filteredData = data.filter(dataItem => {
+    //         return searchColumns
+    //             .map(colName => {
+    //                 return !!dataItem[colName].includes(value);
+    //             })
+    //             .includes(true);
+    //     });
+    //     setFilteredData(filteredData);
+    // };
 
     // const handleSearch = value => {
     //     setSearchValue(value);

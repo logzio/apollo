@@ -19,6 +19,15 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
     appInit();
   }, []);
 
+  // const isSession = !!getAuthToken();
+  // const AppRoute = ({ path, ...props }) => {
+  //   return isSession ? (
+  //     <Route path={path} render={({ match }) => <Container match={match} {...props} />} />
+  //   ) : (
+  //     <Redirect to="/auth/login" />
+  //   );
+  // };
+
   return (
     <Router history={historyBrowser}>
       <Layout className="app">

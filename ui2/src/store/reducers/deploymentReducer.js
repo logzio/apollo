@@ -140,6 +140,24 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, lastCreatedGroupPod: action.payload, isLoading: false };
     case GET_LATEST_GROUP_POD_FAILURE:
       return { ...state, isLoading: false };
+    case GET_ONGOING_DEPLOYMENT_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_ONGOING_DEPLOYMENT_SUCCESS:
+      return { ...state, ongoingDeployments: action.payload, isLoading: false };
+    case GET_ONGOING_DEPLOYMENT_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_LATEST_POD_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_LATEST_POD_SUCCESS:
+      return { ...state, lastCreatedPod: action.payload, isLoading: false };
+    case GET_LATEST_POD_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_LATEST_GROUP_POD_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_LATEST_GROUP_POD_SUCCESS:
+      return { ...state, lastCreatedGroupPod: action.payload, isLoading: false };
+    case GET_LATEST_GROUP_POD_FAILURE:
+      return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;
     default:
