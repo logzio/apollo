@@ -40,7 +40,7 @@ export const AppTable = ({
     setSearchValue(value);
     const filteredData = data.filter(dataItem => {
       const test = searchColumns.map(colName => {
-        if (dataItem[colName].includes(value)) {
+        if (dataItem[colName].toString().includes(value)) {
           return true;
         }
       });

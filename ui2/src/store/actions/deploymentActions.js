@@ -27,6 +27,13 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
+  GET_ONGOING_DEPLOYMENT_REQUEST,
+  GET_ONGOING_DEPLOYMENT_SUCCESS,
+  GET_ONGOING_DEPLOYMENT_FAILURE,
+  GET_LATEST_POD_REQUEST,
+  GET_LATEST_POD_SUCCESS,
+  GET_LATEST_POD_FAILURE,
+  GET_LATEST_GROUP_POD_REQUEST, GET_LATEST_GROUP_POD_SUCCESS, GET_LATEST_GROUP_POD_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
 import {
@@ -224,6 +231,66 @@ export const deploy = newDeployment => {
     } catch (error) {
       dispatch({
         type: NEW_DEPLOYMENT_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getOngoingDeployments = () => {
+  return async dispatch => {
+    dispatch({
+      type: GET_ONGOING_DEPLOYMENT_REQUEST,
+    });
+    try {
+      const data = await API.getOngoingDeployments();
+      dispatch({
+        type: GET_ONGOING_DEPLOYMENT_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_ONGOING_DEPLOYMENT_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getLatestCreatedPod = (environmentId, serviceId) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_LATEST_POD_REQUEST,
+    });
+    try {
+      const data = await API.getLatestCreatedPod(environmentId, serviceId);
+      dispatch({
+        type: GET_LATEST_POD_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_LATEST_POD_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getLatestCreatedGroupPod = (environmentId, serviceId, groupName) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_LATEST_GROUP_POD_REQUEST,
+    });
+    try {
+      const data = await API.getLatestCreatedGroupPod(environmentId, serviceId, groupName);
+      dispatch({
+        type: GET_LATEST_GROUP_POD_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_LATEST_GROUP_POD_FAILURE,
         error,
       });
     }
