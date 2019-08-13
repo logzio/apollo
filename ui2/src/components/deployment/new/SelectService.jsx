@@ -10,7 +10,7 @@ export const SelectService = ({
   servicesStacks,
   resetBreadcrumbs,
   match,
-  selectServices,
+                                  selectServices,
 }) => {
   useEffect(() => {
     resetBreadcrumbs();
@@ -34,21 +34,19 @@ export const SelectService = ({
   }
 
   return (
-    <div>
-      <TableTransfer
-        data={services}
-        searchColumns={['name']}
-        leftColTitles={['name']}
-        rightColTitles={['name']}
-        columnTitles={['Name']}
-        predefinedGroups={servicesStacks}
-        selectGroup={stackSelection}
-        linkTo={'environment'}
-        addSearch={'service'}
-        match={match}
-        handleSelection={handleServicesSelection}
-        emptyMsg={'Please select services from the left panel'}
-      />
-    </div>
+    <TableTransfer
+      data={services}
+      searchColumns={['name']}
+      leftColTitles={['name']}
+      rightColTitles={['name']}
+      columnTitles={['Name']}
+      predefinedGroups={servicesStacks}
+      selectGroup={stackSelection}
+      linkTo={'environment'}
+      addSearch={'service'}
+      match={match}
+      handleSelection={handleServicesSelection}
+      emptyMsg={'Please select services from the left panel'}
+    />
   );
 };

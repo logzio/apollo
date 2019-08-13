@@ -74,7 +74,7 @@ export const getGroups = async (environmentId, serviceId) =>
 
 export const deploy = async newDeployment => {
   try {
-    const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
+    const { data = null } = await axios.post(`${baseUrl}/deployment`, {
       serviceIdsCsv: newDeployment,
       environmentIdsCsv: newDeployment,
       deployableVersionId: newDeployment,
@@ -86,3 +86,7 @@ export const deploy = async newDeployment => {
     throw error;
   }
 };
+
+export const getOngoingDeployments = async () => await fetchData('running-and-just-finished-deployments');
+export const getLatestCreatedPod = async (environmentId, serviceId) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/latestpod`);
+export const getLatestCreatedGroupPod = async (environmentId, serviceId, groupName) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/group/${groupName}/latestpod`);

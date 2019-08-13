@@ -41,6 +41,20 @@ export const AppTable = ({
     setFilteredData(filteredData);
   };
 
+
+    // const handleSearch = value => {
+    //     setSearchValue(value);
+    //     const filteredData = data.filter(dataItem => {
+    //         const test = searchColumns.map(colName => {
+    //             if (dataItem[colName].toString().includes(value)) {
+    //                 return true;
+    //             }
+    //         });
+    //         return test.includes(true);
+    //     });
+    //     setFilteredData(filteredData);
+    // };
+
   return (
     <>
       {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}

@@ -26,11 +26,18 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
-  GET_SERVICE_BY_ID_REQUEST,
-  GET_SERVICE_BY_ID_SUCCESS,
-  GET_SERVICE_BY_ID_FAILURE,
-  LOUGOUT,
-  SELECT_SERVICES,
+    GET_SERVICE_BY_ID_REQUEST,
+    GET_SERVICE_BY_ID_SUCCESS,
+    GET_SERVICE_BY_ID_FAILURE,
+    LOUGOUT,
+    SELECT_SERVICES,
+  GET_ONGOING_DEPLOYMENT_REQUEST,
+  GET_ONGOING_DEPLOYMENT_SUCCESS,
+  GET_ONGOING_DEPLOYMENT_FAILURE,
+  GET_LATEST_POD_REQUEST,
+  GET_LATEST_POD_SUCCESS,
+  GET_LATEST_POD_FAILURE,
+  GET_LATEST_GROUP_POD_REQUEST, GET_LATEST_GROUP_POD_SUCCESS, GET_LATEST_GROUP_POD_FAILURE,
 } from '../actions';
 
 import _ from 'lodash';
@@ -44,6 +51,9 @@ const initialState = {
   versions: null,
   groups: [],
   newDeployment: null,
+  ongoingDeployments: null,
+  lastCreatedPod: null,
+  lastCreatedGroupPod: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -111,6 +121,24 @@ export default function deploymentsReducer(state = initialState, action) {
     case NEW_DEPLOYMENT_SUCCESS:
       return { ...state, newDeployment: action.payload, isLoading: false };
     case NEW_DEPLOYMENT_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_ONGOING_DEPLOYMENT_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_ONGOING_DEPLOYMENT_SUCCESS:
+      return { ...state, ongoingDeployments: action.payload, isLoading: false };
+    case GET_ONGOING_DEPLOYMENT_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_LATEST_POD_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_LATEST_POD_SUCCESS:
+      return { ...state, lastCreatedPod: action.payload, isLoading: false };
+    case GET_LATEST_POD_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_LATEST_GROUP_POD_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_LATEST_GROUP_POD_SUCCESS:
+      return { ...state, lastCreatedGroupPod: action.payload, isLoading: false };
+    case GET_LATEST_GROUP_POD_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;
