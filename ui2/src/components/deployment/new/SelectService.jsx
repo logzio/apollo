@@ -2,7 +2,15 @@ import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
 
-export const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStack, servicesStacks, resetBreadcrumbs, match }) => {
+export const SelectService = ({
+  getServices,
+  services,
+  handleBreadcrumbs,
+  getServicesStack,
+  servicesStacks,
+  resetBreadcrumbs,
+  match,
+}) => {
   useEffect(() => {
     resetBreadcrumbs();
     handleBreadcrumbs(`${match.url}`, 'service');
@@ -22,19 +30,17 @@ export const SelectService = ({ getServices, services, handleBreadcrumbs, getSer
   }
 
   return (
-    <div>
-      <TableTransfer
-        data={services}
-        searchColumns={['name']}
-        leftColTitles={['name']}
-        rightColTitles={['name']}
-        columnTitles={['Name']}
-        predefinedGroups={servicesStacks}
-        selectGroup={stackSelection}
-        linkTo={'environment'}
-        addSearch={'service'}
-        match={match}
-      />
-    </div>
+    <TableTransfer
+      data={services}
+      searchColumns={['name']}
+      leftColTitles={['name']}
+      rightColTitles={['name']}
+      columnTitles={['Name']}
+      predefinedGroups={servicesStacks}
+      selectGroup={stackSelection}
+      linkTo={'environment'}
+      addSearch={'service'}
+      match={match}
+    />
   );
 };

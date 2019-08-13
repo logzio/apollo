@@ -53,10 +53,10 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
-export const getServices = async () => await fetchData('service/');
-export const getServicesStack = async () => await fetchData('services-stack/');
-export const getEnvironment = async () => await fetchData('environment/');
-export const getEnvironmentsStack = async () => await fetchData('environments-stack/');
+export const getServices = async () => await fetchData('service');
+export const getServicesStack = async () => await fetchData('services-stack');
+export const getEnvironment = async () => await fetchData('environment');
+export const getEnvironmentsStack = async () => await fetchData('environments-stack');
 export const getDeployableVersionById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
 export const getDeployableVersionBySha = async gitCommitSha =>
@@ -73,7 +73,7 @@ export const getGroups = async (environmentId, serviceId) =>
 
 export const deploy = async newDeployment => {
   try {
-    const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
+    const { data = null } = await axios.post(`${baseUrl}/deployment`, {
       serviceIdsCsv: newDeployment,
       environmentIdsCsv: newDeployment,
       deployableVersionId: newDeployment,
@@ -85,3 +85,7 @@ export const deploy = async newDeployment => {
     throw error;
   }
 };
+
+export const getOngoingDeployments = async () => await fetchData('running-and-just-finished-deployments');
+export const getLatestCreatedPod = async (environmentId, serviceId) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/latestpod`);
+export const getLatestCreatedGroupPod = async (environmentId, serviceId, groupName) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/group/${groupName}/latestpod`);
