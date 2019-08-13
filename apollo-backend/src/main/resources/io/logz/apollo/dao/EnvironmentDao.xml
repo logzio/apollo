@@ -29,4 +29,10 @@
         (#{name}, #{geoRegion}, #{availability}, #{kubernetesMaster}, #{kubernetesToken}, #{kubernetesCaCert}, #{kubernetesNamespace}, #{servicePortCoefficient}, #{requireDeploymentMessage}, #{requireHealthCheck}, #{concurrencyLimit}, #{additionalParams})
     </insert>
 
+    <update id="updateConcurrencyLimit">
+        UPDATE environment SET
+        concurrency_limit=#{concurrencyLimit}
+        WHERE id=#{id}
+    </update>
+
 </mapper>

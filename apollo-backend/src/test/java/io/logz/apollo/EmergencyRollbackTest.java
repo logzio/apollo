@@ -1,48 +1,98 @@
 package io.logz.apollo;
 
-import io.logz.apollo.clients.ApolloTestClient;
-import io.logz.apollo.helpers.Common;
-import io.logz.apollo.helpers.ModelsGenerator;
-import io.logz.apollo.models.DeployableVersion;
+import io.logz.apollo.dao.DeploymentDao;
+import io.logz.apollo.dao.EnvironmentDao;
+import io.logz.apollo.helpers.RealDeploymentGenerator;
+import io.logz.apollo.helpers.StandaloneApollo;
+import io.logz.apollo.kubernetes.KubernetesMonitor;
+import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
-import io.logz.apollo.models.Service;
 import org.junit.Test;
+
+import javax.script.ScriptException;
+import java.io.IOException;
+import java.sql.SQLException;
+
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class EmergencyRollbackTest {
 
-    @Test
-    public void testEmergencyRollbackWorkingWhenCrossingConcurrencyLimit() throws Exception {
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+    private KubernetesMonitor kubernetesMonitor;
+    private EnvironmentDao environmentDao;
+    private DeploymentDao deploymentDao;
+    private RealDeploymentGenerator realDeploymentGenerator;
+    private Deployment deployment;
 
-        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, 1);
+    public EmergencyRollbackTest() throws ScriptException, IOException, SQLException {
+        StandaloneApollo standaloneApollo = StandaloneApollo.getOrCreateServer();
 
-        Service service1 = ModelsGenerator.createAndSubmitService(apolloTestClient);
-        Service service2 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        kubernetesMonitor = standaloneApollo.getInstance(KubernetesMonitor.class);
+        environmentDao = standaloneApollo.getInstance(EnvironmentDao.class);
+        deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
 
-        DeployableVersion deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service1);
-        DeployableVersion deployableVersion2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service2);
-
-        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service1, deployableVersion1);
-
-        ModelsGenerator.createAndSubmitEmergencyRollback(apolloTestClient, environment, service2, deployableVersion2);
+        realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
+        deployment = realDeploymentGenerator.getDeployment();
     }
 
     @Test
-    public void testRegularDeploymentIsBlockedWhenCrossingConcurrencyLimit() throws Exception {
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+    public void testMonitorEmergencyRollbackOnUnlimitedConcurrencyEnvironment() {
+        Environment environment = realDeploymentGenerator.getEnvironment();
+        environmentDao.updateConcurrencyLinit(environment.getId(), -1);
+        Deployment emergencyRollback = realDeploymentGenerator.getDeployment();
+        emergencyRollback.setEmergencyRollback(true);
 
-        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient, 1);
+        assertThat(kubernetesMonitor.isDeployAllowed(deployment, environmentDao, deploymentDao)).isTrue();
+    }
 
-        Service service1 = ModelsGenerator.createAndSubmitService(apolloTestClient);
-        Service service2 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+    @Test
+    public void testMonitorEmergencyRollbackOnUnlimitedConcurrencyEnvironmentWithOngoingDeployment() {
+        Environment environment = realDeploymentGenerator.getEnvironment();
 
-        DeployableVersion deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service1);
-        DeployableVersion deployableVersion2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service2);
+        RealDeploymentGenerator realDeploymentGeneratorLaterDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
+        realDeploymentGeneratorLaterDeployment.setEnvironment(environment);
+        Deployment deployment = realDeploymentGeneratorLaterDeployment.getDeployment();
+        deployment.setEmergencyRollback(false);
 
-        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service1, deployableVersion1);
+        environmentDao.updateConcurrencyLinit(environment.getId(), -1);
+        Deployment emergencyRollback = realDeploymentGenerator.getDeployment();
+        emergencyRollback.setEmergencyRollback(true);
 
-//        Common.waitABit(60);
+        assertThat(kubernetesMonitor.isDeployAllowed(this.deployment, environmentDao, deploymentDao)).isTrue();
+    }
 
-        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service2, deployableVersion2);
+    @Test
+    public void testMonitorEmergencyRollbackOnConcurrencyLimitedEnvironmentWithOngoingDeployment() throws ScriptException, IOException, SQLException {
+        StandaloneApollo.getOrCreateServer();
+
+        Environment environment = realDeploymentGenerator.getEnvironment();
+        environmentDao.updateConcurrencyLinit(environment.getId(), 1);
+        realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
+        Deployment startedDeployment = realDeploymentGenerator.getDeployment();
+        startedDeployment.setEmergencyRollback(false);
+
+        RealDeploymentGenerator realDeploymentGeneratorLaterDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
+        realDeploymentGeneratorLaterDeployment.setEnvironment(environment);
+        Deployment laterDeployment = realDeploymentGeneratorLaterDeployment.getDeployment();
+        laterDeployment.setEmergencyRollback(true);
+
+        assertThat(kubernetesMonitor.isDeployAllowed(laterDeployment, environmentDao, deploymentDao)).isTrue();
+    }
+
+    @Test
+    public void testMonitorRegularDeploymentOnConcurrencyLimitedEnvironmentWithOngoingDeployment() throws ScriptException, IOException, SQLException {
+        StandaloneApollo.getOrCreateServer();
+
+        Environment environment = realDeploymentGenerator.getEnvironment();
+        environmentDao.updateConcurrencyLinit(environment.getId(), 1);
+        realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
+        Deployment startedDeployment = realDeploymentGenerator.getDeployment();
+        startedDeployment.setEmergencyRollback(false);
+
+        RealDeploymentGenerator realDeploymentGeneratorLaterDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
+        realDeploymentGeneratorLaterDeployment.setEnvironment(environment);
+        Deployment laterDeployment = realDeploymentGeneratorLaterDeployment.getDeployment();
+        laterDeployment.setEmergencyRollback(false);
+
+        assertThat(kubernetesMonitor.isDeployAllowed(laterDeployment, environmentDao, deploymentDao)).isFalse();
     }
 }

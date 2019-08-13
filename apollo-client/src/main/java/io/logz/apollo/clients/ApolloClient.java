@@ -112,20 +112,20 @@ public class ApolloClient {
     }
 
     public MultiDeploymentResponseObject addDeployment(Deployment deployment) throws ApolloClientException {
-        return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName());
+        return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName(), deployment.getEmergencyRollback());
     }
 
-    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId) throws ApolloClientException {
-        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "");
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, boolean isEmergencyRollback) throws ApolloClientException {
+        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "", isEmergencyRollback);
     }
 
-    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName) throws ApolloClientException {
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName, boolean isEmegencyRollback) throws ApolloClientException {
         String requestBody = Common.generateJson("environmentIdsCsv", environmentIdsCsv,
                 "serviceIdsCsv", serviceIdsCsv,
                 "deployableVersionId", String.valueOf(deployableVersionId),
                 "deploymentMessage", "this is a deployment message",
                 "groupName", groupName,
-                "isEmergencyRollback", String.valueOf(false));
+                "isEmergencyRollback", String.valueOf(isEmegencyRollback));
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }

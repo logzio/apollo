@@ -279,6 +279,7 @@ public class ModelsGenerator {
         testDeployment.setGroupName(groupName);
         testDeployment.setDeploymentMessage("message-" + Common.randomStr(5));
         testDeployment.setLastUpdate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.of("UTC")).toInstant()));
+        testDeployment.setStatus(Deployment.DeploymentStatus.PENDING);
         return testDeployment;
     }
 
