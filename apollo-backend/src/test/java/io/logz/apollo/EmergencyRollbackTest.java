@@ -37,7 +37,7 @@ public class EmergencyRollbackTest {
     @Test
     public void testMonitorEmergencyRollbackOnUnlimitedConcurrencyEnvironment() {
         Environment environment = realDeploymentGenerator.getEnvironment();
-        environmentDao.updateConcurrencyLinit(environment.getId(), -1);
+        environmentDao.updateConcurrencyLimit(environment.getId(), -1);
         Deployment emergencyRollback = realDeploymentGenerator.getDeployment();
         emergencyRollback.setEmergencyRollback(true);
 
@@ -53,7 +53,7 @@ public class EmergencyRollbackTest {
         Deployment deployment = realDeploymentGeneratorLaterDeployment.getDeployment();
         deployment.setEmergencyRollback(false);
 
-        environmentDao.updateConcurrencyLinit(environment.getId(), -1);
+        environmentDao.updateConcurrencyLimit(environment.getId(), -1);
         Deployment emergencyRollback = realDeploymentGenerator.getDeployment();
         emergencyRollback.setEmergencyRollback(true);
 
@@ -65,7 +65,7 @@ public class EmergencyRollbackTest {
         StandaloneApollo.getOrCreateServer();
 
         Environment environment = realDeploymentGenerator.getEnvironment();
-        environmentDao.updateConcurrencyLinit(environment.getId(), 1);
+        environmentDao.updateConcurrencyLimit(environment.getId(), 1);
         realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
         Deployment startedDeployment = realDeploymentGenerator.getDeployment();
         startedDeployment.setEmergencyRollback(false);
@@ -83,7 +83,7 @@ public class EmergencyRollbackTest {
         StandaloneApollo.getOrCreateServer();
 
         Environment environment = realDeploymentGenerator.getEnvironment();
-        environmentDao.updateConcurrencyLinit(environment.getId(), 1);
+        environmentDao.updateConcurrencyLimit(environment.getId(), 1);
         realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
         Deployment startedDeployment = realDeploymentGenerator.getDeployment();
         startedDeployment.setEmergencyRollback(false);
