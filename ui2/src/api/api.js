@@ -89,3 +89,5 @@ export const deploy = async newDeployment => {
 export const getOngoingDeployments = async () => await fetchData('running-and-just-finished-deployments');
 export const getLatestCreatedPod = async (environmentId, serviceId) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/latestpod`);
 export const getLatestCreatedGroupPod = async (environmentId, serviceId, groupName) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/group/${groupName}/latestpod`);
+
+//https://apollo.internal.logz.io/api/status/environment/2/pod/log-patterns-service-66fb4dbc-4r7jg/containers

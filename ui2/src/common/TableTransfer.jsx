@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Transfer } from 'antd';
+import {Table, Transfer} from 'antd';
 import _ from 'lodash';
 import { AppTable } from './Table';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { transferTableColumns } from '../utils/tableColumns';
 import './TableTransfer.css';
+import {historyBrowser} from "../utils/history";
 
 export const TableTransfer = ({
   data,
@@ -27,14 +28,14 @@ export const TableTransfer = ({
   // const handleSearch = (inputValue, item) =>
   //   searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
 
-    const handleSearch = (inputValue, item) => {
-        return searchColumns
-            .map(searchCol => {
-                const stringifiedItem = item[searchCol].toString();
-                return stringifiedItem && stringifiedItem.indexOf(inputValue) !== -1;
-            })
-            .includes(true);
-    };
+  const handleSearch = (inputValue, item) => {
+    return searchColumns
+      .map(searchCol => {
+        const stringifiedItem = item[searchCol].toString();
+        return stringifiedItem && stringifiedItem.indexOf(inputValue) !== -1;
+      })
+      .includes(true);
+  };
 
   const handleGroupSelection = predefinedGroupId => {
     const keys = selectGroup(predefinedGroupId);
@@ -45,7 +46,29 @@ export const TableTransfer = ({
       setTargetKeys(_.difference(targetKeys, keys));
     }
   };
+
   const currentTable = match.url.split('/').pop();
+
+  // const onRow={({key}) => ({
+  //   onClick: () => {
+  //     onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
+  //     // setTargetKeys && setTargetKeys([...targetKeys, key]);
+  //   },
+  //   onDoubleClick: () => {
+  //     const keys = targetKeys ? targetKeys : [];
+  //     setTargetKeys && setTargetKeys([...keys, key]);
+  //     onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
+  //     setTimeout(
+  //         () =>
+  //             historyBrowser.push({
+  //               pathname: `${linkTo}`,
+  //               search: `${addSearch}${[...keys, key]}`,
+  //             }),
+  //         100,
+  //     );
+  //   },
+  // })};
+
   return (
     <>
       <div className="submit-transfer-table">

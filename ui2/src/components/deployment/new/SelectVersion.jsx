@@ -33,6 +33,7 @@ export const SelectVersion = ({
       const author = [committerAvatarUrl, committerName];
       return {
         ...dataItem,
+        id: id,
         key: id.toString(),
         commitDate: moment(commitDate).format('DD/MM/YY, h:mm:ss'),
         shortendCommitSha: gitCommitSha.slice(0, 7),
