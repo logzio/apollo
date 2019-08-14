@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table } from 'antd';
+import { Table, Empty } from 'antd';
 import _ from 'lodash';
 import { historyBrowser } from '../utils/history';
 import { AppSearch } from '../common/Search';
@@ -17,7 +17,8 @@ export const AppTable = ({
   showSelection,
   searchColumns,
   showSearch,
-  ...props
+    emptyMsg,
+                             ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
@@ -77,6 +78,16 @@ export const AppTable = ({
             );
           },
         })}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <div>{emptyMsg}</div>
+              }
+            />
+          ),
+        }}
         {...props}
       />
     </>
