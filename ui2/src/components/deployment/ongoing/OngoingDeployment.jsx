@@ -45,7 +45,7 @@ const OngoingDeploymentComponent = ({
         lastUpdate: moment(lastUpdate).format('DD/MM/YY, h:mm:ss'),
         serviceId: findNameById(serviceId, services),
         environmentId: findNameById(environmentId, environment),
-        groupName: groupName ? groupName : 'No',
+        groupName: groupName ? groupName : 'Non',
       };
     });
 
@@ -68,6 +68,7 @@ const OngoingDeploymentComponent = ({
       showSearch={true}
       searchColumns={['lastUpdate', 'serviceId', 'environmentId', 'groupName', 'userEmail', 'status']}
       showSelection={false}
+      emptyMsg={'There aren\'t ongoing deployments'}
     />
   );
 };
