@@ -155,7 +155,7 @@ public class KubernetesMonitor {
 
     @VisibleForTesting
     public boolean isDeployAllowed(Deployment deployment, EnvironmentDao environmentDao, DeploymentDao deploymentDao) {
-        return isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment, environmentDao, deploymentDao) || deployment.getEmergencyRollback();
+        return isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment, environmentDao, deploymentDao) || deployment.getEmergencyDeployment();
     }
 
     private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment, EnvironmentDao environmentDao, DeploymentDao deploymentDao) {

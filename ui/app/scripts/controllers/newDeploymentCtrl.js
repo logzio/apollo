@@ -158,7 +158,7 @@ angular.module('apollo')
            }
         }
 
-        $scope.deploy = function(isEmergencyRollback) {
+        $scope.deploy = function(isEmergencyDeployment) {
 
             // Just running the validators first, to make sure nothing has changed
             angular.forEach(deploymentValidators, function(validateFunction, name) {
@@ -182,14 +182,14 @@ angular.module('apollo')
                             groups.push(group.id);
                         }
                     });
-                    if (!isEmergencyRollback) {
+                    if (!isEmergencyDeployment) {
                         apolloApiService.createNewDeploymentWithGroup(
                             getDeployableVersionFromCommit($scope.versionSelected.gitCommitSha),
                             $scope.selectedServices[0].id,
                             environment.id,
                             $scope.deploymentMessage.text,
                             groups.join(','),
-                            isEmergencyRollback)
+                            isEmergencyDeployment)
                             .then(afterCreatingNewDeploymentWithGroup)
                             .catch(afterCreatingNewDeploymentWithGroupInCaseOfError)
                     }
@@ -200,7 +200,7 @@ angular.module('apollo')
                             environment.id,
                             $scope.deploymentMessage.text,
                             groups.join(','),
-                            isEmergencyRollback)
+                            isEmergencyDeployment)
                             .then(afterCreatingNewDeploymentWithGroup)
                             .catch(afterCreatingNewDeploymentWithGroupInCaseOfError)
                     }
@@ -220,7 +220,7 @@ angular.module('apollo')
                         $scope.selectedServices.map(function (service) { return service.id; }).join(','),
                         $scope.selectedEnvironments.map(function (environment) { return environment.id; }).join(','),
                         $scope.deploymentMessage.text,
-                        isEmergencyRollback 
+                        isEmergencyDeployment
                     ).then(function (response) {
 
                     // Wait a bit to let the deployment be in the DB

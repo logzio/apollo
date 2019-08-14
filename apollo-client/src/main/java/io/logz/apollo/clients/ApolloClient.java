@@ -112,11 +112,11 @@ public class ApolloClient {
     }
 
     public MultiDeploymentResponseObject addDeployment(Deployment deployment) throws ApolloClientException {
-        return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName(), deployment.getEmergencyRollback());
+        return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName(), deployment.getEmergencyDeployment());
     }
 
-    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, boolean isEmergencyRollback) throws ApolloClientException {
-        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "", isEmergencyRollback);
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, boolean isEmergencyDeployment) throws ApolloClientException {
+        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "", isEmergencyDeployment);
     }
 
     public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName, boolean isEmegencyRollback) throws ApolloClientException {
@@ -125,7 +125,7 @@ public class ApolloClient {
                 "deployableVersionId", String.valueOf(deployableVersionId),
                 "deploymentMessage", "this is a deployment message",
                 "groupName", groupName,
-                "isEmergencyRollback", String.valueOf(isEmegencyRollback));
+                "isEmergencyDeployment", String.valueOf(isEmegencyRollback));
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }
@@ -136,7 +136,7 @@ public class ApolloClient {
                 "deployableVersionId", String.valueOf(deployment.getDeployableVersionId()),
                 "groupIdsCsv", groupIdsCsv,
                 "deploymentMessage", deployment.getDeploymentMessage(),
-                "isEmergencyRollback", String.valueOf(false));
+                "isEmergencyDeployment", String.valueOf(false));
 
         return genericApolloClient.postAndGetResult("/deployment-groups", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }

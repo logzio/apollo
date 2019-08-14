@@ -318,7 +318,7 @@ public class ModelsGenerator {
         return testDeployment;
     }
 
-    public static Deployment createAndSubmitEmergencyRollback(ApolloTestClient apolloTestClient, Environment environment,
+    public static Deployment createAndSubmitEmergencyDeployment(ApolloTestClient apolloTestClient, Environment environment,
                                                        Service service, DeployableVersion deployableVersion) throws Exception {
 
         // Give the user permissions to deploy
@@ -326,7 +326,7 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
-        testDeployment.setEmergencyRollback(true);
+        testDeployment.setEmergencyDeployment(true);
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
         if (result.getSuccessful().size() > 0) {

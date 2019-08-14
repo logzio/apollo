@@ -29,7 +29,7 @@ public class Deployment {
     private String groupName;
     private String deploymentParams;
     private String deploymentMessage;
-    private boolean isEmergencyRollback;
+    private boolean isEmergencyDeployment;
 
     public Deployment() {
     }
@@ -130,11 +130,11 @@ public class Deployment {
         this.deploymentMessage = deploymentMessage;
     }
 
-    public boolean getEmergencyRollback() {
-        return isEmergencyRollback;
+    public boolean getEmergencyDeployment() {
+        return isEmergencyDeployment;
     }
 
-    public void setEmergencyRollback(boolean isEmergencyRollback) {
-        this.isEmergencyRollback = isEmergencyRollback;
+    public void setEmergencyDeployment(boolean isEmergencyDeployment) {
+        this.isEmergencyDeployment = isEmergencyDeployment;
     }
 }
