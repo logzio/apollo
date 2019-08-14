@@ -20,10 +20,14 @@ export const AppTable = ({
   emptyMsg,
   rowSelection,
   handleOnSelect,
+                             rowClassName,
+                             expandableColumn,
+                             expandIconAsCell,
   ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
+  const [expandableRows, setExpandableRows] = useState(data); //TODO
 
   useEffect(() => {
     setFilteredData(data);
@@ -55,6 +59,14 @@ export const AppTable = ({
     //     setFilteredData(filteredData);
     // };
 
+    const onExpand = (expanded, { key }) => {//TODO
+        const rowKeyInd = expandableRows.findIndex(({ key: rowKey }) => rowKey === key);
+        if (~rowKeyInd) {
+            setExpandableRows(expandableRows.splice(rowKeyInd, 1));
+        } else {
+            setExpandableRows([...expandableRows, key]);
+        }
+    };
   return (
     <>
       {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
@@ -85,6 +97,11 @@ export const AppTable = ({
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
         }}
+        expandedRowRender={(record, index) => index === 3 && <p style={{ margin: 0 }}>hi</p>}
+        expandIconColumnIndex={expandableColumn}
+        expandIconAsCell={expandIconAsCell}
+        onExpand={onExpand}
+        rowClassName={rowClassName}
         {...props}
       />
     </>
