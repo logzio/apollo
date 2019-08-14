@@ -5,7 +5,6 @@ import { Spinner } from '../../../common/Spinner';
 import { AppTable } from '../../../common/Table';
 import { tableColumns } from '../../../utils/tableColumns';
 import moment from 'moment';
-import { Tag } from 'antd';
 import './OngoingDeployment.css';
 
 const OngoingDeploymentComponent = ({
@@ -17,11 +16,11 @@ const OngoingDeploymentComponent = ({
   environment,
   match,
   resetBreadcrumbs,
-                                        handleBreadcrumbs,
+  handleBreadcrumbs,
 }) => {
   useEffect(() => {
     resetBreadcrumbs();
-    // handleBreadcrumbs(`${match.url}`, 'ongoing');
+    // handleBreadcrumbs(``, 'ongoing'); //TODO
     getServices();
     getEnvironment();
     getOngoingDeployments();
@@ -40,10 +39,10 @@ const OngoingDeploymentComponent = ({
 
   const formattedData =
     ongoingDeployments &&
-    ongoingDeployments.map(({ id, lastUpdate, serviceId, environmentId, groupName, environment, ...dataItem }) => {
+    ongoingDeployments.map(({ id, lastUpdate, serviceId, environmentId, groupName, ...dataItem }) => {
       return {
         ...dataItem,
-          id: id,
+        id: id,
         key: id.toString(),
         lastUpdate: moment(lastUpdate).format('DD/MM/YY, h:mm:ss'),
         serviceId: findNameById(serviceId, services),
@@ -59,15 +58,16 @@ const OngoingDeploymentComponent = ({
   return (
     <AppTable
       columns={tableColumns(
-          ['lastUpdate', 'serviceId', 'environmentId', 'groupName', 'userEmail', 'deploymentMessage', 'status', 'actions'],
-          ['Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
-          null,
-        [{ title: 'View logs', color: '#465BA4' }, { title: 'Revert', color: '#E6B5AD' }],
+        ['lastUpdate', 'serviceId', 'environmentId', 'groupName', 'userEmail', 'deploymentMessage', 'status', 'actions'],
+        ['Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
+        null,
+        [
+          { title: 'View logs', color: '#465BA4', type: 'primary', icon: 'menu-unfold' },
+          { title: 'Revert', color: '#BD656A', type: 'danger', icon: 'undo' },
+        ],
       )}
       data={formattedData}
-      // linkTo={'verification'}
       scroll={{ y: 750 }}
-      // addSearch={`${location.search}&version=`}
       showSearch={true}
       searchColumns={['lastUpdate', 'serviceId', 'environmentId', 'groupName', 'userEmail', 'status']}
       showSelection={false}

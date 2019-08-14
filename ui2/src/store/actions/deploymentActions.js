@@ -312,3 +312,24 @@ export const getLatestCreatedGroupPod = (environmentId, serviceId, groupName) =>
     }
   };
 };
+
+// export const selectService = () => {
+//     return async dispatch => {
+//         dispatch({
+//             type: GET_SERVICES_REQUEST,
+//         });
+//         try {
+//             const data = await API.getServices();
+//             dispatch({
+//                 type: GET_SERVICES_SUCCESS,
+//                 payload: data,
+//                 // payload: servicesMock,
+//             });
+//         } catch (error) {
+//             dispatch({
+//                 type: GET_SERVICES_FAILURE,
+//                 error,
+//             });
+//         }
+//     };
+// };
