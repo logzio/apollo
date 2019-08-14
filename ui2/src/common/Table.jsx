@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Empty } from 'antd';
-// import _ from 'lodash';
+import _ from 'lodash';
 import { historyBrowser } from '../utils/history';
 import { AppSearch } from '../common/Search';
 import './Table.css';
