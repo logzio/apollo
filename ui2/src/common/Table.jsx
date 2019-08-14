@@ -19,13 +19,19 @@ export const AppTable = ({
   showSelection,
   searchColumns,
   showSearch,
-    emptyMsg
+  emptyMsg,
+  rowClassName,
+  expandableColumn,
+  expandIconAsCell,
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
+  const [expandableRows, setExpandableRows] = useState(data); //TODO
+
   useEffect(() => {
     setFilteredData(data);
   }, [data]);
+
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -49,6 +55,15 @@ export const AppTable = ({
       return test.includes(true);
     });
     setFilteredData(filteredData);
+  };
+
+  const onExpand = (expanded, { key }) => {//TODO
+    const rowKeyInd = expandableRows.findIndex(({ key: rowKey }) => rowKey === key);
+    if (~rowKeyInd) {
+      setExpandableRows(expandableRows.splice(rowKeyInd, 1));
+    } else {
+      setExpandableRows([...expandableRows, key]);
+    }
   };
 
   return (
@@ -82,15 +97,13 @@ export const AppTable = ({
         })}
         scroll={scroll}
         locale={{
-          emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={
-                <div>{emptyMsg}</div>
-              }
-            />
-          ),
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
         }}
+        expandedRowRender={(record, index) => index === 3 && <p style={{ margin: 0 }}>hi</p>}
+        expandIconColumnIndex={expandableColumn}
+        expandIconAsCell={expandIconAsCell}
+        onExpand={onExpand}
+        rowClassName={rowClassName}
       />
     </>
   );

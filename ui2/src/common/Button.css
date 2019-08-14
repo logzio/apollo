@@ -19,3 +19,8 @@
 .table-button:hover{
     background-color: #EAEFF1;
 }
+
+.table-circle-button{
+    width: 32px;
+    margin: 0 2px;
+}

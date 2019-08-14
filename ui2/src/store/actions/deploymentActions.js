@@ -67,6 +67,27 @@ export const getServices = () => {
   };
 };
 
+export const selectService = () => {
+  return async dispatch => {
+    dispatch({
+      type: GET_SERVICES_REQUEST,
+    });
+    try {
+      const data = await API.getServices();
+      dispatch({
+        type: GET_SERVICES_SUCCESS,
+        payload: data,
+        // payload: servicesMock,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_SERVICES_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
 export const getServicesStack = () => {
   return async dispatch => {
     dispatch({

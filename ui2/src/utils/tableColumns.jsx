@@ -1,16 +1,33 @@
 import React from 'react';
+import { AppTag } from '../common/Tag';
 import { AppButton } from '../common/Button';
-import { Tag } from 'antd';
+import { Button } from 'antd';
 
-const renderStaff = (dataCategory, imgIndex, index, tagList) => {
+const costumeRender = (dataCategory, imgIndex, index, tagList) => {
+  // if (dataCategory === 'actions') {
+  //   return (
+  //     tagList &&
+  //     (() =>
+  //       tagList && (
+  //         <div>
+  //           {tagList.map(({ color, title, type, icon }, index) => (
+  //             <AppButton type={type} shape="circle" icon={icon} className="table-circle-button" tooltipText={title} />
+  //           ))}
+  //         </div>
+  //       ))
+  //   );
+  // }
+
   if (dataCategory === 'actions') {
     return (
       tagList &&
       (() =>
         tagList && (
           <div>
-            {tagList.map(({ color, title }) => (
-              <Tag color={color}>{title}</Tag>
+            {tagList.map(({ color, title }, index) => (
+              <AppTag color={color} key={index}>
+                {title}
+              </AppTag>
             ))}
           </div>
         ))
@@ -18,7 +35,29 @@ const renderStaff = (dataCategory, imgIndex, index, tagList) => {
   }
 
   if (dataCategory === 'status') {
-    return text => <Tag color={'#49A446'}>{text}</Tag>;
+    return status => {
+      switch (status) {
+        case 'STARTED':
+          return <AppTag color={'#0983F6'}>{status}</AppTag>;
+        case 'CANCELED':
+          return <AppTag color={'#F60935'}>{status}</AppTag>;
+        case 'DONE':
+          return <AppTag color={'#49A446'}>{status}</AppTag>;
+        default:
+          return <AppTag>{status}</AppTag>;
+      }
+    };
+  }
+
+  if (dataCategory === 'groupName') {
+    return group => {
+      switch (group) {
+        case null:
+          return <AppTag color={'#0983F6'}>Non</AppTag>;
+        default:
+          return <AppTag tooltipText={group}>{group}</AppTag>;
+      }
+    };
   }
 
   if (imgIndex === index) {
@@ -41,6 +80,6 @@ export const tableColumns = (dataCategories, columnTitles, imgIndex, tagList) =>
   dataCategories.map((dataCategory, index) => ({
     dataIndex: dataCategory,
     title: columnTitles[index],
-    width: '140px',
-    render: renderStaff(dataCategory, imgIndex, index, tagList),
+    className: dataCategory,
+    render: costumeRender(dataCategory, imgIndex, index, tagList),
   }));
