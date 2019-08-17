@@ -18,9 +18,9 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   }, [appInit, loggedIn]);
 
   const [collapsed, toggleCollapse] = useState(false);
-  const isSession = !!getAuthToken();
+  const isAuthenticate = !!getAuthToken();
   const AppRoute = ({ path, ...props }) => {
-    return isSession ? (
+    return isAuthenticate ? (
       <Route path={path} render={({ match }) => <Container match={match} {...props} />} />
     ) : (
       <Redirect to="/auth/login" />
@@ -30,7 +30,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   return (
     <Router history={history}>
       <Layout className="app">
-        {isSession && (
+        {isAuthenticate && (
           <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
             <Navbar
               toggleCollapsed={() => toggleCollapse(!collapsed)}
@@ -45,8 +45,8 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
             <Switch>
               {isAdmin && <AppRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
               <AppRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
-              {!isSession && <Route path="/auth/login" component={Login} />}
-              {isSession ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
+              {!isAuthenticate && <Route path="/auth/login" component={Login} />}
+              {isAuthenticate ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
             </Switch>
           </Layout.Content>
         </Layout>

@@ -3,7 +3,7 @@ import { Table } from 'antd';
 import _ from 'lodash';
 import './Table.css';
 
-export const AppTable = ({ columns, filteredItems, onItemSelectAll, onItemSelect, selectedKeys, scroll }) => {
+export const AppTable = ({ filteredItems, onItemSelectAll, onItemSelect, selectedKeys, ...props }) => {
   const rowSelection = {
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
@@ -19,7 +19,6 @@ export const AppTable = ({ columns, filteredItems, onItemSelectAll, onItemSelect
   return (
     <Table
       className="app-table"
-      columns={columns}
       dataSource={filteredItems}
       rowSelection={rowSelection}
       size={'small'}
@@ -27,7 +26,7 @@ export const AppTable = ({ columns, filteredItems, onItemSelectAll, onItemSelect
       onRow={item => ({
         onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
       })}
-      scroll={scroll}
+      {...props}
     />
   );
 };

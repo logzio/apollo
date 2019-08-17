@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
 
-export const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStack, servicesStacks, resetBreadcrumbs, match }) => {
+export const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStacks, servicesStacks, resetBreadcrumbs, match }) => {
   useEffect(() => {
     resetBreadcrumbs();
     handleBreadcrumbs(`${match.url}`, 'service');
     getServices();
-    getServicesStack();
+    getServicesStacks();
   }, []);
 
   const stackSelection = stackId => {

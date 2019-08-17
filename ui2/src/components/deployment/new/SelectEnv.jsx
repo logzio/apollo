@@ -3,16 +3,16 @@ import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
 
 export const SelectEnvironment = ({
-  getEnvironment,
-  getEnvironmentsStack,
+  getEnvironments,
+  getEnvironmentsStacks,
   handleBreadcrumbs,
   environment,
   environmentsStacks,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${window.location.href}`, 'environment');
-    getEnvironment();
-    getEnvironmentsStack();
+    getEnvironments();
+    getEnvironmentsStacks();
   }, []);
 
   const stackSelection = stackId => {

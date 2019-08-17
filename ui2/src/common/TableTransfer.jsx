@@ -20,11 +20,12 @@ export const TableTransfer = ({
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [showSearch] = useState(!!searchColumns);
-  const formattedData = data.map(dataItem => ({ ...dataItem, key: dataItem.id.toString() }));
+  const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
   const handleSearch = (inputValue, item) => {
     return searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
   };
+
   const handleGroupSelection = predefinedGroupId => {
     const keys = selectGroup(predefinedGroupId);
     const addedKeys = _.difference(keys, targetKeys);
@@ -39,7 +40,7 @@ export const TableTransfer = ({
     <Transfer
       className="table-transfer"
       dataSource={formattedData}
-      filterOption={(inputValue, item) => handleSearch(inputValue, item)}
+      filterOption={handleSearch}
       showSelectAll={false}
       targetKeys={targetKeys}
       showSearch={showSearch}

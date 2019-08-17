@@ -37,13 +37,13 @@ export const getServices = () => {
   };
 };
 
-export const getServicesStack = () => {
+export const getServicesStacks = () => {
   return async dispatch => {
     dispatch({
       type: GET_SERVICES_STACK_REQUEST,
     });
     try {
-      const data = await API.getServicesStack();
+      const data = await API.getServicesStacks();
       dispatch({
         type: GET_SERVICES_STACK_SUCCESS,
         // payload: data,
@@ -58,13 +58,13 @@ export const getServicesStack = () => {
   };
 };
 
-export const getEnvironment = () => {
+export const getEnvironments = () => {
   return async dispatch => {
     dispatch({
       type: GET_ENV_REQUEST,
     });
     try {
-      const data = await API.getEnvironment();
+      const data = await API.getEnvironments();
       dispatch({
         type: GET_ENV_SUCCESS,
         // payload: data,
@@ -79,13 +79,13 @@ export const getEnvironment = () => {
   };
 };
 
-export const getEnvironmentsStack = () => {
+export const getEnvironmentsStacks = () => {
   return async dispatch => {
     dispatch({
       type: GET_ENV_STACK_REQUEST,
     });
     try {
-      const data = await API.getEnvironmentsStack();
+      const data = await API.getEnvironmentsStacks();
       dispatch({
         type: GET_ENV_STACK_SUCCESS,
         // payload: data,
