@@ -14,7 +14,6 @@ import {
   GET_ENV_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
-import { servicesMock, stackServicesMock, envMock, stackEnvironmentsMock } from './tempMock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -25,8 +24,7 @@ export const getServices = () => {
       const data = await API.getServices();
       dispatch({
         type: GET_SERVICES_SUCCESS,
-        // payload: data,
-        payload: servicesMock,
+        payload: data,
       });
     } catch (error) {
       dispatch({
@@ -46,8 +44,7 @@ export const getServicesStacks = () => {
       const data = await API.getServicesStacks();
       dispatch({
         type: GET_SERVICES_STACK_SUCCESS,
-        // payload: data,
-        payload: stackServicesMock,
+        payload: data,
       });
     } catch (error) {
       dispatch({
@@ -67,8 +64,7 @@ export const getEnvironments = () => {
       const data = await API.getEnvironments();
       dispatch({
         type: GET_ENV_SUCCESS,
-        // payload: data,
-        payload: envMock,
+        payload: data,
       });
     } catch (error) {
       dispatch({
@@ -88,8 +84,7 @@ export const getEnvironmentsStacks = () => {
       const data = await API.getEnvironmentsStacks();
       dispatch({
         type: GET_ENV_STACK_SUCCESS,
-        // payload: data,
-        payload: stackEnvironmentsMock,
+        payload: data,
       });
     } catch (error) {
       dispatch({

@@ -22,9 +22,8 @@ export const TableTransfer = ({
   const [showSearch] = useState(!!searchColumns);
   const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
-  const handleSearch = (inputValue, item) => {
-    return searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
-  };
+  const handleSearch = (inputValue, item) =>
+    searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
 
   const handleGroupSelection = predefinedGroupId => {
     const keys = selectGroup(predefinedGroupId);
