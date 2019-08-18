@@ -6,23 +6,18 @@ import { AppSearch } from '../common/Search';
 import './Table.css';
 
 export const AppTable = ({
-  columns,
   data,
   onItemSelectAll,
   onItemSelect,
   selectedKeys,
-  scroll,
   linkTo,
   addSearch,
   setTargetKeys,
   targetKeys,
   showSelection,
   searchColumns,
-<<<<<<< HEAD
-  showSearch,  ...props
-=======
   showSearch,
->>>>>>> e0d3ba0ffadbeb4dfb13fe2985f1b41e0bcc22b2
+  ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
@@ -59,7 +54,6 @@ export const AppTable = ({
       {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
       <Table
         className="app-table"
-        columns={columns}
         dataSource={filteredData}
         rowSelection={showSelection ? rowSelection : null}
         size={'small'}
@@ -83,7 +77,7 @@ export const AppTable = ({
             );
           },
         })}
-        scroll={scroll}
+        {...props}
       />
     </>
   );

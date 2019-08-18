@@ -54,9 +54,9 @@ export const appLogout = () => {
 };
 
 export const getServices = async () => await fetchData('service/');
-export const getServicesStack = async () => await fetchData('services-stack/');
-export const getEnvironment = async () => await fetchData('environment/');
-export const getEnvironmentsStack = async () => await fetchData('environments-stack/');
+export const getServicesStacks = async () => await fetchData('services-stack/');
+export const getEnvironments = async () => await fetchData('environment/');
+export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
 export const getDeployableVersionById = async (servicesId) => await fetchData(`deployable-version/multi-service/${servicesId}/`);
 export const getDeployableVersionBySha = async (gitCommitSha) => await fetchData(`deployable-version/sha/${gitCommitSha}/`);
 // Double encoding, as nginx is opening the first one

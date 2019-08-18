@@ -24,11 +24,6 @@ import {
 } from '../actions';
 import * as API from '../../api/api';
 import {
-  servicesMock,
-  stackServicesMock,
-  envMock,
-  stackEnvironmentsMock,
-  depVersionMock,
   depShaVersionMock,
 } from './tempMock';
 
