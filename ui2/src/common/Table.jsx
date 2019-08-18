@@ -21,7 +21,10 @@ export const AppTable = ({
   rowClassName,
   expandableColumn,
   expandIconAsCell,
+<<<<<<< HEAD
     ...props
+=======
+>>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
@@ -93,6 +96,10 @@ export const AppTable = ({
             );
           },
         })}
+<<<<<<< HEAD
+=======
+        scroll={scroll}
+>>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
         }}
@@ -101,7 +108,10 @@ export const AppTable = ({
         expandIconAsCell={expandIconAsCell}
         onExpand={onExpand}
         rowClassName={rowClassName}
+<<<<<<< HEAD
         {...props}
+=======
+>>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
       />
     </>
   );

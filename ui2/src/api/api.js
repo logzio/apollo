@@ -53,10 +53,17 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
+<<<<<<< HEAD
 export const getServices = async () => await fetchData('service/');
 export const getServicesStacks = async () => await fetchData('services-stack/');
 export const getEnvironments = async () => await fetchData('environment/');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
+=======
+export const getServices = async () => await fetchData('service');
+export const getServicesStack = async () => await fetchData('services-stack');
+export const getEnvironment = async () => await fetchData('environment');
+export const getEnvironmentsStack = async () => await fetchData('environments-stack');
+>>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
 export const getDeployableVersionById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
 export const getDeployableVersionBySha = async gitCommitSha =>

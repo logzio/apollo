@@ -6,7 +6,11 @@ export const SelectService = ({
   getServices,
   services,
   handleBreadcrumbs,
+<<<<<<< HEAD
   getServicesStacks,
+=======
+  getServicesStack,
+>>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
   servicesStacks,
   resetBreadcrumbs,
   match,
