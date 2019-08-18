@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { getEnvironment, getOngoingDeployments, getServices } from '../../../store/actions/deploymentActions';
+import { getEnvironments, getOngoingDeployments, getServices } from '../../../store/actions/deploymentActions';
 import { Spinner } from '../../../common/Spinner';
 import { AppTable } from '../../../common/Table';
 import { tableColumns } from '../../../utils/tableColumns';
@@ -12,7 +12,7 @@ const OngoingDeploymentComponent = ({
   ongoingDeployments,
   getServices,
   services,
-  getEnvironment,
+  getEnvironments,
   environment,
   match,
   resetBreadcrumbs,
@@ -22,7 +22,7 @@ const OngoingDeploymentComponent = ({
     resetBreadcrumbs();
     // handleBreadcrumbs(``, 'ongoing'); //TODO
     getServices();
-    getEnvironment();
+    getEnvironments();
     getOngoingDeployments();
   }, []);
 
@@ -91,6 +91,6 @@ export const OngoingDeployment = connect(
   {
     getOngoingDeployments,
     getServices,
-    getEnvironment,
+    getEnvironments,
   },
 )(OngoingDeploymentComponent);

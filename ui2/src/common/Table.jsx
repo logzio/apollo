@@ -21,10 +21,7 @@ export const AppTable = ({
   rowClassName,
   expandableColumn,
   expandIconAsCell,
-<<<<<<< HEAD
-    ...props
-=======
->>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
+  ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
@@ -59,7 +56,8 @@ export const AppTable = ({
     setFilteredData(filteredData);
   };
 
-  const onExpand = (expanded, { key }) => {//TODO
+  const onExpand = (expanded, { key }) => {
+    //TODO
     const rowKeyInd = expandableRows.findIndex(({ key: rowKey }) => rowKey === key);
     if (~rowKeyInd) {
       setExpandableRows(expandableRows.splice(rowKeyInd, 1));
@@ -96,10 +94,6 @@ export const AppTable = ({
             );
           },
         })}
-<<<<<<< HEAD
-=======
-        scroll={scroll}
->>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
         }}
@@ -108,10 +102,7 @@ export const AppTable = ({
         expandIconAsCell={expandIconAsCell}
         onExpand={onExpand}
         rowClassName={rowClassName}
-<<<<<<< HEAD
         {...props}
-=======
->>>>>>> 8436fe65b69ff51cdba606535e3a2a8a6a8aed05
       />
     </>
   );
