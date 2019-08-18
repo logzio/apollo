@@ -54,9 +54,15 @@ export const appLogout = () => {
 };
 
 export const getServices = async () => await fetchData('service/');
+<<<<<<< HEAD
 export const getServicesStacks = async () => await fetchData('services-stack/');
 export const getEnvironments = async () => await fetchData('environment/');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
+=======
+export const getServicesStack = async () => await fetchData('services-stack/');
+export const getEnvironment = async () => await fetchData('environment/');
+export const getEnvironmentsStack = async () => await fetchData('environments-stack/');
+>>>>>>> fa90210c1fd1c64f417f792029d84ca8e926c6b9
 export const getDeployableVersionById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
 export const getDeployableVersionBySha = async gitCommitSha =>
