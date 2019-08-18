@@ -29,10 +29,9 @@ import {
   NEW_DEPLOYMENT_FAILURE,
 } from '../actions';
 import * as API from '../../api/api';
-import {
-  depShaVersionMock,
-} from './tempMock';
+import { depShaVersionMock } from './tempMock';
 import { historyBrowser } from '../../utils/history';
+import { serviceCache } from '../../utils/cacheService';
 
 export const getServices = () => {
   return async dispatch => {
@@ -40,7 +39,7 @@ export const getServices = () => {
       type: GET_SERVICES_REQUEST,
     });
     try {
-      const data = await API.getServices();
+      const data = await serviceCache('services', API.getServices, 1);
       dispatch({
         type: GET_SERVICES_SUCCESS,
         payload: data,
