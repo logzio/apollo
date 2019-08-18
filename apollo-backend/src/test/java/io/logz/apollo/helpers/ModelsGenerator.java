@@ -317,13 +317,13 @@ public class ModelsGenerator {
     public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient) throws Exception {
 
         // Add all foreign keys
-        Environment testEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Environment testEnvironment = ModelsGenerator.createEnvironment();
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
 
-        Service testService = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        Service testService = ModelsGenerator.createService();
         testService.setId(apolloTestClient.addService(testService).getId());
 
-        DeployableVersion testDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, testService);
+        DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(testService);
         testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
 
         return createAndSubmitDeployment(apolloTestClient, testEnvironment, testService, testDeployableVersion);
