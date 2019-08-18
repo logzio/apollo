@@ -18,7 +18,11 @@ export const AppTable = ({
   targetKeys,
   showSelection,
   searchColumns,
+<<<<<<< HEAD
   showSearch,  ...props
+=======
+  showSearch,
+>>>>>>> e0d3ba0ffadbeb4dfb13fe2985f1b41e0bcc22b2
 }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);

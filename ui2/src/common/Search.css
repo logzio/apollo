@@ -5,6 +5,7 @@
 }
 .ant-input-wrapper{
     width: 29.5%;
+<<<<<<< HEAD
     margin: 10px 5px;
 }
 
@@ -12,6 +13,11 @@
 /*    width: 34.3%;*/
 /*    margin: 10px 5px;*/
 /*}*/
+=======
+    margin: 5px 5px 10px 5px;
+}
+
+>>>>>>> e0d3ba0ffadbeb4dfb13fe2985f1b41e0bcc22b2
 .ant-input-search-button{
     font-weight: bold;
     font-size: 14px;
