@@ -1,2 +1,2 @@
 ALTER TABLE deployment
-ADD is_emergency_rollback TINYINT DEFAULT 0;
+ADD is_emergency_deployment TINYINT DEFAULT 0;

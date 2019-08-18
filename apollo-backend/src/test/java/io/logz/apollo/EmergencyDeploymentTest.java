@@ -1,12 +1,13 @@
 package io.logz.apollo;
 
+import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.EnvironmentDao;
-import io.logz.apollo.helpers.RealDeploymentGenerator;
+import io.logz.apollo.helpers.Common;
+import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.Environment;
 import org.junit.Test;
 
 import javax.script.ScriptException;
@@ -20,79 +21,28 @@ public class EmergencyDeploymentTest {
     private KubernetesMonitor kubernetesMonitor;
     private EnvironmentDao environmentDao;
     private DeploymentDao deploymentDao;
-    private RealDeploymentGenerator realDeploymentGenerator;
-    private Deployment deployment;
+    private final ApolloTestClient apolloTestClient;
 
     public EmergencyDeploymentTest() throws ScriptException, IOException, SQLException {
         StandaloneApollo standaloneApollo = StandaloneApollo.getOrCreateServer();
+        apolloTestClient = Common.signupAndLogin();
 
         kubernetesMonitor = standaloneApollo.getInstance(KubernetesMonitor.class);
         environmentDao = standaloneApollo.getInstance(EnvironmentDao.class);
         deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
-
-        realDeploymentGenerator = new RealDeploymentGenerator("image", "key", "value", 0);
-        deployment = realDeploymentGenerator.getDeployment();
     }
 
     @Test
-    public void testMonitorEmergencyDeploymentOnUnlimitedConcurrencyEnvironment() {
-        Environment environment = realDeploymentGenerator.getEnvironment();
-        environmentDao.updateConcurrencyLimit(environment.getId(), -1);
-        Deployment EmergencyDeployment = realDeploymentGenerator.getDeployment();
-        EmergencyDeployment.setEmergencyDeployment(true);
+    public void changingToEmergencyDeploymentWhileThereIsAnotherOngoingDeployment() throws Exception {
+        Deployment deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient);
+        environmentDao.updateConcurrencyLimit(deployment.getEnvironmentId(), 1);
+        deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.STARTED);
 
-        assertThat(kubernetesMonitor.isDeployAllowed(deployment, environmentDao, deploymentDao)).isTrue();
-    }
+        Deployment deployment1 = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environmentDao.getEnvironment(deployment.getId()));
+        assertThat(kubernetesMonitor.isDeployAllowed(deployment1, environmentDao, deploymentDao)).isFalse();
 
-    @Test
-    public void testMonitorEmergencyDeploymentOnUnlimitedConcurrencyEnvironmentWithOngoingDeployment() {
-        Environment environment = realDeploymentGenerator.getEnvironment();
-
-        RealDeploymentGenerator realDeploymentGeneratorLaterDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
-        realDeploymentGeneratorLaterDeployment.setEnvironment(environment);
-        Deployment deployment = realDeploymentGeneratorLaterDeployment.getDeployment();
-        deployment.setEmergencyDeployment(false);
-
-        environmentDao.updateConcurrencyLimit(environment.getId(), -1);
-        Deployment EmergencyDeployment = realDeploymentGenerator.getDeployment();
-        EmergencyDeployment.setEmergencyDeployment(true);
-
-        assertThat(kubernetesMonitor.isDeployAllowed(this.deployment, environmentDao, deploymentDao)).isTrue();
-    }
-
-    @Test
-    public void testMonitorEmergencyDeploymentOnConcurrencyLimitedEnvironmentWithOngoingDeployment() throws ScriptException, IOException, SQLException {
-        StandaloneApollo.getOrCreateServer();
-
-        Environment environment = realDeploymentGenerator.getEnvironment();
-        environmentDao.updateConcurrencyLimit(environment.getId(), 1);
-        realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
-        Deployment startedDeployment = realDeploymentGenerator.getDeployment();
-        startedDeployment.setEmergencyDeployment(false);
-
-        RealDeploymentGenerator realDeploymentGeneratorLaterDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
-        realDeploymentGeneratorLaterDeployment.setEnvironment(environment);
-        Deployment laterDeployment = realDeploymentGeneratorLaterDeployment.getDeployment();
-        laterDeployment.setEmergencyDeployment(true);
-
-        assertThat(kubernetesMonitor.isDeployAllowed(laterDeployment, environmentDao, deploymentDao)).isTrue();
-    }
-
-    @Test
-    public void testMonitorRegularDeploymentOnConcurrencyLimitedEnvironmentWithOngoingDeployment() throws ScriptException, IOException, SQLException {
-        StandaloneApollo.getOrCreateServer();
-
-        Environment environment = realDeploymentGenerator.getEnvironment();
-        environmentDao.updateConcurrencyLimit(environment.getId(), 1);
-        realDeploymentGenerator.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
-        Deployment startedDeployment = realDeploymentGenerator.getDeployment();
-        startedDeployment.setEmergencyDeployment(false);
-
-        RealDeploymentGenerator realDeploymentGeneratorLaterDeployment = new RealDeploymentGenerator("image", "key", "value", 0);
-        realDeploymentGeneratorLaterDeployment.setEnvironment(environment);
-        Deployment laterDeployment = realDeploymentGeneratorLaterDeployment.getDeployment();
-        laterDeployment.setEmergencyDeployment(false);
-
-        assertThat(kubernetesMonitor.isDeployAllowed(laterDeployment, environmentDao, deploymentDao)).isFalse();
+        deploymentDao.updateEmergencyDeployment(deployment1.getId(), true);
+        deployment1 = deploymentDao.getDeployment(deployment1.getId());
+        assertThat(kubernetesMonitor.isDeployAllowed(deployment1, environmentDao, deploymentDao)).isTrue();
     }
 }

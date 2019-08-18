@@ -50,9 +50,13 @@ public class ApolloClient {
     }
 
     public Environment addEnvironment(Environment environment) throws ApolloClientException {
-        String requestBody = Common.generateJson("name", environment.getName(), "geoRegion", environment.getGeoRegion(),
-                "availability", environment.getAvailability(), "kubernetesMaster", environment.getKubernetesMaster(),
-                "kubernetesToken", environment.getKubernetesToken(), "kubernetesNamespace", environment.getKubernetesNamespace(),
+        String requestBody = Common.generateJson("name", environment.getName(),
+                "geoRegion", environment.getGeoRegion(),
+                "availability", environment.getAvailability(),
+                "kubernetesMaster", environment.getKubernetesMaster(),
+                "kubernetesToken", environment.getKubernetesToken(),
+                "kubernetesCaCert", environment.getKubernetesCaCert(),
+                "kubernetesNamespace", environment.getKubernetesNamespace(),
                 "servicePortCoefficient", String.valueOf(environment.getServicePortCoefficient()),
                 "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
                 "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()),
@@ -115,17 +119,25 @@ public class ApolloClient {
         return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName(), deployment.getEmergencyDeployment());
     }
 
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId) throws ApolloClientException {
+        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "", false);
+    }
+
     public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, boolean isEmergencyDeployment) throws ApolloClientException {
         return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, "", isEmergencyDeployment);
     }
 
-    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName, boolean isEmegencyRollback) throws ApolloClientException {
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName) throws ApolloClientException {
+        return addDeployment(environmentIdsCsv, serviceIdsCsv, deployableVersionId, groupName, false);
+    }
+
+    public MultiDeploymentResponseObject addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String groupName, boolean isEmegencyDeployment) throws ApolloClientException {
         String requestBody = Common.generateJson("environmentIdsCsv", environmentIdsCsv,
                 "serviceIdsCsv", serviceIdsCsv,
                 "deployableVersionId", String.valueOf(deployableVersionId),
                 "deploymentMessage", "this is a deployment message",
                 "groupName", groupName,
-                "isEmergencyDeployment", String.valueOf(isEmegencyRollback));
+                "isEmergencyDeployment", String.valueOf(isEmegencyDeployment));
 
         return genericApolloClient.postAndGetResult("/deployment", requestBody, new TypeReference<MultiDeploymentResponseObject>() {});
     }

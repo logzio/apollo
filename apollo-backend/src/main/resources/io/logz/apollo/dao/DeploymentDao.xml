@@ -110,7 +110,7 @@
     </select>
 
     <insert id="addDeployment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO deployment (environment_id, service_id, deployable_version_id, user_email, status, source_version, group_name, deployment_params, deployment_message, is_emergency_rollback)
+        INSERT INTO deployment (environment_id, service_id, deployable_version_id, user_email, status, source_version, group_name, deployment_params, deployment_message, is_emergency_deployment)
         VALUES (#{environmentId}, #{serviceId}, #{deployableVersionId}, #{userEmail}, #{status}, #{sourceVersion}, #{groupName}, #{deploymentParams}, #{deploymentMessage}, #{isEmergencyDeployment})
     </insert>
 
@@ -126,6 +126,12 @@
         WHERE id=#{id}
     </update>
 
+    <update id="updateEmergencyDeployment">
+        UPDATE deployment
+        SET is_emergency_deployment=#{isEmergencyDeployment}
+        WHERE id=#{id}
+    </update>
+
     <update id="updateDeployment">
         UPDATE deployment SET
         environment_id=#{environmentId},
@@ -137,7 +143,7 @@
         group_name=#{groupName},
         deployment_params=#{deploymentParams},
         deployment_message=#{deploymentMessage},
-        is_emergency_rollback=#{isEmergencyDeployment}
+        is_emergency_deployment=#{isEmergencyDeployment}
         WHERE id=#{id}
     </update>
 </mapper>

@@ -265,11 +265,16 @@ public class ModelsGenerator {
 
     public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
                                               DeployableVersion relatedDeployableVersion) {
-        return createDeployment(relatedService, relatedEnvironment, relatedDeployableVersion, null);
+        return createDeployment(relatedService, relatedEnvironment, relatedDeployableVersion, null, false);
     }
 
     public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
-                                              DeployableVersion relatedDeployableVersion, String groupName) {
+                                              DeployableVersion relatedDeployableVersion, boolean isEmergencyDeployment) {
+        return createDeployment(relatedService, relatedEnvironment, relatedDeployableVersion, null, isEmergencyDeployment);
+    }
+
+    public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
+                                              DeployableVersion relatedDeployableVersion, String groupName, boolean isEmergencyDeployment) {
 
         Deployment testDeployment = new Deployment();
         testDeployment.setEnvironmentId(relatedEnvironment.getId());
@@ -280,6 +285,7 @@ public class ModelsGenerator {
         testDeployment.setDeploymentMessage("message-" + Common.randomStr(5));
         testDeployment.setLastUpdate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.of("UTC")).toInstant()));
         testDeployment.setStatus(Deployment.DeploymentStatus.PENDING);
+        testDeployment.setEmergencyDeployment(isEmergencyDeployment);
         return testDeployment;
     }
 
@@ -298,6 +304,13 @@ public class ModelsGenerator {
         return createAndSubmitDeployment(apolloTestClient, testEnvironment, testService, testDeployableVersion);
     }
 
+    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment) throws Exception {
+        Service service = createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, service);
+        return createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+    }
+
+
     public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
                                                        Service service, DeployableVersion deployableVersion) throws Exception {
 
@@ -306,6 +319,26 @@ public class ModelsGenerator {
 
         // Now we have enough to create a deployment
         Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
+
+        if (result.getSuccessful().size() > 0) {
+            Deployment deployment = result.getSuccessful().get(0).getDeployment();
+            testDeployment.setId(deployment.getId());
+        } else {
+            throw result.getUnsuccessful().get(0).getException();
+        }
+
+        return testDeployment;
+    }
+
+    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
+                                                       Service service, DeployableVersion deployableVersion, boolean isEmergencyDeployment) throws Exception {
+
+        // Give the user permissions to deploy
+        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, environment);
+
+        // Now we have enough to create a deployment
+        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion, isEmergencyDeployment);
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
         if (result.getSuccessful().size() > 0) {
@@ -321,22 +354,7 @@ public class ModelsGenerator {
     public static Deployment createAndSubmitEmergencyDeployment(ApolloTestClient apolloTestClient, Environment environment,
                                                        Service service, DeployableVersion deployableVersion) throws Exception {
 
-        // Give the user permissions to deploy
-        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, environment);
-
-        // Now we have enough to create a deployment
-        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
-        testDeployment.setEmergencyDeployment(true);
-        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
-
-        if (result.getSuccessful().size() > 0) {
-            Deployment deployment = result.getSuccessful().get(0).getDeployment();
-            testDeployment.setId(deployment.getId());
-        } else {
-            throw result.getUnsuccessful().get(0).getException();
-        }
-
-        return testDeployment;
+       return createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion, true);
     }
 
     public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
@@ -346,7 +364,7 @@ public class ModelsGenerator {
         Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, environment);
 
         // Now we have enough to create a deployment
-        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion, groupName);
+        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion, groupName, false);
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
 
         if (result.getSuccessful().size() > 0) {
