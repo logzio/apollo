@@ -5,7 +5,6 @@ import {
   GET_SERVICES_STACK_REQUEST,
   GET_SERVICES_STACK_SUCCESS,
   GET_SERVICES_STACK_FAILURE,
-  SELECT_SERVICE,
   GET_ENV_STACK_REQUEST,
   GET_ENV_STACK_SUCCESS,
   GET_ENV_STACK_FAILURE,
@@ -27,11 +26,14 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
+  GET_SERVICE_BY_ID_REQUEST,
+  GET_SERVICE_BY_ID_SUCCESS,
+  GET_SERVICE_BY_ID_FAILURE,
+  SELECT_SERVICES
 } from '../actions';
 import * as API from '../../api/api';
-import { depShaVersionMock } from './tempMock';
 import { historyBrowser } from '../../utils/history';
-import { serviceCache } from '../../utils/cacheService';
+import { fetchAndStore } from '../../utils/cacheService';
 
 export const getServices = () => {
   return async dispatch => {
@@ -39,7 +41,7 @@ export const getServices = () => {
       type: GET_SERVICES_REQUEST,
     });
     try {
-      const data = await serviceCache('services', API.getServices, 1);
+      const data = await fetchAndStore('services', API.getServices, 60 * 6);
       dispatch({
         type: GET_SERVICES_SUCCESS,
         payload: data,
@@ -59,7 +61,7 @@ export const getServicesStacks = () => {
       type: GET_SERVICES_STACK_REQUEST,
     });
     try {
-      const data = await API.getServicesStacks();
+      const data = await fetchAndStore('services-stacks', API.getServicesStacks, 60 * 6);
       dispatch({
         type: GET_SERVICES_STACK_SUCCESS,
         payload: data,
@@ -79,7 +81,7 @@ export const getEnvironments = () => {
       type: GET_ENV_REQUEST,
     });
     try {
-      const data = await API.getEnvironments();
+      const data = await fetchAndStore('env', API.getEnvironments, 60 * 6);
       dispatch({
         type: GET_ENV_SUCCESS,
         payload: data,
@@ -99,7 +101,7 @@ export const getEnvironmentsStacks = () => {
       type: GET_ENV_STACK_REQUEST,
     });
     try {
-      const data = await API.getEnvironmentsStacks();
+      const data = await fetchAndStore('env-stacks', API.getEnvironmentsStacks, 60 * 6);
       dispatch({
         type: GET_ENV_STACK_SUCCESS,
         payload: data,
@@ -113,12 +115,23 @@ export const getEnvironmentsStacks = () => {
   };
 };
 
-export const selectServices = servicesId => {
-  return dispatch => {
+export const getServiceById = serviceId => {
+  return async dispatch => {
     dispatch({
-      type: SELECT_SERVICE,
-      payload: servicesId,
+      type: GET_SERVICE_BY_ID_REQUEST,
     });
+    try {
+      const data = await fetchAndStore(`service-${serviceId}`, API.getServiceById, 60 * 6, serviceId);
+      dispatch({
+        type: GET_SERVICE_BY_ID_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_SERVICE_BY_ID_FAILURE,
+        error,
+      });
+    }
   };
 };
 
@@ -149,11 +162,10 @@ export const getDeployableVersionBySha = gitCommitSha => {
       type: GET_DEPLOYABLE_VERSION_SHA_REQUEST,
     });
     try {
-      // const data = await API.getDeployableVersionBySha(gitCommitSha);
+      const data = await API.getDeployableVersionBySha(gitCommitSha);
       dispatch({
         type: GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
-        // payload: data,
-        payload: depShaVersionMock,
+        payload: data,
       });
     } catch (error) {
       dispatch({
@@ -175,7 +187,6 @@ export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
       dispatch({
         type: GET_BRANCH_LATEST_VERSION_SUCCESS,
         payload: data,
-        // payload: depShaVersionMock,
       });
     } catch (error) {
       dispatch({
@@ -226,5 +237,14 @@ export const deploy = newDeployment => {
         error,
       });
     }
+  };
+};
+
+export const selectServices = services => {
+  return dispatch => {
+    dispatch({
+      type: SELECT_SERVICES,
+      payload: services,
+    });
   };
 };

@@ -15,7 +15,7 @@ import './App.css';
 const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   useEffect(() => {
     appInit();
-  }, [appInit, loggedIn]);
+  }, []);
 
   const [collapsed, toggleCollapse] = useState(false);
   const isAuthenticate = !!getAuthToken();

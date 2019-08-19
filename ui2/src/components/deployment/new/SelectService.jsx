@@ -2,7 +2,16 @@ import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
 
-export const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStacks, servicesStacks, resetBreadcrumbs, match }) => {
+export const SelectService = ({
+  getServices,
+  services,
+  handleBreadcrumbs,
+  getServicesStacks,
+  servicesStacks,
+  resetBreadcrumbs,
+  match,
+  selectServices,
+}) => {
   useEffect(() => {
     resetBreadcrumbs();
     handleBreadcrumbs(`${match.url}`, 'service');
@@ -16,6 +25,9 @@ export const SelectService = ({ getServices, services, handleBreadcrumbs, getSer
       .filter(service => selectedStack.services && selectedStack.services.includes(service.id))
       .map(selectedService => selectedService.id.toString());
   };
+
+  const handleServicesSelection = servicesId =>
+    selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
 
   if (!services || !servicesStacks) {
     return <Spinner />;
@@ -34,6 +46,8 @@ export const SelectService = ({ getServices, services, handleBreadcrumbs, getSer
         linkTo={'environment'}
         addSearch={'service'}
         match={match}
+        handleSelection={handleServicesSelection}
+        emptyMsg={'Please select services from the left panel'}
       />
     </div>
   );

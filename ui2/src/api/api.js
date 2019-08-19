@@ -57,6 +57,7 @@ export const getServices = async () => await fetchData('service/');
 export const getServicesStacks = async () => await fetchData('services-stack/');
 export const getEnvironments = async () => await fetchData('environment/');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
+export const getServiceById = async (serviceId) => await fetchData(`service/${serviceId}`);
 export const getDeployableVersionById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
 export const getDeployableVersionBySha = async gitCommitSha =>

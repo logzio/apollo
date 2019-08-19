@@ -12,10 +12,13 @@ export const SelectGrourp = ({ handleBreadcrumbs, resetBreadcrumbs, match, locat
       .split('=')
       .pop()
       .split(',');
-    environmentsId.map(environmentId => {
-      getGroups(environmentId, serviceId);
-    });
+
+    environmentsId.map(environmentId => getGroups(environmentId, serviceId));
   }, []);
+
+  const handleGroupsSelection = groupsId =>
+      console.log(groupsId)
+      // selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
 
   if (!groups) {
     return <Spinner />;
@@ -32,6 +35,7 @@ export const SelectGrourp = ({ handleBreadcrumbs, resetBreadcrumbs, match, locat
         linkTo={'version'}
         addSearch={`${location.search}&group`}
         match={match}
+        handleSelection={handleGroupsSelection}
       />
     </div>
   );

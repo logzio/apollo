@@ -18,23 +18,26 @@ export const TableTransfer = ({
   addSearch,
   match,
   columnTitles,
+  handleSelection,
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [showSearch] = useState(!!searchColumns);
+  const [selectedGroupService, setSelectedGroupService] = useState(null);
+  const [selectedNonGroupService, setSelectedNonGroupService] = useState(false);
   const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
   // const handleSearch = (inputValue, item) =>
   //   searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
 
-    const handleSearch = (inputValue, item) => {
-        return searchColumns
-            .map(searchCol => {
-                const stringifiedItem = item[searchCol].toString();
-                return stringifiedItem && stringifiedItem.indexOf(inputValue) !== -1;
-            })
-            .includes(true);
-    };
+  const handleSearch = (inputValue, item) => {
+    return searchColumns
+      .map(searchCol => {
+        const stringifiedItem = item[searchCol].toString();
+        return stringifiedItem && stringifiedItem.indexOf(inputValue) !== -1;
+      })
+      .includes(true);
+  };
 
   const handleGroupSelection = predefinedGroupId => {
     const keys = selectGroup(predefinedGroupId);
@@ -60,13 +63,14 @@ export const TableTransfer = ({
             disabled={!targetKeys.length}
             className={'table-submit-button'}
             type="primary"
+            onClick={() => handleSelection(targetKeys)}
           />
         </Link>
       </div>
       <Transfer
         className="table-transfer"
         dataSource={formattedData}
-        filterOption={(inputValue, item) => handleSearch(inputValue, item)}
+        filterOption={handleSearch}
         showSelectAll={false}
         targetKeys={targetKeys}
         showSearch={showSearch}
@@ -80,11 +84,35 @@ export const TableTransfer = ({
               ? transferTableColumns(leftColTitles, columnTitles)
               : transferTableColumns(rightColTitles, columnTitles);
           const scroll = direction === 'left' ? { x: 900, y: 580 } : { x: 400, y: 580 };
+          const rowSelection = {
+            onSelectAll: (isSelected, allRows) => {
+              const allRowsKeys = allRows && allRows.map(item => item.key);
+              const currentKeysSelection = isSelected
+                ? _.difference(allRowsKeys, selectedKeys)
+                : _.difference(selectedKeys, allRowsKeys);
+              onItemSelectAll(currentKeysSelection, isSelected);
+            },
+            onSelect: (item, isSelected) => {
+              if (item.isPartOfGroup) {
+                setSelectedGroupService(selectedGroupService ? null : item.key);
+                return onItemSelect(item.key, isSelected);
+              }
+              setSelectedNonGroupService(true);
+              return onItemSelect(item.key, isSelected);
+            },
+            selectedRowKeys: selectedKeys,
+            getCheckboxProps: record => ({
+              disabled:
+                (record.isPartOfGroup === true && targetKeys.length > 0) ||
+                (selectedGroupService && selectedGroupService !== record.key) ||
+                (record.isPartOfGroup === true && selectedNonGroupService),
+            }),
+          };
           return (
             <div>
               {direction === 'left' && (
                 <div className="header-left-transfer-table">
-                  {predefinedGroups &&
+                  {predefinedGroups ? (
                     predefinedGroups.map(({ id, name }) => (
                       <AppButton
                         key={id}
@@ -93,18 +121,28 @@ export const TableTransfer = ({
                         onClick={() => handleGroupSelection(id)}
                         icon={'block'}
                       />
-                    ))}
-                  <AppButton
-                    label={'Select all'}
-                    className={'table-button'}
-                    onClick={() => setTargetKeys(formattedData.map(({ key }) => key))}
-                    icon={'block'}
-                  />
+                    ))
+                  ) : (
+                    <AppButton
+                      label={'Select all'}
+                      className={'table-button'}
+                      onClick={() => setTargetKeys(formattedData.map(({ key }) => key))}
+                      icon={'block'}
+                    />
+                  )}
                 </div>
               )}
               {direction === 'right' && (
                 <div>
-                  <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
+                  <AppButton
+                    label={'Reset'}
+                    className={'table-button'}
+                    onClick={() => {
+                      setTargetKeys([]);
+                      setSelectedGroupService(null);
+                      setSelectedNonGroupService(false);
+                    }}
+                  />
                 </div>
               )}
               <AppTable
@@ -118,7 +156,9 @@ export const TableTransfer = ({
                 addSearch={`${addSearch}=`}
                 setTargetKeys={setTargetKeys}
                 targetKeys={targetKeys}
-                showSelection={true}
+                // rowSelection={direction === 'left' ? rowSelection : null}
+                rowSelection={rowSelection}
+                {...props}
               />
             </div>
           );

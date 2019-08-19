@@ -1,14 +1,14 @@
 import lscache from 'lscache';
 
 export const setToCache = (key, valueToStore, minutesToLive) => lscache.set(key, valueToStore, minutesToLive);
-export const getFromCache = (key) => lscache.get(key);
+export const getFromCache = key => lscache.get(key);
 
-export const serviceCache = async (key, getterFunc, minutesToLive) => {
+export const fetchAndStore = async (key, getterFunc, minutesToLive, params) => {
   const storedValue = getFromCache(key);
   if (storedValue) {
     return storedValue;
   }
-  const valueToStore = await getterFunc();
+  const valueToStore = await getterFunc(params);
   setToCache(key, valueToStore, minutesToLive);
   return valueToStore;
 };

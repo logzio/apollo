@@ -15,7 +15,7 @@ export const tableColumns = (dataCategories, columnTitles, imgIndex) =>
       imgIndex === index &&
       (dataCategory => (
         <div className="user-profile">
-          <img className="image-table" src={dataCategory[0]} />
+          <img className="image-table" src={dataCategory[0]} alt={'user-profile'} />
           <div>{dataCategory[1]}</div>
         </div>
       )),

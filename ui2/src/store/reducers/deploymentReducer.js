@@ -5,7 +5,6 @@ import {
   GET_SERVICES_STACK_REQUEST,
   GET_SERVICES_STACK_SUCCESS,
   GET_SERVICES_STACK_FAILURE,
-  SELECT_SERVICE,
   GET_ENV_STACK_REQUEST,
   GET_ENV_STACK_SUCCESS,
   GET_ENV_STACK_FAILURE,
@@ -27,17 +26,23 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
+  GET_SERVICE_BY_ID_REQUEST,
+  GET_SERVICE_BY_ID_SUCCESS,
+  GET_SERVICE_BY_ID_FAILURE,
+  LOUGOUT,
+  SELECT_SERVICES, APP_INIT,
 } from '../actions';
 
+import _ from 'lodash';
 const initialState = {
   services: null,
   servicesStacks: null,
   isLoading: false,
-  selectedServices: null,
+  selectedServices: [],
   environment: null,
   environmentsStacks: null,
   versions: null,
-  groups: null,
+  groups: [],
   newDeployment: null,
 };
 
@@ -55,7 +60,7 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, servicesStacks: action.payload, isLoading: false };
     case GET_SERVICES_STACK_FAILURE:
       return { ...state, isLoading: false };
-    case SELECT_SERVICE:
+    case SELECT_SERVICES:
       return { ...state, selectedServices: action.payload };
     case GET_ENV_REQUEST:
       return { ...state, isLoading: true };
@@ -68,6 +73,14 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_ENV_STACK_SUCCESS:
       return { ...state, environmentsStacks: action.payload, isLoading: false };
     case GET_ENV_STACK_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_SERVICE_BY_ID_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_SERVICE_BY_ID_SUCCESS: {
+      state.selectedServices[action.payload.id] = action.payload;
+      return { ...state, isLoading: false };
+    }
+    case GET_SERVICE_BY_ID_FAILURE:
       return { ...state, isLoading: false };
     case GET_DEPLOYABLE_VERSION_ID_REQUEST:
       return { ...state, isLoading: true };
@@ -90,7 +103,7 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_GROUPS_REQUEST:
       return { ...state, isLoading: true };
     case GET_GROUPS_SUCCESS:
-      return { ...state, groups: action.payload, isLoading: false };
+      return { ...state, groups: _.unionWith(state.groups, action.payload, _.isEqual), isLoading: false };
     case GET_GROUPS_FAILURE:
       return { ...state, isLoading: false };
     case NEW_DEPLOYMENT_REQUEST:
@@ -99,6 +112,8 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, newDeployment: action.payload, isLoading: false };
     case NEW_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
+    case LOUGOUT:
+      return initialState;
     default:
       return state;
   }
