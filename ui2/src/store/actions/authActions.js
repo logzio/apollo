@@ -14,7 +14,6 @@ import {
 import * as API from '../../api/api';
 import { clearExpiredCache, clearCache } from '../../utils/cacheService';
 
-
 export const signup = userDetails => {
   return async dispatch => {
     dispatch({

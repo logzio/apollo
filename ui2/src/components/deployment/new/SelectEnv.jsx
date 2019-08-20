@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
-import { getServiceById } from '../../../store/actions/deploymentActions';
 
 export const SelectEnvironment = ({
   getEnvironments,
@@ -42,7 +41,7 @@ export const SelectEnvironment = ({
       addSearch={`${location.search}&environment`}
       match={match}
       emptyMsg={'Please select environments from the left panel'}
-      handleSelection={()=>console.log('hi')}
+      handleSelection={() => console.log('hi')}
     />
   );
 };

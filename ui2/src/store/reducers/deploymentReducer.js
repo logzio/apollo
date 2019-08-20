@@ -30,7 +30,7 @@ import {
   GET_SERVICE_BY_ID_SUCCESS,
   GET_SERVICE_BY_ID_FAILURE,
   LOUGOUT,
-  SELECT_SERVICES, APP_INIT,
+  SELECT_SERVICES,
 } from '../actions';
 
 import _ from 'lodash';

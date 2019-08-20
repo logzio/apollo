@@ -16,9 +16,8 @@ export const SelectGrourp = ({ handleBreadcrumbs, resetBreadcrumbs, match, locat
     environmentsId.map(environmentId => getGroups(environmentId, serviceId));
   }, []);
 
-  const handleGroupsSelection = groupsId =>
-      console.log(groupsId)
-      // selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
+  const handleGroupsSelection = groupsId => console.log(groupsId);
+  // selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
 
   if (!groups) {
     return <Spinner />;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AppButton } from '../../../common/Button';
 import { AppModal } from '../../../common/Modal';
 import './VerifyDeployment.css';
-import { AppInput } from '../../../common/FormFields';
+// import { AppInput } from '../../../common/FormFields';
 
 export const VerifyDeployment = ({ handleBreadcrumbs, resetBreadcrumbs, match, location }) => {
   const [showModal, toggleShowModal] = useState(false);

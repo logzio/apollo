@@ -7,8 +7,6 @@ import 'antd/dist/antd.css';
 import './styles/index.css';
 import { App } from './components/app/App';
 
-
-
 ReactDOM.render(
   <Provider store={store}>
     <App />
@@ -17,4 +15,3 @@ ReactDOM.render(
 );
 
 serviceWorker.unregister();
-

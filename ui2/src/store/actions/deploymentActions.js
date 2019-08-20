@@ -29,10 +29,10 @@ import {
   GET_SERVICE_BY_ID_REQUEST,
   GET_SERVICE_BY_ID_SUCCESS,
   GET_SERVICE_BY_ID_FAILURE,
-  SELECT_SERVICES
+  SELECT_SERVICES,
 } from '../actions';
 import * as API from '../../api/api';
-import { historyBrowser } from '../../utils/history';
+// import { historyBrowser } from '../../utils/history';
 import { fetchAndStore } from '../../utils/cacheService';
 
 export const getServices = () => {

@@ -11,6 +11,7 @@ const plugins = [
 
 module.exports = {
     extends: [
+        "react-app",
         "eslint:recommended",
         'plugin:import/errors',
         'plugin:react/recommended',
@@ -22,7 +23,12 @@ module.exports = {
     plugins,
     rules: {
         'prettier/prettier': ['error', prettierRules],
-        "react/prop-types": 0
+        'react/prop-types': 0,
+        'react-hooks/exhaustive-deps': 0,
+        "react/display-name": 0,
+        'array-callback-return': 0,
+        'no-unused-vars': 1,
+        'no-debugger': 0,
     },
     parserOptions: {
         ecmaVersion: 2018,

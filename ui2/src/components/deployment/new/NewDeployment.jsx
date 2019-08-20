@@ -20,14 +20,28 @@ import { SelectVersion } from './SelectVersion';
 import { VerifyDeployment } from './VerifyDeployment';
 
 const NewDeploymentComponent = ({ match, location, selectedServices, ...props }) => {
-
   return (
     <Switch>
-      <Route path={`${match.url}/service`} render={({ match }) => <SelectService match={match} location={location} {...props} />} />
-      <Route path={`${match.url}/environment`} render={({ match }) => <SelectEnvironment match={match} location={location} {...props} />} />
-      <Route path={`${match.url}/group`} render={({ match }) => <SelectGrourp match={match} location={location} {...props} />} />
-      <Route path={`${match.url}/verification`} render={({ match }) => <VerifyDeployment match={match} location={location} {...props} />} />
-      <Route path={`${match.url}/version`} render={({ match }) => <SelectVersion match={match} location={location} {...props} />} />
+      <Route
+        path={`${match.url}/service`}
+        render={({ match }) => <SelectService match={match} location={location} {...props} />}
+      />
+      <Route
+        path={`${match.url}/environment`}
+        render={({ match }) => <SelectEnvironment match={match} location={location} {...props} />}
+      />
+      <Route
+        path={`${match.url}/group`}
+        render={({ match }) => <SelectGrourp match={match} location={location} {...props} />}
+      />
+      <Route
+        path={`${match.url}/verification`}
+        render={({ match }) => <VerifyDeployment match={match} location={location} {...props} />}
+      />
+      <Route
+        path={`${match.url}/version`}
+        render={({ match }) => <SelectVersion match={match} location={location} {...props} />}
+      />
       <Redirect to={`${match.url}/service`} />
     </Switch>
   );
