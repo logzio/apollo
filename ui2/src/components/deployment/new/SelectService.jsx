@@ -10,7 +10,7 @@ export const SelectService = ({
   servicesStacks,
   resetBreadcrumbs,
   match,
-                                  selectServices,
+  selectServices,
 }) => {
   useEffect(() => {
     resetBreadcrumbs();

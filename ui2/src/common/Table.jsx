@@ -20,9 +20,9 @@ export const AppTable = ({
   emptyMsg,
   rowSelection,
   handleOnSelect,
-                             rowClassName,
-                             expandableColumn,
-                             expandIconAsCell,
+  rowClassName,
+  expandableColumn,
+  expandIconAsCell,
   ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
@@ -46,39 +46,40 @@ export const AppTable = ({
     setFilteredData(filteredData);
   };
 
-    // const handleSearch = value => {
-    //     setSearchValue(value);
-    //     const filteredData = data.filter(dataItem => {
-    //         return searchColumns
-    //             .map(colName => {
-    //                 return !!dataItem[colName].includes(value);
-    //             })
-    //             .includes(true);
-    //     });
-    //     setFilteredData(filteredData);
-    // };
+  // const handleSearch = value => {
+  //     setSearchValue(value);
+  //     const filteredData = data.filter(dataItem => {
+  //         return searchColumns
+  //             .map(colName => {
+  //                 return !!dataItem[colName].includes(value);
+  //             })
+  //             .includes(true);
+  //     });
+  //     setFilteredData(filteredData);
+  // };
 
-    // const handleSearch = value => {
-    //     setSearchValue(value);
-    //     const filteredData = data.filter(dataItem => {
-    //         const test = searchColumns.map(colName => {
-    //             if (dataItem[colName].toString().includes(value)) {
-    //                 return true;
-    //             }
-    //         });
-    //         return test.includes(true);
-    //     });
-    //     setFilteredData(filteredData);
-    // };
+  // const handleSearch = value => {
+  //     setSearchValue(value);
+  //     const filteredData = data.filter(dataItem => {
+  //         const test = searchColumns.map(colName => {
+  //             if (dataItem[colName].toString().includes(value)) {
+  //                 return true;
+  //             }
+  //         });
+  //         return test.includes(true);
+  //     });
+  //     setFilteredData(filteredData);
+  // };
 
-    const onExpand = (expanded, { key }) => {//TODO
-        const rowKeyInd = expandableRows.findIndex(({ key: rowKey }) => rowKey === key);
-        if (~rowKeyInd) {
-            setExpandableRows(expandableRows.splice(rowKeyInd, 1));
-        } else {
-            setExpandableRows([...expandableRows, key]);
-        }
-    };
+  const onExpand = (expanded, { key }) => {
+    //TODO
+    const rowKeyInd = expandableRows.findIndex(({ key: rowKey }) => rowKey === key);
+    if (~rowKeyInd) {
+      setExpandableRows(expandableRows.splice(rowKeyInd, 1));
+    } else {
+      setExpandableRows([...expandableRows, key]);
+    }
+  };
   return (
     <>
       {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}

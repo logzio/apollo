@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import {Table, Transfer} from 'antd';
+import { Table, Transfer } from 'antd';
 import _ from 'lodash';
 import { AppTable } from './Table';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { transferTableColumns } from '../utils/tableColumns';
 import './TableTransfer.css';
-import {historyBrowser} from "../utils/history";
+import { historyBrowser } from '../utils/history';
 
 export const TableTransfer = ({
   data,
