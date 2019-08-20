@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { Table, Transfer } from 'antd';
+=======
+import {Table, Transfer} from 'antd';
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 import _ from 'lodash';
 import { AppTable } from './Table';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { transferTableColumns } from '../utils/tableColumns';
 import './TableTransfer.css';
+<<<<<<< HEAD
 import { historyBrowser } from '../utils/history';
+=======
+import {historyBrowser} from "../utils/history";
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 
 export const TableTransfer = ({
   data,
@@ -53,6 +61,29 @@ export const TableTransfer = ({
 
   const currentTable = match.url.split('/').pop();
 
+<<<<<<< HEAD
+=======
+  // const onRow={({key}) => ({
+  //   onClick: () => {
+  //     onItemSelect && onItemSelect(key, !selectedKeys.includes(key));
+  //     // setTargetKeys && setTargetKeys([...targetKeys, key]);
+  //   },
+  //   onDoubleClick: () => {
+  //     const keys = targetKeys ? targetKeys : [];
+  //     setTargetKeys && setTargetKeys([...keys, key]);
+  //     onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
+  //     setTimeout(
+  //         () =>
+  //             historyBrowser.push({
+  //               pathname: `${linkTo}`,
+  //               search: `${addSearch}${[...keys, key]}`,
+  //             }),
+  //         100,
+  //     );
+  //   },
+  // })};
+
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
   return (
     <>
       <div className="submit-transfer-table">

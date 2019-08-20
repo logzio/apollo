@@ -94,8 +94,11 @@ export const OngoingDeployment = connect(
     getEnvironments,
   },
 )(OngoingDeploymentComponent);
+<<<<<<< HEAD
 
 // [
 //     { title: 'View logs', color: '#465BA4', type: 'primary', icon: 'menu-unfold' },
 //     { title: 'Revert', color: '#BD656A', type: 'danger', icon: 'undo' },
 // ],
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e

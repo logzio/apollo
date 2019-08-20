@@ -26,20 +26,27 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
+<<<<<<< HEAD
   GET_SERVICE_BY_ID_REQUEST,
   GET_SERVICE_BY_ID_SUCCESS,
   GET_SERVICE_BY_ID_FAILURE,
   LOUGOUT,
   SELECT_SERVICES,
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
   GET_ONGOING_DEPLOYMENT_REQUEST,
   GET_ONGOING_DEPLOYMENT_SUCCESS,
   GET_ONGOING_DEPLOYMENT_FAILURE,
   GET_LATEST_POD_REQUEST,
   GET_LATEST_POD_SUCCESS,
   GET_LATEST_POD_FAILURE,
+<<<<<<< HEAD
   GET_LATEST_GROUP_POD_REQUEST,
   GET_LATEST_GROUP_POD_SUCCESS,
   GET_LATEST_GROUP_POD_FAILURE,
+=======
+  GET_LATEST_GROUP_POD_REQUEST, GET_LATEST_GROUP_POD_SUCCESS, GET_LATEST_GROUP_POD_FAILURE,
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 } from '../actions';
 
 import _ from 'lodash';
@@ -142,8 +149,11 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, lastCreatedGroupPod: action.payload, isLoading: false };
     case GET_LATEST_GROUP_POD_FAILURE:
       return { ...state, isLoading: false };
+<<<<<<< HEAD
     case LOUGOUT:
       return initialState;
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
     default:
       return state;
   }

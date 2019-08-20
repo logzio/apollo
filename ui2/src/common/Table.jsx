@@ -18,8 +18,11 @@ export const AppTable = ({
   searchColumns,
   showSearch,
   emptyMsg,
+<<<<<<< HEAD
   rowSelection,
   handleOnSelect,
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
   rowClassName,
   expandableColumn,
   expandIconAsCell,
@@ -32,6 +35,21 @@ export const AppTable = ({
   useEffect(() => {
     setFilteredData(data);
   }, [data]);
+<<<<<<< HEAD
+=======
+
+  const rowSelection = {
+    onSelectAll: (isSelected, allRows) => {
+      const allRowsKeys = allRows && allRows.map(item => item.key);
+      const currentKeysSelection = isSelected
+        ? _.difference(allRowsKeys, selectedKeys)
+        : _.difference(selectedKeys, allRowsKeys);
+      onItemSelectAll(currentKeysSelection, isSelected);
+    },
+    onSelect: (item, isSelected) => onItemSelect(item.key, isSelected),
+    selectedRowKeys: selectedKeys,
+  };
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 
   const handleSearch = value => {
     setSearchValue(value);
@@ -46,6 +64,7 @@ export const AppTable = ({
     setFilteredData(filteredData);
   };
 
+<<<<<<< HEAD
   // const handleSearch = value => {
   //     setSearchValue(value);
   //     const filteredData = data.filter(dataItem => {
@@ -71,6 +90,8 @@ export const AppTable = ({
   //     setFilteredData(filteredData);
   // };
 
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
   const onExpand = (expanded, { key }) => {
     //TODO
     const rowKeyInd = expandableRows.findIndex(({ key: rowKey }) => rowKey === key);
@@ -80,6 +101,10 @@ export const AppTable = ({
       setExpandableRows([...expandableRows, key]);
     }
   };
+<<<<<<< HEAD
+=======
+
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
   return (
     <>
       {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}

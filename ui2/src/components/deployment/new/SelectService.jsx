@@ -10,7 +10,10 @@ export const SelectService = ({
   servicesStacks,
   resetBreadcrumbs,
   match,
+<<<<<<< HEAD
   selectServices,
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 }) => {
   useEffect(() => {
     resetBreadcrumbs();
@@ -45,8 +48,11 @@ export const SelectService = ({
       linkTo={'environment'}
       addSearch={'service'}
       match={match}
+<<<<<<< HEAD
       handleSelection={handleServicesSelection}
       emptyMsg={'Please select services from the left panel'}
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
     />
   );
 };

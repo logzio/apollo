@@ -53,11 +53,18 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
+<<<<<<< HEAD
 export const getServices = async () => await fetchData('service');
 export const getServicesStacks = async () => await fetchData('services-stack');
 export const getEnvironments = async () => await fetchData('environment');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack');
 export const getServiceById = async serviceId => await fetchData(`service/${serviceId}`);
+=======
+export const getServices = async () => await fetchData('service/');
+export const getServicesStacks = async () => await fetchData('services-stack/');
+export const getEnvironments = async () => await fetchData('environment/');
+export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 export const getDeployableVersionById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
 export const getDeployableVersionBySha = async gitCommitSha =>
@@ -88,9 +95,14 @@ export const deploy = async newDeployment => {
 };
 
 export const getOngoingDeployments = async () => await fetchData('running-and-just-finished-deployments');
+<<<<<<< HEAD
 export const getLatestCreatedPod = async (environmentId, serviceId) =>
   await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/latestpod`);
 export const getLatestCreatedGroupPod = async (environmentId, serviceId, groupName) =>
   await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/group/${groupName}/latestpod`);
+=======
+export const getLatestCreatedPod = async (environmentId, serviceId) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/latestpod`);
+export const getLatestCreatedGroupPod = async (environmentId, serviceId, groupName) => await fetchData(`status/environment/ ${environmentId}/service/${serviceId}/group/${groupName}/latestpod`);
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
 
 //https://apollo.internal.logz.io/api/status/environment/2/pod/log-patterns-service-66fb4dbc-4r7jg/containers

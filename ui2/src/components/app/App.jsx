@@ -19,6 +19,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
     appInit();
   }, []);
 
+<<<<<<< HEAD
   // const isSession = !!getAuthToken();
   // const AppRoute = ({ path, ...props }) => {
   //   return isSession ? (
@@ -28,6 +29,8 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   //   );
   // };
 
+=======
+>>>>>>> 21fb84b4660cf6c09a558a25820ea90d74c9772e
   return (
     <Router history={historyBrowser}>
       <Layout className="app">
