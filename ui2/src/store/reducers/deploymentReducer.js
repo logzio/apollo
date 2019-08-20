@@ -31,6 +31,9 @@ import {
   GET_SERVICE_BY_ID_FAILURE,
   LOUGOUT,
   SELECT_SERVICES,
+  SELECT_ENVIRONMENTS,
+  SELECT_GROUPS,
+  SELECT_VERSION,
 } from '../actions';
 
 import _ from 'lodash';
@@ -39,7 +42,10 @@ const initialState = {
   servicesStacks: null,
   isLoading: false,
   selectedServices: [],
-  environment: null,
+  selectedEnvironments: [],
+  selectedGroups: [],
+  selectedVersion: [],
+  environments: null,
   environmentsStacks: null,
   versions: null,
   groups: [],
@@ -62,10 +68,16 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, isLoading: false };
     case SELECT_SERVICES:
       return { ...state, selectedServices: action.payload };
+    case SELECT_ENVIRONMENTS:
+      return { ...state, selectedEnvironments: action.payload };
+    case SELECT_GROUPS:
+      return { ...state, selectedGroups: action.payload };
+    case SELECT_VERSION:
+      return { ...state, selectedVersion: action.payload };
     case GET_ENV_REQUEST:
       return { ...state, isLoading: true };
     case GET_ENV_SUCCESS:
-      return { ...state, environment: action.payload, isLoading: false };
+      return { ...state, environments: action.payload, isLoading: false };
     case GET_ENV_FAILURE:
       return { ...state, isLoading: false };
     case GET_ENV_STACK_REQUEST:

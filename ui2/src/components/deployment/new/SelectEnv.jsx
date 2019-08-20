@@ -6,10 +6,11 @@ export const SelectEnvironment = ({
   getEnvironments,
   getEnvironmentsStacks,
   handleBreadcrumbs,
-  environment,
+  environments,
   environmentsStacks,
   match,
   location,
+  selectEnvironments,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'environment');
@@ -19,18 +20,23 @@ export const SelectEnvironment = ({
 
   const stackSelection = stackId => {
     const selectedStack = environmentsStacks.find(environmentsStack => environmentsStack.id === stackId);
-    return environment
+    return environments
       .filter(env => selectedStack.environments && selectedStack.environments.includes(env.id))
       .map(selectedEnv => selectedEnv.id.toString());
   };
 
-  if (!environment || !environmentsStacks) {
+  const handleEnvironmentsSelection = environmentsId =>
+    selectEnvironments(
+      environmentsId.map(environmentId => environments.find(service => service.id.toString() === environmentId)),
+    );
+
+  if (!environments || !environmentsStacks) {
     return <Spinner />;
   }
 
   return (
     <TableTransfer
-      data={environment}
+      data={environments}
       searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
       leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
       columnTitles={['Name', 'Region', 'Availability', 'Kubernetes Master']}
@@ -41,7 +47,7 @@ export const SelectEnvironment = ({
       addSearch={`${location.search}&environment`}
       match={match}
       emptyMsg={'Please select environments from the left panel'}
-      handleSelection={() => console.log('hi')}
+      handleSelection={handleEnvironmentsSelection}
     />
   );
 };

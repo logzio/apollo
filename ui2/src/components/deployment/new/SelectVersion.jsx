@@ -14,6 +14,7 @@ export const SelectVersion = ({
   getLastCommitFromBranch,
   versions,
   location,
+  selectVersion,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const [branchName, setBranchName] = useState(null);
@@ -41,6 +42,10 @@ export const SelectVersion = ({
         commitAuthor: author,
       };
     });
+
+  const handleVersionSelection = version => selectVersion(version);
+  //     environmentsId.map(environmentId => environments.find(service => service.id.toString() === environmentId)),
+  //   );
 
   const handleBranchSelection = branchName => {
     const versionSampleId = versions[0].id;

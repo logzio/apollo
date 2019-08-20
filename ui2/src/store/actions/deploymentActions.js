@@ -30,10 +30,13 @@ import {
   GET_SERVICE_BY_ID_SUCCESS,
   GET_SERVICE_BY_ID_FAILURE,
   SELECT_SERVICES,
+  SELECT_ENVIRONMENTS,
+  SELECT_GROUPS,
+  SELECT_VERSION,
 } from '../actions';
 import * as API from '../../api/api';
 // import { historyBrowser } from '../../utils/history';
-import { fetchAndStore } from '../../utils/cacheService';
+import { fetchAndStore, setToCache } from '../../utils/cacheService';
 
 export const getServices = () => {
   return async dispatch => {
@@ -240,11 +243,42 @@ export const deploy = newDeployment => {
   };
 };
 
-export const selectServices = services => {
+export const selectServices = selectServices => {
+  setToCache('selectedServices', selectServices, 60 * 1);
   return dispatch => {
     dispatch({
       type: SELECT_SERVICES,
-      payload: services,
+      payload: selectServices,
+    });
+  };
+};
+
+export const selectEnvironments = environments => {
+  setToCache('selectedEnvironments', environments, 60 * 1);
+  return dispatch => {
+    dispatch({
+      type: SELECT_ENVIRONMENTS,
+      payload: environments,
+    });
+  };
+};
+
+export const selectGroups = groups => {
+  setToCache('selectedGroups', groups, 60 * 1);
+  return dispatch => {
+    dispatch({
+      type: SELECT_GROUPS,
+      payload: groups,
+    });
+  };
+};
+
+export const selectVersion = version => {
+  setToCache('selectedVersion', version, 60 * 1);
+  return dispatch => {
+    dispatch({
+      type: SELECT_VERSION,
+      payload: version,
     });
   };
 };

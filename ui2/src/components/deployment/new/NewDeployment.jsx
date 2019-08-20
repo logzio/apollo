@@ -12,14 +12,28 @@ import {
   getLastCommitFromBranch,
   getGroups,
   selectServices,
+  selectEnvironments,
+  selectGroups,
+  selectVersion,
 } from '../../../store/actions/deploymentActions';
 import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
-import { SelectGrourp } from './SelectGroup';
+import { SelectGroup } from './SelectGroup';
 import { SelectVersion } from './SelectVersion';
 import { VerifyDeployment } from './VerifyDeployment';
+import { getFromCache } from '../../../utils/cacheService';
+import { Container } from '../../app/Container';
 
 const NewDeploymentComponent = ({ match, location, selectedServices, ...props }) => {
+  const GroupRoute = ({ path, ...rest }) => {
+    const { isPartOfGroup = null } = getFromCache('selectedServices').shift();
+    return isPartOfGroup ? (
+      <Route path={path} render={({ match }) => <SelectGroup match={match} location={location} {...rest} />} />
+    ) : (
+      <Redirect to={`${match.url}/version${location.search}`} />
+    );
+  };
+
   return (
     <Switch>
       <Route
@@ -30,10 +44,7 @@ const NewDeploymentComponent = ({ match, location, selectedServices, ...props })
         path={`${match.url}/environment`}
         render={({ match }) => <SelectEnvironment match={match} location={location} {...props} />}
       />
-      <Route
-        path={`${match.url}/group`}
-        render={({ match }) => <SelectGrourp match={match} location={location} {...props} />}
-      />
+      <GroupRoute path={`${match.url}/group`} {...props} />
       <Route
         path={`${match.url}/verification`}
         render={({ match }) => <VerifyDeployment match={match} location={location} {...props} />}
@@ -48,8 +59,8 @@ const NewDeploymentComponent = ({ match, location, selectedServices, ...props })
 };
 
 const mapStateToProps = ({
-  deploy: { services, isLoading, servicesStacks, selectedServices, environment, environmentsStacks, versions, groups },
-}) => ({ services, isLoading, servicesStacks, selectedServices, environment, environmentsStacks, versions, groups });
+  deploy: { services, isLoading, servicesStacks, selectedServices, environments, environmentsStacks, versions, groups },
+}) => ({ services, isLoading, servicesStacks, selectedServices, environments, environmentsStacks, versions, groups });
 
 export const NewDeployment = connect(
   mapStateToProps,
@@ -64,5 +75,8 @@ export const NewDeployment = connect(
     getLastCommitFromBranch,
     getGroups,
     selectServices,
+    selectEnvironments,
+    selectGroups,
+    selectVersion,
   },
 )(NewDeploymentComponent);
