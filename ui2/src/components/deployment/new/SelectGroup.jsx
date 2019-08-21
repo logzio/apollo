@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
+import { parse } from 'query-string';
 
 export const SelectGroup = ({
   handleBreadcrumbs,
@@ -12,14 +13,10 @@ export const SelectGroup = ({
   selectGroups,
 }) => {
   useEffect(() => {
-    // resetBreadcrumbs();
-    // handleBreadcrumbs(`${location.pathname}${location.search}`, 'group');
-    const [serviceParams, environmentParams] = location.search.split('&');
-    const serviceId = serviceParams.split('=').pop();
-    const environmentsId = environmentParams
-      .split('=')
-      .pop()
-      .split(',');
+    resetBreadcrumbs();
+    handleBreadcrumbs(`${location.pathname}${location.search}`, 'group');
+    const { service: serviceId, environment } = parse(location.search);
+    const environmentsId = environment.split(',');
     environmentsId.map(environmentId => getGroups(environmentId, serviceId));
   }, []);
 

@@ -86,3 +86,4 @@ export const deploy = async newDeployment => {
     throw error;
   }
 };
+// export const getServicesById = async servicesId => await servicesId.map(serviceId => getServiceById(serviceId));

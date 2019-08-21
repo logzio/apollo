@@ -88,10 +88,12 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, isLoading: false };
     case GET_SERVICE_BY_ID_REQUEST:
       return { ...state, isLoading: true };
-    case GET_SERVICE_BY_ID_SUCCESS: {
-      state.selectedServices[action.payload.id] = action.payload;
-      return { ...state, isLoading: false };
-    }
+    case GET_SERVICE_BY_ID_SUCCESS:
+      return {
+        ...state,
+        selectedServices: _.unionWith(state.selectedServices, action.payload, _.isEqual),
+        isLoading: false,
+      };
     case GET_SERVICE_BY_ID_FAILURE:
       return { ...state, isLoading: false };
     case GET_DEPLOYABLE_VERSION_ID_REQUEST:

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import { Switch, Redirect, Route } from 'react-router-dom';
 import {
@@ -21,38 +21,15 @@ import { SelectEnvironment } from './SelectEnv';
 import { SelectGroup } from './SelectGroup';
 import { SelectVersion } from './SelectVersion';
 import { VerifyDeployment } from './VerifyDeployment';
-import { getFromCache } from '../../../utils/cacheService';
-import { Container } from '../../app/Container';
 
-const NewDeploymentComponent = ({ match, location, selectedServices, ...props }) => {
-  const GroupRoute = ({ path, ...rest }) => {
-    const { isPartOfGroup = null } = getFromCache('selectedServices').shift();
-    return isPartOfGroup ? (
-      <Route path={path} render={({ match }) => <SelectGroup match={match} location={location} {...rest} />} />
-    ) : (
-      <Redirect to={`${match.url}/version${location.search}`} />
-    );
-  };
-
+const NewDeploymentComponent = ({ match, ...props }) => {
   return (
     <Switch>
-      <Route
-        path={`${match.url}/service`}
-        render={({ match }) => <SelectService match={match} location={location} {...props} />}
-      />
-      <Route
-        path={`${match.url}/environment`}
-        render={({ match }) => <SelectEnvironment match={match} location={location} {...props} />}
-      />
-      <GroupRoute path={`${match.url}/group`} {...props} />
-      <Route
-        path={`${match.url}/verification`}
-        render={({ match }) => <VerifyDeployment match={match} location={location} {...props} />}
-      />
-      <Route
-        path={`${match.url}/version`}
-        render={({ match }) => <SelectVersion match={match} location={location} {...props} />}
-      />
+      <Route path={`${match.url}/service`} render={({ match }) => <SelectService match={match} {...props} />} />
+      <Route path={`${match.url}/environment`} render={({ match }) => <SelectEnvironment match={match} {...props} />} />
+      <Route path={`${match.url}/group`} render={({ match }) => <SelectGroup match={match} {...props} />} />
+      <Route path={`${match.url}/verification`} render={({ match }) => <VerifyDeployment match={match} {...props} />} />
+      <Route path={`${match.url}/version`} render={({ match }) => <SelectVersion match={match} {...props} />} />
       <Redirect to={`${match.url}/service`} />
     </Switch>
   );
