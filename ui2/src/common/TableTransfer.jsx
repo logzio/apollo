@@ -1,31 +1,24 @@
 import React, { useState } from 'react';
 import { Transfer } from 'antd';
 import _ from 'lodash';
-import { AppTable } from './Table';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
-import { transferTableColumns } from '../utils/tableColumns';
 import './TableTransfer.css';
-import { historyBrowser } from '../utils/history';
+import { AppTransfer } from './Transfer';
 
 export const TableTransfer = ({
   data,
   searchColumns,
-  rightColTitles,
-  leftColTitles,
   selectGroup,
-  predefinedGroups,
   linkTo,
   addSearch,
   match,
-  columnTitles,
   handleSelection,
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const [showSearch] = useState(!!searchColumns);
   const [selectedGroupService, setSelectedGroupService] = useState(null);
-  const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
   const [disabledPredefinedGroups, toggleDisabledPredefinedGroups] = useState(false);
   const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
@@ -88,127 +81,26 @@ export const TableTransfer = ({
         titles={[`Please select at least one ${currentTable}`, `Selected items`]}
         {...props}
       >
-        {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-          const leftPanel = direction === 'left';
-
-          const columns = leftPanel
-            ? transferTableColumns(leftColTitles, columnTitles)
-            : transferTableColumns(rightColTitles, columnTitles);
-
-          const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
-
-          const handleOnSelect = (key, isPartOfGroup, isSelected) => {
-            if (isPartOfGroup) {
-              toggleDisabledPredefinedGroups(leftPanel ? !disabledPredefinedGroups : true);
-              setSelectedGroupService(selectedGroupService && leftPanel ? null : key);
-              return onItemSelect(key, isSelected);
-            }
-            toggleSelectedNonGroupService(leftPanel);
-            return onItemSelect(key, isSelected);
-          };
-
-          const handleDisabledRaws = record => {
-            return (
-              (record.isPartOfGroup === true && targetKeys.length > 0) ||
-              (selectedGroupService && selectedGroupService !== record.key) ||
-              (record.isPartOfGroup === true && selectedNonGroupService && selectedKeys.length > 0)
-            );
-          };
-
-          const rowSelection = {
-            onSelectAll: (isSelected, allRows) => {
-              const allRowsKeys = allRows && allRows.map(item => item.key);
-              const currentKeysSelection = isSelected
-                ? _.difference(allRowsKeys, selectedKeys)
-                : _.difference(selectedKeys, allRowsKeys);
-              onItemSelectAll(currentKeysSelection, isSelected);
-            },
-            onSelect: ({ key, isPartOfGroup }, isSelected) => {
-              handleOnSelect(key, isPartOfGroup, isSelected);
-            },
-            selectedRowKeys: selectedKeys,
-            getCheckboxProps: record => ({
-              disabled: leftPanel ? handleDisabledRaws(record) : null,
-            }),
-          };
-
-          const handleRowSelection = ({ key, isPartOfGroup }) => ({
-            onClick: () => {
-              handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
-            },
-            onDoubleClick: () => {
-              const keys = targetKeys ? targetKeys : [];
-              onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
-              setTargetKeys && setTargetKeys([...keys, key]);
-              setTimeout(
-                () =>
-                  historyBrowser.push({
-                    pathname: `${linkTo}`,
-                    search: `${addSearch}${[...keys, key]}`,
-                  }),
-                100,
-              );
-            },
-          });
-
-          return (
-            <div>
-              {leftPanel && (
-                <div className="header-left-transfer-table">
-                  {predefinedGroups ? (
-                    predefinedGroups.map(({ id, name }) => (
-                      <AppButton
-                        key={id}
-                        label={name}
-                        className={'table-button'}
-                        onClick={() => handleGroupSelection(id)}
-                        icon={'block'}
-                        disabled={disabledPredefinedGroups}
-                      />
-                    ))
-                  ) : (
-                    <AppButton
-                      label={'Select all'}
-                      className={'table-button'}
-                      onClick={() => setTargetKeys(formattedData.map(({ key }) => key))}
-                      icon={'block'}
-                    />
-                  )}
-                </div>
-              )}
-              {!leftPanel && (
-                <div>
-                  <AppButton
-                    label={'Reset'}
-                    className={'table-button'}
-                    onClick={() => {
-                      setTargetKeys([]);
-                      setSelectedGroupService(null);
-                      toggleSelectedNonGroupService(false);
-                      toggleDisabledPredefinedGroups(false);
-                    }}
-                  />
-                </div>
-              )}
-              <AppTable
-                columns={columns}
-                data={filteredItems}
-                onItemSelectAll={onItemSelectAll}
-                onItemSelect={onItemSelect}
-                selectedKeys={selectedKeys}
-                scroll={scroll}
-                linkTo={linkTo}
-                addSearch={`${addSearch}=`}
-                setTargetKeys={setTargetKeys}
-                targetKeys={targetKeys}
-                rowSelection={rowSelection}
-                handleOnSelect={handleOnSelect}
-                handleRowSelection={handleRowSelection}
-                {...props}
-              />
-            </div>
-          );
-        }}
+        {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => (
+          <AppTransfer
+            selectedGroupService={selectedGroupService}
+            disabledPredefinedGroups={disabledPredefinedGroups}
+            toggleDisabledPredefinedGroups={toggleDisabledPredefinedGroups}
+            setSelectedGroupService={setSelectedGroupService}
+            targetKeys={targetKeys}
+            linkTo={linkTo}
+            setTargetKeys={setTargetKeys}
+            addSearch={addSearch}
+            handleGroupSelection={handleGroupSelection}
+            formattedData={formattedData}
+            direction={direction}
+            filteredItems={filteredItems}
+            onItemSelectAll={onItemSelectAll}
+            onItemSelect={onItemSelect}
+            selectedKeys={selectedKeys}
+            {...props}
+          />
+        )}
       </Transfer>
     </>
   );
