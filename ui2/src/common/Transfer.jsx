@@ -4,7 +4,6 @@ import { AppTable } from './Table';
 import { AppButton } from '../common/Button';
 import { transferTableColumns } from '../utils/tableColumns';
 import './TableTransfer.css';
-import { historyBrowser } from '../utils/history';
 
 export const AppTransfer = ({
   direction,
@@ -20,9 +19,7 @@ export const AppTransfer = ({
   toggleDisabledPredefinedGroups,
   setSelectedGroupService,
   targetKeys,
-  linkTo,
   setTargetKeys,
-  addSearch,
   predefinedGroups,
   handleGroupSelection,
   formattedData,
@@ -30,12 +27,11 @@ export const AppTransfer = ({
 }) => {
   const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
   const leftPanel = direction === 'left';
+  const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
 
   const columns = leftPanel
     ? transferTableColumns(leftColTitles, columnTitles)
     : transferTableColumns(rightColTitles, columnTitles);
-
-  const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
 
   const handleOnSelect = (key, isPartOfGroup, isSelected) => {
     if (isPartOfGroup) {
@@ -75,19 +71,6 @@ export const AppTransfer = ({
   const handleRowSelection = ({ key, isPartOfGroup }) => ({
     onClick: () => {
       handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
-    },
-    onDoubleClick: () => {
-      const keys = targetKeys ? targetKeys : [];
-      onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
-      setTargetKeys && setTargetKeys([...keys, key]);
-      setTimeout(
-        () =>
-          historyBrowser.push({
-            pathname: `${linkTo}`,
-            search: `${addSearch}${[...keys, key]}`,
-          }),
-        100,
-      );
     },
   });
 
@@ -133,14 +116,7 @@ export const AppTransfer = ({
       <AppTable
         columns={columns}
         data={filteredItems}
-        onItemSelectAll={onItemSelectAll}
-        onItemSelect={onItemSelect}
-        selectedKeys={selectedKeys}
         scroll={scroll}
-        linkTo={linkTo}
-        addSearch={`${addSearch}=`}
-        setTargetKeys={setTargetKeys}
-        targetKeys={targetKeys}
         rowSelection={rowSelection}
         handleOnSelect={handleOnSelect}
         handleRowSelection={handleRowSelection}
