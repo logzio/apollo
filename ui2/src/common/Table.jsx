@@ -1,26 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Empty } from 'antd';
-// import { historyBrowser } from '../utils/history';
 import { AppSearch } from '../common/Search';
 import './Table.css';
 
-export const AppTable = ({
-  data,
-  onItemSelectAll,
-  onItemSelect,
-  selectedKeys,
-  linkTo,
-  addSearch,
-  setTargetKeys,
-  targetKeys,
-  showSelection,
-  searchColumns,
-  showSearch,
-  emptyMsg,
-  rowSelection,
-  handleOnSelect,
-  ...props
-}) => {
+export const AppTable = ({ data, searchColumns, showSearch, emptyMsg, rowSelection, handleRowSelection, ...props }) => {
   const [searchValue, setSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
 
@@ -49,24 +32,7 @@ export const AppTable = ({
         rowSelection={rowSelection}
         size={'small'}
         pagination={false}
-        onRow={({ key, isPartOfGroup }) => ({
-          onClick: () => {
-            handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
-          },
-          // onDoubleClick: () => {
-          // const keys = targetKeys ? targetKeys : [];
-          // onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
-          // setTargetKeys && setTargetKeys([...keys, key]);
-          // setTimeout(
-          //   () =>
-          //     historyBrowser.push({
-          //       pathname: `${linkTo}`,
-          //       search: `${addSearch}${[...keys, key]}`,
-          //     }),
-          //   100,
-          // );
-          // },
-        })}
+        onRow={handleRowSelection}
         locale={{
           emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
         }}

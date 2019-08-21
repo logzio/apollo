@@ -6,11 +6,13 @@ import { AppButton } from '../../../common/Button';
 import { Spinner } from '../../../common/Spinner';
 import { tableColumns } from '../../../utils/tableColumns';
 import moment from 'moment';
+import { parse } from 'query-string';
+import { historyBrowser } from '../../../utils/history';
 import './SelectVersion.css';
 
 export const SelectVersion = ({
   handleBreadcrumbs,
-  getDeployableVersionById,
+  getDeployableVersionsById,
   getLastCommitFromBranch,
   versions,
   location,
@@ -18,14 +20,12 @@ export const SelectVersion = ({
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const [branchName, setBranchName] = useState(null);
-  const [, servicesId] = location.search
-    .split('&')
-    .shift()
-    .split('=');
+  const [selectedVersion, setSelectedVersion] = useState(null);
+  const { service: servicesId } = parse(location.search);
 
   useEffect(() => {
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'version');
-    getDeployableVersionById(servicesId);
+    getDeployableVersionsById(servicesId);
   }, []);
 
   const formattedData =
@@ -34,6 +34,7 @@ export const SelectVersion = ({
       const author = [committerAvatarUrl, committerName];
       return {
         ...dataItem,
+        id: id,
         key: id.toString(),
         commitDate: moment(commitDate).format('DD/MM/YY, h:mm:ss'),
         shortendCommitSha: gitCommitSha.slice(0, 7),
@@ -43,15 +44,29 @@ export const SelectVersion = ({
       };
     });
 
-  const handleVersionSelection = version => selectVersion(version);
-  //     environmentsId.map(environmentId => environments.find(service => service.id.toString() === environmentId)),
-  //   );
+  const handleVersionSelection = () => {
+    selectVersion(selectedVersion);
+    historyBrowser.push({
+      pathname: 'verification',
+      search: `${location.search}&version=${selectedVersion.key}`,
+    });
+  };
 
   const handleBranchSelection = branchName => {
     const versionSampleId = versions[0].id;
     getLastCommitFromBranch(branchName, versionSampleId);
     setBranchName(null);
   };
+
+  const handleRowSelection = version => ({
+    onClick: () => {
+      setSelectedVersion(version);
+    },
+    onDoubleClick: () => {
+      setSelectedVersion(version);
+      handleVersionSelection();
+    },
+  });
 
   if (!versions) {
     return <Spinner />;
@@ -60,18 +75,25 @@ export const SelectVersion = ({
     <>
       <div className="header">
         <AppButton
-          type="primary"
           onClick={() => toggleShowModal(true)}
           label="Find latest commit from branch"
-          className="table-submit-button"
+          className="table-button"
         />
         <AppButton
-          type="primary"
           label="Find latest commit from master"
-          className="table-submit-button"
+          className="table-button"
           onClick={() => {
             handleBranchSelection('master');
           }}
+        />
+        <AppButton
+          type="primary"
+          label="Select Version"
+          className="table-submit-button"
+          onClick={() => {
+            handleVersionSelection();
+          }}
+          disabled={!selectedVersion}
         />
       </div>
       <AppModal
@@ -98,12 +120,10 @@ export const SelectVersion = ({
           3,
         )}
         data={formattedData}
-        linkTo={'verification'}
         scroll={{ y: 750 }}
-        addSearch={`${location.search}&version=`}
         showSearch={true}
         searchColumns={['commitDate', 'gitCommitSha', 'commitMessage', 'commitAuthor']}
-        showSelection={false}
+        handleRowSelection={handleRowSelection}
       />
     </>
   );

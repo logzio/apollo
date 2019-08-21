@@ -2,16 +2,9 @@ import React from 'react';
 import { Modal } from 'antd';
 import './Button.css';
 
-export const AppModal = ({ title, children, visible, toggleModal, customFooter, onOk, okDisabled }) => {
+export const AppModal = ({ children, toggleModal, okDisabled, ...props }) => {
   return (
-    <Modal
-      title={title}
-      visible={visible}
-      onOk={onOk}
-      onCancel={() => toggleModal(false)}
-      footer={customFooter}
-      okButtonProps={{ disabled: okDisabled }}
-    >
+    <Modal onCancel={() => toggleModal(false)} okButtonProps={{ disabled: okDisabled }} {...props}>
       {children}
     </Modal>
   );

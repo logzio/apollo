@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { transferTableColumns } from '../utils/tableColumns';
 import './TableTransfer.css';
+import { historyBrowser } from '../utils/history';
 
 export const TableTransfer = ({
   data,
@@ -131,6 +132,25 @@ export const TableTransfer = ({
             }),
           };
 
+          const handleRowSelection = ({ key, isPartOfGroup }) => ({
+            onClick: () => {
+              handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
+            },
+            onDoubleClick: () => {
+              const keys = targetKeys ? targetKeys : [];
+              onItemSelect && onItemSelect([...keys, key], !selectedKeys.includes(key));
+              setTargetKeys && setTargetKeys([...keys, key]);
+              setTimeout(
+                () =>
+                  historyBrowser.push({
+                    pathname: `${linkTo}`,
+                    search: `${addSearch}${[...keys, key]}`,
+                  }),
+                100,
+              );
+            },
+          });
+
           return (
             <div>
               {leftPanel && (
@@ -183,6 +203,7 @@ export const TableTransfer = ({
                 targetKeys={targetKeys}
                 rowSelection={rowSelection}
                 handleOnSelect={handleOnSelect}
+                handleRowSelection={handleRowSelection}
                 {...props}
               />
             </div>

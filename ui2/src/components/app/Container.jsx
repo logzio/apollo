@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-// import queryString from 'query-string';
+import { parse, parseUrl } from 'query-string';
 import './Container.css';
 
-export const Container = ({ title, component: Component, match, ...props }) => {
+export const Container = ({ title, component: Component, match, location, ...props }) => {
   const breadcrumbHomePath = [{ path: '/home', title: 'Home' }];
   const [breadcrumbs, setBreadcrumbs] = useState(breadcrumbHomePath);
 
@@ -43,6 +43,26 @@ export const Container = ({ title, component: Component, match, ...props }) => {
   //     }
   //   };
 
+  // const handleBreadcrumbs = (path, title) => {
+  //   const { url, query } = parseUrl(path);
+  //   const currentBreadcrumbPath = url.split('/').pop();
+  //   const breadcrumbInd = breadcrumbs.findIndex(({ path }) => path === `${match.url}/${currentBreadcrumbPath}`);
+  //   debugger;
+  //   let prevBreadcrumbs = [];
+  //   let addPrevBreadcrumbs = true;
+  //   if (query) {
+  //     for (let queryKey in query) {
+  //       prevBreadcrumbs.push({
+  //         path: query[index - 1]
+  //           ? `${match.url}/${queryKey}?${query[index - 1]}`
+  //           : `${match.url}/${queryKey}`,
+  //         title: queryKey,
+  //       });
+  //     }
+  //     debugger;
+  //   }
+  // };
+
   const handleBreadcrumbs = (path, title) => {
     const pathSearch = path.split('?')[1];
     const currentBreadcrumb = path.split('/').pop();
@@ -59,7 +79,7 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         title: searchTitle,
       }));
       prevBreadcrumbs.map(prevBreadcrumb => {
-        breadcrumbs.map(breadcrumb => {
+        return breadcrumbs.map(breadcrumb => {
           if (breadcrumb.path === prevBreadcrumb.path) {
             addPrevBreadcrumbs = false;
           }
@@ -74,7 +94,6 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         : setBreadcrumbs([...breadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }]);
     }
   };
-
   const resetBreadcrumbs = () => {
     setBreadcrumbs(breadcrumbHomePath);
   };
@@ -92,7 +111,13 @@ export const Container = ({ title, component: Component, match, ...props }) => {
         </Breadcrumb>
       </div>
       <div className="container-content">
-        <Component handleBreadcrumbs={handleBreadcrumbs} resetBreadcrumbs={resetBreadcrumbs} match={match} {...props} />
+        <Component
+          handleBreadcrumbs={handleBreadcrumbs}
+          resetBreadcrumbs={resetBreadcrumbs}
+          match={match}
+          location={location}
+          {...props}
+        />
       </div>
     </div>
   );

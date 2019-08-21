@@ -13,6 +13,7 @@ export const fetchData = async (endPoint, customError) => {
   }
 };
 
+/***********    AUTH API:   ***************/
 export const signup = async user => {
   try {
     const { data = null } = await axios.post(`${baseUrl}/signup/`, user);
@@ -53,15 +54,19 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
+
+/***********    DEPLOYMENT API:   ***************/
 export const getServices = async () => await fetchData('service/');
 export const getServicesStacks = async () => await fetchData('services-stack/');
 export const getEnvironments = async () => await fetchData('environment/');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
-export const getServiceById = async serviceId => await fetchData(`service/${serviceId}`);
-export const getDeployableVersionById = async servicesId =>
+// export const getServiceById = async serviceId => await fetchData(`service/${serviceId}`);
+export const getDeployableVersionsById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
-export const getDeployableVersionBySha = async gitCommitSha =>
-  await fetchData(`deployable-version/sha/${gitCommitSha}/`);
+
+// export const getDeployableVersionBySha = async gitCommitSha =>
+//   await fetchData(`deployable-version/sha/${gitCommitSha}/`);
+
 // Double encoding, as nginx is opening the first one
 export const getLastCommitFromBranch = async (branchName, deployableVersionId) =>
   await fetchData(
@@ -86,4 +91,3 @@ export const deploy = async newDeployment => {
     throw error;
   }
 };
-// export const getServicesById = async servicesId => await servicesId.map(serviceId => getServiceById(serviceId));

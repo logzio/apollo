@@ -118,37 +118,36 @@ export const getEnvironmentsStacks = () => {
   };
 };
 
-export const getServiceById = serviceId => {
-  return async dispatch => {
-    dispatch({
-      type: GET_SERVICE_BY_ID_REQUEST,
-    });
-    try {
-      const data = await fetchAndStore(`service-${serviceId}`, API.getServiceById, 60 * 6, serviceId);
-      dispatch({
-        type: GET_SERVICE_BY_ID_SUCCESS,
-        payload: data,
-      });
-    } catch (error) {
-      dispatch({
-        type: GET_SERVICE_BY_ID_FAILURE,
-        error,
-      });
-    }
-  };
-};
+// export const getServiceById = serviceId => {
+//   return async dispatch => {
+//     dispatch({
+//       type: GET_SERVICE_BY_ID_REQUEST,
+//     });
+//     try {
+//       const data = await fetchAndStore(`service-${serviceId}`, API.getServiceById, 60 * 6, serviceId);
+//       dispatch({
+//         type: GET_SERVICE_BY_ID_SUCCESS,
+//         payload: data,
+//       });
+//     } catch (error) {
+//       dispatch({
+//         type: GET_SERVICE_BY_ID_FAILURE,
+//         error,
+//       });
+//     }
+//   };
+// };
 
-export const getDeployableVersionById = servicesId => {
+export const getDeployableVersionsById = servicesId => {
   return async dispatch => {
     dispatch({
       type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
     });
     try {
-      const data = await API.getDeployableVersionById(servicesId);
+      const data = await fetchAndStore('deployable-versions', API.getDeployableVersionsById, 60 * 6, servicesId);
       dispatch({
         type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
         payload: data,
-        // payload: depVersionMock,
       });
     } catch (error) {
       dispatch({
@@ -158,26 +157,26 @@ export const getDeployableVersionById = servicesId => {
     }
   };
 };
-
-export const getDeployableVersionBySha = gitCommitSha => {
-  return async dispatch => {
-    dispatch({
-      type: GET_DEPLOYABLE_VERSION_SHA_REQUEST,
-    });
-    try {
-      const data = await API.getDeployableVersionBySha(gitCommitSha);
-      dispatch({
-        type: GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
-        payload: data,
-      });
-    } catch (error) {
-      dispatch({
-        type: GET_DEPLOYABLE_VERSION_SHA_FAILURE,
-        error,
-      });
-    }
-  };
-};
+//
+// export const getDeployableVersionBySha = gitCommitSha => {
+//   return async dispatch => {
+//     dispatch({
+//       type: GET_DEPLOYABLE_VERSION_SHA_REQUEST,
+//     });
+//     try {
+//       const data = await API.getDeployableVersionBySha(gitCommitSha);
+//       dispatch({
+//         type: GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
+//         payload: data,
+//       });
+//     } catch (error) {
+//       dispatch({
+//         type: GET_DEPLOYABLE_VERSION_SHA_FAILURE,
+//         error,
+//       });
+//     }
+//   };
+// };
 
 //Supply one of the service deployable versions ID's
 export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
