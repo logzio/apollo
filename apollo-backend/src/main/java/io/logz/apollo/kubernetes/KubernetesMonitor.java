@@ -1,5 +1,6 @@
 package io.logz.apollo.kubernetes;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.dao.DeploymentDao;
@@ -105,7 +106,7 @@ public class KubernetesMonitor {
 
                 switch (deployment.getStatus()) {
                     case PENDING:
-                        if (isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment)) {
+                        if (isDeployAllowed(deployment, environmentDao, deploymentDao)) {
                             returnedDeployment = kubernetesHandler.startDeployment(deployment);
                         } else {
                             logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());
@@ -152,7 +153,12 @@ public class KubernetesMonitor {
         }
     }
 
-    private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment) {
+    @VisibleForTesting
+    public boolean isDeployAllowed(Deployment deployment, EnvironmentDao environmentDao, DeploymentDao deploymentDao) {
+        return isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment, environmentDao, deploymentDao) || deployment.getEmergencyDeployment();
+    }
+
+    private boolean isDeployedEnvironmentConcurrencyLimitPermitsDeployment(Deployment deployment, EnvironmentDao environmentDao, DeploymentDao deploymentDao) {
         Integer concurrencyLimit = environmentDao.getEnvironment(deployment.getEnvironmentId()).getConcurrencyLimit();
         if (concurrencyLimit != null && concurrencyLimit >= MINIMUM_CONCURRENCY_LIMIT) {
             long startedDeploymentOnEnvironment = deploymentDao.getAllStartedDeployments()

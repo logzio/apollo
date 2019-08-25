@@ -92,7 +92,7 @@ public class DeploymentController {
 
     @LoggedIn
     @POST("/deployment")
-    public void addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String deploymentMessage, String groupName, Req req) {
+    public void addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String deploymentMessage, String groupName, Boolean isEmergencyDeployment, Req req) {
         Iterable<String> environmentIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(environmentIdsCsv);
         Iterable<String> serviceIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(serviceIdsCsv);
 
@@ -119,7 +119,7 @@ public class DeploymentController {
                 responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId));
             } else {
                 try {
-                    Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), req);
+                        Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), isEmergencyDeployment, req);
                     responseObject.addSuccessful(environmentId, serviceId, deployment);
                 } catch (ApolloDeploymentException e) {
                     responseObject.addUnsuccessful(environmentId, serviceId, e);
