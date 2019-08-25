@@ -158,21 +158,24 @@ public class ModelsGenerator {
         return createAndSubmitServicesStack(apolloTestClient, new ArrayList<>());
     }
 
-    public static Group createGroup() {
+    public static Group createGroup(int serviceId, int environmentId, String name) {
         Group testGroup = new Group();
-        testGroup.setName("group-name-" + Common.randomStr(5));
+        testGroup.setName(generateRandomGroupName());
         testGroup.setScalingFactor(DEFAULT_SCALING_FACTOR);
         testGroup.setJsonParams(Common.generateJson("json", "params"));
+        testGroup.setServiceId(serviceId);
+        testGroup.setEnvironmentId(environmentId);
+        testGroup.setName(name);
 
         return testGroup;
     }
 
-    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId, String name) throws ApolloClientException {
-        Group testGroup = createGroup();
+    private static String generateRandomGroupName() {
+        return "group-name-" + Common.randomStr(5);
+    }
 
-        testGroup.setServiceId(serviceId);
-        testGroup.setEnvironmentId(environmentId);
-        testGroup.setName(name);
+    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId, String name) throws ApolloClientException {
+        Group testGroup = createGroup(serviceId, environmentId, name);
 
         apolloTestClient.addGroup(testGroup);
 
@@ -182,16 +185,7 @@ public class ModelsGenerator {
     }
 
     public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId) throws ApolloClientException {
-        Group testGroup = createGroup();
-
-        testGroup.setServiceId(serviceId);
-        testGroup.setEnvironmentId(environmentId);
-
-        apolloTestClient.addGroup(testGroup);
-
-        testGroup.setId(apolloTestClient.getGroupByName(testGroup.getName()).getId());
-
-        return testGroup;
+       return createAndSubmitGroup(apolloTestClient, serviceId, environmentId, generateRandomGroupName());
     }
 
     public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient) throws ApolloClientException {
@@ -218,34 +212,33 @@ public class ModelsGenerator {
     }
 
     public static DeployableVersion createDeployableVersion(Service relatedService) {
-        String repositoryUrl = "http://test.com/logzio/" + Common.randomStr(5);
-        String commitSha = "abc129aed837f6" + Common.randomStr(5);
-
-        return createDeployableVersion(relatedService, repositoryUrl, commitSha);
+        return createDeployableVersion(relatedService, generateRandomRepositoryUrl(), generateRandomCommitSha());
     }
 
     public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient, Service service, String repositoryUrl, String commitSha) throws ApolloClientException {
 
         // Add deployable version
-        DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(service, repositoryUrl, commitSha);
+        DeployableVersion testDeployableVersion = createDeployableVersion(service, repositoryUrl, commitSha);
         testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
 
         return testDeployableVersion;
     }
 
     public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient, Service service) throws ApolloClientException {
-        String repositoryUrl = "http://test.com/logzio/" + Common.randomStr(5);
-        String commitSha = "abc129aed837f6" + Common.randomStr(5);
-
-        return createAndSubmitDeployableVersion(apolloTestClient, service, repositoryUrl, commitSha);
+        return createAndSubmitDeployableVersion(apolloTestClient, service, generateRandomRepositoryUrl(), generateRandomCommitSha());
     }
 
     public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient) throws ApolloClientException {
         Service service = createAndSubmitService(apolloTestClient);
-        String repositoryUrl = "http://test.com/logzio/" + Common.randomStr(5);
-        String commitSha = "abc129aed837f6" + Common.randomStr(5);
+        return createAndSubmitDeployableVersion(apolloTestClient, service);
+    }
 
-        return createAndSubmitDeployableVersion(apolloTestClient, service, repositoryUrl, commitSha);
+    private static String generateRandomRepositoryUrl() {
+        return "http://test.com/logzio/" + Common.randomStr(5);
+    }
+
+    private static String generateRandomCommitSha() {
+        return "abc129aed837f6" + Common.randomStr(5);
     }
 
     public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,

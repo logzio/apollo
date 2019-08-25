@@ -33,20 +33,20 @@ public class EmergencyDeploymentTest {
     }
 
     @Test
-    public void changingToEmergencyDeploymentWhileThereIsAnotherOngoingDeployment() throws Exception {
+    public void testEmegencyDeploymnetLimits() throws Exception {
         Deployment deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient);
         environmentDao.updateConcurrencyLimit(deployment.getEnvironmentId(), 1);
 
         deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.STARTED);
         deployment = deploymentDao.getDeployment(deployment.getId());
 
-        Deployment deployment1 = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environmentDao.getEnvironment(deployment.getEnvironmentId()));
+        Deployment currentDeployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environmentDao.getEnvironment(deployment.getEnvironmentId()));
 
-        assertThat(kubernetesMonitor.isDeployAllowed(deployment1, environmentDao, deploymentDao)).isFalse();
+        assertThat(kubernetesMonitor.isDeployAllowed(currentDeployment, environmentDao, deploymentDao)).isFalse();
 
-        deploymentDao.updateEmergencyDeployment(deployment1.getId(), true);
-        deployment1 = deploymentDao.getDeployment(deployment1.getId());
+        deploymentDao.updateEmergencyDeployment(currentDeployment.getId(), true);
+        currentDeployment = deploymentDao.getDeployment(currentDeployment.getId());
 
-        assertThat(kubernetesMonitor.isDeployAllowed(deployment1, environmentDao, deploymentDao)).isTrue();
+        assertThat(kubernetesMonitor.isDeployAllowed(currentDeployment, environmentDao, deploymentDao)).isTrue();
     }
 }
