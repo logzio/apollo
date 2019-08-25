@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
+import { cacheKeys } from '../../../utils/cacheConfig';
+import { removeFromCache } from '../../../utils/cacheService';
 
 export const SelectService = ({
   getServices,
@@ -13,6 +15,7 @@ export const SelectService = ({
   selectServices,
 }) => {
   useEffect(() => {
+    removeFromCache(cacheKeys.DEPLOYABLE_VERSIONS);
     resetBreadcrumbs();
     handleBreadcrumbs(`${match.url}`, 'service');
     getServices();

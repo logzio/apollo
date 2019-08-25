@@ -57,7 +57,7 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_SERVICES_REQUEST:
       return { ...state, isLoading: true };
     case GET_SERVICES_SUCCESS:
-      return { ...state, services: action.payload, isLoading: false };
+      return { ...state, services: action.payload, isLoading: false, versions: null };
     case GET_SERVICES_FAILURE:
       return { ...state, isLoading: false };
     case GET_SERVICES_STACK_REQUEST:

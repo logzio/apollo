@@ -9,6 +9,7 @@ import moment from 'moment';
 import { parse } from 'query-string';
 import { historyBrowser } from '../../../utils/history';
 import './SelectVersion.css';
+import _ from 'lodash';
 
 export const SelectVersion = ({
   handleBreadcrumbs,
@@ -68,6 +69,14 @@ export const SelectVersion = ({
     },
   });
 
+  const rowSelection = {
+    onSelect: version => {
+      setSelectedVersion(selectedVersion ? null : version);
+    },
+    selectedRowKeys: selectedVersion && selectedVersion.key,
+    type: 'radio',
+  };
+
   if (!versions) {
     return <Spinner />;
   }
@@ -124,6 +133,7 @@ export const SelectVersion = ({
         showSearch={true}
         searchColumns={['commitDate', 'gitCommitSha', 'commitMessage', 'commitAuthor']}
         handleRowSelection={handleRowSelection}
+        rowSelection={rowSelection}
       />
     </>
   );

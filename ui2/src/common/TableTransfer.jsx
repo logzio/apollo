@@ -3,8 +3,8 @@ import { Transfer } from 'antd';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
-import './TableTransfer.css';
 import { AppTransfer } from './Transfer';
+import './TableTransfer.css';
 
 export const TableTransfer = ({
   data,
@@ -22,14 +22,11 @@ export const TableTransfer = ({
   const [disabledPredefinedGroups, toggleDisabledPredefinedGroups] = useState(false);
   const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
-  // const handleSearch = (inputValue, item) =>
-  //   searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
-
   const handleSearch = (inputValue, item) => {
     return searchColumns
       .map(searchCol => {
-        const stringifiedItem = item[searchCol].toString();
-        return stringifiedItem && stringifiedItem.indexOf(inputValue) !== -1;
+        const stringifiedItem = item[searchCol].toString().toLowerCase();
+        return stringifiedItem && stringifiedItem.indexOf(inputValue.toLowerCase()) !== -1;
       })
       .includes(true);
   };

@@ -13,13 +13,17 @@ export const AppTable = ({ data, searchColumns, showSearch, emptyMsg, rowSelecti
 
   const handleSearch = value => {
     setSearchValue(value);
-    const filteredData = data.filter(dataItem => {
-      return searchColumns
-        .map(colName => {
-          return !!dataItem[colName].includes(value);
-        })
-        .includes(true);
-    });
+    const filteredData = data.filter(dataItem =>
+      searchColumns
+        .map(
+          colName =>
+            !!dataItem[colName]
+              .toString()
+              .toLowerCase()
+              .includes(value.toLowerCase()),
+        )
+        .includes(true),
+    );
     setFilteredData(filteredData);
   };
 

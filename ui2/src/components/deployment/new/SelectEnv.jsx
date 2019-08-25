@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
 import { parse } from 'query-string';
+import { cacheKeys } from '../../../utils/cacheConfig';
 import { getFromCache } from '../../../utils/cacheService';
 
 export const SelectEnvironment = ({
@@ -15,7 +16,7 @@ export const SelectEnvironment = ({
   selectEnvironments,
   getServices,
   services,
-  selectedServices,
+  getSelectedServices,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'environment');
@@ -31,18 +32,9 @@ export const SelectEnvironment = ({
       .map(selectedEnv => selectedEnv.id.toString());
   };
 
-  const getLink = () => {
-    const cachedSelectedServices = getFromCache('selectedServices');
-    if (selectedServices.length || cachedSelectedServices) {
-      return (
-        (selectedServices.length && !!selectedServices[0].isPartOfGroup) ||
-        (cachedSelectedServices && !!cachedSelectedServices[0].isPartOfGroup)
-      );
-    } else {
-      const { service } = parse(location.search);
-      const [selectedServiceId] = service.split(',');
-      return !!services.find(({ id }) => id.toString() === selectedServiceId).isPartOfGroup;
-    }
+  const isServicePartOfGroup = () => {
+    const selectedServices = getSelectedServices();
+    return selectedServices[0].isPartOfGroup;
   };
 
   const handleEnvironmentsSelection = environmentsId => {
@@ -64,7 +56,7 @@ export const SelectEnvironment = ({
       rightColTitles={['name']}
       predefinedGroups={environmentsStacks}
       selectGroup={stackSelection}
-      linkTo={getLink() ? 'group' : 'version'}
+      linkTo={isServicePartOfGroup() ? 'group' : 'version'}
       addSearch={`${location.search}&environment`}
       match={match}
       emptyMsg={'Please select environments from the left panel'}

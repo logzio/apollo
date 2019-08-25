@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { AppButton } from '../../../common/Button';
 import { AppModal } from '../../../common/Modal';
+import { AppTable } from '../../../common/Table';
 import { Spinner } from '../../../common/Spinner';
 import './VerifyDeployment.css';
+import { Timeline } from 'antd';
+import { useUserService } from '../deploymentCustomHooks';
 
 export const VerifyDeployment = ({
   handleBreadcrumbs,
@@ -12,36 +15,44 @@ export const VerifyDeployment = ({
   getServices,
   environments,
   services,
+  groups,
+  versions,
+  isLoading,
+  getSelectedServices,
+  selectedServices,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
 
   useEffect(() => {
     resetBreadcrumbs();
-    handleBreadcrumbs(`${location.pathname}${location.search}`, 'Deployment details');
+    handleBreadcrumbs(`${location.pathname}${location.search}`, 'deployment');
     getEnvironments();
     getServices();
-    // getGroups();
-    // getDeployableVersionsById(servicesId);
   }, []);
 
-  // const getDeploymentDetails = () => {
-  //
-  //     return({
-  //         versionId: ,
-  //         servicesNames: ,
-  //         environmentsNames: ,
-  //         groupsNames: ,
-  //     })
-  // };
+  useEffect(() => {
+    getSelectedServices();
+  }, [services]);
 
-  if (!environments || !services) {
+  if (!services || !environments) {
     return <Spinner />;
   }
 
   return (
     <div className="verify-deployment">
-      <div>So just making sure</div>
-      <div></div>
+      <div>So just making sure {selectedServices[1] && selectedServices[1].name}</div>
+      {/*<div>*/}
+      {/*  <Timeline>*/}
+      {/*    {getSelectedServices().map(service => {*/}
+      {/*      return <Timeline.Item key={service.id}>{service.name}</Timeline.Item>;*/}
+      {/*    })}*/}
+      {/*  </Timeline>*/}
+      {/*  <Timeline>*/}
+      {/*    {getSelectedEnv().map(env => {*/}
+      {/*      return <Timeline.Item key={env.id}>{env.name}</Timeline.Item>;*/}
+      {/*    })}*/}
+      {/*  </Timeline>*/}
+      {/*</div>*/}
       <AppButton
         label={`Confirm deployment details`}
         className={'table-submit-button'}
@@ -65,3 +76,10 @@ export const VerifyDeployment = ({
     </div>
   );
 };
+
+// return({
+//     versionId: ,
+//     servicesNames: ,
+//     environmentsNames: ,
+//     groupsNames: ,
+// })

@@ -1,99 +1,55 @@
 import React, { useState } from 'react';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-import { parse, parseUrl } from 'query-string';
+import { parseUrl } from 'query-string';
+import _ from 'lodash';
 import './Container.css';
 
 export const Container = ({ title, component: Component, match, location, ...props }) => {
   const breadcrumbHomePath = [{ path: '/home', title: 'Home' }];
   const [breadcrumbs, setBreadcrumbs] = useState(breadcrumbHomePath);
 
-  //   const handleBreadcrumbs = (path, title) => {
-  //     let prevBreadcrumbs = null;
-  //     const [url, searchUrl] = path.split('?');
-  //     const currentBreadcrumb = url.split('/').pop();
-  //     const currentBreadcrumbPath = `${match.url}/${currentBreadcrumb}`;
-  // debugger
-  //     if (searchUrl) {
-  //       const searchParams = searchUrl.split('&');
-  //       const searchTitles = searchParams.map(searchParam => searchParam.split('=')[0]);
-  //
-  //       prevBreadcrumbs = searchTitles.map((searchTitle, index) => ({
-  //         path: searchParams[index - 1]
-  //           ? `${match.url}/${searchTitle}?${searchParams[index - 1]}`
-  //           : `${match.url}/${searchTitle}`,
-  //         title: searchTitle,
-  //       }));
-  //       prevBreadcrumbs.map(prevBreadcrumb => {
-  //         breadcrumbs.map(breadcrumb => {
-  //           if (breadcrumb.path === prevBreadcrumb.path) {
-  //             prevBreadcrumbs = null;
-  //           }
-  //         });
-  //       });
-  //     }
-  //
-  //     const breadcrumbInd = breadcrumbs.findIndex(({ path }) => path === currentBreadcrumbPath);
-  //     if (~breadcrumbInd) {
-  //       setBreadcrumbs(breadcrumbs.slice(0, breadcrumbInd + 1));
-  //     } else {
-  //       prevBreadcrumbs
-  //         ? setBreadcrumbs([...breadcrumbs, ...prevBreadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }])
-  //         : setBreadcrumbs([...breadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }]);
-  //     }
-  //   };
-
-  // const handleBreadcrumbs = (path, title) => {
-  //   const { url, query } = parseUrl(path);
-  //   const currentBreadcrumbPath = url.split('/').pop();
-  //   const breadcrumbInd = breadcrumbs.findIndex(({ path }) => path === `${match.url}/${currentBreadcrumbPath}`);
-  //   debugger;
-  //   let prevBreadcrumbs = [];
-  //   let addPrevBreadcrumbs = true;
-  //   if (query) {
-  //     for (let queryKey in query) {
-  //       prevBreadcrumbs.push({
-  //         path: query[index - 1]
-  //           ? `${match.url}/${queryKey}?${query[index - 1]}`
-  //           : `${match.url}/${queryKey}`,
-  //         title: queryKey,
-  //       });
-  //     }
-  //     debugger;
-  //   }
-  // };
+  const parseSearchUrl = searchUrl =>
+    searchUrl
+      .split('?')
+      .pop()
+      .split('&')
+      .map(searchParam => searchParam.split('=').shift());
 
   const handleBreadcrumbs = (path, title) => {
-    const pathSearch = path.split('?')[1];
-    const currentBreadcrumb = path.split('/').pop();
-    const breadcrumbInd = breadcrumbs.findIndex(breadcrumb => breadcrumb.path === `${match.url}/${currentBreadcrumb}`);
-    let prevBreadcrumbs;
-    let addPrevBreadcrumbs = true;
-    if (pathSearch) {
-      const searchParams = pathSearch.split('&');
-      const searchTitles = searchParams.map(searchParam => searchParam.split('=')[0]);
-      prevBreadcrumbs = searchTitles.map((searchTitle, index) => ({
-        path: searchParams[index - 1]
-          ? `${match.url}/${searchTitle}?${searchParams[index - 1]}`
-          : `${match.url}/${searchTitle}`,
-        title: searchTitle,
-      }));
+    let prevBreadcrumbs = null;
+    const { query } = parseUrl(path);
+
+    if (!_.isEmpty(query)) {
+      const queryKeys = parseSearchUrl(path);
+      prevBreadcrumbs = queryKeys.map((queryKey, index) => {
+        const currentPath = `${match.url}/${queryKey}`;
+        const prevQueryKey = queryKeys[index - 1];
+        return {
+          path: prevQueryKey ? `${currentPath}?${prevQueryKey}=${query[prevQueryKey]}` : `${currentPath}`,
+          title: queryKey,
+        };
+      });
       prevBreadcrumbs.map(prevBreadcrumb => {
-        return breadcrumbs.map(breadcrumb => {
-          if (breadcrumb.path === prevBreadcrumb.path) {
-            addPrevBreadcrumbs = false;
+        return breadcrumbs.map(({ path }) => {
+          if (path === prevBreadcrumb.path) {
+            prevBreadcrumbs = null;
           }
         });
       });
     }
-    if (breadcrumbInd >= 0) {
-      setBreadcrumbs(breadcrumbs.slice(0, breadcrumbInd + 1));
+
+    const breadcrumbIndex = breadcrumbs.findIndex(breadcrumb => breadcrumb.path === path);
+    if (~breadcrumbIndex) {
+      setBreadcrumbs(breadcrumbs.slice(0, breadcrumbIndex + 1));
     } else {
-      addPrevBreadcrumbs && prevBreadcrumbs
-        ? setBreadcrumbs([...breadcrumbs, ...prevBreadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }])
-        : setBreadcrumbs([...breadcrumbs, { path: `${match.url}/${currentBreadcrumb}`, title }]);
+      const currentBreadcrumb = { path, title };
+      prevBreadcrumbs
+        ? setBreadcrumbs([...breadcrumbs, ...prevBreadcrumbs, currentBreadcrumb])
+        : setBreadcrumbs([...breadcrumbs, currentBreadcrumb]);
     }
   };
+
   const resetBreadcrumbs = () => {
     setBreadcrumbs(breadcrumbHomePath);
   };

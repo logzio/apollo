@@ -13,6 +13,7 @@ export const SelectGroup = ({
   selectGroups,
 }) => {
   useEffect(() => {
+    debugger
     resetBreadcrumbs();
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'group');
     const { service: serviceId, environment } = parse(location.search);

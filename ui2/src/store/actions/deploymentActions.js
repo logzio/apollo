@@ -37,6 +37,7 @@ import {
 import * as API from '../../api/api';
 // import { historyBrowser } from '../../utils/history';
 import { fetchAndStore, setToCache } from '../../utils/cacheService';
+import { cacheKeys } from '../../utils/cacheConfig';
 
 export const getServices = () => {
   return async dispatch => {
@@ -44,13 +45,13 @@ export const getServices = () => {
       type: GET_SERVICES_REQUEST,
     });
     try {
-      const data = await fetchAndStore('services', API.getServices, 60 * 6);
-      dispatch({
+      const data = await fetchAndStore(cacheKeys.SERVICES, API.getServices, 60 * 6);
+      await dispatch({
         type: GET_SERVICES_SUCCESS,
         payload: data,
       });
     } catch (error) {
-      dispatch({
+      await dispatch({
         type: GET_SERVICES_FAILURE,
         error,
       });
@@ -64,7 +65,7 @@ export const getServicesStacks = () => {
       type: GET_SERVICES_STACK_REQUEST,
     });
     try {
-      const data = await fetchAndStore('services-stacks', API.getServicesStacks, 60 * 6);
+      const data = await fetchAndStore(cacheKeys.SERVICES_STACKS, API.getServicesStacks, 60 * 6);
       dispatch({
         type: GET_SERVICES_STACK_SUCCESS,
         payload: data,
@@ -84,7 +85,7 @@ export const getEnvironments = () => {
       type: GET_ENV_REQUEST,
     });
     try {
-      const data = await fetchAndStore('env', API.getEnvironments, 60 * 6);
+      const data = await fetchAndStore(cacheKeys.ENVIRONMENTS, API.getEnvironments, 60 * 6);
       dispatch({
         type: GET_ENV_SUCCESS,
         payload: data,
@@ -104,7 +105,7 @@ export const getEnvironmentsStacks = () => {
       type: GET_ENV_STACK_REQUEST,
     });
     try {
-      const data = await fetchAndStore('env-stacks', API.getEnvironmentsStacks, 60 * 6);
+      const data = await fetchAndStore(cacheKeys.ENVIRONMENTS_STACKS, API.getEnvironmentsStacks, 60 * 6);
       dispatch({
         type: GET_ENV_STACK_SUCCESS,
         payload: data,
@@ -144,7 +145,7 @@ export const getDeployableVersionsById = servicesId => {
       type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
     });
     try {
-      const data = await fetchAndStore('deployable-versions', API.getDeployableVersionsById, 60 * 6, servicesId);
+      const data = await fetchAndStore(cacheKeys.DEPLOYABLE_VERSIONS, API.getDeployableVersionsById, 60 * 6, servicesId);
       dispatch({
         type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
         payload: data,
@@ -243,7 +244,7 @@ export const deploy = newDeployment => {
 };
 
 export const selectServices = selectServices => {
-  setToCache('selectedServices', selectServices, 60 * 1);
+  // setToCache(cacheKeys.SELECTED_SERVICES, selectServices, 60 * 1);
   return dispatch => {
     dispatch({
       type: SELECT_SERVICES,
@@ -253,7 +254,7 @@ export const selectServices = selectServices => {
 };
 
 export const selectEnvironments = environments => {
-  setToCache('selectedEnvironments', environments, 60 * 1);
+  setToCache(cacheKeys.SELECTED_ENVIRONMENTS, environments, 60 * 1);
   return dispatch => {
     dispatch({
       type: SELECT_ENVIRONMENTS,
@@ -263,7 +264,7 @@ export const selectEnvironments = environments => {
 };
 
 export const selectGroups = groups => {
-  setToCache('selectedGroups', groups, 60 * 1);
+  setToCache(cacheKeys.SELECTED_GROUPS, groups, 60 * 1);
   return dispatch => {
     dispatch({
       type: SELECT_GROUPS,
@@ -273,7 +274,7 @@ export const selectGroups = groups => {
 };
 
 export const selectVersion = version => {
-  setToCache('selectedVersion', version, 60 * 1);
+  setToCache(cacheKeys.SELECTED_VERSION, version, 60 * 1);
   return dispatch => {
     dispatch({
       type: SELECT_VERSION,

@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { AppTable } from './Table';
 import { AppButton } from '../common/Button';
 import { transferTableColumns } from '../utils/tableColumns';
-import './TableTransfer.css';
 
 export const AppTransfer = ({
   direction,
