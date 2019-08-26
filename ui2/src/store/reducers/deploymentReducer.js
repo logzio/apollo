@@ -14,9 +14,9 @@ import {
   GET_DEPLOYABLE_VERSION_ID_REQUEST,
   GET_DEPLOYABLE_VERSION_ID_SUCCESS,
   GET_DEPLOYABLE_VERSION_ID_FAILURE,
-  GET_DEPLOYABLE_VERSION_SHA_REQUEST,
-  GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
-  GET_DEPLOYABLE_VERSION_SHA_FAILURE,
+  // GET_DEPLOYABLE_VERSION_SHA_REQUEST,
+  // GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
+  // GET_DEPLOYABLE_VERSION_SHA_FAILURE,
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
@@ -44,7 +44,7 @@ const initialState = {
   selectedServices: [],
   selectedEnvironments: [],
   selectedGroups: [],
-  selectedVersion: [],
+  selectedVersion: null,
   environments: null,
   environmentsStacks: null,
   versions: null,
@@ -102,12 +102,12 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, versions: action.payload, isLoading: false };
     case GET_DEPLOYABLE_VERSION_ID_FAILURE:
       return { ...state, isLoading: false };
-    case GET_DEPLOYABLE_VERSION_SHA_REQUEST:
-      return { ...state, isLoading: true, versions: null };
-    case GET_DEPLOYABLE_VERSION_SHA_SUCCESS:
-      return { ...state, versions: action.payload, isLoading: false };
-    case GET_DEPLOYABLE_VERSION_SHA_FAILURE:
-      return { ...state, isLoading: false };
+    // case GET_DEPLOYABLE_VERSION_SHA_REQUEST:
+    //   return { ...state, isLoading: true, versions: null };
+    // case GET_DEPLOYABLE_VERSION_SHA_SUCCESS:
+    //   return { ...state, versions: action.payload, isLoading: false };
+    // case GET_DEPLOYABLE_VERSION_SHA_FAILURE:
+    //   return { ...state, isLoading: false };
     case GET_BRANCH_LATEST_VERSION_REQUEST:
       return { ...state, isLoading: true, versions: null };
     case GET_BRANCH_LATEST_VERSION_SUCCESS:

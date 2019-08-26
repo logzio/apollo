@@ -1,8 +1,15 @@
 .verify-deployment{
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    justify-items: center;
     align-items: center;
-    height: 100vh;
+    margin-top: 80px;
+}
+
+.verify-deployment-content{
+    width: 100%;
+}
+
+.list-icon{
+    width: 20px;
+    height: 20px;
 }

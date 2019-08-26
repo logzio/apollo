@@ -12,17 +12,19 @@ export const SelectGroup = ({
   groups,
   selectGroups,
 }) => {
+  const { service: serviceId, environment: environmentsId } = parse(location.search);
+
   useEffect(() => {
-    debugger
     resetBreadcrumbs();
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'group');
-    const { service: serviceId, environment } = parse(location.search);
-    const environmentsId = environment.split(',');
-    environmentsId.map(environmentId => getGroups(environmentId, serviceId));
+    environmentsId.split(',').map(environmentId => getGroups(environmentId, serviceId));
   }, []);
 
-  const handleGroupsSelection = groupsId =>
-    selectGroups(groupsId.map(groupId => groups.find(service => service.id.toString() === groupId)));
+  const handleGroupsSelection = groupsId => {
+    const test = groupsId.map(groupId => groups.find(service => service.id.toString() === groupId));
+    debugger;
+    selectGroups(test);
+  };
 
   if (!groups) {
     return <Spinner />;

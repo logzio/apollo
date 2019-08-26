@@ -9,3 +9,4 @@ export const AppModal = ({ children, toggleModal, okDisabled, ...props }) => {
     </Modal>
   );
 };
+

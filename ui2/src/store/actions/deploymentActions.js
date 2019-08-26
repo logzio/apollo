@@ -244,7 +244,7 @@ export const deploy = newDeployment => {
 };
 
 export const selectServices = selectServices => {
-  // setToCache(cacheKeys.SELECTED_SERVICES, selectServices, 60 * 1);
+  setToCache(cacheKeys.SELECTED_SERVICES, selectServices, 60 * 1);
   return dispatch => {
     dispatch({
       type: SELECT_SERVICES,

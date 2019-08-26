@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { TableTransfer } from '../../../common/TableTransfer';
 import { Spinner } from '../../../common/Spinner';
-import { parse } from 'query-string';
-import { cacheKeys } from '../../../utils/cacheConfig';
-import { getFromCache } from '../../../utils/cacheService';
 
 export const SelectEnvironment = ({
   getEnvironments,
@@ -17,6 +14,7 @@ export const SelectEnvironment = ({
   getServices,
   services,
   getSelectedServices,
+  selectedServices,
 }) => {
   useEffect(() => {
     handleBreadcrumbs(`${location.pathname}${location.search}`, 'environment');
@@ -24,6 +22,10 @@ export const SelectEnvironment = ({
     getEnvironmentsStacks();
     getServices();
   }, []);
+
+  useEffect(() => {
+    getSelectedServices();
+  }, [services]);
 
   const stackSelection = stackId => {
     const selectedStack = environmentsStacks.find(environmentsStack => environmentsStack.id === stackId);
@@ -33,7 +35,6 @@ export const SelectEnvironment = ({
   };
 
   const isServicePartOfGroup = () => {
-    const selectedServices = getSelectedServices();
     return selectedServices[0].isPartOfGroup;
   };
 
@@ -43,7 +44,7 @@ export const SelectEnvironment = ({
     );
   };
 
-  if (!environments || !environmentsStacks || !services) {
+  if (!environments || !environmentsStacks || !services || !selectedServices.length) {
     return <Spinner />;
   }
 

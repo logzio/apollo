@@ -19,3 +19,7 @@
 .table-button:hover{
     background-color: #EAEFF1;
 }
+
+.modal-btn{
+    width: initial;
+}

@@ -84,6 +84,7 @@ export const deploy = async newDeployment => {
       environmentIdsCsv: newDeployment,
       deployableVersionId: newDeployment,
       deploymentMessage: newDeployment,
+      // isEmergencyDeployment: isEmergencyDeployment,
     });
     return data;
   } catch (error) {
