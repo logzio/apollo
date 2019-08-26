@@ -9,7 +9,6 @@ import moment from 'moment';
 import { parse } from 'query-string';
 import { historyBrowser } from '../../../utils/history';
 import './SelectVersion.css';
-import _ from 'lodash';
 
 export const SelectVersion = ({
   handleBreadcrumbs,
@@ -41,6 +40,8 @@ export const SelectVersion = ({
         shortendCommitSha: gitCommitSha.slice(0, 7),
         gitCommitSha: gitCommitSha,
         commitMessage: commitMessage.split('*').shift(),
+        committerAvatarUrl: committerAvatarUrl,
+        committerName: committerName,
         commitAuthor: author,
       };
     });
@@ -57,6 +58,7 @@ export const SelectVersion = ({
     const versionSampleId = versions[0].id;
     getLastCommitFromBranch(branchName, versionSampleId);
     setBranchName(null);
+    setSelectedVersion(null);
   };
 
   const handleRowSelection = version => ({

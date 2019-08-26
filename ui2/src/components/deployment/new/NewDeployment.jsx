@@ -13,6 +13,7 @@ import {
   selectEnvironments,
   selectGroups,
   selectVersion,
+  deploy,
 } from '../../../store/actions/deploymentActions';
 import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
@@ -56,7 +57,17 @@ const NewDeploymentComponent = ({
   const getSelectedEnv = () =>
     getSelected(environments, cacheKeys.SELECTED_ENVIRONMENTS, environment, selectEnvironments, selectEnvironments);
   const getSelectedGroups = () => getSelected(groups, cacheKeys.SELECTED_GROUPS, group, selectGroups);
-  const getSelectedVersion = () => getSelected(versions, cacheKeys.SELECTED_VERSION, version, selectVersion);
+  // const getSelectedVersion = () => getSelected(versions, cacheKeys.SELECTED_VERSION, version, selectVersion);
+
+  const getSelectedVersion = () => {
+    const cachedSelectedServices = getFromCache(cacheKeys.SELECTED_VERSION);
+    if (cachedSelectedServices) {
+      selectVersion(cachedSelectedServices);
+    } else {
+      const selectedItems = versions && versions.find(selected => version === selected.id.toString());
+      selectedItems && selectVersion(selectedItems);
+    }
+  };
 
   return (
     <Switch>
@@ -169,5 +180,6 @@ export const NewDeployment = connect(
     selectEnvironments,
     selectGroups,
     selectVersion,
+    deploy,
   },
 )(NewDeploymentComponent);

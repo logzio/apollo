@@ -3,11 +3,10 @@ import { AppButton } from '../../../common/Button';
 import { AppModal } from '../../../common/Modal';
 import { Spinner } from '../../../common/Spinner';
 import { AppCard } from '../../../common/Card';
-import { Col, Row, List, Avatar, Button } from 'antd';
+import { Col, Row, List, Avatar } from 'antd';
 import { parse } from 'query-string';
 import symbol from '../../../assets/images/apollo-symbol.svg';
 import './VerifyDeployment.css';
-import { Link } from 'react-router-dom';
 
 export const VerifyDeployment = ({
   handleBreadcrumbs,
@@ -29,6 +28,8 @@ export const VerifyDeployment = ({
   getGroups,
   selectedGroups,
   getSelectedGroups,
+  isLoading,
+  deploy,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const { service: serviceId, group, environment: environmentsId } = parse(location.search);
@@ -66,12 +67,30 @@ export const VerifyDeployment = ({
   }, [versions]);
 
   useEffect(() => {
-    if (!selectedGroups.length) {
+    if (!selectedGroups.length && group) {
       getSelectedGroups();
     }
   }, [groups]);
 
-  if (!services || !environments || !versions || (group && !groups)) {
+  const handleDeploy = isEmergencyDeployment => {
+    deploy(
+      selectedServices.map(selectedService => selectedService.id).join(','),
+      selectedEnvironments.map(selectedEnvironment => selectedEnvironment.id).join(','),
+      selectedVersion.id,
+      selectedVersion.commitMessage,
+      isEmergencyDeployment,
+    );
+  };
+
+  if (
+    !services ||
+    !environments ||
+    !versions ||
+    !selectedVersion ||
+    !selectedEnvironments ||
+    !selectedServices ||
+    (group && !groups)
+  ) {
     return <Spinner />;
   }
 
@@ -91,16 +110,17 @@ export const VerifyDeployment = ({
             <div className="card-details">
               <div className={'extra-small-title'}>Author:</div>
               <div className="card-user-profile">
-                <img className="card-user-image" src={selectedVersion.commitAuthor[0]} />
-                <div className="card-user-title">{selectedVersion.commitAuthor[1]}</div>
+                <img className="card-user-image" src={selectedVersion.committerAvatarUrl} alt={'user profile'} />
+                <div className="card-user-title">{selectedVersion.committerName}</div>
               </div>
             </div>
           </AppCard>
         </Col>
-        {deployItems.map(
-          ({ isPartOfGroup, dataSource, title }, index) =>
-            (!isPartOfGroup || !!group) && (
-              <Col span={5} offset={1} key={index}>
+        {deployItems.map(({ isPartOfGroup, dataSource, title }, index) => {
+          const isSelectedGroups = !isPartOfGroup || !!group;
+          return (
+            isSelectedGroups && (
+              <Col span={isSelectedGroups ? 4 : 5} offset={isSelectedGroups ? 4 : 1} key={index}>
                 <AppCard title={title}>
                   <List
                     itemLayout="horizontal"
@@ -116,12 +136,13 @@ export const VerifyDeployment = ({
                   />
                 </AppCard>
               </Col>
-            ),
-        )}
+            )
+          );
+        })}
       </Row>
       <AppButton
         label={`Confirm deployment details`}
-        className={'table-submit-button'}
+        className={'deploy table-submit-button'}
         type="primary"
         onClick={() => {
           toggleShowModal(true);
@@ -131,26 +152,24 @@ export const VerifyDeployment = ({
         visible={showModal}
         toggleModal={toggleShowModal}
         title="Fashizle?"
-        // onOk={() => {
-        //   //api new deployment
-        //   toggleShowModal(false);
-        // }}
-        // okText={'Deploy'}
         footer={[
           <AppButton
             label={'Emergency'}
-            className={'modal-btn'}
+            className={'modal-btn emergency-modal-btn'}
             key="emergency"
             type="danger"
-            onClick={() => console.log('hi')}
+            onClick={() => handleDeploy(true)}
+            tooltipText={"Deploy while ignoring environment's concurrency limits!"}
+            isLoading={isLoading}
           />,
-          <AppButton label={'Return'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />,
+          <AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />,
           <AppButton
             label={'Deploy'}
             className={'modal-btn'}
             key="submit"
             type="primary"
-            onClick={() => toggleShowModal(false)}
+            onClick={() => handleDeploy(false)}
+            isLoading={isLoading}
           />,
         ]}
       >

@@ -45,6 +45,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
             <Switch>
               {isAdmin && <AppRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
               <AppRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
+              <AppRoute path="/deployment/ongoing" title={'Ongoing deployment'} component={Signup} />
               {!isAuthenticate && <Route path="/auth/login" component={Login} />}
               {isAuthenticate ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
             </Switch>

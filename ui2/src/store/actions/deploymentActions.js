@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   GET_SERVICES_REQUEST,
   GET_SERVICES_SUCCESS,
@@ -35,9 +36,10 @@ import {
   SELECT_VERSION,
 } from '../actions';
 import * as API from '../../api/api';
-// import { historyBrowser } from '../../utils/history';
+import { historyBrowser } from '../../utils/history';
 import { fetchAndStore, setToCache } from '../../utils/cacheService';
 import { cacheKeys } from '../../utils/cacheConfig';
+import { notification, Icon } from 'antd';
 
 export const getServices = () => {
   return async dispatch => {
@@ -220,19 +222,37 @@ export const getGroups = (environmentId, serviceId) => {
   };
 };
 
-export const deploy = newDeployment => {
+export const deploy = (
+  serviceIdsCsv,
+  environmentIdsCsv,
+  deployableVersionId,
+  deploymentMessage,
+  isEmergencyDeployment,
+) => {
   return async dispatch => {
     dispatch({
       type: NEW_DEPLOYMENT_REQUEST,
     });
     try {
-      const data = await API.deploy(newDeployment);
-      // historyBrowser.push({
-      //   pathname: '/ongoingDeployment',
-      // });
+      // const data = await API.deploy(
+      //   serviceIdsCsv,
+      //   environmentIdsCsv,
+      //   deployableVersionId,
+      //   deploymentMessage,
+      //   isEmergencyDeployment,
+      // );
+      debugger;
+      notification.open({
+        message: `Commit: ${deployableVersionId} was successfully deployed`,
+        icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
+      });
+      historyBrowser.push({
+        pathname: '/deployment/ongoing',
+      });
       dispatch({
         type: NEW_DEPLOYMENT_SUCCESS,
-        payload: data,
+        // payload: data,
+        payload: 'hi',
       });
     } catch (error) {
       dispatch({

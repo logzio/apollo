@@ -54,7 +54,6 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
-
 /***********    DEPLOYMENT API:   ***************/
 export const getServices = async () => await fetchData('service/');
 export const getServicesStacks = async () => await fetchData('services-stack/');
@@ -77,14 +76,20 @@ export const getLastCommitFromBranch = async (branchName, deployableVersionId) =
 export const getGroups = async (environmentId, serviceId) =>
   await fetchData(`group/environment/${environmentId}/service/${serviceId}`);
 
-export const deploy = async newDeployment => {
+export const deploy = async (
+  serviceIdsCsv,
+  environmentIdsCsv,
+  deployableVersionId,
+  deploymentMessage,
+  isEmergencyDeployment,
+) => {
   try {
     const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
-      serviceIdsCsv: newDeployment,
-      environmentIdsCsv: newDeployment,
-      deployableVersionId: newDeployment,
-      deploymentMessage: newDeployment,
-      // isEmergencyDeployment: isEmergencyDeployment,
+      serviceIdsCsv: serviceIdsCsv,
+      environmentIdsCsv: environmentIdsCsv,
+      deployableVersionId: deployableVersionId,
+      deploymentMessage: deploymentMessage,
+      isEmergencyDeployment: isEmergencyDeployment,
     });
     return data;
   } catch (error) {
