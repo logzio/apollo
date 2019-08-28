@@ -17,6 +17,7 @@ export const TableTransfer = ({
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
+  const [searchedKeys, setSearchedKeys] = useState([]);
   const [showSearch] = useState(!!searchColumns);
   const [selectedGroupService, setSelectedGroupService] = useState(null);
   const [disabledPredefinedGroups, toggleDisabledPredefinedGroups] = useState(false);
@@ -93,6 +94,7 @@ export const TableTransfer = ({
             onItemSelectAll={onItemSelectAll}
             onItemSelect={onItemSelect}
             selectedKeys={selectedKeys}
+            searchedKeys={searchedKeys}
             {...props}
           />
         )}

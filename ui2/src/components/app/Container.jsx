@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-import { parseUrl } from 'query-string';
-import _ from 'lodash';
 import './Container.css';
 
 export const Container = ({ title, component: Component, match, location, ...props }) => {
@@ -17,16 +15,15 @@ export const Container = ({ title, component: Component, match, location, ...pro
       .map(searchParam => searchParam.split('=').shift());
 
   const handleBreadcrumbs = (path, title) => {
+    // debugger
     let prevBreadcrumbs = null;
-    const { query } = parseUrl(path);
-
-    if (!_.isEmpty(query)) {
+    if (location.search.length) {
       const queryKeys = parseSearchUrl(path);
       prevBreadcrumbs = queryKeys.map((queryKey, index) => {
         const currentPath = `${match.url}/${queryKey}`;
-        const prevQueryKey = queryKeys[index - 1];
+        const prevSearchParamas = location.search.split(`&${queryKey}`).shift();
         return {
-          path: prevQueryKey ? `${currentPath}?${prevQueryKey}=${query[prevQueryKey]}` : `${currentPath}`,
+          path: queryKeys[index - 1] ? `${currentPath}${prevSearchParamas}` : `${currentPath}`,
           title: queryKey,
         };
       });
@@ -51,6 +48,7 @@ export const Container = ({ title, component: Component, match, location, ...pro
   };
 
   const resetBreadcrumbs = () => {
+    // debugger
     setBreadcrumbs(breadcrumbHomePath);
   };
 

@@ -22,6 +22,7 @@ export const AppTransfer = ({
   predefinedGroups,
   handleGroupSelection,
   formattedData,
+  searchedKeys,
   ...props
 }) => {
   const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
@@ -92,7 +93,9 @@ export const AppTransfer = ({
             <AppButton
               label={'Select all'}
               className={'table-button'}
-              onClick={() => setTargetKeys(formattedData.map(({ key }) => key))}
+              onClick={() => {
+                setTargetKeys(filteredItems.map(({ key }) => key));
+              }}
               icon={'block'}
             />
           )}

@@ -39,3 +39,7 @@ code {
     font-size: 14px;
     height: 30px;
 }
+
+.ant-layout{
+    background: white;
+}

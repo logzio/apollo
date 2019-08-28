@@ -49,27 +49,19 @@ export const VerifyDeployment = ({
   }, []);
 
   useEffect(() => {
-    if (!selectedServices.length) {
-      getSelectedServices();
-    }
+    !selectedServices.length && getSelectedServices();
   }, [services]);
 
   useEffect(() => {
-    if (!selectedEnvironments.length) {
-      getSelectedEnv();
-    }
+    !selectedEnvironments.length && getSelectedEnv();
   }, [environments]);
 
   useEffect(() => {
-    if (!selectedVersion) {
-      getSelectedVersion();
-    }
+    !selectedVersion && getSelectedVersion();
   }, [versions]);
 
   useEffect(() => {
-    if (!selectedGroups.length && group) {
-      getSelectedGroups();
-    }
+    !selectedGroups.length && group && getSelectedGroups();
   }, [groups]);
 
   const handleDeploy = isEmergencyDeployment => {
@@ -120,7 +112,7 @@ export const VerifyDeployment = ({
           const isSelectedGroups = !isPartOfGroup || !!group;
           return (
             isSelectedGroups && (
-              <Col span={isSelectedGroups ? 4 : 5} offset={isSelectedGroups ? 4 : 1} key={index}>
+              <Col span={group ? 5 : 4} offset={group ? 1 : 4} key={index}>
                 <AppCard title={title}>
                   <List
                     itemLayout="horizontal"

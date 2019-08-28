@@ -21,9 +21,7 @@ export const SelectGroup = ({
   }, []);
 
   const handleGroupsSelection = groupsId => {
-    const test = groupsId.map(groupId => groups.find(service => service.id.toString() === groupId));
-    debugger;
-    selectGroups(test);
+    selectGroups(groupsId.map(groupId => groups.find(service => service.id.toString() === groupId)));
   };
 
   if (!groups) {

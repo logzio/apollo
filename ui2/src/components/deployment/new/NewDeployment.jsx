@@ -40,34 +40,24 @@ const NewDeploymentComponent = ({
 }) => {
   const { service, environment, version, group } = parse(location.search);
 
-  const getSelected = (selectedFrom, cachedKey, urlParams, setSelected) => {
-    const cachedSelectedServices = getFromCache(cachedKey);
-    if (cachedSelectedServices) {
-      setSelected(cachedSelectedServices);
-    } else {
-      const urlParamsId = urlParams.split(',');
-      const selectedItems =
-        selectedFrom &&
-        urlParamsId.map(urlParamId => selectedFrom.find(selected => urlParamId === selected.id.toString()));
-      selectedItems && setSelected(selectedItems);
-    }
+  const getSelected = (selectedFrom, cachedKey, urlParams, setSelected, saveAsObject) => {
+    const selectedFromCache = getFromCache(cachedKey);
+    const urlParamsId = urlParams.split(',');
+    const selectedItems =
+      !saveAsObject &&
+      selectedFrom &&
+      urlParamsId.map(urlParamId => selectedFrom.find(selected => urlParamId === selected.id.toString()));
+    const selectedItem =
+      saveAsObject && selectedFrom && selectedFrom.find(selected => urlParams === selected.id.toString());
+    (selectedFromCache || selectedItems || selectedItem) &&
+      setSelected(selectedFromCache ? selectedFromCache : selectedItems || selectedItem);
   };
 
-  const getSelectedServices = () => getSelected(services, cacheKeys.SELECTED_SERVICES, service, selectServices);
   const getSelectedEnv = () =>
     getSelected(environments, cacheKeys.SELECTED_ENVIRONMENTS, environment, selectEnvironments, selectEnvironments);
+  const getSelectedServices = () => getSelected(services, cacheKeys.SELECTED_SERVICES, service, selectServices);
   const getSelectedGroups = () => getSelected(groups, cacheKeys.SELECTED_GROUPS, group, selectGroups);
-  // const getSelectedVersion = () => getSelected(versions, cacheKeys.SELECTED_VERSION, version, selectVersion);
-
-  const getSelectedVersion = () => {
-    const cachedSelectedServices = getFromCache(cacheKeys.SELECTED_VERSION);
-    if (cachedSelectedServices) {
-      selectVersion(cachedSelectedServices);
-    } else {
-      const selectedItems = versions && versions.find(selected => version === selected.id.toString());
-      selectedItems && selectVersion(selectedItems);
-    }
-  };
+  const getSelectedVersion = () => getSelected(versions, cacheKeys.SELECTED_VERSION, version, selectVersion, true);
 
   return (
     <Switch>
