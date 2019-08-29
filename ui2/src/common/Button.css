@@ -3,6 +3,7 @@
 }
 .ant-btn[disabled]{
     height: 40px;
+    width: inherit;
 }
 
 .table-submit-button{
