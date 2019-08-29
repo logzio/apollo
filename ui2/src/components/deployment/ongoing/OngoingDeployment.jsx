@@ -13,7 +13,7 @@ const OngoingDeploymentComponent = ({
   getServices,
   services,
   getEnvironments,
-  environment,
+  environments,
   handleBreadcrumbs,
 }) => {
   useEffect(() => {
@@ -43,12 +43,12 @@ const OngoingDeploymentComponent = ({
         key: id.toString(),
         lastUpdate: moment(lastUpdate).format('DD/MM/YY, h:mm:ss'),
         serviceId: findNameById(serviceId, services),
-        environmentId: findNameById(environmentId, environment),
+        environmentId: findNameById(environmentId, environments),
         groupName: groupName ? groupName : 'Non',
       };
     });
 
-  if (!ongoingDeployments || !services || !environment) {
+  if (!ongoingDeployments || !services || !environments) {
     return <Spinner />;
   }
 
@@ -76,11 +76,11 @@ const OngoingDeploymentComponent = ({
   );
 };
 
-const mapStateToProps = ({ deploy: { isLoading, ongoingDeployments, services, environment } }) => ({
+const mapStateToProps = ({ deploy: { isLoading, ongoingDeployments, services, environments } }) => ({
   isLoading,
   ongoingDeployments,
   services,
-  environment,
+  environments,
 });
 
 export const OngoingDeployment = connect(
