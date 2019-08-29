@@ -1,0 +1,19 @@
+.deploymentMessage{
+    min-width: 25%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.environmentId{
+    min-width: 15%;
+}
+
+.status, .actions, .groupName{
+    display: flex;
+    justify-content: center;
+}
+
+.status, .groupName{
+    max-width: 7%;
+}
