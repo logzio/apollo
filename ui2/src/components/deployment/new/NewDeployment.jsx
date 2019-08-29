@@ -27,7 +27,7 @@ import './NewDeployment.css';
 
 const NewDeploymentComponent = ({
   match,
-  location,
+  search,
   services,
   environments,
   versions,
@@ -38,7 +38,7 @@ const NewDeploymentComponent = ({
   selectGroups,
   ...props
 }) => {
-  const { service, environment, version, group } = parse(location.search);
+  const { service, environment, version, group } = parse(search);
 
   const getSelected = (selectedFrom, cachedKey, urlParams, setSelected, saveAsObject) => {
     const selectedFromCache = getFromCache(cachedKey);
@@ -64,13 +64,7 @@ const NewDeploymentComponent = ({
       <Route
         path={`${match.url}/service`}
         render={({ match }) => (
-          <SelectService
-            match={match}
-            location={location}
-            services={services}
-            selectServices={selectServices}
-            {...props}
-          />
+          <SelectService match={match} search={search} services={services} selectServices={selectServices} {...props} />
         )}
       />
       <Route
@@ -79,7 +73,7 @@ const NewDeploymentComponent = ({
           <SelectEnvironment
             getSelectedServices={getSelectedServices}
             match={match}
-            location={location}
+            search={search}
             services={services}
             environments={environments}
             selectEnvironments={selectEnvironments}
@@ -90,19 +84,13 @@ const NewDeploymentComponent = ({
       <Route
         path={`${match.url}/group`}
         render={({ match }) => (
-          <SelectGroup match={match} location={location} selectGroups={selectGroups} groups={groups} {...props} />
+          <SelectGroup match={match} search={search} selectGroups={selectGroups} groups={groups} {...props} />
         )}
       />
       <Route
         path={`${match.url}/version`}
         render={({ match }) => (
-          <SelectVersion
-            match={match}
-            location={location}
-            selectVersion={selectVersion}
-            versions={versions}
-            {...props}
-          />
+          <SelectVersion match={match} search={search} selectVersion={selectVersion} versions={versions} {...props} />
         )}
       />
       <Route
@@ -110,7 +98,7 @@ const NewDeploymentComponent = ({
         render={({ match }) => (
           <VerifyDeployment
             match={match}
-            location={location}
+            search={search}
             services={services}
             environments={environments}
             getSelectedServices={getSelectedServices}

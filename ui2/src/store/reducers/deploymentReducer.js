@@ -14,9 +14,6 @@ import {
   GET_DEPLOYABLE_VERSION_ID_REQUEST,
   GET_DEPLOYABLE_VERSION_ID_SUCCESS,
   GET_DEPLOYABLE_VERSION_ID_FAILURE,
-  // GET_DEPLOYABLE_VERSION_SHA_REQUEST,
-  // GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
-  // GET_DEPLOYABLE_VERSION_SHA_FAILURE,
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
@@ -26,14 +23,11 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
-  GET_SERVICE_BY_ID_REQUEST,
-  GET_SERVICE_BY_ID_SUCCESS,
-  GET_SERVICE_BY_ID_FAILURE,
-  LOUGOUT,
   SELECT_SERVICES,
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
   SELECT_VERSION,
+  LOUGOUT,
 } from '../actions';
 
 import _ from 'lodash';
@@ -86,28 +80,12 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, environmentsStacks: action.payload, isLoading: false };
     case GET_ENV_STACK_FAILURE:
       return { ...state, isLoading: false };
-    case GET_SERVICE_BY_ID_REQUEST:
-      return { ...state, isLoading: true };
-    case GET_SERVICE_BY_ID_SUCCESS:
-      return {
-        ...state,
-        selectedServices: _.unionWith(state.selectedServices, action.payload, _.isEqual),
-        isLoading: false,
-      };
-    case GET_SERVICE_BY_ID_FAILURE:
-      return { ...state, isLoading: false };
     case GET_DEPLOYABLE_VERSION_ID_REQUEST:
       return { ...state, isLoading: true };
     case GET_DEPLOYABLE_VERSION_ID_SUCCESS:
       return { ...state, versions: action.payload, isLoading: false };
     case GET_DEPLOYABLE_VERSION_ID_FAILURE:
       return { ...state, isLoading: false };
-    // case GET_DEPLOYABLE_VERSION_SHA_REQUEST:
-    //   return { ...state, isLoading: true, versions: null };
-    // case GET_DEPLOYABLE_VERSION_SHA_SUCCESS:
-    //   return { ...state, versions: action.payload, isLoading: false };
-    // case GET_DEPLOYABLE_VERSION_SHA_FAILURE:
-    //   return { ...state, isLoading: false };
     case GET_BRANCH_LATEST_VERSION_REQUEST:
       return { ...state, isLoading: true, versions: null };
     case GET_BRANCH_LATEST_VERSION_SUCCESS:

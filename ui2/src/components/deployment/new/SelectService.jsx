@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { TableTransfer } from '../../../common/TableTransfer';
+import { AppTransfer } from '../../../common/Transfer';
 import { Spinner } from '../../../common/Spinner';
 import { cacheKeys } from '../../../utils/cacheConfig';
 import { removeFromCache } from '../../../utils/cacheService';
@@ -10,14 +10,12 @@ export const SelectService = ({
   handleBreadcrumbs,
   getServicesStacks,
   servicesStacks,
-  resetBreadcrumbs,
   match,
   selectServices,
 }) => {
   useEffect(() => {
     removeFromCache(cacheKeys.DEPLOYABLE_VERSIONS);
-    resetBreadcrumbs();
-    handleBreadcrumbs(`${match.url}`, 'service');
+    handleBreadcrumbs('service');
     getServices();
     getServicesStacks();
   }, []);
@@ -38,7 +36,7 @@ export const SelectService = ({
 
   return (
     <div>
-      <TableTransfer
+      <AppTransfer
         data={services}
         searchColumns={['name']}
         leftColTitles={['name']}

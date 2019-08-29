@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   GET_SERVICES_REQUEST,
   GET_SERVICES_SUCCESS,
@@ -15,9 +14,6 @@ import {
   GET_DEPLOYABLE_VERSION_ID_REQUEST,
   GET_DEPLOYABLE_VERSION_ID_SUCCESS,
   GET_DEPLOYABLE_VERSION_ID_FAILURE,
-  GET_DEPLOYABLE_VERSION_SHA_REQUEST,
-  GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
-  GET_DEPLOYABLE_VERSION_SHA_FAILURE,
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
@@ -27,9 +23,6 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
-  GET_SERVICE_BY_ID_REQUEST,
-  GET_SERVICE_BY_ID_SUCCESS,
-  GET_SERVICE_BY_ID_FAILURE,
   SELECT_SERVICES,
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
@@ -39,7 +32,7 @@ import * as API from '../../api/api';
 import { historyBrowser } from '../../utils/history';
 import { fetchAndStore, setToCache } from '../../utils/cacheService';
 import { cacheKeys } from '../../utils/cacheConfig';
-import { notification, Icon } from 'antd';
+import { appNotification } from '../../common/notification';
 
 export const getServices = () => {
   return async dispatch => {
@@ -121,26 +114,6 @@ export const getEnvironmentsStacks = () => {
   };
 };
 
-// export const getServiceById = serviceId => {
-//   return async dispatch => {
-//     dispatch({
-//       type: GET_SERVICE_BY_ID_REQUEST,
-//     });
-//     try {
-//       const data = await fetchAndStore(`service-${serviceId}`, API.getServiceById, 60 * 6, serviceId);
-//       dispatch({
-//         type: GET_SERVICE_BY_ID_SUCCESS,
-//         payload: data,
-//       });
-//     } catch (error) {
-//       dispatch({
-//         type: GET_SERVICE_BY_ID_FAILURE,
-//         error,
-//       });
-//     }
-//   };
-// };
-
 export const getDeployableVersionsById = servicesId => {
   return async dispatch => {
     dispatch({
@@ -160,26 +133,6 @@ export const getDeployableVersionsById = servicesId => {
     }
   };
 };
-//
-// export const getDeployableVersionBySha = gitCommitSha => {
-//   return async dispatch => {
-//     dispatch({
-//       type: GET_DEPLOYABLE_VERSION_SHA_REQUEST,
-//     });
-//     try {
-//       const data = await API.getDeployableVersionBySha(gitCommitSha);
-//       dispatch({
-//         type: GET_DEPLOYABLE_VERSION_SHA_SUCCESS,
-//         payload: data,
-//       });
-//     } catch (error) {
-//       dispatch({
-//         type: GET_DEPLOYABLE_VERSION_SHA_FAILURE,
-//         error,
-//       });
-//     }
-//   };
-// };
 
 //Supply one of the service deployable versions ID's
 export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
@@ -234,6 +187,7 @@ export const deploy = (
       type: NEW_DEPLOYMENT_REQUEST,
     });
     try {
+      //Temp, so I wouldn't deploy!
       // const data = await API.deploy(
       //   serviceIdsCsv,
       //   environmentIdsCsv,
@@ -241,18 +195,14 @@ export const deploy = (
       //   deploymentMessage,
       //   isEmergencyDeployment,
       // );
-      debugger;
-      notification.open({
-        message: `Commit: ${deployableVersionId} was successfully deployed`,
-        icon: <Icon type="smile" style={{ color: '#108ee9' }} />,
-      });
+      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
       dispatch({
         type: NEW_DEPLOYMENT_SUCCESS,
         // payload: data,
-        payload: 'hi',
+        payload: 'temp',
       });
     } catch (error) {
       dispatch({

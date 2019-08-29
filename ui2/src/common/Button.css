@@ -1,6 +1,10 @@
 .app-btn {
     width: 100%;
 }
+.ant-btn[disabled]{
+    height: 40px;
+}
+
 .table-submit-button{
     width: initial;
     margin: 10px 5px;
@@ -14,6 +18,10 @@
     height: 40px;
     font-weight: bold;
     background-color: #F2F2F2;
+}
+
+.ant-btn:active.table-button, .ant-btn:focus.table-button{
+    background-color: #EAEFF1;
 }
 
 .table-button:hover{

@@ -1,22 +1,13 @@
 import React, { useEffect } from 'react';
-import { TableTransfer } from '../../../common/TableTransfer';
+import { AppTransfer } from '../../../common/Transfer';
 import { Spinner } from '../../../common/Spinner';
 import { parse } from 'query-string';
 
-export const SelectGroup = ({
-  handleBreadcrumbs,
-  resetBreadcrumbs,
-  match,
-  location,
-  getGroups,
-  groups,
-  selectGroups,
-}) => {
-  const { service: serviceId, environment: environmentsId } = parse(location.search);
+export const SelectGroup = ({ handleBreadcrumbs, match, search, getGroups, groups, selectGroups }) => {
+  const { service: serviceId, environment: environmentsId } = parse(search);
 
   useEffect(() => {
-    resetBreadcrumbs();
-    handleBreadcrumbs(`${location.pathname}${location.search}`, 'group');
+    handleBreadcrumbs('group');
     environmentsId.split(',').map(environmentId => getGroups(environmentId, serviceId));
   }, []);
 
@@ -30,14 +21,14 @@ export const SelectGroup = ({
 
   return (
     <div>
-      <TableTransfer
+      <AppTransfer
         data={groups}
         searchColumns={['name', 'scalingFactor', 'jsonParams']}
         leftColTitles={['name', 'scalingFactor', 'jsonParams', 'environmentId']}
         rightColTitles={['name']}
         columnTitles={['Name', 'Scaling Factor', 'Parameters', 'Environment']}
         linkTo={'version'}
-        addSearch={`${location.search}&group`}
+        addSearch={`${search}&group`}
         match={match}
         handleSelection={handleGroupsSelection}
       />

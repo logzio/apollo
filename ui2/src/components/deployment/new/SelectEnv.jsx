@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { TableTransfer } from '../../../common/TableTransfer';
+import { AppTransfer } from '../../../common/Transfer';
 import { Spinner } from '../../../common/Spinner';
 
 export const SelectEnvironment = ({
@@ -9,7 +9,7 @@ export const SelectEnvironment = ({
   environments,
   environmentsStacks,
   match,
-  location,
+  search,
   selectEnvironments,
   getServices,
   services,
@@ -17,7 +17,7 @@ export const SelectEnvironment = ({
   selectedServices,
 }) => {
   useEffect(() => {
-    handleBreadcrumbs(`${location.pathname}${location.search}`, 'environment');
+    handleBreadcrumbs('environment');
     getEnvironments();
     getEnvironmentsStacks();
     getServices();
@@ -49,7 +49,7 @@ export const SelectEnvironment = ({
   }
 
   return (
-    <TableTransfer
+    <AppTransfer
       data={environments}
       searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
       leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
@@ -58,7 +58,7 @@ export const SelectEnvironment = ({
       predefinedGroups={environmentsStacks}
       selectGroup={stackSelection}
       linkTo={isServicePartOfGroup() ? 'group' : 'version'}
-      addSearch={`${location.search}&environment`}
+      addSearch={`${search}&environment`}
       match={match}
       emptyMsg={'Please select environments from the left panel'}
       handleSelection={handleEnvironmentsSelection}

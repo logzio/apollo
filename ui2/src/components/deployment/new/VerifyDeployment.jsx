@@ -9,30 +9,29 @@ import symbol from '../../../assets/images/apollo-symbol.svg';
 import './VerifyDeployment.css';
 
 export const VerifyDeployment = ({
+  search,
   handleBreadcrumbs,
-  resetBreadcrumbs,
-  location,
-  getEnvironments,
-  getServices,
-  environments,
   services,
+  environments,
   groups,
   versions,
+  getServices,
+  getEnvironments,
+  getGroups,
+  getDeployableVersionsById,
   getSelectedServices,
-  selectedServices,
   getSelectedEnv,
+  getSelectedVersion,
+  getSelectedGroups,
+  selectedServices,
   selectedEnvironments,
   selectedVersion,
-  getDeployableVersionsById,
-  getSelectedVersion,
-  getGroups,
   selectedGroups,
-  getSelectedGroups,
   isLoading,
   deploy,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
-  const { service: serviceId, group, environment: environmentsId } = parse(location.search);
+  const { service: serviceId, group, environment: environmentsId } = parse(search);
   const deployItems = [
     { title: 'Services to deploy:', dataSource: selectedServices, isPartOfGroup: false },
     { title: 'Environments to deploy:', dataSource: selectedEnvironments, isPartOfGroup: false },
@@ -40,8 +39,7 @@ export const VerifyDeployment = ({
   ];
 
   useEffect(() => {
-    resetBreadcrumbs();
-    handleBreadcrumbs(`${location.pathname}${location.search}`, 'deployment');
+    handleBreadcrumbs('deployment');
     getEnvironments();
     getServices();
     getDeployableVersionsById(serviceId);
@@ -92,19 +90,19 @@ export const VerifyDeployment = ({
         <Col span={5} offset={1}>
           <AppCard title={'Version to deploy: '}>
             <div className="card-details">
+              <div className={'extra-small-title'}>Author:</div>
+              <div className="card-user-profile">
+                <img className="card-user-image" src={selectedVersion.committerAvatarUrl} alt={'user profile'} />
+                <div className="card-user-title">{selectedVersion.committerName}</div>
+              </div>
+            </div>
+            <div className="card-details">
               <div className={'extra-small-title'}>Commit: </div>
               {selectedVersion.gitCommitSha}
             </div>
             <div className="card-details">
               <div className={'extra-small-title'}>Message:</div>
               {selectedVersion.commitMessage.split('*').shift()}
-            </div>
-            <div className="card-details">
-              <div className={'extra-small-title'}>Author:</div>
-              <div className="card-user-profile">
-                <img className="card-user-image" src={selectedVersion.committerAvatarUrl} alt={'user profile'} />
-                <div className="card-user-title">{selectedVersion.committerName}</div>
-              </div>
             </div>
           </AppCard>
         </Col>

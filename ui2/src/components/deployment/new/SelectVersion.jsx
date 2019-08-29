@@ -15,16 +15,16 @@ export const SelectVersion = ({
   getDeployableVersionsById,
   getLastCommitFromBranch,
   versions,
-  location,
+  search,
   selectVersion,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const [branchName, setBranchName] = useState(null);
   const [selectedVersion, setSelectedVersion] = useState(null);
-  const { service: servicesId } = parse(location.search);
+  const { service: servicesId } = parse(search);
 
   useEffect(() => {
-    handleBreadcrumbs(`${location.pathname}${location.search}`, 'version');
+    handleBreadcrumbs('version');
     getDeployableVersionsById(servicesId);
   }, []);
 
@@ -50,7 +50,7 @@ export const SelectVersion = ({
     selectVersion(selectedVersion);
     historyBrowser.push({
       pathname: 'verification',
-      search: `${location.search}&version=${selectedVersion.key}`,
+      search: `${search}&version=${selectedVersion.key}`,
     });
   };
 

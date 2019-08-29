@@ -6,6 +6,7 @@ export const transferTableColumns = (dataCategories, columnTitles) =>
     title: columnTitles[index],
   }));
 
+//Changed in future version
 export const tableColumns = (dataCategories, columnTitles, imgIndex) =>
   dataCategories.map((dataCategory, index) => ({
     dataIndex: dataCategory,
