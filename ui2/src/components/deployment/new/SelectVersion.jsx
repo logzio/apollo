@@ -131,7 +131,7 @@ export const SelectVersion = ({
           3,
         )}
         data={formattedData}
-        scroll={{ y: 750 }}
+        scroll={{ y: 690 }}
         showSearch={true}
         searchColumns={['commitDate', 'gitCommitSha', 'commitMessage', 'commitAuthor']}
         handleRowSelection={handleRowSelection}

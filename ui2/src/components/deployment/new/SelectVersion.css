@@ -8,3 +8,16 @@
 th.ant-table-selection-column{
     visibility: hidden;
 }
+
+/*.status, .actions{*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*}*/
+
+.shortendCommitSha, .commitDate, .commitAuthor{
+    max-width: 13%;
+}
+
+.commitAuthor{
+    max-width: 20%;
+}
