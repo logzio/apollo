@@ -42,6 +42,7 @@ import {
   GET_ONGOING_DEPLOYMENT_REQUEST,
   GET_ONGOING_DEPLOYMENT_SUCCESS,
 } from './index';
+import { ongoing } from './mock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -272,6 +273,7 @@ export const getOngoingDeployments = () => {
       dispatch({
         type: GET_ONGOING_DEPLOYMENT_SUCCESS,
         payload: data,
+        // payload: ongoing,
       });
     } catch (error) {
       dispatch({
