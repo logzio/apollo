@@ -28,6 +28,7 @@ export const AppTableTransfer = ({
   const [selectedButton, toggleSelectedButton] = useState(false);
   const leftPanel = direction === 'left';
   const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
+  // const scroll = leftPanel ? { x: 900, y: 430 } : { x: 400, y: 430 };
 
   const columns = leftPanel
     ? transferTableColumns(leftColTitles, columnTitles)
