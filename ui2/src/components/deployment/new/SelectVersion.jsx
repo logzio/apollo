@@ -5,9 +5,9 @@ import { AppInput } from '../../../common/FormFields';
 import { AppButton } from '../../../common/Button';
 import { Spinner } from '../../../common/Spinner';
 import { tableColumns } from '../../../utils/tableColumns';
-import moment from 'moment';
 import { parse } from 'query-string';
 import { historyBrowser } from '../../../utils/history';
+import moment from 'moment';
 import './SelectVersion.css';
 
 export const SelectVersion = ({
@@ -132,6 +132,7 @@ export const SelectVersion = ({
         )}
         data={formattedData}
         scroll={{ y: 690 }}
+        // scroll={{ y: 540 }}
         showSearch={true}
         searchColumns={['commitDate', 'gitCommitSha', 'commitMessage', 'commitAuthor']}
         handleRowSelection={handleRowSelection}

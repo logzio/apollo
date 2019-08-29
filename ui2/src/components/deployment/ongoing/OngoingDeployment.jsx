@@ -64,7 +64,7 @@ const OngoingDeploymentComponent = ({
         ],
       )}
       data={formattedData}
-      scroll={{ y: 650 }}
+      scroll={{ y: 650 }} //600
       showSearch={true}
       searchColumns={['lastUpdate', 'serviceId', 'environmentId', 'groupName', 'userEmail', 'status']}
       showSelection={false}
