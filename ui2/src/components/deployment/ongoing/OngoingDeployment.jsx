@@ -17,7 +17,7 @@ const OngoingDeploymentComponent = ({
   handleBreadcrumbs,
 }) => {
   useEffect(() => {
-    // handleBreadcrumbs(``, 'ongoing'); //TODO
+    handleBreadcrumbs('ongoing');
     getServices();
     getEnvironments();
     getOngoingDeployments();
