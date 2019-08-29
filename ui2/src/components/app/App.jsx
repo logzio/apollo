@@ -9,6 +9,7 @@ import { Layout } from 'antd';
 import { Navbar } from './Navbar';
 import { getAuthToken } from '../../api/api';
 import { NewDeployment } from '../deployment/new/NewDeployment';
+import { OngoingDeployment } from '../deployment/ongoing/OngoingDeployment';
 import { Container } from './Container';
 import './App.css';
 
@@ -45,7 +46,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
             <Switch>
               {isAdmin && <AppRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
               <AppRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
-              <AppRoute path="/deployment/ongoing" title={'Ongoing deployment'} component={Signup} />
+              <AppRoute path="/deployment/ongoing" title={'Ongoing deployment'} component={OngoingDeployment} />
               {!isAuthenticate && <Route path="/auth/login" component={Login} />}
               {isAuthenticate ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
             </Switch>
