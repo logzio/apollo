@@ -1,3 +1,8 @@
+import * as API from '../../api/api';
+import { historyBrowser } from '../../utils/history';
+import { fetchAndStore, setToCache } from '../../utils/cacheService';
+import { cacheKeys } from '../../utils/cacheConfig';
+import { appNotification } from '../../common/notification';
 import {
   GET_SERVICES_REQUEST,
   GET_SERVICES_SUCCESS,
@@ -30,12 +35,16 @@ import {
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
   SELECT_VERSION,
-} from '../actions';
-import * as API from '../../api/api';
-import { historyBrowser } from '../../utils/history';
-import { fetchAndStore, setToCache } from '../../utils/cacheService';
-import { cacheKeys } from '../../utils/cacheConfig';
-import { appNotification } from '../../common/notification';
+  GET_LATEST_GROUP_POD_FAILURE,
+  GET_LATEST_GROUP_POD_REQUEST,
+  GET_LATEST_GROUP_POD_SUCCESS,
+  GET_LATEST_POD_FAILURE,
+  GET_LATEST_POD_REQUEST,
+  GET_LATEST_POD_SUCCESS,
+  GET_ONGOING_DEPLOYMENT_FAILURE,
+  GET_ONGOING_DEPLOYMENT_REQUEST,
+  GET_ONGOING_DEPLOYMENT_SUCCESS,
+} from './index';
 
 export const getServices = () => {
   return async dispatch => {
@@ -293,5 +302,65 @@ export const selectVersion = version => {
       type: SELECT_VERSION,
       payload: version,
     });
+  };
+};
+
+export const getOngoingDeployments = () => {
+  return async dispatch => {
+    dispatch({
+      type: GET_ONGOING_DEPLOYMENT_REQUEST,
+    });
+    try {
+      const data = await API.getOngoingDeployments();
+      dispatch({
+        type: GET_ONGOING_DEPLOYMENT_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_ONGOING_DEPLOYMENT_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getLatestCreatedPod = (environmentId, serviceId) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_LATEST_POD_REQUEST,
+    });
+    try {
+      const data = await API.getLatestCreatedPod(environmentId, serviceId);
+      dispatch({
+        type: GET_LATEST_POD_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_LATEST_POD_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const getLatestCreatedGroupPod = (environmentId, serviceId, groupName) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_LATEST_GROUP_POD_REQUEST,
+    });
+    try {
+      const data = await API.getLatestCreatedGroupPod(environmentId, serviceId, groupName);
+      dispatch({
+        type: GET_LATEST_GROUP_POD_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_LATEST_GROUP_POD_FAILURE,
+        error,
+      });
+    }
   };
 };
