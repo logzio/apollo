@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "EXTEND_ESLINT=true react-scripts start",
+    "start": "react-scripts start",
+    "start-1": "EXTEND_ESLINT=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -40,6 +41,8 @@
     "react-scripts": "^3.1.1",
     "redux": "^4.0.2",
     "redux-thunk": "^2.3.0",
+    "socket.io": "^2.2.0",
+    "xterm": "^3.14.5",
     "yup": "^0.27.0"
   },
   "devDependencies": {

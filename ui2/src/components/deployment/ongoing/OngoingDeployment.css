@@ -1,8 +1,12 @@
 .deploymentMessage{
-    min-width: 25%;
+    min-width: 22%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.serviceId{
+    max-width: 10%;
 }
 
 .environmentId{
@@ -14,6 +18,16 @@
     justify-content: center;
 }
 
-.status, .groupName{
+.status {
     max-width: 7%;
+}
+
+.groupName{
+    min-width: 15%;
+}
+
+
+.groupName .app-tag{
+    width: 100%;
+    text-align: center;
 }

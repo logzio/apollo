@@ -44,6 +44,9 @@ import {
   GET_ONGOING_DEPLOYMENT_FAILURE,
   GET_ONGOING_DEPLOYMENT_REQUEST,
   GET_ONGOING_DEPLOYMENT_SUCCESS,
+  GET_CONTAINERS_REQUEST,
+  GET_CONTAINERS_FAILURE,
+  GET_CONTAINERS_SUCCESS,
 } from './index';
 import { ongoing } from './mock';
 
@@ -327,20 +330,21 @@ export const getOngoingDeployments = () => {
   };
 };
 
-export const getLatestCreatedPod = (environmentId, serviceId) => {
+export const getContainers = (environmentId, serviceId) => {
   return async dispatch => {
     dispatch({
-      type: GET_LATEST_POD_REQUEST,
+      type: GET_CONTAINERS_REQUEST,
     });
     try {
-      const data = await API.getLatestCreatedPod(environmentId, serviceId);
+      const podName = await API.getLatestCreatedPod(environmentId, serviceId);
+      const data = await API.getContainers(environmentId, podName);
       dispatch({
-        type: GET_LATEST_POD_SUCCESS,
+        type: GET_CONTAINERS_SUCCESS,
         payload: data,
       });
     } catch (error) {
       dispatch({
-        type: GET_LATEST_POD_FAILURE,
+        type: GET_CONTAINERS_FAILURE,
         error,
       });
     }
@@ -366,3 +370,25 @@ export const getLatestCreatedGroupPod = (environmentId, serviceId, groupName) =>
     }
   };
 };
+
+// export const getContainers = (environmentId, podName) => {
+//   debugger
+//   return async dispatch => {
+//     dispatch({
+//       type: GET_CONTAINERS_REQUEST,
+//     });
+//     try {
+//       debugger
+//       const data = await API.getContainers(environmentId, podName);
+//       dispatch({
+//         type: GET_CONTAINERS_SUCCESS,
+//         payload: data,
+//       });
+//     } catch (error) {
+//       dispatch({
+//         type: GET_CONTAINERS_FAILURE,
+//         error,
+//       });
+//     }
+//   };
+// };
