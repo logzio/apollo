@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
+import { Terminal } from 'xterm';
+import { fit } from 'xterm/lib/addons/fit/fit';
+import { attach } from 'xterm/lib/addons/attach/attach';
+import moment from 'moment';
 import {
   getEnvironments,
   getOngoingDeployments,
@@ -10,10 +14,9 @@ import { Spinner } from '../../../common/Spinner';
 import { AppTable } from '../../../common/Table';
 import { AppModal } from '../../../common/Modal';
 import { tableColumns } from '../../../utils/tableColumns';
-import moment from 'moment';
-import { Terminal } from 'xterm';
-import './OngoingDeployment.css';
 import { AppButton } from '../../../common/Button';
+import 'xterm/dist/xterm.css';
+import './OngoingDeployment.css';
 
 const OngoingDeploymentComponent = ({
   getOngoingDeployments,
@@ -25,8 +28,14 @@ const OngoingDeploymentComponent = ({
   handleBreadcrumbs,
   getContainers,
   containers,
+  isLoading,
+  location,
+  ...props
 }) => {
   const [showModal, toggleShowModal] = useState(false);
+  const [terminal, setTerminal] = useState(null);
+  const [websocket, setWebsocket] = useState(null);
+  const [terminalRef, setTerminalRef] = useState(React.createRef());
   useEffect(() => {
     handleBreadcrumbs('ongoing');
     getServices();
@@ -61,9 +70,9 @@ const OngoingDeploymentComponent = ({
       };
     });
 
-  const handleViewLogsAction = async (environmentId, serviceId) => {
+  const handleViewLogsAction = (environmentId, serviceId) => {
     toggleShowModal(true);
-    await getContainers(environmentId, serviceId);
+    getContainers(environmentId, serviceId);
   };
 
   const columns = tableColumns(
@@ -72,15 +81,69 @@ const OngoingDeploymentComponent = ({
     [{ title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction }, { title: 'Revert', color: '#BD656A' }],
   );
 
+  const startLogsWebsocket = () => {
+    const terminal = new Terminal({
+      convertEol: true,
+      fontFamily: `'Fira Mono', monospace`,
+      fontSize: 15,
+      rendererType: 'dom', // default is canvas
+    });
+    terminal.setOption('theme', {
+      background: '#030405',
+      foreground: '#fcfcfc',
+    });
+
+    // fit(terminal);
+    // debugger;
+    // const execUrl = location.protocol === "https:" ? `wss://${location.host}/ws/` : `ws://${location.host}/ws/`,
+    // const execUrl = `ws://${location.host}/ws/exec/pod/${podName}/container/${containerName}?environment=${environment}&service=${service}`,
+    const execUrl = `ws://${document.location.host}/ws/exec/pod/kibana-6-5467c75db7-6zq47/container/kibana-6-node?environment=2`;
+    const webSocket = new WebSocket(execUrl);
+    // const test = webSocket.readyState;
+    terminal.writeln('Opening web socket, wait a sec!');
+
+    webSocket.onopen = (webSocket, e) => {
+      debugger;
+      console.log(e.data);
+      attach(terminal, webSocket, true, false);
+    };
+    webSocket.onmessage = e => {
+      debugger;
+      console.log(e.data);
+      attach(terminal, webSocket, true, false);
+    };
+    webSocket.onerror = e => {
+      debugger;
+      console.log('error');
+    };
+    terminal.open(terminalRef.current);
+    attach(terminal, webSocket, true, false);
+  };
+
   if (!ongoingDeployments || !services || !environments) {
     return <Spinner />;
   }
 
   return (
     <div>
+      <button onClick={() => startLogsWebsocket()}>test</button>
       <AppModal visible={showModal} toggleModal={toggleShowModal} title="View Logs">
-        <div>{containers ? containers : <Spinner/>}</div>
+        {containers ? (
+          containers.map((container, index) => (
+            <AppButton
+              key={index}
+              type="primary"
+              isLoading={isLoading}
+              label={container}
+              className="modal-btn"
+              onClick={() => startLogsWebsocket()}
+            />
+          ))
+        ) : (
+          <Spinner />
+        )}
       </AppModal>
+      <div ref={terminalRef} className={'test'} />
       <AppTable
         columns={columns}
         data={formattedData}
