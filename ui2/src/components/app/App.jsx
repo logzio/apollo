@@ -13,7 +13,7 @@ import { OngoingDeployment } from '../deployment/ongoing/OngoingDeployment';
 import { Container } from './Container';
 import './App.css';
 
-const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
+const AppComponent = ({ appInit, logout, isAdmin }) => {
   useEffect(() => {
     appInit();
   }, []);
