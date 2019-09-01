@@ -4,18 +4,18 @@ import { Link } from 'react-router-dom';
 import { parseSearchUrl } from '../../utils/parse';
 import './Container.css';
 
-export const Container = ({ title, component: Component, match, location: { search, pathname }, ...props }) => {
+export const Container = ({ title, component: Component, match, location, ...props }) => {
   const breadcrumbHomePath = [{ path: '/home', title: 'Home' }];
   const [breadcrumbs, setBreadcrumbs] = useState(breadcrumbHomePath);
 
   const handleBreadcrumbs = title => {
-    const path = `${pathname}${search}`;
+    const path = `${location.pathname}${location.search}`;
     let prevBreadcrumbs = null;
-    if (search.length) {
+    if (location.search.length) {
       const searchTitles = parseSearchUrl(path);
       prevBreadcrumbs = searchTitles.map((searchTitle, index) => {
         const currentPath = `${match.url}/${searchTitle}`;
-        const searchParamas = search.split(`&${searchTitle}`).shift();
+        const searchParamas = location.search.split(`&${searchTitle}`).shift();
         return {
           path: searchTitles[index - 1] ? `${currentPath}${searchParamas}` : `${currentPath}`,
           title: searchTitle,
@@ -55,7 +55,8 @@ export const Container = ({ title, component: Component, match, location: { sear
           handleBreadcrumbs={handleBreadcrumbs}
           resetBreadcrumbs={resetBreadcrumbs}
           match={match}
-          search={search}
+          search={location.search}
+          location={location}
           {...props}
         />
       </div>
