@@ -59,8 +59,6 @@ angular.module('apollo')
                         }
                     });
                 } else if ($scope.selectedService !== null && $scope.selectedEnvironment !== null) { //selected environment and service
-
-
                        function handleError(error) {
                            growl.error(errorMessage, {ttl:7000});
                            reject(null);

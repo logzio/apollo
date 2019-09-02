@@ -13,7 +13,7 @@ function ApiService($q, $http){
     };
 
      var getAllServicesStacks = function() {
-        return $http.get(CONFIG.appUrl + 'servicesMock-stack');
+        return $http.get(CONFIG.appUrl + 'services-stack');
      };
 
     var getAllUsers = function() {
