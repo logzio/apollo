@@ -336,11 +336,11 @@ export const getContainers = (environmentId, serviceId) => {
       type: GET_CONTAINERS_REQUEST,
     });
     try {
-      const podName = await API.getLatestCreatedPod(environmentId, serviceId);
-      const data = await API.getContainers(environmentId, podName);
+      const lastCreatedPod = await API.getLatestCreatedPod(environmentId, serviceId);
+      const containers = await API.getContainers(environmentId, lastCreatedPod);
       dispatch({
         type: GET_CONTAINERS_SUCCESS,
-        payload: data,
+        payload: { containers, lastCreatedPod },
       });
     } catch (error) {
       dispatch({

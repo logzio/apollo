@@ -15,6 +15,7 @@ import { AppTable } from '../../../common/Table';
 import { AppModal } from '../../../common/Modal';
 import { tableColumns } from '../../../utils/tableColumns';
 import { AppButton } from '../../../common/Button';
+import { wsUrl } from '../../../api/api';
 import 'xterm/dist/xterm.css';
 import './OngoingDeployment.css';
 
@@ -30,10 +31,13 @@ const OngoingDeploymentComponent = ({
   containers,
   isLoading,
   location,
+  lastCreatedPod,
   ...props
 }) => {
   const [showModal, toggleShowModal] = useState(false);
-  const [terminal, setTerminal] = useState(null);
+  const [showTerminal, toggleShowTerminal] = useState(false);
+  const [environmentId, setEnvironmentId] = useState(null);
+  const [terminal, IdsetTerminal] = useState(null);
   const [websocket, setWebsocket] = useState(null);
   const [terminalRef, setTerminalRef] = useState(React.createRef());
   useEffect(() => {
@@ -72,6 +76,7 @@ const OngoingDeploymentComponent = ({
 
   const handleViewLogsAction = (environmentId, serviceId) => {
     toggleShowModal(true);
+    setEnvironmentId(environmentId);
     getContainers(environmentId, serviceId);
   };
 
@@ -81,43 +86,23 @@ const OngoingDeploymentComponent = ({
     [{ title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction }, { title: 'Revert', color: '#BD656A' }],
   );
 
-  const startLogsWebsocket = () => {
-    const terminal = new Terminal({
-      convertEol: true,
-      fontFamily: `'Fira Mono', monospace`,
-      fontSize: 15,
-      rendererType: 'dom', // default is canvas
-    });
-    terminal.setOption('theme', {
-      background: '#030405',
-      foreground: '#fcfcfc',
-    });
-
-    // fit(terminal);
-    // debugger;
-    // const execUrl = location.protocol === "https:" ? `wss://${location.host}/ws/` : `ws://${location.host}/ws/`,
-    // const execUrl = `ws://${location.host}/ws/exec/pod/${podName}/container/${containerName}?environment=${environment}&service=${service}`,
-    const execUrl = `ws://${document.location.host}/ws/exec/pod/kibana-6-5467c75db7-6zq47/container/kibana-6-node?environment=2`;
+  const startLogsWebsocket = container => {
+    const terminal = new Terminal();
+    terminal.open(terminalRef.current);
+    fit(terminal);
+    const execUrl = `${wsUrl}/logs/pod/${lastCreatedPod}/container/${container}?environment=${environmentId}`;
     const webSocket = new WebSocket(execUrl);
-    // const test = webSocket.readyState;
     terminal.writeln('Opening web socket, wait a sec!');
 
-    webSocket.onopen = (webSocket, e) => {
-      debugger;
-      console.log(e.data);
-      attach(terminal, webSocket, true, false);
-    };
-    webSocket.onmessage = e => {
+    webSocket.onopen = e => {
       debugger;
       console.log(e.data);
       attach(terminal, webSocket, true, false);
     };
     webSocket.onerror = e => {
       debugger;
-      console.log('error');
+      console.log(e);
     };
-    terminal.open(terminalRef.current);
-    attach(terminal, webSocket, true, false);
   };
 
   if (!ongoingDeployments || !services || !environments) {
@@ -126,24 +111,38 @@ const OngoingDeploymentComponent = ({
 
   return (
     <div>
-      <button onClick={() => startLogsWebsocket()}>test</button>
-      <AppModal visible={showModal} toggleModal={toggleShowModal} title="View Logs">
-        {containers ? (
-          containers.map((container, index) => (
-            <AppButton
-              key={index}
-              type="primary"
-              isLoading={isLoading}
-              label={container}
-              className="modal-btn"
-              onClick={() => startLogsWebsocket()}
-            />
-          ))
-        ) : (
-          <Spinner />
-        )}
-      </AppModal>
-      <div ref={terminalRef} className={'test'} />
+      {showModal && (
+        <AppModal
+          visible={true}
+          toggleModal={toggleShowModal}
+          onClose={() => toggleShowTerminal(false)}
+          title="View Logs"
+          width={1000}
+        >
+          {containers ? (
+            containers.map((container, index) => (
+              <div key={index} className={`${showTerminal ? 'modal-content-term' : ''}`}>
+                {!showTerminal && (
+                  <AppButton
+                    key={index}
+                    type="primary"
+                    isLoading={isLoading}
+                    label={container}
+                    className={'modal-btn'}
+                    onClick={async () => {
+                      await toggleShowTerminal(true);
+                      startLogsWebsocket(container);
+                    }}
+                  />
+                )}
+                {showTerminal && <div ref={terminalRef} />}
+              </div>
+            ))
+          ) : (
+            <Spinner />
+          )}
+        </AppModal>
+      )}
       <AppTable
         columns={columns}
         data={formattedData}

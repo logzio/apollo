@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { logout } from '../store/actions/authActions';
 const baseUrl = 'http://localhost:8081';
+export const wsUrl = `${document.location.protocol === 'https:' ? 'wss' : 'ws'}://${document.location.host}/ws`;
 export const AUTH_TOKEN = 'token';
 
 export const fetchData = async (endPoint, customError) => {
@@ -54,7 +55,7 @@ export const appLogout = () => {
   localStorage.removeItem(AUTH_TOKEN);
 };
 
-/***********    DEPLOYMENT API:   ***************/
+/***********    NEW DEPLOYMENT API:   ***************/
 export const getServices = async () => await fetchData('service/');
 export const getServicesStacks = async () => await fetchData('services-stack/');
 export const getEnvironments = async () => await fetchData('environment/');
@@ -122,6 +123,7 @@ export const deployGroup = async (
   }
 };
 
+/***********    ONGOING DEPLOYMENT API:   ***************/
 export const getOngoingDeployments = async () => await fetchData('running-and-just-finished-deployments');
 export const getLatestCreatedPod = async (environmentId, serviceId) =>
   await fetchData(`status/environment/${environmentId}/service/${serviceId}/latestpod`);

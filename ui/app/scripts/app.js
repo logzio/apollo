@@ -121,7 +121,7 @@ angular
             return $ocLazyLoad.load({
               name:'apollo',
               files:[
-              'scripts/servicesMock/apolloApiService.js',
+              'scripts/services/apolloApiService.js',
               'scripts/controllers/newDeploymentCtrl.js'
               ]
             })
@@ -137,7 +137,7 @@ angular
                     return $ocLazyLoad.load({
                       name:'apollo',
                       files:[
-                      'scripts/servicesMock/apolloApiService.js',
+                      'scripts/services/apolloApiService.js',
                       'scripts/controllers/ongoingDeploymentCtrl.js'
                       ]
                     })
@@ -156,7 +156,7 @@ angular
                         return $ocLazyLoad.load({
                           name:'apollo',
                           files:[
-                          'scripts/servicesMock/apolloApiService.js',
+                          'scripts/services/apolloApiService.js',
                           'scripts/controllers/deploymentHistoryCtrl.js'
                           ]
                         })
@@ -224,7 +224,7 @@ angular
                         return $ocLazyLoad.load({
                           name:'apollo',
                           files:[
-                          'scripts/servicesMock/apolloApiService.js',
+                          'scripts/services/apolloApiService.js',
                           'scripts/controllers/serviceVersionStatusCtrl.js'
                           ]
                         })
@@ -240,7 +240,7 @@ angular
                   return $ocLazyLoad.load({
                       name:'apollo',
                       files:[
-                          'scripts/servicesMock/apolloApiService.js',
+                          'scripts/services/apolloApiService.js',
                           'scripts/controllers/configureServiceCtrl.js'
                       ]
                   })
@@ -308,7 +308,7 @@ angular
                         return $ocLazyLoad.load({
                           name:'apollo',
                           files:[
-                          'scripts/servicesMock/apolloApiService.js',
+                          'scripts/services/apolloApiService.js',
                           'scripts/controllers/blockersCtrl.js'
                           ]
                         })
@@ -376,7 +376,7 @@ angular
                             return $ocLazyLoad.load({
                               name:'apollo',
                               files:[
-                              'scripts/servicesMock/apolloApiService.js',
+                              'scripts/services/apolloApiService.js',
                               'scripts/controllers/groupsCtrl.js'
                               ]
                             })
@@ -443,7 +443,7 @@ angular
                             return $ocLazyLoad.load({
                               name:'apollo',
                               files:[
-                              'scripts/servicesMock/apolloApiService.js',
+                              'scripts/services/apolloApiService.js',
                               'scripts/controllers/signupCtrl.js'
                               ]
                             })
@@ -459,7 +459,7 @@ angular
                     return $ocLazyLoad.load({
                       name:'apollo',
                       files:[
-                      'scripts/servicesMock/apolloApiService.js',
+                      'scripts/services/apolloApiService.js',
                       'scripts/controllers/loginCtrl.js'
                       ]
                     })

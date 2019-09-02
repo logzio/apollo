@@ -61,6 +61,7 @@ const initialState = {
   newDeployment: null,
   ongoingDeployments: null,
   containers: null,
+  lastCreatedPod: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -146,9 +147,14 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_LATEST_GROUP_POD_FAILURE:
       return { ...state, isLoading: false };
     case GET_CONTAINERS_REQUEST:
-      return { ...state, isLoading: true };
+      return { ...state, isLoading: true, containers: null, lastCreatedPod: null };
     case GET_CONTAINERS_SUCCESS:
-      return { ...state, containers: action.payload, isLoading: false };
+      return {
+        ...state,
+        containers: action.payload.containers,
+        lastCreatedPod: action.payload.lastCreatedPod,
+        isLoading: false,
+      };
     case GET_CONTAINERS_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
