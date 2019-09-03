@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Terminal } from 'xterm';
-import { fit } from 'xterm/lib/addons/fit/fit';
-import { attach } from 'xterm/lib/addons/attach/attach';
 import moment from 'moment';
 import {
   getEnvironments,
@@ -12,11 +9,8 @@ import {
 } from '../../../store/actions/deploymentActions';
 import { Spinner } from '../../../common/Spinner';
 import { AppTable } from '../../../common/Table';
-import { AppModal } from '../../../common/Modal';
 import { tableColumns } from '../../../utils/tableColumns';
-import { AppButton } from '../../../common/Button';
-import { wsUrl } from '../../../api/api';
-import 'xterm/dist/xterm.css';
+import { LiveLogsView } from './LiveLogsView';
 import './OngoingDeployment.css';
 
 const OngoingDeploymentComponent = ({
@@ -30,21 +24,21 @@ const OngoingDeploymentComponent = ({
   getContainers,
   containers,
   isLoading,
-  location,
   lastCreatedPod,
-  ...props
 }) => {
   const [showModal, toggleShowModal] = useState(false);
-  const [showTerminal, toggleShowTerminal] = useState(false);
   const [environmentId, setEnvironmentId] = useState(null);
-  const [terminal, IdsetTerminal] = useState(null);
-  const [websocket, setWebsocket] = useState(null);
-  const [terminalRef, setTerminalRef] = useState(React.createRef());
+
   useEffect(() => {
     handleBreadcrumbs('ongoing');
     getServices();
     getEnvironments();
-    getOngoingDeployments();
+
+    const intervalId = setInterval(() => {
+      getOngoingDeployments();
+    }, 1000 * 10);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const findNameById = (itemId, itemsList) => {
@@ -86,25 +80,6 @@ const OngoingDeploymentComponent = ({
     [{ title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction }, { title: 'Revert', color: '#BD656A' }],
   );
 
-  const startLogsWebsocket = container => {
-    const terminal = new Terminal();
-    terminal.open(terminalRef.current);
-    fit(terminal);
-    const execUrl = `${wsUrl}/logs/pod/${lastCreatedPod}/container/${container}?environment=${environmentId}`;
-    const webSocket = new WebSocket(execUrl);
-    terminal.writeln('Opening web socket, wait a sec!');
-
-    webSocket.onopen = e => {
-      debugger;
-      console.log(e.data);
-      attach(terminal, webSocket, true, false);
-    };
-    webSocket.onerror = e => {
-      debugger;
-      console.log(e);
-    };
-  };
-
   if (!ongoingDeployments || !services || !environments) {
     return <Spinner />;
   }
@@ -112,36 +87,13 @@ const OngoingDeploymentComponent = ({
   return (
     <div>
       {showModal && (
-        <AppModal
-          visible={true}
-          toggleModal={toggleShowModal}
-          onClose={() => toggleShowTerminal(false)}
-          title="View Logs"
-          width={1000}
-        >
-          {containers ? (
-            containers.map((container, index) => (
-              <div key={index} className={`${showTerminal ? 'modal-content-term' : ''}`}>
-                {!showTerminal && (
-                  <AppButton
-                    key={index}
-                    type="primary"
-                    isLoading={isLoading}
-                    label={container}
-                    className={'modal-btn'}
-                    onClick={async () => {
-                      await toggleShowTerminal(true);
-                      startLogsWebsocket(container);
-                    }}
-                  />
-                )}
-                {showTerminal && <div ref={terminalRef} />}
-              </div>
-            ))
-          ) : (
-            <Spinner />
-          )}
-        </AppModal>
+        <LiveLogsView
+          toggleShowModal={toggleShowModal}
+          environmentId={environmentId}
+          containers={containers}
+          lastCreatedPod={lastCreatedPod}
+          isLoading={isLoading}
+        />
       )}
       <AppTable
         columns={columns}
