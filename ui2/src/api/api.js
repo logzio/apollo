@@ -99,6 +99,7 @@ export const deploy = async (
   }
 };
 
+<<<<<<< HEAD
 export const deployGroup = async (
   serviceIdsCsv,
   environmentIdsCsv,
@@ -123,6 +124,8 @@ export const deployGroup = async (
   }
 };
 
+=======
+>>>>>>> 865727c066d6a9e9d347d618d2357564d75f8d18
 /***********    ONGOING DEPLOYMENT API:   ***************/
 export const getOngoingDeployments = async () => await fetchData('running-and-just-finished-deployments');
 export const getLatestCreatedPod = async (environmentId, serviceId) =>
