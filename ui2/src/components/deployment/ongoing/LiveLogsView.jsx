@@ -8,7 +8,7 @@ import { AppButton } from '../../../common/Button';
 import { wsUrl } from '../../../api/api';
 import 'xterm/dist/xterm.css';
 
-export const LiveLogsView = ({ environmentId, containers, isLoading, lastCreatedPod, toggleShowModal }) => {
+export const LiveLogsView = ({ environmentId, containers, lastCreatedPod, toggleShowModal }) => {
   const [showTerminal, toggleShowTerminal] = useState(false);
   const [terminalTest, setTerminal] = useState(null);
   const [websocketTest, setWebsocket] = useState(null);
@@ -52,7 +52,7 @@ export const LiveLogsView = ({ environmentId, containers, isLoading, lastCreated
         toggleShowTerminal(false);
         closeLiveLogs();
       }}
-      title="View Logs"
+      title={!showTerminal ? 'Select a container to view logs from' : 'Live logs from the latest created container'}
       width={1000}
     >
       {containers ? (
@@ -62,7 +62,6 @@ export const LiveLogsView = ({ environmentId, containers, isLoading, lastCreated
               <AppButton
                 key={index}
                 type="primary"
-                isLoading={isLoading}
                 label={container}
                 className={'modal-btn'}
                 onClick={async () => {

@@ -107,3 +107,12 @@ export const getLatestCreatedGroupPod = async (environmentId, serviceId, groupNa
   await fetchData(`status/environment/${environmentId}/service/${serviceId}/group/${groupName}/latestpod`);
 export const getContainers = async (environmentId, podName) =>
   await fetchData(`status/environment/${environmentId}/pod/${podName}/containers`);
+
+export const revertDeployment = async deploymentId => {
+  try {
+    await axios.delete(`${baseUrl}/deployment/${deploymentId}/`);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

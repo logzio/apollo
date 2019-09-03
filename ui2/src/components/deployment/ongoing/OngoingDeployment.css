@@ -18,8 +18,8 @@
     justify-content: center;
 }
 
-.status {
-    max-width: 7%;
+.status, .actions {
+    min-width: 13%;
 }
 
 .groupName{

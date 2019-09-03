@@ -27,18 +27,18 @@ import {
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
   SELECT_VERSION,
-  GET_LATEST_GROUP_POD_FAILURE,
-  GET_LATEST_GROUP_POD_REQUEST,
-  GET_LATEST_GROUP_POD_SUCCESS,
-  GET_LATEST_POD_FAILURE,
-  GET_LATEST_POD_REQUEST,
-  GET_LATEST_POD_SUCCESS,
   GET_ONGOING_DEPLOYMENT_FAILURE,
   GET_ONGOING_DEPLOYMENT_REQUEST,
   GET_ONGOING_DEPLOYMENT_SUCCESS,
   GET_CONTAINERS_REQUEST,
   GET_CONTAINERS_FAILURE,
   GET_CONTAINERS_SUCCESS,
+  DELETE_DEPLOYMENT_REQUEST,
+  DELETE_DEPLOYMENT_SUCCESS,
+  DELETE_DEPLOYMENT_FAILURE,
+  GET_GROUP_CONTAINERS_REQUEST,
+  GET_GROUP_CONTAINERS_SUCCESS,
+  GET_GROUP_CONTAINERS_FAILURE,
   LOUGOUT,
 } from '../actions';
 
@@ -125,18 +125,6 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, ongoingDeployments: action.payload, isLoading: false };
     case GET_ONGOING_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
-    case GET_LATEST_POD_REQUEST:
-      return { ...state, isLoading: true };
-    case GET_LATEST_POD_SUCCESS:
-      return { ...state, lastCreatedPod: action.payload, isLoading: false };
-    case GET_LATEST_POD_FAILURE:
-      return { ...state, isLoading: false };
-    case GET_LATEST_GROUP_POD_REQUEST:
-      return { ...state, isLoading: true };
-    case GET_LATEST_GROUP_POD_SUCCESS:
-      return { ...state, lastCreatedGroupPod: action.payload, isLoading: false };
-    case GET_LATEST_GROUP_POD_FAILURE:
-      return { ...state, isLoading: false };
     case GET_CONTAINERS_REQUEST:
       return { ...state, isLoading: true, containers: null, lastCreatedPod: null };
     case GET_CONTAINERS_SUCCESS:
@@ -147,6 +135,23 @@ export default function deploymentsReducer(state = initialState, action) {
         isLoading: false,
       };
     case GET_CONTAINERS_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_GROUP_CONTAINERS_REQUEST:
+      return { ...state, isLoading: true, containers: null, lastCreatedPod: null };
+    case GET_GROUP_CONTAINERS_SUCCESS:
+      return {
+        ...state,
+        containers: action.payload.containers,
+        lastCreatedPod: action.payload.lastCreatedPod,
+        isLoading: false,
+      };
+    case GET_GROUP_CONTAINERS_FAILURE:
+      return { ...state, isLoading: false };
+    case DELETE_DEPLOYMENT_REQUEST:
+      return { ...state, isLoading: true };
+    case DELETE_DEPLOYMENT_SUCCESS:
+      return { ...state, isLoading: false };
+    case DELETE_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;

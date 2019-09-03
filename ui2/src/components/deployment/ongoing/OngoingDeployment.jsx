@@ -6,6 +6,8 @@ import {
   getOngoingDeployments,
   getServices,
   getContainers,
+  getGroupContainers,
+  revertDeployment,
 } from '../../../store/actions/deploymentActions';
 import { Spinner } from '../../../common/Spinner';
 import { AppTable } from '../../../common/Table';
@@ -22,9 +24,10 @@ const OngoingDeploymentComponent = ({
   environments,
   handleBreadcrumbs,
   getContainers,
+  getGroupContainers,
   containers,
-  isLoading,
   lastCreatedPod,
+  revertDeployment,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const [environmentId, setEnvironmentId] = useState(null);
@@ -33,12 +36,13 @@ const OngoingDeploymentComponent = ({
     handleBreadcrumbs('ongoing');
     getServices();
     getEnvironments();
+    getOngoingDeployments();
 
-    const intervalId = setInterval(() => {
-      getOngoingDeployments();
-    }, 1000 * 10);
-
-    return () => clearInterval(intervalId);
+    // const intervalId = setInterval(() => {
+    //   getOngoingDeployments();
+    // }, 1000 * 10);
+    //
+    // return () => clearInterval(intervalId);
   }, []);
 
   const findNameById = (itemId, itemsList) => {
@@ -64,20 +68,28 @@ const OngoingDeploymentComponent = ({
         serviceName: findNameById(serviceId, services),
         environmentId: environmentId,
         environmentName: findNameById(environmentId, environments),
-        groupName: groupName ? groupName : 'Non',
+        group: groupName ? groupName : 'Non',
+        groupName: groupName,
       };
     });
 
-  const handleViewLogsAction = (environmentId, serviceId) => {
+  const handleViewLogsAction = ({ environmentId, serviceId, groupName }) => {
     toggleShowModal(true);
     setEnvironmentId(environmentId);
-    getContainers(environmentId, serviceId);
+    !groupName ? getContainers(environmentId, serviceId) : getGroupContainers(environmentId, serviceId, groupName);
+  };
+
+  const handleRevertDeploymentAction = ({ id }) => {
+    revertDeployment(id);
   };
 
   const columns = tableColumns(
-    ['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'deploymentMessage', 'status', 'actions'],
+    ['lastUpdate', 'serviceName', 'environmentName', 'group', 'userEmail', 'deploymentMessage', 'status', 'actions'],
     ['Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
-    [{ title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction }, { title: 'Revert', color: '#BD656A' }],
+    [
+      { title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction },
+      { title: 'Revert', color: '#BD656A', onClick: handleRevertDeploymentAction },
+    ],
   );
 
   if (!ongoingDeployments || !services || !environments) {
@@ -92,7 +104,6 @@ const OngoingDeploymentComponent = ({
           environmentId={environmentId}
           containers={containers}
           lastCreatedPod={lastCreatedPod}
-          isLoading={isLoading}
         />
       )}
       <AppTable
@@ -106,16 +117,14 @@ const OngoingDeploymentComponent = ({
         rowClassName={({ groupName }) => (groupName ? 'hide-row-expand-icon' : '')} //TODO
         expandableColumn={3}
         expandIconAsCell={false}
-        handleViewLogsAction={handleViewLogsAction}
       />
     </div>
   );
 };
 
 const mapStateToProps = ({
-  deploy: { isLoading, ongoingDeployments, services, environments, lastCreatedPod, lastCreatedGroupPod, containers },
+  deploy: { ongoingDeployments, services, environments, lastCreatedPod, lastCreatedGroupPod, containers },
 }) => ({
-  isLoading,
   ongoingDeployments,
   services,
   environments,
@@ -131,5 +140,7 @@ export const OngoingDeployment = connect(
     getServices,
     getEnvironments,
     getContainers,
+    getGroupContainers,
+    revertDeployment,
   },
 )(OngoingDeploymentComponent);
