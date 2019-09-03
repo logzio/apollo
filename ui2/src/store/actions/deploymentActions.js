@@ -35,20 +35,19 @@ import {
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
   SELECT_VERSION,
-  GET_LATEST_GROUP_POD_FAILURE,
-  GET_LATEST_GROUP_POD_REQUEST,
-  GET_LATEST_GROUP_POD_SUCCESS,
-  GET_LATEST_POD_FAILURE,
-  GET_LATEST_POD_REQUEST,
-  GET_LATEST_POD_SUCCESS,
   GET_ONGOING_DEPLOYMENT_FAILURE,
   GET_ONGOING_DEPLOYMENT_REQUEST,
   GET_ONGOING_DEPLOYMENT_SUCCESS,
   GET_CONTAINERS_REQUEST,
   GET_CONTAINERS_FAILURE,
   GET_CONTAINERS_SUCCESS,
+  DELETE_DEPLOYMENT_REQUEST,
+  DELETE_DEPLOYMENT_SUCCESS,
+  DELETE_DEPLOYMENT_FAILURE,
+  GET_GROUP_CONTAINERS_REQUEST,
+  GET_GROUP_CONTAINERS_SUCCESS,
+  GET_GROUP_CONTAINERS_FAILURE,
 } from './index';
-import { ongoing } from './mock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -204,21 +203,21 @@ export const deploy = (
     });
     try {
       //Temp, so I wouldn't deploy!
-      // const data = await API.deploy(
-      //   serviceIdsCsv,
-      //   environmentIdsCsv,
-      //   deployableVersionId,
-      //   deploymentMessage,
-      //   isEmergencyDeployment,
-      // );
+      const data = await API.deploy(
+        serviceIdsCsv,
+        environmentIdsCsv,
+        deployableVersionId,
+        deploymentMessage,
+        isEmergencyDeployment,
+      );
       appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
       dispatch({
         type: NEW_DEPLOYMENT_SUCCESS,
-        // payload: data,
-        payload: 'temp',
+        payload: data,
+        // payload: 'temp',
       });
     } catch (error) {
       dispatch({
@@ -319,7 +318,6 @@ export const getOngoingDeployments = () => {
       dispatch({
         type: GET_ONGOING_DEPLOYMENT_SUCCESS,
         payload: data,
-        // payload: ongoing,
       });
     } catch (error) {
       dispatch({
@@ -351,44 +349,44 @@ export const getContainers = (environmentId, serviceId) => {
   };
 };
 
-export const getLatestCreatedGroupPod = (environmentId, serviceId, groupName) => {
+export const getGroupContainers = (environmentId, serviceId, groupName) => {
   return async dispatch => {
     dispatch({
-      type: GET_LATEST_GROUP_POD_REQUEST,
+      type: GET_GROUP_CONTAINERS_REQUEST,
     });
     try {
-      const data = await API.getLatestCreatedGroupPod(environmentId, serviceId, groupName);
+      const lastCreatedPod = await API.getLatestCreatedGroupPod(environmentId, serviceId, groupName);
+      const containers = await API.getContainers(environmentId, lastCreatedPod);
       dispatch({
-        type: GET_LATEST_GROUP_POD_SUCCESS,
-        payload: data,
+        type: GET_GROUP_CONTAINERS_SUCCESS,
+        payload: { containers, lastCreatedPod },
       });
     } catch (error) {
       dispatch({
-        type: GET_LATEST_GROUP_POD_FAILURE,
+        type: GET_GROUP_CONTAINERS_FAILURE,
         error,
       });
     }
   };
 };
 
-// export const getContainers = (environmentId, podName) => {
-//   debugger
-//   return async dispatch => {
-//     dispatch({
-//       type: GET_CONTAINERS_REQUEST,
-//     });
-//     try {
-//       debugger
-//       const data = await API.getContainers(environmentId, podName);
-//       dispatch({
-//         type: GET_CONTAINERS_SUCCESS,
-//         payload: data,
-//       });
-//     } catch (error) {
-//       dispatch({
-//         type: GET_CONTAINERS_FAILURE,
-//         error,
-//       });
-//     }
-//   };
-// };
+export const revertDeployment = deploymentId => {
+  return async dispatch => {
+    dispatch({
+      type: DELETE_DEPLOYMENT_REQUEST,
+    });
+    try {
+      await API.revertDeployment(deploymentId);
+      appNotification(`Successfully revert deployment id: ${deploymentId}`);
+      dispatch({
+        type: DELETE_DEPLOYMENT_SUCCESS,
+      });
+    } catch (error) {
+      appNotification(`Could not revert deployment id: ${deploymentId}!`);
+      dispatch({
+        type: DELETE_DEPLOYMENT_FAILURE,
+        error,
+      });
+    }
+  };
+};

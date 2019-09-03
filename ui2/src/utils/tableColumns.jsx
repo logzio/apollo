@@ -3,11 +3,15 @@ import { AppTag } from '../common/Tag';
 
 const getStatusTag = status => {
   switch (status) {
+    case 'PENDING_CANCELLATION':
+      return <AppTag color={'#F18D04'}>{status}</AppTag>;
     case 'PENDING':
-      return <AppTag color={'#0983F6'}>{status}</AppTag>;
+      return <AppTag color={'#F18D04'}>{status}</AppTag>;
     case 'STARTED':
       return <AppTag color={'#0983F6'}>{status}</AppTag>;
     case 'CANCELED':
+      return <AppTag color={'#F60935'}>{status}</AppTag>;
+    case 'CANCELING':
       return <AppTag color={'#F60935'}>{status}</AppTag>;
     case 'DONE':
       return <AppTag color={'#49A446'}>{status}</AppTag>;
@@ -24,27 +28,34 @@ const getGroupTag = group => {
   }
 };
 
-const getActionTags = (tagList, environmentId, serviceId) =>
+const getActionTags = (tagList, { status, ...rest }) =>
   tagList && (
     <div>
-      {tagList.map(({ color, title, onClick }, index) => (
-        <AppTag
-          color={color}
-          key={index}
-          onClick={() => {
-            onClick(environmentId, serviceId);
-          }}
-        >
-          {title}
-        </AppTag>
-      ))}
+      {tagList.map(({ color, title, onClick }, index) => {
+        const isDisabled =
+          (status !== 'DONE' && status !== 'CANCELED' && status !== 'PENDING_CANCELLATION' && title === 'Revert') ||
+          title !== 'Revert'; //Antd table doesn't support disabling of tags
+        return (
+          isDisabled && (
+            <AppTag
+              color={color}
+              key={index}
+              onClick={() => {
+                onClick(rest);
+              }}
+            >
+              {title}
+            </AppTag>
+          )
+        );
+      })}
     </div>
   );
 
 const costumeRender = (dataCategory, index, tagList, record, text) => {
   switch (dataCategory) {
     case 'actions':
-      return getActionTags(tagList, record.environmentId, record.serviceId);
+      return getActionTags(tagList, record);
     case 'status':
       return getStatusTag(record.status);
     case 'groupName':
