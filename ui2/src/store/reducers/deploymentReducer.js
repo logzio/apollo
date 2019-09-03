@@ -23,6 +23,9 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
+  NEW_GROUP_DEPLOYMENT_REQUEST,
+  NEW_GROUP_DEPLOYMENT_SUCCESS,
+  NEW_GROUP_DEPLOYMENT_FAILURE,
   SELECT_SERVICES,
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
@@ -103,6 +106,12 @@ export default function deploymentsReducer(state = initialState, action) {
     case NEW_DEPLOYMENT_SUCCESS:
       return { ...state, newDeployment: action.payload, isLoading: false };
     case NEW_DEPLOYMENT_FAILURE:
+      return { ...state, isLoading: false };
+    case NEW_GROUP_DEPLOYMENT_REQUEST:
+      return { ...state, isLoading: true };
+    case NEW_GROUP_DEPLOYMENT_SUCCESS:
+      return { ...state, newDeployment: action.payload, isLoading: false };
+    case NEW_GROUP_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;

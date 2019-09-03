@@ -97,3 +97,27 @@ export const deploy = async (
     throw error;
   }
 };
+
+export const deployGroup = async (
+  serviceIdsCsv,
+  environmentIdsCsv,
+  deployableVersionId,
+  deploymentMessage,
+  groupIdsCsv,
+  isEmergencyDeployment,
+) => {
+  try {
+    const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
+      serviceIdsCsv: serviceIdsCsv,
+      environmentIdsCsv: environmentIdsCsv,
+      deployableVersionId: deployableVersionId,
+      deploymentMessage: deploymentMessage,
+      groupIdsCsv: groupIdsCsv,
+      isEmergencyDeployment: isEmergencyDeployment,
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

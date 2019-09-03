@@ -14,6 +14,7 @@ import {
   selectGroups,
   selectVersion,
   deploy,
+  deployGroup,
 } from '../../../store/actions/deploymentActions';
 import { SelectService } from './SelectService';
 import { SelectEnvironment } from './SelectEnv';
@@ -159,5 +160,6 @@ export const NewDeployment = connect(
     selectGroups,
     selectVersion,
     deploy,
+    deployGroup,
   },
 )(NewDeploymentComponent);

@@ -29,6 +29,7 @@ export const VerifyDeployment = ({
   selectedGroups,
   isLoading,
   deploy,
+  deployGroup,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const { service: serviceId, group, environment: environmentsId } = parse(search);
@@ -63,13 +64,24 @@ export const VerifyDeployment = ({
   }, [groups]);
 
   const handleDeploy = isEmergencyDeployment => {
-    deploy(
-      selectedServices.map(selectedService => selectedService.id).join(','),
-      selectedEnvironments.map(selectedEnvironment => selectedEnvironment.id).join(','),
-      selectedVersion.id,
-      selectedVersion.commitMessage,
-      isEmergencyDeployment,
-    );
+    if (!selectedGroups.length) {
+      deploy(
+        selectedServices.map(selectedService => selectedService.id).join(','),
+        selectedEnvironments.map(selectedEnvironment => selectedEnvironment.id).join(','),
+        selectedVersion.id,
+        selectedVersion.commitMessage,
+        isEmergencyDeployment,
+      );
+    } else {
+      deployGroup(
+        selectedServices.map(selectedService => selectedService.id).join(','),
+        selectedEnvironments.map(selectedEnvironment => selectedEnvironment.id).join(','),
+        selectedVersion.id,
+        selectedVersion.commitMessage,
+        selectedGroups.map(selectedGroup => selectedGroup.id).join(','),
+        isEmergencyDeployment,
+      );
+    }
   };
 
   if (

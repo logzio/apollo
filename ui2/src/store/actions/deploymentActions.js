@@ -23,6 +23,9 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
+  NEW_GROUP_DEPLOYMENT_REQUEST,
+  NEW_GROUP_DEPLOYMENT_SUCCESS,
+  NEW_GROUP_DEPLOYMENT_FAILURE,
   SELECT_SERVICES,
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
@@ -207,6 +210,46 @@ export const deploy = (
     } catch (error) {
       dispatch({
         type: NEW_DEPLOYMENT_FAILURE,
+        error,
+      });
+    }
+  };
+};
+
+export const deployGroup = (
+  serviceIdsCsv,
+  environmentIdsCsv,
+  deployableVersionId,
+  deploymentMessage,
+  groupIdsCsv,
+  isEmergencyDeployment,
+) => {
+  return async dispatch => {
+    dispatch({
+      type: NEW_GROUP_DEPLOYMENT_REQUEST,
+    });
+    try {
+      //Temp, so I wouldn't deploy!
+      // const data = await API.deployGroup(
+      //   serviceIdsCsv,
+      //   environmentIdsCsv,
+      //   deployableVersionId,
+      //   deploymentMessage,
+      // groupIdsCsv,
+      //   isEmergencyDeployment,
+      // );
+      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
+      historyBrowser.push({
+        pathname: '/deployment/ongoing',
+      });
+      dispatch({
+        type: NEW_GROUP_DEPLOYMENT_SUCCESS,
+        // payload: data,
+        payload: 'temp',
+      });
+    } catch (error) {
+      dispatch({
+        type: NEW_GROUP_DEPLOYMENT_FAILURE,
         error,
       });
     }
