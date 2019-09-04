@@ -1,0 +1,84 @@
+<!doctype html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <title>Apollo</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <!-- build:css(.) styles/vendor.css -->
+        <!-- bower:css -->
+        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="bower_components/metisMenu/dist/metisMenu.min.css">
+        <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css">
+        <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css" type="text/css">
+        <link rel="stylesheet" href="bower_components/angular-growl-v2/build/angular-growl.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="bower_components/angular-hotkeys/build/hotkeys.min.css">
+        <link rel="stylesheet" href="bower_components/codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="bower_components/codemirror/theme/material.css">
+        <link rel="stylesheet" href="bower_components/xterm.js/dist/xterm.css">
+        <link href="resources/dataTables.bootstrap.css" rel="stylesheet">
+        <!-- endbower -->
+        <!-- endbuild -->
+
+        <!-- build:css(.tmp) styles/main.css -->
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/sb-admin-2.css">
+        <link rel="stylesheet" href="styles/timeline.css">
+        <!-- endbuild -->
+
+        <!-- build:js(.) scripts/vendor.js -->
+        <!-- bower:js -->
+        <script src="bower_components/jquery/dist/jquery.min.js"></script>
+        <script type="text/javascript"  src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <script src="bower_components/angular/angular.min.js"></script>
+        <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+        <script src="bower_components/json3/lib/json3.min.js"></script>
+        <script src="bower_components/oclazyload/dist/ocLazyLoad.min.js"></script>
+        <script src="bower_components/angular-loading-bar/build/loading-bar.min.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+        <script src="bower_components/metisMenu/dist/metisMenu.min.js"></script>
+        <script src="bower_components/Chart.js/Chart.min.js"></script>
+        <script src="bower_components/angular-animate/angular-animate.min.js"></script>
+        <script src="bower_components/angular-growl-v2/build/angular-growl.min.js"></script>
+        <script src="bower_components/spin.js/spin.min.js"></script>
+        <script src="bower_components/angular-spinner/angular-spinner.min.js"></script>
+        <script src="bower_components/angular-sanitize/angular-sanitize.min.js"></script>
+        <script src="bower_components/angular-filter/dist/angular-filter.min.js"></script>
+        <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
+        <script src="bower_components/angular-gravatar/build/angular-gravatar.min.js"></script>
+        <script src="bower_components/angular-datatables/dist/angular-datatables.js"></script>
+        <script src="bower_components/angular-hotkeys/build/hotkeys.min.js"></script>
+        <script src="bower_components/codemirror/lib/codemirror.js"></script>
+        <script src="bower_components/codemirror/mode/yaml/yaml.js"></script>
+        <script src="bower_components/angular-ui-codemirror/ui-codemirror.js"></script>
+        <script src="bower_components/xterm.js/dist/xterm.js"></script>
+        <script src="bower_components/xterm.js/dist/addons/attach/attach.js"></script>
+        <script src="bower_components/xterm.js/dist/addons/fit/fit.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+        <script src="resources/datetime-moment.js"></script>
+        <!-- endbower -->
+        <!-- endbuild -->
+
+        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+        <script src="scripts/config.js"></script>
+        <script src="scripts/app.js"></script>
+        <script src="scripts/interceptors/apolloApiInterceptor.js"></script>
+        <script src="scripts/controllers/apolloMainCtrl.js"></script>
+        <script src="js/sb-admin-2.js"></script>
+        <!-- endbuild -->
+
+        <!-- Custom CSS -->
+
+        <!-- Custom Fonts -->
+    </head>
+
+    <body>
+        <div ng-app="apollo" ng-controller="apolloMainCtrl">
+            <div ui-view></div>
+            <div growl></div>
+        </div>
+    </body>
+</html>

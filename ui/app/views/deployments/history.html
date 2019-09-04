@@ -1,0 +1,99 @@
+<div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Deployments History</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="revert-spinner"></span>
+    <div class="col-lg-12 col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading apollo-form-headline">
+                Past & Current Deployments
+            </div>
+            <div class="panel-body">
+                <div class="">
+                    <table class="table table-responsive" datatable="" dt-options="dtOptions" dt-columns="dtColumns" dt-column-defs="dtColumnDefs">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="confirm-revert" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Sure?</h4>
+                </div>
+                <div class="modal-body">
+                    This will revert the current version to that version. <br>
+                    <b>THIS CAN SERIOUSLY BREAK THINGS!</b> <br>
+                    Please, be <b>100% sure</b> that this is what you want to do, <br>
+                    and double check with at least 2 people that this is really, <b>really</b> what you want to do.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="revert()">
+                        I'm 100% sure, and I know it can break everything!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="show-details" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Deployment Details</h4>
+                </div>
+                <div class="modal-body">
+                    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="details-spinner"></span>
+                    <table class="table">
+                        <tr>
+                            <td>Commit Sha</td><td><a target="_blank" href="{{deployableVersion.commitUrl}}">{{deployableVersion.gitCommitSha | limitTo: 7}}</a></td>
+                        </tr>
+                        <tr>
+                            <td>Commit Author</td><td><img class="apollo-committer-image" ng-src="{{deployableVersion.committerAvatarUrl}}">{{deployableVersion.committerName}}</td>
+                        </tr>
+                        <tr>
+                            <td>Commit Message</td><td>{{deployableVersion.commitMessage}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="show-env-status" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Environment Status</h4>
+                </div>
+                <div class="modal-body">
+                    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="details-spinner"></span>
+                    <table class="table" style="table-layout: fixed">
+                        <tr>
+                            <pre>{{ envStatusWithServiceNames | json }}</pre>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

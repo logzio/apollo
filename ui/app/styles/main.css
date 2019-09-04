@@ -1,0 +1,289 @@
+/* Space out content a bit */
+body {
+    padding-bottom: 20px;
+}
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Custom page header */
+.header {
+  border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+  padding-bottom: 19px;
+}
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  font-size: 21px;
+  padding: 14px 24px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 40px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+.nav>li.active>a {
+text-decoration: none;
+background-color: #eee;
+}
+
+.apollo-pic-container {
+    height: 100px;
+    overflow-y: auto;
+}
+
+.apollo-table {
+    margin-bottom: 2px;
+}
+
+.apollo-flow-button {
+
+  margin: 10px 10px 10px 10px;
+  outline: none;
+}
+
+.apollo-delimiter-right {
+    margin-right: 30px;
+    margin-left: 20px;
+}
+
+.apollo-form-control {
+    border-radius: 4px;
+    height: 34px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+}
+
+.apollo-form-headline {
+
+  font-weight: bold;
+}
+
+.apollo-committer-image {
+
+  width: 24px;
+  height: auto;
+  margin: 5px 5px 5px 5px;
+}
+
+.btn:focus {
+
+  outline: none;
+}
+
+.apollo-logs {
+
+  height: 100%;
+  max-height: 70vh;
+}
+
+.apollo-live-session {
+  height: 70vh;
+}
+
+.apollo-clear-filter {
+
+    margin-top: -5px;
+}
+
+.apollo-filter {
+
+    text-align-last:center;
+}
+
+.apollo-version-selector {
+
+    margin: 10px 10px 10px 10px;
+}
+
+#apollo-login-header {
+
+    margin-bottom: 50px;
+}
+
+#apollo-login-button {
+
+    font-size: 15px;
+    padding: 5px 10px;
+}
+
+#page-wrapper {
+
+    overflow: hidden;
+}
+
+.apollo-logo {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+a.navbar-brand {
+  padding: 9px 9px 2px
+}
+
+/* Animation stuff */
+.panel {
+  overflow:hidden;
+}
+
+.animate-switch-container {
+    -webkit-transition: 200ms cubic-bezier(0.600, -0.280, 0.735, 0.045) all;
+    -moz-transition: 200ms cubic-bezier(0.600, -0.280, 0.735, 0.045) all;
+    -ms-transition: 200ms cubic-bezier(0.600, -0.280, 0.735, 0.045) all;
+    -o-transition: 200ms cubic-bezier(0.600, -0.280, 0.735, 0.045) all;
+    transition: 200ms cubic-bezier(0.600, -0.280, 0.735, 0.045) all;
+}
+
+.animate-switch-container.ng-enter {
+  left: 100%;
+  transition-delay: 200ms;
+}
+
+.animate-switch-container.ng-enter-active {
+  left: 0;
+
+}
+
+.animate-switch-container.ng-leave {
+
+  left: 0;
+}
+
+.animate-switch-container.ng-leave-active {
+  left: -100%;
+}
+
+.my-deployment {
+  background-color: rgba(255, 255, 153, 0.25);
+}
+
+.modal-dialog {
+    width: 80%;
+    height: 100%;
+    max-height: 90vh;
+}
+
+.modal-find-commit {
+    width: 700px;
+    margin: 0 auto;
+    margin-top: 60px;
+}
+
+.find-my-commit-input {
+    width: 500px;
+}
+
+.find-my-commit-button {
+    margin-top: 2px;
+}
+
+/* Pretty logs block */
+pre {
+    font-size: 90%;
+    line-height: 1.2em;
+    font-family: "Courier 10 Pitch", Courier, monospace;
+    white-space: pre;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -o-pre-wrap;
+
+    height:1%;
+    width: auto;
+    display: block;
+    clear: both;
+    color: #555555;
+    padding: 1em 1em;
+    margin: auto 40px auto 40px;
+    background: #f4f4f4;
+    border: solid 1px #e1e1e1
+}
+code {
+    font-size: 90%;
+    line-height: 1.2em;
+    font-family: Monaco, Consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+
+    display: inline;
+    color: #555555;
+    padding: 1em 1em;
+    background: #f4f4f4;
+}
+
+table.table.table-hover tbody tr.marked-as-favorite {
+    background-color: #fff5e5;
+}
+
+table.table.table-hover tbody tr.marked-as-favorite:hover {
+    background-color: #eee5d6;
+}
+
+table.table.table-hover tbody tr td .mark-as-favorite-container {
+    color: #f58c02;
+    cursor: pointer;
+}
+
+table.table.table-hover tbody tr td .mark-as-favorite-container:hover {
+    color: #e28102;
+}
+
+table.table.table-hover tbody tr td .mark-as-favorite-container:active {
+    color: #ca7302;
+}
+
+.apollo-form-control-ident-follow-h2 {
+    margin-top: 20px;
+}

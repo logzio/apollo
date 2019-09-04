@@ -1,0 +1,421 @@
+<div>
+    <div class="row">
+        <div class="col-lg-9">
+            <h1 class="page-header">New Deployment</h1>
+        </div>
+    </div>
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="deployment-spinner"></span>
+    <div class="row" ng-switch on="currentStep">
+
+        <!-- Environment chooser div -->
+        <div class="col-lg-12 col-sm-12 animate-switch-container" ng-switch-when="choose-environment">
+            <div class="panel panel-default">
+                <div class="panel-heading apollo-form-headline">
+                    Select environment
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" datatable="ng" dt-options="dtOptions" >
+                            <thead>
+                            <tr>
+                                <th style="display: none;"></th>
+                                <th style="width: 20px"></th>
+                                <th style="width: 20px"></th>
+                                <th>Name</th>
+                                <th>Region</th>
+                                <th>Availability</th>
+                                <th>Kubernetes Master</th>
+                                <th>Type</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="environment in environmentsAndStackForDisplay"
+                                ng-click="toggleSelectedEnvironment(environment)"
+                                ng-dblclick="toggleSelectedEnvironment(environment); handleEnvironmentDbClick()"
+                                ng-class="{ 'active':selectedEnvironmentsAndStacks.indexOf(environment) > -1, 'marked-as-favorite': favoriteEnvironmentsNames.indexOf(environment.name) > -1 }">
+                                <td style="display: none;">
+                                    {{environment.orderId}}
+                                </td>
+                                <td>
+                                    <!--ng-if instead of ng-class for data table order by-->
+                                    <i class="mark-as-favorite-container fa fa-star" ng-if="favoriteEnvironmentsNames.indexOf(environment.name) > -1" ng-click="toggleMarkEnvironmentAsFavorite(environment.name, $event)"></i>
+                                    <i class="mark-as-favorite-container fa fa-star-o" ng-if="favoriteEnvironmentsNames.indexOf(environment.name) === -1" ng-click="toggleMarkEnvironmentAsFavorite(environment.name, $event)"></i>
+                                </td>
+                                <td>
+                                    <input type="checkbox"
+                                           name="selectedEnvironmentsAndStacks[]"
+                                           value="{{environment}}"
+                                           ng-checked="selectedEnvironmentsAndStacks.indexOf(environment) > -1">
+                                </td>
+                                <td>
+                                    <i class="fa fa-clone" aria-hidden="true" style="margin-right: 5px" ng-if="environment.isStack == true" uib-tooltip-html="environmentsInStack[environment.id].join('<br>')"></i>
+                                    {{environment.name}}
+                                </td>
+                                <td>{{environment.geoRegion}}</td>
+                                <td>{{environment.availability}}</td>
+                                <td>{{environment.kubernetesMaster}}</td>
+                                <td>
+                                    {{environment.isStack ? "Stack" : "Environment"}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service chooser div -->
+        <div class="col-lg-12 col-sm-12 animate-switch-container" ng-switch-when="choose-service">
+            <div class="panel panel-default">
+                <div class="panel-heading apollo-form-headline">
+                    Select service
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                            <thead>
+                            <tr>
+                                <th style="display: none;"></th>
+                                <th style="width: 20px"></th>
+                                <th style="width: 20px"></th>
+                                <th>Name</th>
+                                <th>YAMLs</th>
+                                <th>Type</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="service in servicesAndStackForDisplay"
+                                ng-click="toggleSelectedServiceOrStack(service)"
+                                ng-dblclick="toggleSelectedServiceOrStack(service); nextStep()"
+                                ng-class="{ 'active':selectedServicesAndStacks.indexOf(service) > -1, 'marked-as-favorite': favoriteServicesNames.indexOf(service.name) > -1 }">
+                                <td style="display: none;">
+                                    {{service.orderId}}
+                                </td>
+                                <td>
+                                    <!--ng-if instead of ng-class for data table order by-->
+                                    <i class="mark-as-favorite-container fa fa-star" ng-if="favoriteServicesNames.indexOf(service.name) > -1" ng-click="toggleMarkServiceAsFavorite(service.name, $event)"></i>
+                                    <i class="mark-as-favorite-container fa fa-star-o" ng-if="favoriteServicesNames.indexOf(service.name) === -1" ng-click="toggleMarkServiceAsFavorite(service.name, $event)"></i>
+                                </td>
+                                <td>
+                                    <input ng-if="!service.isPartOfGroup"
+                                           type="checkbox"
+                                           name="selectedServices[]"
+                                           value="{{service}}"
+                                           ng-checked="selectedServicesAndStacks.indexOf(service) > -1">
+                                </td>
+                                <td>
+                                    <i class="fa fa-clone" aria-hidden="true" style="margin-right: 5px" ng-if="service.isStack == true" uib-tooltip-html="servicesInStack[service.id].join('<br>')"></i>
+                                    {{service.name}}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" uib-tooltip="See kubernetes deployment YAML"
+                                        data-toggle="modal" data-target="#show-kubernetes-deployment-yaml">
+                                        Deployment
+                                    </button>
+                                    <button type="button" class="btn btn-primary" uib-tooltip="See kubernetes service YAML"
+                                        data-toggle="modal" data-target="#show-kubernetes-service-yaml">
+                                        Service
+                                    </button>
+                                    <button type="button" class="btn btn-primary" uib-tooltip="See kubernetes ingress YAML"
+                                            data-toggle="modal" data-target="#show-kubernetes-ingress-yaml">
+                                        Ingress
+                                    </button>
+                                </td>
+                                <td>
+                                    {{service.isStack ? "Stack" : "Service"}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Groups chooser div -->
+        <div class="col-lg-12 col-sm-12 animate-switch-container" ng-switch-when="choose-groups">
+            <div class="panel panel-default">
+                <div class="panel-heading apollo-form-headline">
+                    Select groups
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>Scaling Factor</th>
+                                <th>Parameters</th>
+                                <th>Environment</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="group in possibleGroups"
+                                ng-click="toggleSelectedGroup(group)"
+                                ng-class="{'active':selectedGroups.contains(group)}">
+                                <td>
+                                    <input type="checkbox"
+                                           name="selectedGroups[]"
+                                           value="{{group}}"
+                                           ng-checked="selectedGroups.indexOf(group) > -1">
+                                </td>
+                                <td>{{group.name}}</td>
+                                <td>{{group.scalingFactor}}</td>
+                                <td>{{group.jsonParams}}</td>
+                                <td>{{possibleEnvironments[group.environmentId].name}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-outline btn-default" ng-click="selectAllGroups()">Select All</button>
+        </div>
+
+        <!-- Version chooser div -->
+        <div class="col-lg-12 col-sm-12 animate-switch-container" ng-switch-when="choose-version">
+            <div class="panel panel-default">
+                <div class="panel-heading apollo-form-headline">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            Select version
+                            <button class="btn btn-outline btn-primary pull-right" data-toggle="modal" data-target="#latest-commit-from-branch">
+                                Deploy latest commit from branch
+                            </button>
+                            <button class="btn btn-outline btn-primary pull-right" data-toggle="modal" style="margin-right:10px" data-target="#find-my-commit">
+                                Find my commit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" datatable="ng" dt-options="dtOptionsDeployableVersion" dt-column-defs="dtColumnDefsDeployableVersion">
+                            <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Commit</th>
+                                <th>Message</th>
+                                <th>Author</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="deployableVersion in allDeployableVersions"
+                                ng-click="setSelectedVersion(deployableVersion)"
+                                ng-dblclick="nextStep()"
+                                ng-class="{'active':deployableVersion.gitCommitSha == versionSelected.gitCommitSha}">
+                                <td>{{deployableVersion.commitDate | date:'dd/MM/yy HH:mm:ss'}}</td>
+                                <td><a target="_blank" href="{{deployableVersion.commitUrl}}">{{deployableVersion.gitCommitSha | limitTo: 7}}</a></td>
+                                <td>{{firstLine(deployableVersion.commitMessage)}}</td>
+                                <td><span><img class="apollo-committer-image" ng-src="{{deployableVersion.committerAvatarUrl}}">{{deployableVersion.committerName}}</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-sm-12 animate-switch-container" ng-switch-when="confirmation">
+
+            <div class="well">
+                <h4>So just making sure</h4>
+                <p>You are going to deploy commit <b>{{versionSelected.gitCommitSha}}</b><br> </p>
+                <p>To services <b>{{serviceNames}}</b><br></p>
+                <div ng-repeat="environment in selectedEnvironments" ng-if="selectedGroups.length > 0">
+                    <br><p>On environment <b>{{environment.name}}</b></p>
+                    <p ng-if="getGroupsNamesPerEnvironment(environment.id).length > 0">On group <b>{{getGroupsNamesPerEnvironment(environment.id)}}</b></p>
+                </div>
+                <div ng-if="selectedGroups.length == 0"><p>On environments <b>{{environmentNames}}</b></p></div>
+                <button class="btn btn-default btn-lg center-block" data-toggle="modal" data-target="#confirm-modal">That is correct</button>
+            </div>
+
+            <div class="modal fade" id="confirm-modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h4 class="modal-title" id="myModalLabel">Fashizle?</h4>
+                        </div>
+                        <div class="modal-body">
+                            Confirm here will actually deploy you commit. <br>
+                            You will be able to revert, but just be sure. <br>
+                            <div ng-if="environmentSelected.requireDeploymentMessage">
+                                <br>
+                                This environment also requires a deployment message! <br>
+                                Please supply that below<br>
+                                <input class="form-control" type="text" ng-model="deploymentMessage.text"
+                                       name="name" placeholder="Your deployment message/ reason / motivational speech"
+                                       autofocus required>
+                            </div>
+                            <br>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button ng-disabled="environmentSelected.requireDeploymentMessage && deploymentMessage.text === undefined" type="button" class="btn btn-primary" data-dismiss="modal" ng-click="deploy()">Just deploy already!</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="pull-right">
+        <button type="button" ng-if="showNextStep" class="btn btn-success btn-circle btn-lg apollo-flow-button" ng-click="handleEnvironmentDbClick()">
+            <i class="fa fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <div class="modal fade" id="show-kubernetes-deployment-yaml" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Kubernetes Deployment YAML</h4>
+                </div>
+                <div class="modal-body">
+                    <pre class="apollo-logs">
+{{serviceSelected.deploymentYaml}}
+                    </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="show-kubernetes-service-yaml" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Kubernetes Service YAML</h4>
+                </div>
+                <div class="modal-body">
+                    <pre class="apollo-logs">
+{{serviceSelected.serviceYaml}}
+                    </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="show-kubernetes-ingress-yaml" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Kubernetes Ingress YAML</h4>
+                </div>
+                <div class="modal-body">
+                    <pre class="apollo-logs">
+{{serviceSelected.ingressYaml}}
+                    </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="latest-commit-from-branch" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Select the branch you want the latest commit from</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-1 col-sm-offset-4">
+                            <button class="btn btn-primary" data-dismiss="modal" ng-click="deployableVersionFromBranch('master')">
+                                <strong>master</strong>
+                            </button>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="pull-left">
+                                <strong class="apollo-delimiter-right">OR</strong>
+                                <input class="apollo-form-control" type="text" placeholder="Branch Name" ng-model="branchName">
+                                <button class="btn btn-circle btn-primary" data-dismiss="modal" ng-click="deployableVersionFromBranch()">
+                                    <strong>OK</strong>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="find-my-commit" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-find-commit">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Enter your commit sha</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-9">
+                            <input class="apollo-form-control find-my-commit-input" type="text" placeholder="Commit sha" ng-model="commitSha">
+                        </div>
+                        <div class="col-sm-2">
+                            <button class="btn btn-circle btn-primary find-my-commit-button" data-dismiss="modal" ng-click="getSuitableDeployableVersionsFromPartialSha(commitSha)">
+                                <strong>OK</strong>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div modal="blockedDeployments" class="modal" id="blocked-deployments" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Some of your deployments were blocked</h4>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-hover" datatable="ng" dt-options="dtOptions">
+                        <thead>
+                            <tr>
+                                <th>Environment</th>
+                                <th>Service</th>
+                                <th>Group</th>
+                                <th>Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="blockedDeployment in blockedDeployments">
+                            <td>{{blockedDeployment.environment}}</td>
+                            <td>{{blockedDeployment.service}}</td>
+                            <td>{{blockedDeployment.group}}</td>
+                            <td>{{blockedDeployment.reason}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-click="closeBlockerModal()" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
