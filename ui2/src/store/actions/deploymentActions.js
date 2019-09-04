@@ -210,7 +210,6 @@ export const deploy = (
         deploymentMessage,
         isEmergencyDeployment,
       );
-<<<<<<< HEAD
       appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
@@ -251,22 +250,14 @@ export const deployGroup = (
       // groupIdsCsv,
       //   isEmergencyDeployment,
       // );
-=======
->>>>>>> 865727c066d6a9e9d347d618d2357564d75f8d18
       appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
       dispatch({
-<<<<<<< HEAD
         type: NEW_GROUP_DEPLOYMENT_SUCCESS,
         // payload: data,
         payload: 'temp',
-=======
-        type: NEW_DEPLOYMENT_SUCCESS,
-        payload: data,
-        // payload: 'temp',
->>>>>>> 865727c066d6a9e9d347d618d2357564d75f8d18
       });
     } catch (error) {
       dispatch({

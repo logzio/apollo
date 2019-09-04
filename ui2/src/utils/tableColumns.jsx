@@ -1,19 +1,20 @@
 import React from 'react';
 import { AppTag } from '../common/Tag';
+import { deploymentStatus, category } from './tableConfig';
 
 const getStatusTag = status => {
   switch (status) {
-    case 'PENDING_CANCELLATION':
+    case deploymentStatus.PENDING_CANCELLATION:
       return <AppTag color={'#F18D04'}>{status}</AppTag>;
-    case 'PENDING':
+    case deploymentStatus.PENDING:
       return <AppTag color={'#F18D04'}>{status}</AppTag>;
-    case 'STARTED':
+    case deploymentStatus.STARTED:
       return <AppTag color={'#0983F6'}>{status}</AppTag>;
-    case 'CANCELED':
+    case deploymentStatus.CANCELED:
       return <AppTag color={'#F60935'}>{status}</AppTag>;
-    case 'CANCELING':
-      return <AppTag color={'#F60935'}>{status}</AppTag>;
-    case 'DONE':
+    case deploymentStatus.CANCELING:
+      return <AppTag color={'#F18D04'}>{status}</AppTag>;
+    case deploymentStatus.DONE:
       return <AppTag color={'#49A446'}>{status}</AppTag>;
     default:
       return <AppTag>{status}</AppTag>;
@@ -32,11 +33,9 @@ const getActionTags = (tagList, { status, ...rest }) =>
   tagList && (
     <div>
       {tagList.map(({ color, title, onClick }, index) => {
-        const isDisabled =
-          (status !== 'DONE' && status !== 'CANCELED' && status !== 'PENDING_CANCELLATION' && title === 'Revert') ||
-          title !== 'Revert'; //Antd table doesn't support disabling of tags
+        const isRevertable = (status === deploymentStatus.STARTED && title === 'Revert') || title !== 'Revert'; //Antd table doesn't support disabling of tags
         return (
-          isDisabled && (
+          isRevertable && (
             <AppTag
               color={color}
               key={index}
@@ -52,26 +51,26 @@ const getActionTags = (tagList, { status, ...rest }) =>
     </div>
   );
 
+const getAuthorProfile = (userProfileUrl, userProfileName) => (
+  <div className="user-profile">
+    <img className="image-table" src={userProfileUrl} alt="user-profile" />
+    <div>{userProfileName}</div>
+  </div>
+);
+
 const costumeRender = (dataCategory, index, tagList, record, text) => {
   switch (dataCategory) {
-    case 'actions':
+    case category.ACTIONS:
       return getActionTags(tagList, record);
-    case 'status':
+    case category.STATUS:
       return getStatusTag(record.status);
-    case 'groupName':
-      return getGroupTag(record.groupName);
+    case category.GROUP:
+      return getGroupTag(record.group);
+    case category.AUTHOR:
+      return getAuthorProfile(record.committerAvatarUrl, record.committerName);
     default:
       return <div>{text}</div>;
   }
-
-  // if (imgIndex === index) {
-  //   return userProfile => (
-  //     <div className="user-profile">
-  //       <img className="image-table" src={userProfile[0]} alt="user-profile" />
-  //       <div>{userProfile[1]}</div>
-  //     </div>
-  //   );
-  // }
 };
 
 export const transferTableColumns = (dataCategories, columnTitles) =>

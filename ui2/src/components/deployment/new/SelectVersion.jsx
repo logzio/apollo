@@ -30,8 +30,7 @@ export const SelectVersion = ({
 
   const formattedData =
     versions &&
-    versions.map(({ commitDate, commitMessage, id, gitCommitSha, committerAvatarUrl, committerName, ...dataItem }) => {
-      const author = [committerAvatarUrl, committerName];
+    versions.map(({ commitDate, commitMessage, id, gitCommitSha, ...dataItem }) => {
       return {
         ...dataItem,
         id: id,
@@ -40,9 +39,6 @@ export const SelectVersion = ({
         shortendCommitSha: gitCommitSha.slice(0, 7),
         gitCommitSha: gitCommitSha,
         commitMessage: commitMessage.split('*').shift(),
-        committerAvatarUrl: committerAvatarUrl,
-        committerName: committerName,
-        commitAuthor: author,
       };
     });
 
@@ -126,7 +122,7 @@ export const SelectVersion = ({
       </AppModal>
       <AppTable
         columns={tableColumns(
-          ['commitDate', 'shortendCommitSha', 'commitMessage', 'commitAuthor'],
+          ['commitDate', 'shortendCommitSha', 'commitMessage', 'author'],
           ['Date', 'Commit', 'Message', 'Author'],
           3,
         )}

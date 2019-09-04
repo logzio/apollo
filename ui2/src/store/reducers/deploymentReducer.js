@@ -122,15 +122,12 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, newDeployment: action.payload, isLoading: false };
     case NEW_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
-<<<<<<< HEAD
     case NEW_GROUP_DEPLOYMENT_REQUEST:
       return { ...state, isLoading: true };
     case NEW_GROUP_DEPLOYMENT_SUCCESS:
       return { ...state, newDeployment: action.payload, isLoading: false };
     case NEW_GROUP_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
-=======
->>>>>>> 865727c066d6a9e9d347d618d2357564d75f8d18
     case GET_ONGOING_DEPLOYMENT_REQUEST:
       return { ...state, isLoading: true };
     case GET_ONGOING_DEPLOYMENT_SUCCESS:
