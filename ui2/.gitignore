@@ -21,3 +21,7 @@ yarn-debug.log*
 yarn-error.log*
 
 yarn.lock
+README.md
+/src/assets/images/apollo-logo.svg
+/src/assets/images/apollo-symbol.svg
+/public/apollo-favicon.ico
