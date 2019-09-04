@@ -48,6 +48,7 @@ import {
   GET_GROUP_CONTAINERS_SUCCESS,
   GET_GROUP_CONTAINERS_FAILURE,
 } from './index';
+import { ongoing as mock } from './mock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -317,7 +318,8 @@ export const getOngoingDeployments = () => {
       const data = await API.getOngoingDeployments();
       dispatch({
         type: GET_ONGOING_DEPLOYMENT_SUCCESS,
-        payload: data,
+        // payload: data,
+        payload: mock,
       });
     } catch (error) {
       dispatch({

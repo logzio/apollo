@@ -114,9 +114,10 @@ const OngoingDeploymentComponent = ({
         searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
         showSelection={false}
         emptyMsg={"There aren't ongoing deployments"}
-        rowClassName={({ groupName }) => (groupName ? 'hide-row-expand-icon' : '')} //TODO
+        rowClassName={({ group }) => (group === 'Non' ? 'hide-row-expand-icon' : '')} //TODO
         expandableColumn={3}
         expandIconAsCell={false}
+        expandable={true}
       />
     </div>
   );

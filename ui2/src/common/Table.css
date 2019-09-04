@@ -45,3 +45,15 @@
     height: 24px;
     margin-right: 10px;
 }
+
+.ant-table-expanded-row{
+    display: flex;
+}
+
+.ant-table-row-expand-icon-cell, .ant-table-expand-icon-th{
+    max-width: 100px;
+}
+
+.hide-row-expand-icon .ant-table-row-expand-icon{
+    display: none;
+}
