@@ -5,30 +5,17 @@
     text-overflow: ellipsis;
 }
 
-.serviceId{
-    max-width: 10%;
+.environmentName{
+    min-width: 20%;
 }
 
-.environmentId{
-    min-width: 15%;
-}
-
-.status, .actions, .groupName{
+.status, .actions, .group{
     display: flex;
     justify-content: center;
 }
 
-.status, .actions {
-    min-width: 13%;
-}
-
-.groupName{
-    min-width: 15%;
-}
-
-
-.groupName .app-tag{
-    width: 100%;
+.group .app-tag{
+    width: 50%;
     text-align: center;
 }
 

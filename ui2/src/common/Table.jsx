@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Empty } from 'antd';
 import { AppSearch } from '../common/Search';
 import './Table.css';
+import { AppSkeleton } from './Skeleton';
 
 export const AppTable = ({
   data,
@@ -49,27 +50,31 @@ export const AppTable = ({
       setExpandableRows([...expandableRows, key]);
     }
   };
-debugger
+
   return (
     <>
       {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
-      <Table
-        className="app-table"
-        dataSource={filteredData}
-        rowSelection={rowSelection}
-        size={'small'}
-        pagination={false}
-        onRow={handleRowSelection}
-        locale={{
-          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
-        }}
-        expandedRowRender={(record, index) => index === 3 && <p style={{ margin: 0 }}>hi</p>}
-        expandIconColumnIndex={expandableColumn ? expandableColumn : null}
-        expandIconAsCell={expandIconAsCell}
-        onExpand={onExpand}
-        rowClassName={rowClassName}
-        {...props}
-      />
+      {!filteredData ? (
+        <AppSkeleton />
+      ) : (
+        <Table
+          className="app-table"
+          dataSource={filteredData}
+          rowSelection={rowSelection}
+          size={'small'}
+          pagination={false}
+          onRow={handleRowSelection}
+          locale={{
+            emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
+          }}
+          // expandedRowRender={(record, index) => index === 3 && <p style={{ margin: 0 }}>hi</p>}
+          // expandIconColumnIndex={expandableColumn ? expandableColumn : null}
+          // expandIconAsCell={expandIconAsCell}
+          // onExpand={onExpand}
+          // rowClassName={rowClassName}
+          {...props}
+        />
+      )}
     </>
   );
 };

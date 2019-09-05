@@ -75,9 +75,6 @@ export const SelectVersion = ({
     type: 'radio',
   };
 
-  if (!versions) {
-    return <Spinner />;
-  }
   return (
     <>
       <div className="header">

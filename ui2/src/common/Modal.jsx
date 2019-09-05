@@ -7,7 +7,7 @@ export const AppModal = ({ children, toggleModal, okDisabled, onClose, ...props 
     <Modal
       onCancel={() => {
         toggleModal(false);
-        onClose();
+        onClose && onClose();
       }}
       okButtonProps={{ disabled: okDisabled }}
       {...props}

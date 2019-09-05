@@ -10,7 +10,8 @@ export const deploymentStatus = {
 export const category = {
   ACTIONS: 'actions',
   STATUS: 'status',
-  GROUP: 'group',
+  GROUP: 'Group status',
   AUTHOR: 'author',
   REVERT: 'Revert',
+  LOGS: 'View logs',
 };

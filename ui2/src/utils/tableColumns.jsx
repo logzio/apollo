@@ -21,35 +21,44 @@ const getStatusTag = status => {
   }
 };
 
-const getGroupTag = group => {
-  if (group === 'Non') {
-    return <div>Non</div>;
-  } else {
-    return <AppTag tooltipText={group}>{group}</AppTag>;
+const getActionTags = (tagList, { status, groupName, ...rest }) => {
+  if (groupName !== null) {
+    return (
+      <AppTag
+        color={tagList[2].color}
+        key={tagList[2].index}
+        onClick={() => {
+          tagList[2].onClick(rest);
+        }}
+      >
+        Hi
+      </AppTag>
+    );
   }
-};
 
-const getActionTags = (tagList, { status, ...rest }) =>
-  tagList && (
-    <div>
-      {tagList.map(({ color, title, onClick }, index) => {
-        const isRevertable = (status === deploymentStatus.STARTED && title === 'Revert') || title !== 'Revert'; //Antd table doesn't support disabling of tags
-        return (
-          isRevertable && (
-            <AppTag
-              color={color}
-              key={index}
-              onClick={() => {
-                onClick(rest);
-              }}
-            >
-              {title}
-            </AppTag>
-          )
-        );
-      })}
-    </div>
+  return (
+    tagList && (
+      <div>
+        {tagList.map(({ color, title, onClick }, index) => {
+          const isRevertable = (status === deploymentStatus.STARTED && title === 'Revert') || title !== 'Revert'; //Antd table doesn't support disabling of tags
+          return (
+            isRevertable && (
+              <AppTag
+                color={color}
+                key={index}
+                onClick={() => {
+                  onClick(rest);
+                }}
+              >
+                {title}
+              </AppTag>
+            )
+          );
+        })}
+      </div>
+    )
   );
+};
 
 const getAuthorProfile = (userProfileUrl, userProfileName) => (
   <div className="user-profile">
@@ -64,8 +73,6 @@ const costumeRender = (dataCategory, index, tagList, record, text) => {
       return getActionTags(tagList, record);
     case category.STATUS:
       return getStatusTag(record.status);
-    case category.GROUP:
-      return getGroupTag(record.group);
     case category.AUTHOR:
       return getAuthorProfile(record.committerAvatarUrl, record.committerName);
     default:

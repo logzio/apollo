@@ -9,11 +9,13 @@ import {
   getGroupContainers,
   revertDeployment,
 } from '../../../store/actions/deploymentActions';
-import { Spinner } from '../../../common/Spinner';
+import { AppModal } from '../../../common/Modal';
 import { AppTable } from '../../../common/Table';
 import { tableColumns } from '../../../utils/tableColumns';
 import { LiveLogsView } from './LiveLogsView';
+import _ from 'lodash';
 import './OngoingDeployment.css';
+import { AppButton } from '../../../common/Button';
 
 const OngoingDeploymentComponent = ({
   getOngoingDeployments,
@@ -30,6 +32,7 @@ const OngoingDeploymentComponent = ({
   revertDeployment,
 }) => {
   const [showModal, toggleShowModal] = useState(false);
+  const [showGroupModal, toggleShowGroupModal] = useState(false);
   const [environmentId, setEnvironmentId] = useState(null);
 
   useEffect(() => {
@@ -56,22 +59,46 @@ const OngoingDeploymentComponent = ({
     return itemName;
   };
 
-  const formattedData =
-    ongoingDeployments &&
-    ongoingDeployments.map(({ id, lastUpdate, serviceId, environmentId, groupName, ...dataItem }) => {
-      return {
-        ...dataItem,
-        id: id,
-        key: id.toString(),
-        lastUpdate: moment(lastUpdate).format('DD/MM/YY, h:mm:ss'),
-        serviceId: serviceId,
-        serviceName: findNameById(serviceId, services),
-        environmentId: environmentId,
-        environmentName: findNameById(environmentId, environments),
-        group: groupName ? groupName : 'Non',
-        groupName: groupName,
-      };
+  const filteredData = () => {
+    const dataOfGroups = _.filter(ongoingDeployments, obj => obj.groupName !== null);
+    const dataWithoutGroups = _.filter(ongoingDeployments, obj => obj.groupName === null);
+    const groupsRecords = _.chain(dataOfGroups)
+      .groupBy('deployableVersionId')
+      .mapValues(ageArr => _.groupBy(ageArr, ageObj => ageObj.environmentId))
+      .value();
+
+    let formattedDataByGroups = [...dataWithoutGroups];
+    // debugger;
+    const a = _.forEach(groupsRecords, groupRecords => {
+      _.forEach(groupRecords, records => {
+        formattedDataByGroups.push({
+          ...records[0],
+          groupRecords: records,
+        });
+      });
     });
+    // debugger;
+    return formattedDataByGroups;
+  };
+
+  const formattedData = () => {
+    return (
+      ongoingDeployments &&
+      filteredData().map(({ id, lastUpdate, serviceId, environmentId, groupName, ...dataItem }) => {
+        return {
+          ...dataItem,
+          id: id,
+          key: id.toString(),
+          lastUpdate: moment(lastUpdate).format('DD/MM/YY, h:mm:ss'),
+          serviceId: serviceId,
+          serviceName: findNameById(serviceId, services),
+          environmentId: environmentId,
+          environmentName: findNameById(environmentId, environments),
+          groupName: groupName,
+        };
+      })
+    );
+  };
 
   const handleViewLogsAction = ({ environmentId, serviceId, groupName }) => {
     toggleShowModal(true);
@@ -84,17 +111,14 @@ const OngoingDeploymentComponent = ({
   };
 
   const columns = tableColumns(
-    ['lastUpdate', 'serviceName', 'environmentName', 'group', 'userEmail', 'deploymentMessage', 'status', 'actions'],
-    ['Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
+    ['lastUpdate', 'serviceName', 'environmentName', 'userEmail', 'deploymentMessage', 'status', 'actions'],
+    ['Last Update', 'Service', 'Environment', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
     [
       { title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction },
       { title: 'Revert', color: '#BD656A', onClick: handleRevertDeploymentAction },
+      { title: 'Group status', color: '#33C737', onClick: toggleShowGroupModal },
     ],
   );
-
-  if (!ongoingDeployments || !services || !environments) {
-    return <Spinner />;
-  }
 
   return (
     <div>
@@ -105,6 +129,20 @@ const OngoingDeploymentComponent = ({
           containers={containers}
           lastCreatedPod={lastCreatedPod}
         />
+      )}
+      {showGroupModal && (
+        <AppModal
+          visible={true}
+          title="Status Per Group"
+          toggleModal={toggleShowGroupModal}
+          footer={[
+            <AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowGroupModal(false)}>
+              hi
+            </AppButton>,
+          ]}
+        >
+          {'hi'}
+        </AppModal>
       )}
       <AppTable
         columns={columns}

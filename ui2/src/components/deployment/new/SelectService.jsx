@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { AppTransfer } from '../../../common/Transfer';
-import { Spinner } from '../../../common/Spinner';
 import { cacheKeys } from '../../../utils/cacheConfig';
 import { removeFromCache } from '../../../utils/cacheService';
 
@@ -29,10 +28,6 @@ export const SelectService = ({
 
   const handleServicesSelection = servicesId =>
     selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
-
-  if (!services || !servicesStacks) {
-    return <Spinner />;
-  }
 
   return (
     <div>

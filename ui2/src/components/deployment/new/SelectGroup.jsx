@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { AppTransfer } from '../../../common/Transfer';
-import { Spinner } from '../../../common/Spinner';
 import { parse } from 'query-string';
 
 export const SelectGroup = ({ handleBreadcrumbs, match, search, getGroups, groups, selectGroups }) => {
@@ -14,10 +13,6 @@ export const SelectGroup = ({ handleBreadcrumbs, match, search, getGroups, group
   const handleGroupsSelection = groupsId => {
     selectGroups(groupsId.map(groupId => groups.find(service => service.id.toString() === groupId)));
   };
-
-  if (!groups) {
-    return <Spinner />;
-  }
 
   return (
     <div>

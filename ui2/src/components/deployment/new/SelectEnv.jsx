@@ -44,7 +44,7 @@ export const SelectEnvironment = ({
     );
   };
 
-  if (!environments || !environmentsStacks || !services || !selectedServices.length) {
+  if (!selectedServices.length) {
     return <Spinner />;
   }
 

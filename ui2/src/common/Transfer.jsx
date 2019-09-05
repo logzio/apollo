@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { AppTableTransfer } from './TableTransfer';
+import { AppSkeleton } from './Skeleton';
 import './Transfer.css';
 
 export const AppTransfer = ({
@@ -20,7 +21,7 @@ export const AppTransfer = ({
   const [showSearch] = useState(!!searchColumns);
   const [selectedGroupService, setSelectedGroupService] = useState(null);
   const [disabledPredefinedGroups, toggleDisabledPredefinedGroups] = useState(false);
-  const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
+  const formattedData = data && data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
   const handleSearch = (inputValue, item) => {
     return searchColumns
@@ -61,42 +62,46 @@ export const AppTransfer = ({
           />
         </Link>
       </div>
-      <Transfer
-        className="table-transfer"
-        dataSource={formattedData}
-        filterOption={handleSearch}
-        showSelectAll={false}
-        targetKeys={targetKeys}
-        showSearch={showSearch}
-        onChange={(targetKeys, direction) => {
-          if (direction === 'left') {
-            toggleDisabledPredefinedGroups(false);
-            setSelectedGroupService(null);
-          }
-          setTargetKeys(targetKeys);
-        }}
-        titles={[`Please select at least one ${currentTable}`, `Selected items`]}
-        {...props}
-      >
-        {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => (
-          <AppTableTransfer
-            selectedGroupService={selectedGroupService}
-            disabledPredefinedGroups={disabledPredefinedGroups}
-            toggleDisabledPredefinedGroups={toggleDisabledPredefinedGroups}
-            setSelectedGroupService={setSelectedGroupService}
-            targetKeys={targetKeys}
-            setTargetKeys={setTargetKeys}
-            handleGroupSelection={handleGroupSelection}
-            formattedData={formattedData}
-            direction={direction}
-            filteredItems={filteredItems}
-            onItemSelectAll={onItemSelectAll}
-            onItemSelect={onItemSelect}
-            selectedKeys={selectedKeys}
-            {...props}
-          />
-        )}
-      </Transfer>
+      {!data ? (
+        <AppSkeleton />
+      ) : (
+        <Transfer
+          className="table-transfer"
+          dataSource={formattedData}
+          filterOption={handleSearch}
+          showSelectAll={false}
+          targetKeys={targetKeys}
+          showSearch={showSearch}
+          onChange={(targetKeys, direction) => {
+            if (direction === 'left') {
+              toggleDisabledPredefinedGroups(false);
+              setSelectedGroupService(null);
+            }
+            setTargetKeys(targetKeys);
+          }}
+          titles={[`Please select at least one ${currentTable}`, `Selected items`]}
+          {...props}
+        >
+          {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => (
+            <AppTableTransfer
+              selectedGroupService={selectedGroupService}
+              disabledPredefinedGroups={disabledPredefinedGroups}
+              toggleDisabledPredefinedGroups={toggleDisabledPredefinedGroups}
+              setSelectedGroupService={setSelectedGroupService}
+              targetKeys={targetKeys}
+              setTargetKeys={setTargetKeys}
+              handleGroupSelection={handleGroupSelection}
+              formattedData={formattedData}
+              direction={direction}
+              filteredItems={filteredItems}
+              onItemSelectAll={onItemSelectAll}
+              onItemSelect={onItemSelect}
+              selectedKeys={selectedKeys}
+              {...props}
+            />
+          )}
+        </Transfer>
+      )}
     </>
   );
 };
