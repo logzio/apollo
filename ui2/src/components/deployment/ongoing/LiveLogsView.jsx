@@ -5,43 +5,40 @@ import { attach, detach } from 'xterm/lib/addons/attach/attach';
 import { Spinner } from '../../../common/Spinner';
 import { AppModal } from '../../../common/Modal';
 import { AppButton } from '../../../common/Button';
-import { wsUrl } from '../../../api/api';
+import { getLiveLogsWebSocketUrl } from '../../../api/api';
 import 'xterm/dist/xterm.css';
 
 export const LiveLogsView = ({ environmentId, containers, lastCreatedPod, toggleShowModal }) => {
   const [showTerminal, toggleShowTerminal] = useState(false);
-  const [terminalTest, setTerminal] = useState(null);
-  const [websocketTest, setWebsocket] = useState(null);
-  const [terminalRef, setTerminalRef] = useState(React.createRef());
+  const [logsTerminal, setLogsTerminal] = useState(null);
+  const [logsWebsocket, setLogsWebsocket] = useState(null);
+  const [terminalRef] = useState(React.createRef());
 
   const showLiveLogs = container => {
     const terminal = new Terminal();
     terminal.open(terminalRef.current);
-    setTerminal(terminal);
+    setLogsTerminal(terminal);
     fit(terminal);
-    const execUrl = `${wsUrl}/logs/pod/${lastCreatedPod}/container/${container}?environment=${environmentId}`;
-    const webSocket = new WebSocket(execUrl);
+    const webSocket = new WebSocket(getLiveLogsWebSocketUrl(lastCreatedPod, container, environmentId));
     terminal.writeln('Opening web socket, wait a sec!');
 
     webSocket.onopen = e => {
-      debugger;
-      setWebsocket(webSocket);
       console.log(e.data);
-      attach(terminalTest, webSocket, true, false);
+      setLogsWebsocket(webSocket);
+      attach(terminal, webSocket, true, false);
     };
 
     webSocket.onerror = e => {
-      debugger;
-      console.log(e);
-      // detach(terminalTest, websocket)
-      // websocket.close();
+      console.log(e.data);
+      detach(terminal, webSocket);
+      webSocket.close();
     };
   };
 
   const closeLiveLogs = () => {
-    // terminalTest && detach(terminalTest, websocket);
-    terminalTest && terminalTest.destroy();
-    websocketTest && websocketTest.close();
+    logsTerminal && detach(logsTerminal, logsWebsocket);
+    logsTerminal && logsTerminal.destroy();
+    logsWebsocket && logsWebsocket.close();
   };
 
   return (
@@ -53,7 +50,7 @@ export const LiveLogsView = ({ environmentId, containers, lastCreatedPod, toggle
         closeLiveLogs();
       }}
       title={!showTerminal ? 'Select a container to view logs from' : 'Live logs from the latest created container'}
-      width={1000}
+      footer={[<AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />]}
     >
       {containers ? (
         containers.map((container, index) => (

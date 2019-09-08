@@ -1,3 +1,7 @@
+.app-table{
+    width: 100%
+}
+
 .ant-table-thead tr {
     display: flex;
     width: 100%;

@@ -9,6 +9,7 @@
 .verify-deployment-content{
     width: 100%;
     flex: 1;
+
 }
 
 .list-icon{
@@ -22,4 +23,20 @@
 
 .deploy{
     flex-shrink: 0;
+}
+
+.ant-card-body{
+    max-height: 50vh;
+    overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 12px;
+}
+
+.ant-card-body:hover::-webkit-scrollbar-thumb {
+    border-radius: 12px;
+    border: 2px solid white;
+    background-color: rgba(0, 0, 0, .45);
 }

@@ -26,6 +26,7 @@ export const SelectGroup = ({ handleBreadcrumbs, match, search, getGroups, group
         addSearch={`${search}&group`}
         match={match}
         handleSelection={handleGroupsSelection}
+        showDefaultSelection={true}
       />
     </div>
   );

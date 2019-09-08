@@ -38,6 +38,7 @@ export const SelectService = ({
         rightColTitles={['name']}
         columnTitles={['Name']}
         predefinedGroups={servicesStacks}
+        showDefaultSelection={false}
         selectGroup={stackSelection}
         linkTo={'environment'}
         addSearch={'service'}

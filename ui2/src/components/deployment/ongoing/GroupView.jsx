@@ -16,8 +16,8 @@ export const GroupView = ({
     ['groupName', 'status', 'actions'],
     ['Group Name', 'Status', 'Actions'],
     [
-      { title: tagListTitles.GROUP_LOGS, color: '#465BA4', onClick: handleViewLogsAction },
-      { title: tagListTitles.GROUP_REVERT, color: '#BD656A', onClick: handleRevertDeploymentAction },
+      { title: tagListTitles.LOGS, color: '#465BA4', onClick: handleViewLogsAction },
+      { title: tagListTitles.REVERT, color: '#BD656A', onClick: handleRevertDeploymentAction },
     ],
   );
 

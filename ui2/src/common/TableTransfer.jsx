@@ -22,13 +22,13 @@ export const AppTableTransfer = ({
   predefinedGroups,
   handleGroupSelection,
   formattedData,
+  showDefaultSelection,
   ...props
 }) => {
   const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
   const [selectedButton, toggleSelectedButton] = useState(false);
   const leftPanel = direction === 'left';
   const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
-  // const scroll = leftPanel ? { x: 900, y: 430 } : { x: 400, y: 430 };
 
   const columns = leftPanel
     ? transferTableColumns(leftColTitles, columnTitles)
@@ -79,22 +79,21 @@ export const AppTableTransfer = ({
     <div>
       {leftPanel && (
         <div className="header-left-transfer-table">
-          {predefinedGroups ? (
+          {predefinedGroups &&
             predefinedGroups.map(({ id, name }) => (
               <AppButton
                 key={id}
                 label={name}
                 className={'table-button'}
-                onClick={event => {
+                onClick={() => {
                   toggleSelectedButton(!selectedButton);
                   handleGroupSelection(id);
-                  // event.target.style = selectedButton ? 'color:blue' : 'color:red';
                 }}
                 icon={'block'}
                 disabled={disabledPredefinedGroups}
               />
-            ))
-          ) : (
+            ))}
+          {showDefaultSelection && (
             <AppButton
               label={'Select all'}
               className={'table-button'}

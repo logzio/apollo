@@ -10,10 +10,11 @@ import {
   revertDeployment,
 } from '../../../store/actions/deploymentActions';
 import { AppTable } from '../../../common/Table';
+import { AppModal } from '../../../common/Modal';
 import { tableColumns } from '../../../utils/tableColumns';
 import { LiveLogsView } from './LiveLogsView';
 import { GroupView } from './GroupView';
-import { tagListTitles } from '../../../utils/tableConfig';
+import { category, tagListTitles } from '../../../utils/tableConfig';
 import _ from 'lodash';
 import './OngoingDeployment.css';
 
@@ -33,20 +34,21 @@ const OngoingDeploymentComponent = ({
 }) => {
   const [showModal, toggleShowModal] = useState(false);
   const [showGroupModal, toggleShowGroupModal] = useState(false);
+  const [showRevertModal, toggleShowRevertModal] = useState(false);
   const [environmentId, setEnvironmentId] = useState(null);
+  const [versionId, setVersionId] = useState(null);
   const [groupRecords, setGroupRecords] = useState(null);
 
   useEffect(() => {
     handleBreadcrumbs('ongoing');
     getServices();
     getEnvironments();
-    getOngoingDeployments();
 
-    // const intervalId = setInterval(() => {
-    //   getOngoingDeployments();
-    // }, 1000 * 10);
-    //
-    // return () => clearInterval(intervalId);
+    const intervalId = setInterval(() => {
+      getOngoingDeployments();
+    }, 1000 * 10);
+
+    return () => clearInterval(intervalId);
   }, []);
 
   const findNameById = (itemId, itemsList) => {
@@ -61,37 +63,37 @@ const OngoingDeploymentComponent = ({
   };
 
   const filteredData = () => {
-    //TODO ORGANIZE AND NAMES
-    const [groupsData, ungroupedData] = _.partition(
+    const [groupsRecords, nonGroupsRecords] = _.partition(
       ongoingDeployments,
       ongoingDeployment => ongoingDeployment.groupName !== null,
     );
-    const groupsRecords = _.chain(groupsData)
-      .groupBy('deployableVersionId')
+    const groupedRecords = _.chain(groupsRecords)
+      .groupBy(category.VERSION_ID)
       .mapValues(sortedGroupsRecords => _.groupBy(sortedGroupsRecords, groupRecord => groupRecord.environmentId))
       .value();
 
-    let formattedDataByGroups = [...ungroupedData];
-    _.forEach(groupsRecords, groupRecords => {
-      _.forEach(groupRecords, records => {
-        formattedDataByGroups.push({
-          ...records[0],
-          groupRecords: records,
+    let formattedData = [...nonGroupsRecords];
+    _.forEach(groupedRecords, groupedRecordsByVersionId => {
+      _.forEach(groupedRecordsByVersionId, groupedRecordsByEnvId => {
+        formattedData.push({
+          ...groupedRecordsByEnvId[0],
+          groupRecords: groupedRecordsByEnvId,
         });
       });
     });
-    return formattedDataByGroups;
+    return formattedData;
   };
 
   const formattedData = () => {
+    const sortedData = _.reverse(_.sortBy(filteredData(), category.LAST_UPDATED));
     return (
       ongoingDeployments &&
-      filteredData().map(({ id, lastUpdate, serviceId, environmentId, groupName, ...dataItem }) => {
+      sortedData.map(({ id, lastUpdate, serviceId, environmentId, groupName, ...dataItem }) => {
         return {
           ...dataItem,
           id: id,
           key: id.toString(),
-          lastUpdate: moment(lastUpdate).format('DD/MM/YY, h:mm:ss'),
+          lastUpdate: moment(lastUpdate).format('DD/MM/YY, hh:mm:ss'),
           serviceId: serviceId,
           serviceName: findNameById(serviceId, services),
           environmentId: environmentId,
@@ -109,8 +111,9 @@ const OngoingDeploymentComponent = ({
     !groupName ? getContainers(environmentId, serviceId) : getGroupContainers(environmentId, serviceId, groupName);
   };
 
-  const handleRevertDeploymentAction = ({ id }) => {
-    revertDeployment(id);
+  const handleRevertDeploymentAction = async ({ id }) => {
+    await setVersionId(id);
+    toggleShowRevertModal(true);
   };
 
   const handleViewSelectedGroup = ({ groupRecords }) => {
@@ -146,6 +149,19 @@ const OngoingDeploymentComponent = ({
           handleViewLogsAction={handleViewLogsAction}
         />
       )}
+      {showRevertModal && (
+        <AppModal
+          title={'Are you sure you want to revert this deployment?'}
+          visible={true}
+          toggleModal={toggleShowRevertModal}
+          onOk={() => {
+            revertDeployment(versionId);
+            toggleShowRevertModal(false);
+          }}
+        >
+          Are you sure you want to revert this deployment?
+        </AppModal>
+      )}
       <AppTable
         columns={columns}
         data={formattedData}
@@ -154,10 +170,6 @@ const OngoingDeploymentComponent = ({
         searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
         showSelection={false}
         emptyMsg={"There aren't ongoing deployments"}
-        rowClassName={({ group }) => (group === 'Non' ? 'hide-row-expand-icon' : '')} //TODO EXPAND ROWS
-        expandableColumn={3}
-        expandIconAsCell={false}
-        expandable={true}
       />
     </div>
   );

@@ -10,6 +10,7 @@ export const AppModal = ({ children, toggleModal, okDisabled, onClose, ...props 
         onClose && onClose();
       }}
       okButtonProps={{ disabled: okDisabled }}
+      width={1000}
       {...props}
     >
       {children}

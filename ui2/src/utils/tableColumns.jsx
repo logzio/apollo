@@ -1,8 +1,13 @@
 import React from 'react';
 import { AppTag } from '../common/Tag';
 import { deploymentStatus, category, tagListTitles } from './tableConfig';
+import _ from 'lodash';
 
-const getStatusTag = status => {
+const getStatusTag = (status, groupRecords) => {
+  if (groupRecords) {
+    const finishedDeploymentSize = _.countBy(groupRecords, category.STATUS)[deploymentStatus.DONE];
+    return <AppTag color={'#40C9BA'}>{`${finishedDeploymentSize}/${groupRecords.length}`}</AppTag>;
+  }
   switch (status) {
     case deploymentStatus.PENDING_CANCELLATION:
       return <AppTag color={'#F18D04'}>{status}</AppTag>;
@@ -13,7 +18,7 @@ const getStatusTag = status => {
     case deploymentStatus.CANCELED:
       return <AppTag color={'#F60935'}>{status}</AppTag>;
     case deploymentStatus.CANCELING:
-      return <AppTag color={'#F18D04'}>{status}</AppTag>;
+      return !<AppTag color={'#F18D04'}>{status}</AppTag>;
     case deploymentStatus.DONE:
       return <AppTag color={'#49A446'}>{status}</AppTag>;
     default:
@@ -27,7 +32,7 @@ const getActionTags = (tagList, { status, groupName, ...rest }) => {
       <div>
         {tagList.map(({ color, title, onClick }, index) => {
           const isRevertable = status === deploymentStatus.STARTED || status === deploymentStatus.PENDING;
-          const isPartOfGroup = groupName !== null;
+          const isPartOfGroup = rest.groupRecords;
           const actionTag = (
             <AppTag
               color={color}
@@ -46,8 +51,6 @@ const getActionTags = (tagList, { status, groupName, ...rest }) => {
               return isRevertable && actionTag;
             case tagListTitles.GROUP:
               return isPartOfGroup && actionTag;
-            case tagListTitles.GROUP_REVERT:
-              return isRevertable && actionTag;
             default:
               return actionTag;
           }
@@ -65,12 +68,11 @@ const getAuthorProfile = (userProfileUrl, userProfileName) => (
 );
 
 const costumeRender = (dataCategory, index, tagList, record, text) => {
-  debugger;
   switch (dataCategory) {
     case category.ACTIONS:
       return getActionTags(tagList, record);
     case category.STATUS:
-      return getStatusTag(record.status);
+      return getStatusTag(record.status, record.groupRecords);
     case category.AUTHOR:
       return getAuthorProfile(record.committerAvatarUrl, record.committerName);
     default:
@@ -89,5 +91,6 @@ export const tableColumns = (dataCategories, columnTitles, tagList) =>
     dataIndex: dataCategory,
     title: columnTitles[index],
     className: dataCategory,
+    sorter: (a, b) => a[dataCategory].localeCompare(b[dataCategory]),
     render: (text, record) => costumeRender(dataCategory, index, tagList, record, text),
   }));

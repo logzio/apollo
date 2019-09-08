@@ -6,7 +6,7 @@ export const AppSkeleton = ({ numInstances = 10, className }) => (
   <div className={`skeleton ${className}`}>
     {Array(numInstances)
       .fill()
-      .map(index => (
+      .map((instance, index) => (
         <Skeleton key={index} active />
       ))}
   </div>

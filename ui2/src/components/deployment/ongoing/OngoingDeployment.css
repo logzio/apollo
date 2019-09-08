@@ -30,3 +30,7 @@
 .modal-content-term{
     width: 100%;
 }
+
+.actions .ant-table-column-sorter{
+    visibility: hidden;
+}

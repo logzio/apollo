@@ -140,3 +140,6 @@ export const revertDeployment = async deploymentId => {
     throw error;
   }
 };
+
+export const getLiveLogsWebSocketUrl = (lastCreatedPod, container, environmentId) =>
+  `${wsUrl}/logs/pod/${lastCreatedPod}/container/${container}?environment=${environmentId}`;
