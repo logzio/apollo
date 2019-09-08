@@ -84,10 +84,9 @@ export const AppTableTransfer = ({
                 key={id}
                 label={name}
                 className={'table-button'}
-                onClick={event => {
+                onClick={() => {
                   toggleSelectedButton(!selectedButton);
                   handleGroupSelection(id);
-                  // event.target.style = selectedButton ? 'color:blue' : 'color:red';
                 }}
                 icon={'block'}
                 disabled={disabledPredefinedGroups}

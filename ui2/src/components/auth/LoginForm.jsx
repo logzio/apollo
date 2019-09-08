@@ -25,7 +25,7 @@ export const LoginForm = ({ handleSubmit, isLoading }) => (
           htmlType="submit"
           className="submit-form"
           disabled={isSubmitting}
-          isLoading={isLoading}
+          loading={isLoading}
         />
       </Form>
     )}

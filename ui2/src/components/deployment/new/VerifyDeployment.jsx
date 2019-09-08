@@ -162,7 +162,7 @@ export const VerifyDeployment = ({
             type="danger"
             onClick={() => handleDeploy(true)}
             tooltipText={"Deploy while ignoring environment's concurrency limits!"}
-            isLoading={isLoading}
+            loading={isLoading}
           />,
           <AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />,
           <AppButton
@@ -171,7 +171,7 @@ export const VerifyDeployment = ({
             key="submit"
             type="primary"
             onClick={() => handleDeploy(false)}
-            isLoading={isLoading}
+            loading={isLoading}
           />,
         ]}
       >

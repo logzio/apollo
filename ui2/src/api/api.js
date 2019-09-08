@@ -73,8 +73,8 @@ export const getLastCommitFromBranch = async (branchName, deployableVersionId) =
       encodeURIComponent(branchName),
     )}/repofrom/${deployableVersionId}`,
   );
-export const getGroups = async (environmentId, serviceId) =>
-  await fetchData(`group/environment/${environmentId}/service/${serviceId}`);
+export const getGroups = async (envId, serviceId) =>
+  await fetchData(`group/environment/${envId}/service/${serviceId}`);
 
 export const deploy = async (
   serviceIdsCsv,
@@ -84,14 +84,14 @@ export const deploy = async (
   isEmergencyDeployment,
 ) => {
   try {
-    const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
-      serviceIdsCsv: serviceIdsCsv,
-      environmentIdsCsv: environmentIdsCsv,
-      deployableVersionId: deployableVersionId,
-      deploymentMessage: deploymentMessage,
-      isEmergencyDeployment: isEmergencyDeployment,
-    });
-    return data;
+    // const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
+    //   serviceIdsCsv,
+    //   environmentIdsCsv,
+    //   deployableVersionId,
+    //   deploymentMessage,
+    //   isEmergencyDeployment,
+    // });
+    // return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -107,15 +107,15 @@ export const deployGroup = async (
   isEmergencyDeployment,
 ) => {
   try {
-    const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
-      serviceIdsCsv: serviceIdsCsv,
-      environmentIdsCsv: environmentIdsCsv,
-      deployableVersionId: deployableVersionId,
-      deploymentMessage: deploymentMessage,
-      groupIdsCsv: groupIdsCsv,
-      isEmergencyDeployment: isEmergencyDeployment,
-    });
-    return data;
+    // const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
+    //   serviceIdsCsv,
+    //   environmentIdsCsv,
+    //   deployableVersionId,
+    //   deploymentMessage,
+    //   groupIdsCsv,
+    //   isEmergencyDeployment,
+    // });
+    // return data;
   } catch (error) {
     console.error(error);
     throw error;

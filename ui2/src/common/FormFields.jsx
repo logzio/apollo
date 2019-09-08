@@ -30,7 +30,3 @@ export const SelectField = ({ field: { name }, options }) => (
     </Select>
   </Form.Item>
 );
-
-export const AppInput = ({ placeholder, onChange, value }) => (
-  <Input placeholder={placeholder} onChange={onChange} value={value} />
-);
