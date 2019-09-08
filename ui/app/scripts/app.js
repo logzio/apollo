@@ -25,7 +25,7 @@ angular
     'cfp.hotkeys'
   ])
   .config(['$stateProvider','$urlRouterProvider','$ocLazyLoadProvider',function ($stateProvider,$urlRouterProvider,$ocLazyLoadProvider) {
-
+    
     $ocLazyLoadProvider.config({
       debug:false,
       events:true
@@ -148,9 +148,9 @@ angular
         }
     })
       .state('deployments.history',{
-            templateUrl:'views/deployments/historyBrowser.html',
+            templateUrl:'views/deployments/history.html',
             controller: 'deploymentHistoryCtrl',
-            url:'/historyBrowser',
+            url:'/history',
             resolve: {
                       loadMyFiles:function($ocLazyLoad) {
                         return $ocLazyLoad.load({

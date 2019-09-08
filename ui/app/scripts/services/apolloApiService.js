@@ -274,7 +274,7 @@ function ApiService($q, $http){
         // Double encoding, as nginx is opening the first one
         return $http.get(CONFIG.appUrl + "deployable-version/latest/branch/" + encodeURIComponent(encodeURIComponent(branchName)) + "/repofrom/" + sourceDeployableVersion);
     };
-
+    
     var getWebsocketExecUrl = function (environment, service, podName, containerName) {
       return CONFIG.wsUrl + "exec/pod/" + podName + "/container/" + containerName + "?environment=" + environment + "&service=" + service;
     };
@@ -286,7 +286,7 @@ function ApiService($q, $http){
     var getAllBlockers = function () {
         return $http.get(CONFIG.appUrl + "blocker-definition");
     };
-
+    
     var addBlocker = function (name, environmentId, serviceId, isActive, blockerTypeName, blockerJsonConfiguration) {
         return $http.post(CONFIG.appUrl + "blocker-definition", {
             name: name,
