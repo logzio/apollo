@@ -10,8 +10,13 @@ export const deploymentStatus = {
 export const category = {
   ACTIONS: 'actions',
   STATUS: 'status',
-  GROUP: 'Group status',
   AUTHOR: 'author',
+};
+
+export const tagListTitles = {
+  GROUP: 'Group status',
   REVERT: 'Revert',
   LOGS: 'View logs',
+  GROUP_LOGS: 'View group logs',
+  GROUP_REVERT: 'Revert group',
 };

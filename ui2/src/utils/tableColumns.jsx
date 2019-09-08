@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppTag } from '../common/Tag';
-import { deploymentStatus, category } from './tableConfig';
+import { deploymentStatus, category, tagListTitles } from './tableConfig';
 
 const getStatusTag = status => {
   switch (status) {
@@ -22,38 +22,35 @@ const getStatusTag = status => {
 };
 
 const getActionTags = (tagList, { status, groupName, ...rest }) => {
-  if (groupName !== null) {
-    return (
-      <AppTag
-        color={tagList[2].color}
-        key={tagList[2].index}
-        onClick={() => {
-          tagList[2].onClick(rest);
-        }}
-      >
-        Hi
-      </AppTag>
-    );
-  }
-
   return (
     tagList && (
       <div>
         {tagList.map(({ color, title, onClick }, index) => {
-          const isRevertable = (status === deploymentStatus.STARTED && title === 'Revert') || title !== 'Revert'; //Antd table doesn't support disabling of tags
-          return (
-            isRevertable && (
-              <AppTag
-                color={color}
-                key={index}
-                onClick={() => {
-                  onClick(rest);
-                }}
-              >
-                {title}
-              </AppTag>
-            )
+          const isRevertable = status === deploymentStatus.STARTED || status === deploymentStatus.PENDING;
+          const isPartOfGroup = groupName !== null;
+          const actionTag = (
+            <AppTag
+              color={color}
+              key={index}
+              onClick={() => {
+                onClick(rest);
+              }}
+            >
+              {title}
+            </AppTag>
           );
+          switch (title) {
+            case tagListTitles.LOGS:
+              return !isPartOfGroup && actionTag;
+            case tagListTitles.REVERT:
+              return isRevertable && actionTag;
+            case tagListTitles.GROUP:
+              return isPartOfGroup && actionTag;
+            case tagListTitles.GROUP_REVERT:
+              return isRevertable && actionTag;
+            default:
+              return actionTag;
+          }
         })}
       </div>
     )
@@ -68,6 +65,7 @@ const getAuthorProfile = (userProfileUrl, userProfileName) => (
 );
 
 const costumeRender = (dataCategory, index, tagList, record, text) => {
+  debugger;
   switch (dataCategory) {
     case category.ACTIONS:
       return getActionTags(tagList, record);

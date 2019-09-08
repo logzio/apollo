@@ -9,13 +9,13 @@ import {
   getGroupContainers,
   revertDeployment,
 } from '../../../store/actions/deploymentActions';
-import { AppModal } from '../../../common/Modal';
 import { AppTable } from '../../../common/Table';
 import { tableColumns } from '../../../utils/tableColumns';
 import { LiveLogsView } from './LiveLogsView';
+import { GroupView } from './GroupView';
+import { tagListTitles } from '../../../utils/tableConfig';
 import _ from 'lodash';
 import './OngoingDeployment.css';
-import { AppButton } from '../../../common/Button';
 
 const OngoingDeploymentComponent = ({
   getOngoingDeployments,
@@ -34,6 +34,7 @@ const OngoingDeploymentComponent = ({
   const [showModal, toggleShowModal] = useState(false);
   const [showGroupModal, toggleShowGroupModal] = useState(false);
   const [environmentId, setEnvironmentId] = useState(null);
+  const [groupRecords, setGroupRecords] = useState(null);
 
   useEffect(() => {
     handleBreadcrumbs('ongoing');
@@ -60,16 +61,18 @@ const OngoingDeploymentComponent = ({
   };
 
   const filteredData = () => {
-    const dataOfGroups = _.filter(ongoingDeployments, obj => obj.groupName !== null);
-    const dataWithoutGroups = _.filter(ongoingDeployments, obj => obj.groupName === null);
-    const groupsRecords = _.chain(dataOfGroups)
+    //TODO ORGANIZE AND NAMES
+    const [groupsData, ungroupedData] = _.partition(
+      ongoingDeployments,
+      ongoingDeployment => ongoingDeployment.groupName !== null,
+    );
+    const groupsRecords = _.chain(groupsData)
       .groupBy('deployableVersionId')
-      .mapValues(ageArr => _.groupBy(ageArr, ageObj => ageObj.environmentId))
+      .mapValues(sortedGroupsRecords => _.groupBy(sortedGroupsRecords, groupRecord => groupRecord.environmentId))
       .value();
 
-    let formattedDataByGroups = [...dataWithoutGroups];
-    // debugger;
-    const a = _.forEach(groupsRecords, groupRecords => {
+    let formattedDataByGroups = [...ungroupedData];
+    _.forEach(groupsRecords, groupRecords => {
       _.forEach(groupRecords, records => {
         formattedDataByGroups.push({
           ...records[0],
@@ -77,7 +80,6 @@ const OngoingDeploymentComponent = ({
         });
       });
     });
-    // debugger;
     return formattedDataByGroups;
   };
 
@@ -101,6 +103,7 @@ const OngoingDeploymentComponent = ({
   };
 
   const handleViewLogsAction = ({ environmentId, serviceId, groupName }) => {
+    toggleShowGroupModal(false);
     toggleShowModal(true);
     setEnvironmentId(environmentId);
     !groupName ? getContainers(environmentId, serviceId) : getGroupContainers(environmentId, serviceId, groupName);
@@ -110,13 +113,18 @@ const OngoingDeploymentComponent = ({
     revertDeployment(id);
   };
 
+  const handleViewSelectedGroup = ({ groupRecords }) => {
+    toggleShowGroupModal(true);
+    setGroupRecords(groupRecords);
+  };
+
   const columns = tableColumns(
     ['lastUpdate', 'serviceName', 'environmentName', 'userEmail', 'deploymentMessage', 'status', 'actions'],
     ['Last Update', 'Service', 'Environment', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
     [
-      { title: 'View logs', color: '#465BA4', onClick: handleViewLogsAction },
-      { title: 'Revert', color: '#BD656A', onClick: handleRevertDeploymentAction },
-      { title: 'Group status', color: '#33C737', onClick: toggleShowGroupModal },
+      { title: tagListTitles.LOGS, color: '#465BA4', onClick: handleViewLogsAction },
+      { title: tagListTitles.REVERT, color: '#BD656A', onClick: handleRevertDeploymentAction },
+      { title: tagListTitles.GROUP, color: '#33C737', onClick: handleViewSelectedGroup },
     ],
   );
 
@@ -131,18 +139,12 @@ const OngoingDeploymentComponent = ({
         />
       )}
       {showGroupModal && (
-        <AppModal
-          visible={true}
-          title="Status Per Group"
-          toggleModal={toggleShowGroupModal}
-          footer={[
-            <AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowGroupModal(false)}>
-              hi
-            </AppButton>,
-          ]}
-        >
-          {'hi'}
-        </AppModal>
+        <GroupView
+          toggleShowGroupModal={toggleShowGroupModal}
+          groupRecords={groupRecords}
+          handleRevertDeploymentAction={handleRevertDeploymentAction}
+          handleViewLogsAction={handleViewLogsAction}
+        />
       )}
       <AppTable
         columns={columns}
@@ -152,7 +154,7 @@ const OngoingDeploymentComponent = ({
         searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
         showSelection={false}
         emptyMsg={"There aren't ongoing deployments"}
-        rowClassName={({ group }) => (group === 'Non' ? 'hide-row-expand-icon' : '')} //TODO
+        rowClassName={({ group }) => (group === 'Non' ? 'hide-row-expand-icon' : '')} //TODO EXPAND ROWS
         expandableColumn={3}
         expandIconAsCell={false}
         expandable={true}
