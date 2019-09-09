@@ -44,16 +44,15 @@ public class BlockerService {
     private final ServicesStackController servicesStackController;
 
     @Inject
-    public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons,
-                          StackDao stackDao, EnvironmentsStackDao environmentsStackDao, ServicesStackDao servicesStackDao, ServiceDao serviceDao) {
+    public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons) {
         this.blockerDefinitionDao = requireNonNull(blockerDefinitionDao);
         this.blockerInjectableCommons = requireNonNull(blockerInjectableCommons);
 
         blockerTypeNameBindings = new HashMap<>();
         reflections = new Reflections("io.logz.apollo.blockers.types");
-        stackController = new StackController(requireNonNull(stackDao));
-        environmentsStackController = new EnvironmentsStackController(requireNonNull(environmentsStackDao), requireNonNull(stackDao));
-        servicesStackController = new ServicesStackController(requireNonNull(servicesStackDao), requireNonNull(stackDao), requireNonNull(serviceDao));
+        stackController = new StackController(requireNonNull(blockerInjectableCommons.getStackDao()));
+        environmentsStackController = new EnvironmentsStackController(requireNonNull(blockerInjectableCommons.getEnvironmentsStackDao()), blockerInjectableCommons.getStackDao());
+        servicesStackController = new ServicesStackController(blockerInjectableCommons.getServicesStackDao(), blockerInjectableCommons.getStackDao(), blockerInjectableCommons.getServiceDao());
     }
 
     public Optional<Class<? extends BlockerFunction>> getBlockerTypeBinding(String blockerTypeName) {
@@ -148,8 +147,6 @@ public class BlockerService {
                             serviceToCheck = deployment.getServiceId();
                         }
                         break;
-                    default:
-                        throw new EnumConstantNotPresentException(StackType.class, "Unknown Enum type - " + stackController.getStackType(blocker.getStackId()));
                 }
 
                 if (blocker.getStackId() != null && environmentToCheck == null && serviceToCheck == null) {
