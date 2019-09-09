@@ -55,26 +55,19 @@ export const appLogout = () => {
 };
 
 /***********    DEPLOYMENT API:   ***************/
-export const getServices = async () => await fetchData('service/');
-export const getServicesStacks = async () => await fetchData('services-stack/');
-export const getEnvironments = async () => await fetchData('environment/');
-export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
-// export const getServiceById = async serviceId => await fetchData(`service/${serviceId}`);
-export const getDeployableVersionsById = async servicesId =>
-  await fetchData(`deployable-version/multi-service/${servicesId}/`);
+export const getServices = () => fetchData('service/');
+export const getServicesStacks = () => fetchData('services-stack/');
+export const getEnvironments = () => fetchData('environment/');
+export const getEnvironmentsStacks = () => fetchData('environments-stack/');
+export const getDeployableVersionsById = servicesId => fetchData(`deployable-version/multi-service/${servicesId}/`);
 
-// export const getDeployableVersionBySha = async gitCommitSha =>
-//   await fetchData(`deployable-version/sha/${gitCommitSha}/`);
+export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
+  // Double encoding, as nginx is opening the first one
+  const encodedBranchNameURI = encodeURIComponent(encodeURIComponent(branchName));
+  fetchData(`deployable-version/latest/branch/${encodedBranchNameURI}/repofrom/${deployableVersionId}`);
+};
 
-// Double encoding, as nginx is opening the first one
-export const getLastCommitFromBranch = async (branchName, deployableVersionId) =>
-  await fetchData(
-    `deployable-version/latest/branch/${encodeURIComponent(
-      encodeURIComponent(branchName),
-    )}/repofrom/${deployableVersionId}`,
-  );
-export const getGroups = async (envId, serviceId) =>
-  await fetchData(`group/environment/${envId}/service/${serviceId}`);
+export const getGroups = (envId, serviceId) => fetchData(`group/environment/${envId}/service/${serviceId}`);
 
 export const deploy = async (
   serviceIdsCsv,
