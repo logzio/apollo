@@ -2,6 +2,7 @@ import * as API from '../../api/api';
 import { historyBrowser } from '../../utils/history';
 import { fetchAndStore, setToCache } from '../../utils/cacheService';
 import { cacheKeys } from '../../utils/cacheConfig';
+import { errorHandler } from '../../utils/errorHandler';
 import { appNotification } from '../../common/notification';
 import {
   GET_SERVICES_REQUEST,
@@ -57,15 +58,16 @@ export const getServices = () => {
     });
     try {
       const data = await fetchAndStore(cacheKeys.SERVICES, API.getServices, 60 * 6);
-      await dispatch({
+      dispatch({
         type: GET_SERVICES_SUCCESS,
         payload: data,
       });
     } catch (error) {
-      await dispatch({
+      dispatch({
         type: GET_SERVICES_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -86,6 +88,7 @@ export const getServicesStacks = () => {
         type: GET_SERVICES_STACK_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -106,6 +109,7 @@ export const getEnvironments = () => {
         type: GET_ENV_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -126,6 +130,7 @@ export const getEnvironmentsStacks = () => {
         type: GET_ENV_STACK_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -146,6 +151,7 @@ export const getDeployableVersionsById = servicesId => {
         type: GET_DEPLOYABLE_VERSION_ID_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -167,6 +173,7 @@ export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
         type: GET_BRANCH_LATEST_VERSION_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -187,6 +194,7 @@ export const getGroups = (environmentId, serviceId) => {
         type: GET_GROUPS_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -204,27 +212,28 @@ export const deploy = (
     });
     try {
       //Temp, so I wouldn't deploy!
-      const data = await API.deploy(
-        serviceIdsCsv,
-        environmentIdsCsv,
-        deployableVersionId,
-        deploymentMessage,
-        isEmergencyDeployment,
-      );
-      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
+      // const data = await API.deploy(
+      //   serviceIdsCsv,
+      //   environmentIdsCsv,
+      //   deployableVersionId,
+      //   deploymentMessage,
+      //   isEmergencyDeployment,
+      // );
+      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
       dispatch({
         type: NEW_DEPLOYMENT_SUCCESS,
-        payload: data,
-        // payload: 'temp',
+        // payload: data,
+        payload: 'temp',
       });
     } catch (error) {
       dispatch({
         type: NEW_DEPLOYMENT_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -251,7 +260,7 @@ export const deployGroup = (
       // groupIdsCsv,
       //   isEmergencyDeployment,
       // );
-      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, 'smile', 'twoTone');
+      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
@@ -265,6 +274,7 @@ export const deployGroup = (
         type: NEW_GROUP_DEPLOYMENT_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -326,6 +336,7 @@ export const getOngoingDeployments = () => {
         type: GET_ONGOING_DEPLOYMENT_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -347,6 +358,7 @@ export const getContainers = (environmentId, serviceId) => {
         type: GET_CONTAINERS_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -368,6 +380,7 @@ export const getGroupContainers = (environmentId, serviceId, groupName) => {
         type: GET_GROUP_CONTAINERS_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };
@@ -384,11 +397,11 @@ export const revertDeployment = deploymentId => {
         type: DELETE_DEPLOYMENT_SUCCESS,
       });
     } catch (error) {
-      appNotification(`Could not revert deployment id: ${deploymentId}!`);
       dispatch({
         type: DELETE_DEPLOYMENT_FAILURE,
         error,
       });
+      errorHandler({ error });
     }
   };
 };

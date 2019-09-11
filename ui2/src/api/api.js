@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { logout } from '../store/actions/authActions';
+import React from 'react';
+
 const baseUrl = 'http://localhost:8081';
 export const wsUrl = `${document.location.protocol === 'https:' ? 'wss' : 'ws'}://${document.location.host}/ws`;
 export const AUTH_TOKEN = 'token';
@@ -60,12 +62,8 @@ export const getServices = async () => await fetchData('service/');
 export const getServicesStacks = async () => await fetchData('services-stack/');
 export const getEnvironments = async () => await fetchData('environment/');
 export const getEnvironmentsStacks = async () => await fetchData('environments-stack/');
-// export const getServiceById = async serviceId => await fetchData(`service/${serviceId}`);
 export const getDeployableVersionsById = async servicesId =>
   await fetchData(`deployable-version/multi-service/${servicesId}/`);
-
-// export const getDeployableVersionBySha = async gitCommitSha =>
-//   await fetchData(`deployable-version/sha/${gitCommitSha}/`);
 
 // Double encoding, as nginx is opening the first one
 export const getLastCommitFromBranch = async (branchName, deployableVersionId) =>
@@ -85,14 +83,15 @@ export const deploy = async (
   isEmergencyDeployment,
 ) => {
   try {
-    const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
-      serviceIdsCsv: serviceIdsCsv,
-      environmentIdsCsv: environmentIdsCsv,
-      deployableVersionId: deployableVersionId,
-      deploymentMessage: deploymentMessage,
-      isEmergencyDeployment: isEmergencyDeployment,
-    });
-    return data;
+    // const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
+    //   serviceIdsCsv: serviceIdsCsv,
+    //   environmentIdsCsv: environmentIdsCsv,
+    //   deployableVersionId: deployableVersionId,
+    //   deploymentMessage: deploymentMessage,
+    //   isEmergencyDeployment: isEmergencyDeployment,
+    // });
+    // return data;
+    return 'hi';
   } catch (error) {
     console.error(error);
     throw error;
@@ -108,15 +107,16 @@ export const deployGroup = async (
   isEmergencyDeployment,
 ) => {
   try {
-    const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
-      serviceIdsCsv: serviceIdsCsv,
-      environmentIdsCsv: environmentIdsCsv,
-      deployableVersionId: deployableVersionId,
-      deploymentMessage: deploymentMessage,
-      groupIdsCsv: groupIdsCsv,
-      isEmergencyDeployment: isEmergencyDeployment,
-    });
-    return data;
+    // const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
+    //   serviceIdsCsv: serviceIdsCsv,
+    //   environmentIdsCsv: environmentIdsCsv,
+    //   deployableVersionId: deployableVersionId,
+    //   deploymentMessage: deploymentMessage,
+    //   groupIdsCsv: groupIdsCsv,
+    //   isEmergencyDeployment: isEmergencyDeployment,
+    // });
+    // return data;
+    return 'hi';
   } catch (error) {
     console.error(error);
     throw error;
