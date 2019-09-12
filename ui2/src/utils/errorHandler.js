@@ -2,14 +2,15 @@ import _ from 'lodash';
 import { appNotification } from '../common/notification';
 import { historyBrowser } from './history';
 
-export const errorHandler = ({
-  error: {
-    response: { status, data },
-    message,
-  },
-}) => {
-  if (!_.isNil(status) && !_.isNil(message)) {
+export const errorHandler = (error, customMsg) => {
+  if (!error.response) {
+    return appNotification('Unexpected error', error.message);
+  }
+  const { status, data } = error.response;
+
+  if (!_.isNil(status) && !_.isNil(error.message)) {
     const description = _.isString(data) ? data : data.error;
+    const errorNotification = appNotification(error.message, description ? description : customMsg, 'frown');
 
     switch (status) {
       case 403:
@@ -18,9 +19,9 @@ export const errorHandler = ({
           pathname: '/error',
           search: `?status=${status}`,
         });
-        return appNotification(message, description, 'frown');
+        return errorNotification;
       default:
-        return appNotification(message, description, 'frown');
+        return errorNotification;
     }
   }
 

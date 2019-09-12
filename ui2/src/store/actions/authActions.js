@@ -31,7 +31,6 @@ export const signup = userDetails => {
         type: SIGNUP_FAILURE,
         error,
       });
-      errorHandler({ error });
       throw error;
     }
   };
@@ -53,7 +52,6 @@ export const login = userDetails => {
         type: LOGIN_FAILURE,
         error,
       });
-      errorHandler({ error });
       throw error;
     }
   };
@@ -96,7 +94,7 @@ export const getDeploymentRoles = () => {
         type: GET_DEP_ROLE_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };

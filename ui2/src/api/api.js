@@ -34,8 +34,7 @@ export const login = async user => {
     return data;
   } catch (error) {
     console.error(error);
-    // throw error.response.data.error;
-    throw new Error('User credentials are incorrect'); //temp until an error notification will be returned from the server
+    throw error;
   }
 };
 

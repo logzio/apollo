@@ -67,7 +67,7 @@ export const getServices = () => {
         type: GET_SERVICES_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -88,7 +88,7 @@ export const getServicesStacks = () => {
         type: GET_SERVICES_STACK_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -109,7 +109,7 @@ export const getEnvironments = () => {
         type: GET_ENV_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -130,7 +130,7 @@ export const getEnvironmentsStacks = () => {
         type: GET_ENV_STACK_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -151,7 +151,7 @@ export const getDeployableVersionsById = servicesId => {
         type: GET_DEPLOYABLE_VERSION_ID_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -173,7 +173,7 @@ export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
         type: GET_BRANCH_LATEST_VERSION_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -194,7 +194,7 @@ export const getGroups = (environmentId, serviceId) => {
         type: GET_GROUPS_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -233,7 +233,7 @@ export const deploy = (
         type: NEW_DEPLOYMENT_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -274,7 +274,7 @@ export const deployGroup = (
         type: NEW_GROUP_DEPLOYMENT_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -336,7 +336,7 @@ export const getOngoingDeployments = () => {
         type: GET_ONGOING_DEPLOYMENT_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -358,7 +358,7 @@ export const getContainers = (environmentId, serviceId) => {
         type: GET_CONTAINERS_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -380,7 +380,7 @@ export const getGroupContainers = (environmentId, serviceId, groupName) => {
         type: GET_GROUP_CONTAINERS_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
@@ -401,7 +401,7 @@ export const revertDeployment = deploymentId => {
         type: DELETE_DEPLOYMENT_FAILURE,
         error,
       });
-      errorHandler({ error });
+      errorHandler(error);
     }
   };
 };
