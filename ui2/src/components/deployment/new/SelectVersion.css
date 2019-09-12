@@ -1,0 +1,10 @@
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+/* hide select all option in antd table */
+th.ant-table-selection-column{
+    visibility: hidden;
+}

@@ -1,0 +1,28 @@
+.ant-list-item-meta-content{
+    display: flex;
+    align-items: center;
+    height: 32px;
+}
+
+.card-details{
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
+}
+
+.card-user-profile{
+    display: flex;
+    flex-direction: row;
+    justify-items: center;
+}
+
+.card-user-title{
+    display: flex;
+    align-items: center;
+}
+
+.card-user-image{
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}

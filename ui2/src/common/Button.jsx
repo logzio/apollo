@@ -1,9 +1,11 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import './Button.css';
 
-export const AppButton = ({ label, className, isLoading, ...props }) => (
-  <Button className={`${className} app-btn`} loading={isLoading} {...props}>
-    {label}
-  </Button>
+export const AppButton = ({ label, className, tooltipText, ...props }) => (
+  <Tooltip title={tooltipText}>
+    <Button className={`${className} app-btn`} {...props}>
+      {label}
+    </Button>
+  </Tooltip>
 );
