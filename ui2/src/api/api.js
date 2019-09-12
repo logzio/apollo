@@ -142,3 +142,5 @@ export const revertDeployment = async deploymentId => {
 
 export const getLiveLogsWebSocketUrl = (lastCreatedPod, container, environmentId) =>
   `${wsUrl}/logs/pod/${lastCreatedPod}/container/${container}?environment=${environmentId}`;
+
+/***********    HISTORY DEPLOYMENT API:   ***************/

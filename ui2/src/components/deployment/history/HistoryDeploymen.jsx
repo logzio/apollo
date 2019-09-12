@@ -18,7 +18,7 @@ import { category, tagListTitles } from '../../../utils/tableConfig';
 import _ from 'lodash';
 import './OngoingDeployment.css';
 
-const PlainOngoingDeployment = ({
+const PlainHistoryDeployment = ({
   getOngoingDeployments,
   ongoingDeployments,
   getServices,
@@ -186,14 +186,10 @@ const mapStateToProps = ({
   containers,
 });
 
-export const OngoingDeployment = connect(
+export const HistoryDeployment = connect(
   mapStateToProps,
   {
-    getOngoingDeployments,
     getServices,
     getEnvironments,
-    getContainers,
-    getGroupContainers,
-    revertDeployment,
   },
-)(PlainOngoingDeployment);
+)(PlainHistoryDeployment);
