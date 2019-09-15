@@ -3,7 +3,6 @@ import { AppTable } from '../../../common/Table';
 import { AppModal } from '../../../common/Modal';
 import { AppInput } from '../../../common/FormFields';
 import { AppButton } from '../../../common/Button';
-import { Spinner } from '../../../common/Spinner';
 import { tableColumns } from '../../../utils/tableColumns';
 import { parse } from 'query-string';
 import { historyBrowser } from '../../../utils/history';
@@ -82,6 +81,7 @@ export const SelectVersion = ({
           onClick={() => toggleShowModal(true)}
           label="Find latest commit from branch"
           className="table-button"
+          disabled={!versions}
         />
         <AppButton
           label="Find latest commit from master"
@@ -89,6 +89,7 @@ export const SelectVersion = ({
           onClick={() => {
             handleBranchSelection('master');
           }}
+          disabled={!versions}
         />
         <AppButton
           type="primary"
