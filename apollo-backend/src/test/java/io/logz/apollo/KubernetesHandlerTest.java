@@ -1,15 +1,17 @@
 package io.logz.apollo;
 
+import com.google.common.net.UrlEscapers;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
 import io.fabric8.kubernetes.api.model.PodListBuilder;
-import io.fabric8.kubernetes.api.model.extensions.DeploymentBuilder;
-import io.fabric8.kubernetes.api.model.extensions.DeploymentListBuilder;
-import io.fabric8.kubernetes.api.model.extensions.DeploymentStatus;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
+import io.fabric8.kubernetes.api.model.apps.DeploymentListBuilder;
+import io.fabric8.kubernetes.api.model.apps.DeploymentStatus;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.mock.KubernetesMockClient;
+import io.fabric8.kubernetes.client.server.mock.KubernetesServer;
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.GroupDao;
@@ -32,13 +34,17 @@ import io.logz.apollo.models.Service;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitGroup;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,7 +56,7 @@ public class KubernetesHandlerTest {
 
     private static final String LOG_MESSAGE_IN_POD = "test log message to search..";
 
-    private static KubernetesMockClient kubernetesMockClient;
+//    private static KubernetesMockClient kubernetesMockClient;
     private static RealDeploymentGenerator notFinishedDeployment;
     private static RealDeploymentGenerator finishedDeployment;
     private static RealDeploymentGenerator finishedDeploymentForEnvTest;
@@ -68,8 +74,17 @@ public class KubernetesHandlerTest {
     private static StandaloneApollo standaloneApollo;
     private static ApolloTestClient apolloTestClient;
 
+    @ClassRule
+    public static KubernetesServer server = new KubernetesServer();
+
+    private static KubernetesClient client;
+
+    private static final Logger logger = LoggerFactory.getLogger(KubernetesHandlerTest.class);
+
+
     @BeforeClass
     public static void initialize() throws ScriptException, IOException, SQLException, ApolloClientException {
+        client = server.getClient();
 
         apolloTestClient = Common.signupAndLogin();
 
@@ -80,7 +95,6 @@ public class KubernetesHandlerTest {
         deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
         groupDao = standaloneApollo.getInstance(GroupDao.class);
 
-        kubernetesMockClient = new KubernetesMockClient();
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
 
         // Create deployments
@@ -134,17 +148,14 @@ public class KubernetesHandlerTest {
         finishedDeploymentForEnvTest.setEnvironment(finishedDeployment.getEnvironment());
         deploymentDao.updateDeployment(finishedDeploymentForEnvTest.getDeployment());
 
-        // Get an instance of the client
-        KubernetesClient kubernetesClient = kubernetesMockClient.replay();
-
         // Inject the client
-        notFinishedDeploymentHandler = kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(notFinishedDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(notFinishedCanceledDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedCanceledDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(statusDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(groupWithScalingFactorZeroDeployment.getEnvironment(), kubernetesClient);
-        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedDeploymentForEnvTest.getEnvironment(), kubernetesClient);
+        notFinishedDeploymentHandler = kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(notFinishedDeployment.getEnvironment(), client);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedDeployment.getEnvironment(), client);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(notFinishedCanceledDeployment.getEnvironment(), client);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedCanceledDeployment.getEnvironment(), client);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(statusDeployment.getEnvironment(), client);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(groupWithScalingFactorZeroDeployment.getEnvironment(), client);
+        kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedDeploymentForEnvTest.getEnvironment(), client);
 
         // Since the mock library does not support "createOrReplace" we can't mock this phase (and its fine to neglect it since its fabric8 code)
         notFinishedDeployment.updateDeploymentStatus(Deployment.DeploymentStatus.STARTED);
@@ -270,31 +281,37 @@ public class KubernetesHandlerTest {
 
         DeploymentStatus deploymentStatus;
         if (finished) {
-            deploymentStatus = new DeploymentStatus(1, 1L, totalReplicas, 0, 1);
+            deploymentStatus = new DeploymentStatus(1, 1, new ArrayList<>(), 1L, 1, totalReplicas, 0, 1);
         } else {
-            deploymentStatus = new DeploymentStatus(1, 1L, totalReplicas, 0, 0);
+            deploymentStatus = new DeploymentStatus(1, 1, new ArrayList<>(), 1L, 1, totalReplicas, 0, 0);
         }
 
-        kubernetesMockClient
-                .extensions()
-                .deployments()
-                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-                .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
-                .list()
-                .andReturn(
-                        new DeploymentListBuilder()
-                                .withItems(
-                                        new DeploymentBuilder()
-                                                .withStatus(deploymentStatus)
-                                                .withNewMetadata()
-                                                .withLabels(
-                                                        ImmutableMap.of(ApolloToKubernetes.getApolloCommitShaKey(),
-                                                                realDeploymentGenerator.getDeployableVersion().getGitCommitSha())
-                                                )
-                                                .endMetadata()
-                                                .build()
-                                ).build()
-                ).anyTimes();
+        server.expect()
+              .get()
+              .withPath(String.format("/apis/apps/v1/namespaces/%s/deployments?labelSelector=%s",
+                      realDeploymentGenerator.getEnvironment().getKubernetesNamespace(),
+                      getUrlEscapedLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
+                              apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())))
+              .andReturn(HttpStatus.OK,
+                      new DeploymentListBuilder()
+                              .withItems(
+                                      new DeploymentBuilder()
+                                              .withStatus(deploymentStatus)
+                                              .withNewMetadata()
+                                                  .withLabels(
+                                                          ImmutableMap.of(ApolloToKubernetes.getApolloCommitShaKey(),
+                                                                  realDeploymentGenerator.getDeployableVersion().getGitCommitSha())
+                                                  )
+                                              .endMetadata()
+                                              .build())
+                              .build())
+              .always();
+
+        logger.info("");
+    }
+
+    private static String getUrlEscapedLabel(String labelName, String labelValue) {
+        return UrlEscapers.urlFormParameterEscaper().escape(String.format("%s=%s", labelName, labelValue));
     }
 
     private static void setMockPodLogsAndStatus(RealDeploymentGenerator realDeploymentGenerator,
@@ -321,33 +338,31 @@ public class KubernetesHandlerTest {
                 .endStatus()
                 .build();
 
-        kubernetesMockClient
-                .pods()
-                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-                .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentPodUniqueIdentifierValue())
-                .list()
-                .andReturn(
-                        new PodListBuilder()
-                                .withItems(pod)
-                                .build()
-                ).anyTimes();
+        server.expect()
+              .get()
+              .withPath(String.format("/api/v1/namespaces/%s/pods?labelSelector=%s",
+                      realDeploymentGenerator.getEnvironment().getKubernetesNamespace(),
+                      getUrlEscapedLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
+                              apolloToKubernetes.getApolloDeploymentPodUniqueIdentifierValue())))
+              .andReturn(HttpStatus.OK,
+                      new PodListBuilder()
+                              .withItems(pod)
+                              .build()
+              )
+              .always();
 
-        kubernetesMockClient
-                .pods()
-                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-                .withName(podStatus.getName())
-                //.inContainer(containerName)        //TODO: not mockable :(   Adding to the technical debt.
-                //.tailingLines(EasyMock.anyInt())
-                .getLog(true)
-                .andReturn(log)
-                .anyTimes();
+        server.expect()
+              .get()
+              .withPath(String.format("/api/v1/namespaces/%s/pods/%s/log", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
+              .andReturn(HttpStatus.OK, log)
+              .always();
 
-        kubernetesMockClient
-                .pods()
-                .inNamespace(realDeploymentGenerator.getEnvironment().getKubernetesNamespace())
-                .withName(podStatus.getName())
-                .get()
-                .andReturn(pod)
-                .anyTimes();
+        server.expect()
+              .get()
+              .withPath(String.format("/api/v1/namespaces/%s/pods/%s", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
+              .andReturn(HttpStatus.OK, pod)
+              .always();
+
+        logger.info("");
     }
 }

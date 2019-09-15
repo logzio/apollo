@@ -4,15 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class Fabric8TestMethods {
 
-    public static void assertImageName(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String imageName) {
+    public static void assertImageName(io.fabric8.kubernetes.api.model.apps.Deployment deployment, String imageName) {
         assertThat(deployment.getSpec().getTemplate().getSpec().getContainers().stream().findFirst().get().getImage()).isEqualTo(imageName);
     }
 
-    public static void assertImageNameContains(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String imageName) {
+    public static void assertImageNameContains(io.fabric8.kubernetes.api.model.apps.Deployment deployment, String imageName) {
         assertThat(deployment.getSpec().getTemplate().getSpec().getContainers().stream().findFirst().get().getImage()).contains(imageName);
     }
 
-    public static void assertDeploymentLabelExists(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String labelKey, String labelValue) {
+    public static void assertDeploymentLabelExists(io.fabric8.kubernetes.api.model.apps.Deployment deployment, String labelKey, String labelValue) {
         assertThat(deployment.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
     }
 
@@ -24,7 +24,7 @@ public class Fabric8TestMethods {
         assertThat(ingress.getMetadata().getLabels().get(labelKey)).isEqualTo(labelValue);
     }
 
-    public static void assertDeploymentEnvironmentVariableExists(io.fabric8.kubernetes.api.model.extensions.Deployment deployment, String envName, String envValue) {
+    public static void assertDeploymentEnvironmentVariableExists(io.fabric8.kubernetes.api.model.apps.Deployment deployment, String envName, String envValue) {
         assertThat(
                 deployment.getSpec().getTemplate().getSpec().getContainers()
                         .stream()
