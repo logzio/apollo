@@ -52,6 +52,7 @@ export const AppTableTransfer = ({
     if (isPartOfGroup) {
       toggleDisabledPredefinedGroups(leftPanel ? !disabledPredefinedGroups : true);
       setSelectedGroupService(selectedGroupService && leftPanel ? null : key);
+      toggleSelectedNonGroupService(false);
       return onItemSelect(key, isSelected);
     }
 
