@@ -43,3 +43,7 @@ code {
 .ant-layout{
     background: white;
 }
+
+.ant-btn[disabled]{
+    height: 32px;
+}
