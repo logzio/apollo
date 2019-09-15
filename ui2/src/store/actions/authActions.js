@@ -11,6 +11,7 @@ import {
   LOUGOUT,
   APP_INIT,
 } from './index';
+import { errorHandler } from '../../utils/errorHandler';
 import * as API from '../../api/api';
 import { clearExpiredCache, clearCache } from '../../utils/cacheService';
 
@@ -93,6 +94,7 @@ export const getDeploymentRoles = () => {
         type: GET_DEP_ROLE_FAILURE,
         error,
       });
+      errorHandler(error);
     }
   };
 };

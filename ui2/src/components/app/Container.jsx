@@ -40,16 +40,20 @@ export const Container = ({ title, component: Component, match, location, ...pro
 
   return (
     <div className="container">
-      <div className="container-title large-title">{title}</div>
-      <div className="container-breadcrumbs">
-        <Breadcrumb>
-          {breadcrumbs.map(({ path, title }, index) => (
-            <Breadcrumb.Item key={index} className="container-breadcrumb">
-              <Link to={path}>{title}</Link>
-            </Breadcrumb.Item>
-          ))}
-        </Breadcrumb>
-      </div>
+      {title && (
+        <>
+          <div className="container-title large-title">{title}</div>
+          <div className="container-breadcrumbs">
+            <Breadcrumb>
+              {breadcrumbs.map(({ path, title }, index) => (
+                <Breadcrumb.Item key={index} className="container-breadcrumb">
+                  <Link to={path}>{title}</Link>
+                </Breadcrumb.Item>
+              ))}
+            </Breadcrumb>
+          </div>
+        </>
+      )}
       <div className="container-content">
         <Component
           handleBreadcrumbs={handleBreadcrumbs}
