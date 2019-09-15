@@ -148,9 +148,6 @@ public class KubernetesHandlerTest {
         finishedDeploymentForEnvTest.setEnvironment(finishedDeployment.getEnvironment());
         deploymentDao.updateDeployment(finishedDeploymentForEnvTest.getDeployment());
 
-        // Get an instance of the client
-//        KubernetesClient kubernetesClient = kubernetesMockClient.replay();
-
         // Inject the client
         notFinishedDeploymentHandler = kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(notFinishedDeployment.getEnvironment(), client);
         kubernetesHandlerStore.getOrCreateKubernetesHandlerWithSpecificClient(finishedDeployment.getEnvironment(), client);
@@ -176,7 +173,7 @@ public class KubernetesHandlerTest {
     @Test
     public void testDeploymentMonitor() throws JSONException {
         // We need to wait at least 2 iterations of the monitoring thread + 1 buffer
-        Common.waitABit(15);
+        Common.waitABit(5);
 
         Deployment currentNotFinishedDeployment = deploymentDao.getDeployment(notFinishedDeployment.getDeployment().getId());
         Deployment currentFinishedDeployment = deploymentDao.getDeployment(finishedDeployment.getDeployment().getId());
