@@ -1,88 +1,133 @@
 import React, { useState } from 'react';
-import { Transfer } from 'antd';
 import _ from 'lodash';
 import { AppTable } from './Table';
-import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
-import { tableColumns } from '../utils/tableColumns';
-import './TableTransfer.css';
+import { transferTableColumns } from '../utils/tableColumns';
 
-export const TableTransfer = ({
-  data,
-  searchColumns,
+export const AppTableTransfer = ({
+  direction,
+  filteredItems,
+  onItemSelectAll,
+  onItemSelect,
+  selectedKeys,
+  disabledPredefinedGroups,
+  selectedGroupService,
   rightColTitles,
   leftColTitles,
-  selectGroup,
+  columnTitles,
+  toggleDisabledPredefinedGroups,
+  setSelectedGroupService,
+  targetKeys,
+  setTargetKeys,
   predefinedGroups,
-  linkTo,
-  addSearch,
+  handleGroupSelection,
+  formattedData,
+  showDefaultSelection,
   ...props
 }) => {
-  const [targetKeys, setTargetKeys] = useState([]);
-  const [showSearch] = useState(!!searchColumns);
-  const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
+  const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
+  const [selectedButton, toggleSelectedButton] = useState(false);
+  const leftPanel = direction === 'left';
+  const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
 
-  const handleSearch = (inputValue, item) =>
-    searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
+  const columns = leftPanel
+    ? transferTableColumns(leftColTitles, columnTitles)
+    : transferTableColumns(rightColTitles, columnTitles);
 
-  const handleGroupSelection = predefinedGroupId => {
-    const keys = selectGroup(predefinedGroupId);
-    const addedKeys = _.difference(keys, targetKeys);
-    if (addedKeys.length) {
-      setTargetKeys([...targetKeys, ...addedKeys]);
-    } else {
-      setTargetKeys(_.difference(targetKeys, keys));
+  const handleOnSelect = (key, isPartOfGroup, isSelected) => {
+    if (isPartOfGroup) {
+      toggleDisabledPredefinedGroups(leftPanel ? !disabledPredefinedGroups : true);
+      setSelectedGroupService(selectedGroupService && leftPanel ? null : key);
+      return onItemSelect(key, isSelected);
     }
+    toggleSelectedNonGroupService(leftPanel);
+    return onItemSelect(key, isSelected);
   };
 
-  return (
-    <Transfer
-      className="table-transfer"
-      dataSource={formattedData}
-      filterOption={handleSearch}
-      showSelectAll={false}
-      targetKeys={targetKeys}
-      showSearch={showSearch}
-      onChange={targetKeys => setTargetKeys(targetKeys)}
-      {...props}
-    >
-      {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-        const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
-        const scroll = direction === 'left' ? { x: 1000, y: 600 } : { x: 500, y: 600 };
+  const handleDisabledRaws = record => {
+    return (
+      (record.isPartOfGroup === true && targetKeys.length > 0) ||
+      (selectedGroupService && selectedGroupService !== record.key) ||
+      (record.isPartOfGroup === true && selectedNonGroupService && selectedKeys.length > 0)
+    );
+  };
 
-        return (
-          <div>
-            {direction === 'left' && (
-              <>
-                {predefinedGroups.map(({ id, name }) => (
-                  <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
-                ))}
-                <Link
-                  to={{
-                    pathname: linkTo,
-                    search: `${addSearch}=${targetKeys}`,
-                  }}
-                >
-                  <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
-                </Link>
-              </>
-            )}
-            {direction === 'right' && (
-              <div>
-                <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
-              </div>
-            )}
-            <AppTable
-              columns={columns}
-              filteredItems={filteredItems}
-              onItemSelectAll={onItemSelectAll}
-              onItemSelect={onItemSelect}
-              selectedKeys={selectedKeys}
-              scroll={scroll}
+  const rowSelection = {
+    onSelectAll: (isSelected, allRows) => {
+      const allRowsKeys = allRows && allRows.map(item => item.key);
+      const currentKeysSelection = isSelected
+        ? _.difference(allRowsKeys, selectedKeys)
+        : _.difference(selectedKeys, allRowsKeys);
+      onItemSelectAll(currentKeysSelection, isSelected);
+    },
+    onSelect: ({ key, isPartOfGroup }, isSelected) => {
+      handleOnSelect(key, isPartOfGroup, isSelected);
+    },
+    selectedRowKeys: selectedKeys,
+    getCheckboxProps: record => ({
+      disabled: leftPanel ? handleDisabledRaws(record) : null,
+    }),
+  };
+
+  const handleRowSelection = ({ key, isPartOfGroup }) => ({
+    onClick: () => {
+      handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
+    },
+  });
+
+  return (
+    <div>
+      {leftPanel && (
+        <div className="header-left-transfer-table">
+          {predefinedGroups &&
+            predefinedGroups.map(({ id, name }) => (
+              <AppButton
+                key={id}
+                label={name}
+                className={'table-button'}
+                onClick={() => {
+                  toggleSelectedButton(!selectedButton);
+                  handleGroupSelection(id);
+                }}
+                icon={'block'}
+                disabled={disabledPredefinedGroups}
+              />
+            ))}
+          {showDefaultSelection && (
+            <AppButton
+              label={'Select all'}
+              className={'table-button'}
+              onClick={() => {
+                setTargetKeys(filteredItems.map(({ key }) => key));
+              }}
+              icon={'block'}
             />
-          </div>
-        );
-      }}
-    </Transfer>
+          )}
+        </div>
+      )}
+      {!leftPanel && (
+        <div>
+          <AppButton
+            label={'Reset'}
+            className={'table-button'}
+            onClick={() => {
+              setTargetKeys([]);
+              setSelectedGroupService(null);
+              toggleSelectedNonGroupService(false);
+              toggleDisabledPredefinedGroups(false);
+            }}
+          />
+        </div>
+      )}
+      <AppTable
+        columns={columns}
+        data={filteredItems}
+        scroll={scroll}
+        rowSelection={rowSelection}
+        handleOnSelect={handleOnSelect}
+        handleRowSelection={handleRowSelection}
+        {...props}
+      />
+    </div>
   );
 };

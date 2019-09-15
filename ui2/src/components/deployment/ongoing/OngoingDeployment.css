@@ -1,0 +1,36 @@
+.deploymentMessage{
+    min-width: 22%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.environmentName{
+    min-width: 20%;
+}
+
+.status, .actions, .group{
+    display: flex;
+    justify-content: center;
+}
+
+.group .app-tag{
+    width: 50%;
+    text-align: center;
+}
+
+.ant-modal-body{
+    /*height: 200px;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.modal-content-term{
+    width: 100%;
+}
+
+.actions .ant-table-column-sorter{
+    visibility: hidden;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
-import { history } from '../../utils/history';
+import { historyBrowser } from '../../utils/history';
 import { connect } from 'react-redux';
 import { appInit, logout } from '../../store/actions/authActions';
 import { Signup } from '../auth/Signup';
@@ -9,15 +9,16 @@ import { Layout } from 'antd';
 import { Navbar } from './Navbar';
 import { getAuthToken } from '../../api/api';
 import { NewDeployment } from '../deployment/new/NewDeployment';
-import './App.css';
+import { OngoingDeployment } from '../deployment/ongoing/OngoingDeployment';
 import { Container } from './Container';
+import './App.css';
 
-const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
+const AppComponent = ({ appInit, logout, isAdmin }) => {
   useEffect(() => {
     appInit();
-  }, [appInit, loggedIn]);
+  }, []);
 
-  const [collapsed, toggleCollapse] = useState(false);
+  const [collapsed, toggleCollapse] = useState(true);
   const isAuthenticate = !!getAuthToken();
   const AppRoute = ({ path, ...props }) => {
     return isAuthenticate ? (
@@ -28,7 +29,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   };
 
   return (
-    <Router history={history}>
+    <Router history={historyBrowser}>
       <Layout className="app">
         {isAuthenticate && (
           <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
@@ -45,6 +46,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
             <Switch>
               {isAdmin && <AppRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
               <AppRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
+              <AppRoute path="/deployment/ongoing" title={'Ongoing deployment'} component={OngoingDeployment} />
               {!isAuthenticate && <Route path="/auth/login" component={Login} />}
               {isAuthenticate ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
             </Switch>

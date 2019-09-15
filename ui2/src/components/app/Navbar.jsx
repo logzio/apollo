@@ -1,11 +1,12 @@
-import { Menu, Icon } from 'antd';
+import { Menu } from 'antd';
+import { AppIcon } from '../../common/Icon';
 import Logo from '../../assets/images/apollo-logo.svg';
 import Symbol from '../../assets/images/apollo-symbol.svg';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
 
-export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) => {
+export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin, currentNavBarTab }) => {
   const navItems = [
     { title: 'New Deployment', iconType: 'edit', path: '/deployment/new', isAdmin: false },
     { title: 'Ongoing Deployment', iconType: 'unordered-list', path: '/deployment/ongoing', isAdmin: false },
@@ -18,12 +19,7 @@ export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) =>
   ];
 
   return (
-    <Menu
-      className="navbar-menu"
-      // defaultSelectedKeys={['7']} //temp until we have a home screen
-      mode="inline"
-      theme="dark"
-    >
+    <Menu className="navbar-menu" mode="inline" theme="dark">
       <div className="menu-header">
         {collapsed ? (
           <img className="symbol" src={Symbol} alt="Apollo logo" />
@@ -36,18 +32,18 @@ export const Navbar = ({ toggleCollapsed, collapsed, handleLogout, isAdmin }) =>
           (!isAdminNav || isAdminNav === isAdmin) && (
             <Menu.Item key={index}>
               <Link to={path}>
-                <Icon type={iconType} />
+                <AppIcon type={iconType} />
                 <span>{title}</span>
               </Link>
             </Menu.Item>
           ),
       )}
       <Menu.Item className="menu-footer" id="menu-footer-test" onClick={() => handleLogout()}>
-        <Icon type="logout" />
+        <AppIcon type="logout" />
         <span>Logout</span>
       </Menu.Item>
       <Menu.Item onClick={() => toggleCollapsed()}>
-        <Icon type={collapsed ? 'menu-unfold' : 'menu-fold'} />
+        <AppIcon type={collapsed ? 'menu-unfold' : 'menu-fold'} />
         <span>Collapse</span>
       </Menu.Item>
     </Menu>

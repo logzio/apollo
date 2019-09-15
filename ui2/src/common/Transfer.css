@@ -1,0 +1,18 @@
+.submit-transfer-table{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.header-left-transfer-table{
+    min-height: 60px;
+}
+
+.ant-transfer-list-header{
+    background-color: aliceblue;
+}
+
+.ant-transfer-list-header-title{
+    margin-right: 5px;
+    font-weight: bolder;
+}
