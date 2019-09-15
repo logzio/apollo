@@ -40,3 +40,8 @@
     border: 2px solid white;
     background-color: rgba(0, 0, 0, .45);
 }
+
+.version-details-card .ant-card-body{
+    max-height: initial;
+    overflow-y: initial;
+}

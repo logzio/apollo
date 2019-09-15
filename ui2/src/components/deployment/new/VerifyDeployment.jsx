@@ -100,7 +100,7 @@ export const VerifyDeployment = ({
     <div className="verify-deployment">
       <Row className={'verify-deployment-content'}>
         <Col span={5} offset={1}>
-          <AppCard title={'Version to deploy: '}>
+          <AppCard title={'Version to deploy: '} className="version-details-card">
             <div className="card-details">
               <div className={'extra-small-title'}>Author:</div>
               <div className="card-user-profile">
