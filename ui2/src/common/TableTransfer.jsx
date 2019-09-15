@@ -23,6 +23,8 @@ export const AppTableTransfer = ({
   handleGroupSelection,
   formattedData,
   showDefaultSelection,
+  selectedServicesList,
+  setSelectedServicesList,
   ...props
 }) => {
   const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
@@ -34,13 +36,28 @@ export const AppTableTransfer = ({
     ? transferTableColumns(leftColTitles, columnTitles)
     : transferTableColumns(rightColTitles, columnTitles);
 
+  const updateSelectedServicesList = serviceId => {
+    const selectedServiceIndex = selectedServicesList.findIndex(selectedService => selectedService === serviceId);
+
+    const updatedServiceList = ~selectedServiceIndex
+      ? selectedServicesList.filter(selectedService => selectedService !== serviceId)
+      : [...selectedServicesList, serviceId];
+
+    setSelectedServicesList(updatedServiceList);
+
+    return updatedServiceList;
+  };
+
   const handleOnSelect = (key, isPartOfGroup, isSelected) => {
     if (isPartOfGroup) {
       toggleDisabledPredefinedGroups(leftPanel ? !disabledPredefinedGroups : true);
       setSelectedGroupService(selectedGroupService && leftPanel ? null : key);
+      toggleSelectedNonGroupService(false);
       return onItemSelect(key, isSelected);
     }
-    toggleSelectedNonGroupService(leftPanel);
+
+    const updatedServiceList = updateSelectedServicesList(key);
+    updatedServiceList.length === 0 ? toggleSelectedNonGroupService(false) : toggleSelectedNonGroupService(true);
     return onItemSelect(key, isSelected);
   };
 
@@ -115,6 +132,7 @@ export const AppTableTransfer = ({
               setSelectedGroupService(null);
               toggleSelectedNonGroupService(false);
               toggleDisabledPredefinedGroups(false);
+              setSelectedServicesList([]);
             }}
           />
         </div>

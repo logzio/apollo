@@ -18,9 +18,11 @@ export const AppTransfer = ({
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
+  const [selectedServicesList, setSelectedServicesList] = useState([]);
   const [showSearch] = useState(!!searchColumns);
   const [selectedGroupService, setSelectedGroupService] = useState(null);
   const [disabledPredefinedGroups, toggleDisabledPredefinedGroups] = useState(false);
+
   const formattedData = data && data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
 
   const handleSearch = (inputValue, item) => {
@@ -76,6 +78,7 @@ export const AppTransfer = ({
             if (direction === 'left') {
               toggleDisabledPredefinedGroups(false);
               setSelectedGroupService(null);
+              setSelectedServicesList([]);
             }
             setTargetKeys(targetKeys);
           }}
@@ -97,6 +100,8 @@ export const AppTransfer = ({
               onItemSelectAll={onItemSelectAll}
               onItemSelect={onItemSelect}
               selectedKeys={selectedKeys}
+              setSelectedServicesList={setSelectedServicesList}
+              selectedServicesList={selectedServicesList}
               {...props}
             />
           )}
