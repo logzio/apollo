@@ -1,16 +1,9 @@
 package io.logz.apollo.blockers;
 
-import io.logz.apollo.controllers.EnvironmentsStackController;
-import io.logz.apollo.controllers.ServicesStackController;
-import io.logz.apollo.controllers.StackController;
+import io.logz.apollo.controllers.StackService;
 import io.logz.apollo.dao.BlockerDefinitionDao;
-import io.logz.apollo.dao.EnvironmentsStackDao;
-import io.logz.apollo.dao.ServiceDao;
-import io.logz.apollo.dao.ServicesStackDao;
-import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.StackType;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +30,18 @@ public class BlockerService {
 
     private final BlockerDefinitionDao blockerDefinitionDao;
     private final BlockerInjectableCommons blockerInjectableCommons;
+    private final StackService stackService;
     private final Map<String, Class<? extends BlockerFunction>> blockerTypeNameBindings;
     private final Reflections reflections;
-    private final StackController stackController;
-    private final EnvironmentsStackController environmentsStackController;
-    private final ServicesStackController servicesStackController;
 
     @Inject
-    public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons) {
+    public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons, StackService stackService) {
         this.blockerDefinitionDao = requireNonNull(blockerDefinitionDao);
         this.blockerInjectableCommons = requireNonNull(blockerInjectableCommons);
+        this.stackService = requireNonNull(stackService);
 
         blockerTypeNameBindings = new HashMap<>();
         reflections = new Reflections("io.logz.apollo.blockers.types");
-        stackController = new StackController(requireNonNull(blockerInjectableCommons.getStackDao()));
-        environmentsStackController = new EnvironmentsStackController(requireNonNull(blockerInjectableCommons.getEnvironmentsStackDao()), blockerInjectableCommons.getStackDao());
-        servicesStackController = new ServicesStackController(blockerInjectableCommons.getServicesStackDao(), blockerInjectableCommons.getStackDao(), blockerInjectableCommons.getServiceDao());
     }
 
     public Optional<Class<? extends BlockerFunction>> getBlockerTypeBinding(String blockerTypeName) {
@@ -136,14 +125,14 @@ public class BlockerService {
         }
 
             if (blocker.getStackId() != null) {
-                switch (stackController.getStackType(blocker.getStackId())) {
+                switch (stackService.getStackType(blocker.getStackId())) {
                     case ENVIRONMENTS:
-                        if (environmentsStackController.getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
+                        if (stackService.getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
                             environmentToCheck = deployment.getEnvironmentId();
                         }
                         break;
                     case SERVICES:
-                        if (servicesStackController.getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
+                        if (stackService.getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
                             serviceToCheck = deployment.getServiceId();
                         }
                         break;
