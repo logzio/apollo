@@ -10,18 +10,23 @@ import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.DeploymentHistory;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
+import org.rapidoid.commons.Str;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+
+import io.logz.apollo.database.OrderDirection;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
@@ -116,7 +121,7 @@ public class DeploymentController {
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
 
             if (serviceDeployableVersion == null) {
-                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId));
+                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() + " is not applicable on service " + serviceId));
             } else {
                 try {
                     Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), req);
@@ -164,4 +169,23 @@ public class DeploymentController {
             lockService.releaseLock(lockName);
         }
     }
+
+    @LoggedIn
+    @POST("/deployment-history")
+    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
+        //input validations
+//        Optional<String> a = Optional.ofNullable(searchTerm);
+        DeploymentHistory deploymentHistory = new DeploymentHistory();
+        int start = (pageNumber - 1) * pageSize;
+        OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
+
+        deploymentHistory.pageNumber = pageNumber;
+        deploymentHistory.pageSize = pageSize;
+        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(searchTerm);
+        deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
+        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(searchTerm, orderDirection, start, pageSize);
+
+        assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
+    }
+
 }

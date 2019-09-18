@@ -42,6 +42,9 @@ import {
   GET_GROUP_CONTAINERS_REQUEST,
   GET_GROUP_CONTAINERS_SUCCESS,
   GET_GROUP_CONTAINERS_FAILURE,
+  GET_DEPLOYMENT_HISTORY_REQUEST,
+  GET_DEPLOYMENT_HISTORY_SUCCESS,
+  GET_DEPLOYMENT_HISTORY_FAILURE,
   LOUGOUT,
 } from '../actions';
 
@@ -62,6 +65,7 @@ const initialState = {
   ongoingDeployments: null,
   containers: null,
   lastCreatedPod: null,
+  deploymentsHistory: null
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -161,6 +165,12 @@ export default function deploymentsReducer(state = initialState, action) {
     case DELETE_DEPLOYMENT_SUCCESS:
       return { ...state, isLoading: false };
     case DELETE_DEPLOYMENT_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_DEPLOYMENT_HISTORY_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_DEPLOYMENT_HISTORY_SUCCESS:
+      return { ...state, deploymentsHistory: action.payload, isLoading: false };
+    case GET_DEPLOYMENT_HISTORY_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;

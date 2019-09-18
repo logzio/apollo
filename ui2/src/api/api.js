@@ -144,3 +144,18 @@ export const getLiveLogsWebSocketUrl = (lastCreatedPod, container, environmentId
   `${wsUrl}/logs/pod/${lastCreatedPod}/container/${container}?environment=${environmentId}`;
 
 /***********    HISTORY DEPLOYMENT API:   ***************/
+
+export const getDeploymentHistory = async (descending, pageNumber, pageSize, searchTerm) => {
+  try {
+    const { data = null } = await axios.post(`${baseUrl}/deployment-history`, {
+      descending,
+      pageNumber,
+      pageSize,
+      searchTerm: 'services',
+    });
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

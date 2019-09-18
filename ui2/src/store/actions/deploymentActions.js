@@ -48,6 +48,9 @@ import {
   GET_GROUP_CONTAINERS_REQUEST,
   GET_GROUP_CONTAINERS_SUCCESS,
   GET_GROUP_CONTAINERS_FAILURE,
+  GET_DEPLOYMENT_HISTORY_REQUEST,
+  GET_DEPLOYMENT_HISTORY_SUCCESS,
+  GET_DEPLOYMENT_HISTORY_FAILURE,
 } from './index';
 import { ongoing as mock } from './mock';
 
@@ -399,6 +402,26 @@ export const revertDeployment = deploymentId => {
     } catch (error) {
       dispatch({
         type: DELETE_DEPLOYMENT_FAILURE,
+        error,
+      });
+      errorHandler(error);
+    }
+  };
+};
+
+export const getDeploymentHistory = (descending, pageNumber, pageSize, searchTerm) => {
+  return async dispatch => {
+    dispatch({
+      type: GET_DEPLOYMENT_HISTORY_REQUEST,
+    });
+    try {
+      await API.getDeploymentHistory(descending, pageNumber, pageSize, searchTerm);
+      dispatch({
+        type: GET_DEPLOYMENT_HISTORY_SUCCESS,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_DEPLOYMENT_HISTORY_FAILURE,
         error,
       });
       errorHandler(error);
