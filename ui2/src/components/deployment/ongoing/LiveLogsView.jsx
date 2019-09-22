@@ -50,7 +50,7 @@ export const LiveLogsView = ({ environmentId, containers, lastCreatedPod, toggle
         closeLiveLogs();
       }}
       title={!showTerminal ? 'Select a container to view logs from' : 'Live logs from the latest created container'}
-      footer={[<AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />]}
+      footer={[<AppButton label={'Close'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />]}
     >
       {containers ? (
         containers.map((container, index) => (

@@ -15,6 +15,7 @@ export const AppTable = ({
   expandableColumn,
   expandIconAsCell,
   expandable,
+  pagination,
   ...props
 }) => {
   const [searchValue, setSearchValue] = useState(null);
@@ -52,7 +53,7 @@ export const AppTable = ({
           dataSource={filteredData}
           rowSelection={rowSelection}
           size={'small'}
-          pagination={false}
+          pagination={pagination}
           onRow={handleRowSelection}
           locale={{
             emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,

@@ -1,0 +1,34 @@
+.environmentName{
+    min-width: 12%;
+}
+
+.id{
+    max-width: 7%;
+    display: flex;
+    justify-content: center;
+}
+
+.status, .actions {
+    display: flex;
+    justify-content: center;
+}
+
+.ant-modal-body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 250px;
+
+}
+
+.modal-content-term{
+    width: 100%;
+}
+
+.actions .ant-table-column-sorter, .id .ant-table-column-sorter, .groupName .ant-table-column-sorter{
+    visibility: hidden;
+}
+
+.warning-text{
+    font-weight: bold;
+}

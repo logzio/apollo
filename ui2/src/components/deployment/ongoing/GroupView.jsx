@@ -30,7 +30,7 @@ export const GroupView = ({
         <AppButton label={'Cancel'} className={'modal-btn'} key="back" onClick={() => toggleShowGroupModal(false)} />,
       ]}
     >
-      <AppTable columns={columns} data={groupRecords} scroll={{ y: 300 }} showSelection={false} />
+      <AppTable columns={columns} data={groupRecords} scroll={{ y: 300 }} showSelection={false} pagination={false} />
     </AppModal>
   );
 };

@@ -6,6 +6,7 @@ import { AppCard } from '../../../common/Card';
 import { Col, Row, List, Avatar } from 'antd';
 import { parse } from 'query-string';
 import symbol from '../../../assets/images/apollo-symbol.svg';
+import { DeploymentDetailsCard } from '../DeploymentDetailsCard';
 import './VerifyDeployment.css';
 
 export const VerifyDeployment = ({
@@ -100,23 +101,14 @@ export const VerifyDeployment = ({
     <div className="verify-deployment">
       <Row className={'verify-deployment-content'}>
         <Col span={5} offset={1}>
-          <AppCard title={'Version to deploy: '}>
-            <div className="card-details">
-              <div className={'extra-small-title'}>Author:</div>
-              <div className="card-user-profile">
-                <img className="card-user-image" src={selectedVersion.committerAvatarUrl} alt={'user profile'} />
-                <div className="card-user-title">{selectedVersion.committerName}</div>
-              </div>
-            </div>
-            <div className="card-details">
-              <div className={'extra-small-title'}>Commit: </div>
-              {selectedVersion.gitCommitSha}
-            </div>
-            <div className="card-details">
-              <div className={'extra-small-title'}>Message:</div>
-              {selectedVersion.commitMessage.split('*').shift()}
-            </div>
-          </AppCard>
+          <DeploymentDetailsCard
+            title={'Version to deploy: '}
+            commitMessage={selectedVersion.commitMessage}
+            committerAvatarUrl={selectedVersion.committerAvatarUrl}
+            committerName={selectedVersion.committerName}
+            gitCommitSha={selectedVersion.gitCommitSha}
+            commitUrl={selectedVersion.commitUrl}
+          />
         </Col>
         {deployItems.map(({ isPartOfGroup, dataSource, title }, index) => {
           const isSelectedGroups = !isPartOfGroup || !!group;

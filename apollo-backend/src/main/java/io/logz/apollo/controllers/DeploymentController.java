@@ -173,8 +173,7 @@ public class DeploymentController {
     @LoggedIn
     @POST("/deployment-history")
     public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
-        //input validations
-//        Optional<String> a = Optional.ofNullable(searchTerm);
+
         DeploymentHistory deploymentHistory = new DeploymentHistory();
         int start = (pageNumber - 1) * pageSize;
         OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;

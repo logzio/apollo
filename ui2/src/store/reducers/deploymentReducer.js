@@ -14,6 +14,9 @@ import {
   GET_DEPLOYABLE_VERSION_ID_REQUEST,
   GET_DEPLOYABLE_VERSION_ID_SUCCESS,
   GET_DEPLOYABLE_VERSION_ID_FAILURE,
+  GET_DEPLOYABLE_VERSIONS_ID_REQUEST,
+  GET_DEPLOYABLE_VERSIONS_ID_SUCCESS,
+  GET_DEPLOYABLE_VERSIONS_ID_FAILURE,
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
@@ -45,6 +48,12 @@ import {
   GET_DEPLOYMENT_HISTORY_REQUEST,
   GET_DEPLOYMENT_HISTORY_SUCCESS,
   GET_DEPLOYMENT_HISTORY_FAILURE,
+  GET_ENV_STATUS_REQUEST,
+  GET_ENV_STATUS_SUCCESS,
+  GET_ENV_STATUS_FAILURE,
+  GET_DEPLOYMENT_REQUEST,
+  GET_DEPLOYMENT_SUCCESS,
+  GET_DEPLOYMENT_FAILURE,
   LOUGOUT,
 } from '../actions';
 
@@ -65,7 +74,11 @@ const initialState = {
   ongoingDeployments: null,
   containers: null,
   lastCreatedPod: null,
-  deploymentsHistory: null
+  deploymentsHistory: null,
+  deploymentsHistoryDetails: null,
+  deployableVersion: null,
+  error: null,
+  deploymentDetails: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -102,11 +115,11 @@ export default function deploymentsReducer(state = initialState, action) {
       return { ...state, environmentsStacks: action.payload, isLoading: false };
     case GET_ENV_STACK_FAILURE:
       return { ...state, isLoading: false };
-    case GET_DEPLOYABLE_VERSION_ID_REQUEST:
+    case GET_DEPLOYABLE_VERSIONS_ID_REQUEST:
       return { ...state, isLoading: true };
-    case GET_DEPLOYABLE_VERSION_ID_SUCCESS:
+    case GET_DEPLOYABLE_VERSIONS_ID_SUCCESS:
       return { ...state, versions: action.payload, isLoading: false };
-    case GET_DEPLOYABLE_VERSION_ID_FAILURE:
+    case GET_DEPLOYABLE_VERSIONS_ID_FAILURE:
       return { ...state, isLoading: false };
     case GET_BRANCH_LATEST_VERSION_REQUEST:
       return { ...state, isLoading: true, versions: null };
@@ -169,8 +182,31 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_DEPLOYMENT_HISTORY_REQUEST:
       return { ...state, isLoading: true };
     case GET_DEPLOYMENT_HISTORY_SUCCESS:
-      return { ...state, deploymentsHistory: action.payload, isLoading: false };
+      return {
+        ...state,
+        deploymentsHistory: action.payload.data,
+        deploymentsHistoryDetails: action.payload,
+        isLoading: false,
+      };
     case GET_DEPLOYMENT_HISTORY_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_DEPLOYABLE_VERSION_ID_REQUEST:
+      return { ...state, isLoading: true, deployableVersion: null };
+    case GET_DEPLOYABLE_VERSION_ID_SUCCESS:
+      return { ...state, deployableVersion: action.payload, isLoading: false };
+    case GET_DEPLOYABLE_VERSION_ID_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_ENV_STATUS_REQUEST:
+      return { ...state, isLoading: true, envStatus: null };
+    case GET_ENV_STATUS_SUCCESS:
+      return { ...state, envStatus: action.payload, isLoading: false };
+    case GET_ENV_STATUS_FAILURE:
+      return { ...state, isLoading: false, error: action.error };
+    case GET_DEPLOYMENT_REQUEST:
+      return { ...state, isLoading: true};
+    case GET_DEPLOYMENT_SUCCESS:
+      return { ...state, deploymentDetails: action.payload, isLoading: false };
+    case GET_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;

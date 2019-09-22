@@ -126,6 +126,7 @@ export const AppTableTransfer = ({
         rowSelection={rowSelection}
         handleOnSelect={handleOnSelect}
         handleRowSelection={handleRowSelection}
+        pagination={false}
         {...props}
       />
     </div>

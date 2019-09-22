@@ -20,6 +20,9 @@ import {
   GET_DEPLOYABLE_VERSION_ID_REQUEST,
   GET_DEPLOYABLE_VERSION_ID_SUCCESS,
   GET_DEPLOYABLE_VERSION_ID_FAILURE,
+  GET_DEPLOYABLE_VERSIONS_ID_REQUEST,
+  GET_DEPLOYABLE_VERSIONS_ID_SUCCESS,
+  GET_DEPLOYABLE_VERSIONS_ID_FAILURE,
   GET_BRANCH_LATEST_VERSION_REQUEST,
   GET_BRANCH_LATEST_VERSION_SUCCESS,
   GET_BRANCH_LATEST_VERSION_FAILURE,
@@ -51,6 +54,12 @@ import {
   GET_DEPLOYMENT_HISTORY_REQUEST,
   GET_DEPLOYMENT_HISTORY_SUCCESS,
   GET_DEPLOYMENT_HISTORY_FAILURE,
+  GET_ENV_STATUS_REQUEST,
+  GET_ENV_STATUS_SUCCESS,
+  GET_ENV_STATUS_FAILURE,
+  GET_DEPLOYMENT_REQUEST,
+  GET_DEPLOYMENT_SUCCESS,
+  GET_DEPLOYMENT_FAILURE,
 } from './index';
 import { ongoing as mock } from './mock';
 
@@ -141,17 +150,17 @@ export const getEnvironmentsStacks = () => {
 export const getDeployableVersionsById = servicesId => {
   return async dispatch => {
     dispatch({
-      type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
+      type: GET_DEPLOYABLE_VERSIONS_ID_REQUEST,
     });
     try {
       const data = await fetchAndStore(cacheKeys.DEPLOYABLE_VERSIONS, API.getDeployableVersionsById, 60 * 6, servicesId);
       dispatch({
-        type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
+        type: GET_DEPLOYABLE_VERSIONS_ID_SUCCESS,
         payload: data,
       });
     } catch (error) {
       dispatch({
-        type: GET_DEPLOYABLE_VERSION_ID_FAILURE,
+        type: GET_DEPLOYABLE_VERSIONS_ID_FAILURE,
         error,
       });
       errorHandler(error);
@@ -331,8 +340,8 @@ export const getOngoingDeployments = () => {
       const data = await API.getOngoingDeployments();
       dispatch({
         type: GET_ONGOING_DEPLOYMENT_SUCCESS,
-        // payload: data,
-        payload: mock,
+        payload: data,
+        // payload: mock,
       });
     } catch (error) {
       dispatch({
@@ -415,13 +424,77 @@ export const getDeploymentHistory = (descending, pageNumber, pageSize, searchTer
       type: GET_DEPLOYMENT_HISTORY_REQUEST,
     });
     try {
-      await API.getDeploymentHistory(descending, pageNumber, pageSize, searchTerm);
+      const data = await API.getDeploymentHistory(descending, pageNumber, pageSize, searchTerm);
       dispatch({
         type: GET_DEPLOYMENT_HISTORY_SUCCESS,
+        payload: data,
       });
     } catch (error) {
       dispatch({
         type: GET_DEPLOYMENT_HISTORY_FAILURE,
+        error,
+      });
+      errorHandler(error);
+    }
+  };
+};
+
+export const getDeployableVersionById = deployableVersionId => {
+  return async dispatch => {
+    dispatch({
+      type: GET_DEPLOYABLE_VERSION_ID_REQUEST,
+    });
+    try {
+      const data = await API.getDeployableVersionById(deployableVersionId);
+      dispatch({
+        type: GET_DEPLOYABLE_VERSION_ID_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_DEPLOYABLE_VERSION_ID_FAILURE,
+        error,
+      });
+      errorHandler(error);
+    }
+  };
+};
+
+export const getDeploymentEnvStatus = deploymentId => {
+  return async dispatch => {
+    dispatch({
+      type: GET_ENV_STATUS_REQUEST,
+    });
+    try {
+      const data = await API.getDeploymentEnvStatus(deploymentId);
+      dispatch({
+        type: GET_ENV_STATUS_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_ENV_STATUS_FAILURE,
+        error,
+      });
+      errorHandler(error); //TODO ERROR FOR MODALS!
+    }
+  };
+};
+
+export const getDeploymentById = deploymentId => {
+  return async dispatch => {
+    dispatch({
+      type: GET_DEPLOYMENT_REQUEST,
+    });
+    try {
+      const data = await API.getDeploymentById(deploymentId);
+      dispatch({
+        type: GET_DEPLOYMENT_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_DEPLOYMENT_FAILURE,
         error,
       });
       errorHandler(error);

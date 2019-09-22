@@ -151,7 +151,7 @@ export const getDeploymentHistory = async (descending, pageNumber, pageSize, sea
       descending,
       pageNumber,
       pageSize,
-      searchTerm: 'services',
+      searchTerm,
     });
     return data;
   } catch (error) {
@@ -159,3 +159,7 @@ export const getDeploymentHistory = async (descending, pageNumber, pageSize, sea
     throw error;
   }
 };
+export const getDeployableVersionById = async deployableVersionId =>
+  await fetchData(`deployable-version/${deployableVersionId}`);
+export const getDeploymentEnvStatus = async deploymentId => await fetchData(`deployment/${deploymentId}/envstatus`);
+export const getDeploymentById = async deploymentId => await fetchData(`deployment/${deploymentId}/`);

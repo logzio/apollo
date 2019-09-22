@@ -170,6 +170,7 @@ const PlainOngoingDeployment = ({
         searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
         showSelection={false}
         emptyMsg={"There aren't ongoing deployments"}
+        pagination={false}
       />
     </div>
   );
