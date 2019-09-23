@@ -14,9 +14,9 @@ import { tableColumns } from '../../../utils/tableColumns';
 import { tagListTitles } from '../../../utils/tableConfig';
 import { DeploymentDetailsView } from './DeploymentDetailsView';
 import { EnvStatusView } from './EnvStatusView';
-import './DeploymentsHistory.css';
 import { AppModal } from '../../../common/Modal';
 import { AppButton } from '../../../common/Button';
+import './DeploymentsHistory.css';
 
 const PlainHistoryDeployment = ({
   getDeploymentHistory,
@@ -36,9 +36,13 @@ const PlainHistoryDeployment = ({
   const [showModalInfo, toggleShowModalInfo] = useState(false);
   const [showModalEnv, toggleShowModalEnv] = useState(false);
   const [showModalRevert, toggleShowModalRevert] = useState(false);
+  const [searchValue, setSearchValue] = useState(null);
+  const [selectedEnv, setSelectedEnv] = useState(null);
+  const pageSize = 15;
+  const defaultCurrentPage = 1;
 
   useEffect(() => {
-    getDeploymentHistory(true, 1, 50);
+    getDeploymentHistory(true, defaultCurrentPage, pageSize);
     handleBreadcrumbs('history');
   }, []);
 
@@ -57,7 +61,7 @@ const PlainHistoryDeployment = ({
   };
 
   const handlePageSelection = (page, pageSize) => {
-    getDeploymentHistory(true, page, pageSize);
+    pageSize && getDeploymentHistory(true, page, pageSize, searchValue);
   };
 
   const handleViewCommitDetails = ({ deployableVersionId }) => {
@@ -65,7 +69,8 @@ const PlainHistoryDeployment = ({
     getDeployableVersionById(deployableVersionId);
   };
 
-  const handleViewEnvStatus = ({ id }) => {
+  const handleViewEnvStatus = ({ id, environmentName }) => {
+    setSelectedEnv(environmentName);
     toggleShowModalEnv(true);
     getDeploymentEnvStatus(id);
   };
@@ -73,6 +78,11 @@ const PlainHistoryDeployment = ({
   const handleRevert = ({ id }) => {
     toggleShowModalRevert(true);
     getDeploymentById(id);
+  };
+
+  const handleSearch = searchValue => {
+    setSearchValue(searchValue);
+    getDeploymentHistory(true, defaultCurrentPage, pageSize, searchValue);
   };
 
   const columns = tableColumns(
@@ -96,6 +106,7 @@ const PlainHistoryDeployment = ({
           envStatus={envStatus}
           services={services}
           getServices={getServices}
+          selectedEnv={selectedEnv}
         />
       )}
       {showModalRevert && (
@@ -141,16 +152,18 @@ const PlainHistoryDeployment = ({
       <AppTable
         columns={columns}
         data={formattedData}
-        scroll={{ y: 650 }} //600
+        scroll={{ y: 800 }}
         showSearch={true}
-        searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
+        searchColumns={['id', 'lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
         showSelection={false}
         emptyMsg={"There aren't deployments"}
         pagination={{
-          pageSize: 50,
+          pageSize: pageSize,
           total: deploymentsHistoryDetails && deploymentsHistoryDetails.recordsFiltered,
           onChange: handlePageSelection,
         }}
+        handleSearch={handleSearch}
+        searchValue={searchValue}
       />
     </div>
   );

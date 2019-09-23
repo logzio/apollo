@@ -19,7 +19,7 @@ export const tagListTitles = {
   GROUP: 'Group status',
   REVERT: 'Revert',
   LOGS: 'View logs',
-  DETAILS: 'Commit details',
+  DETAILS: 'Info',
   STATUS: 'Status',
-  BACK: 'Back to this version',
+  BACK: 'Back to this',
 };

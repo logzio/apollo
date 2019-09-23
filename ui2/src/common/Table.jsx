@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Empty } from 'antd';
 import { AppSearch } from '../common/Search';
-import './Table.css';
 import { AppSkeleton } from './Skeleton';
+import './Table.css';
 
 export const AppTable = ({
   data,
@@ -16,18 +16,19 @@ export const AppTable = ({
   expandIconAsCell,
   expandable,
   pagination,
+  handleSearch,
+  searchValue,
   ...props
 }) => {
-  const [searchValue, setSearchValue] = useState(null);
+  const [defaultSearchValue, setDefaultSearchValue] = useState(null);
   const [filteredData, setFilteredData] = useState(data);
-  const [expandableRows, setExpandableRows] = useState(data); //TODO
 
   useEffect(() => {
     setFilteredData(data);
   }, [data]);
 
-  const handleSearch = value => {
-    setSearchValue(value);
+  const defaultHandleSearch = searchValue => {
+    setDefaultSearchValue(searchValue);
     const filteredData = data.filter(dataItem =>
       searchColumns
         .map(
@@ -35,7 +36,7 @@ export const AppTable = ({
             !!dataItem[colName]
               .toString()
               .toLowerCase()
-              .includes(value.toLowerCase()),
+              .includes(searchValue.toLowerCase()),
         )
         .includes(true),
     );
@@ -44,7 +45,13 @@ export const AppTable = ({
 
   return (
     <>
-      {showSearch && <AppSearch onSearch={handleSearch} onChange={handleSearch} value={searchValue} />}
+      {showSearch && (
+        <AppSearch
+          onSearch={handleSearch ? handleSearch : defaultHandleSearch}
+          onChange={handleSearch ? handleSearch : defaultHandleSearch}
+          value={searchValue ? searchValue : defaultSearchValue}
+        />
+      )}
       {!filteredData ? (
         <AppSkeleton />
       ) : (

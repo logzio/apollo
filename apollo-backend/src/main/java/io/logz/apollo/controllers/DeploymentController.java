@@ -15,7 +15,6 @@ import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
-import org.rapidoid.commons.Str;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
@@ -176,13 +175,14 @@ public class DeploymentController {
 
         DeploymentHistory deploymentHistory = new DeploymentHistory();
         int start = (pageNumber - 1) * pageSize;
+        String search = searchTerm != null ? "%" + searchTerm + "%" : null;
         OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
 
         deploymentHistory.pageNumber = pageNumber;
         deploymentHistory.pageSize = pageSize;
-        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(searchTerm);
+        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
         deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
-        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(searchTerm, orderDirection, start, pageSize);
+        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
 
         assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
     }
