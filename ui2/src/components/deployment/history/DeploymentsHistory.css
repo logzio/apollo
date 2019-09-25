@@ -25,10 +25,31 @@
     width: 100%;
 }
 
-.actions .ant-table-column-sorter, .id .ant-table-column-sorter, .groupName .ant-table-column-sorter{
+.ant-table-column-sorter{
     visibility: hidden;
+}
+
+.id .ant-table-column-sorter{
+    visibility: visible;
 }
 
 .warning-text{
     font-weight: bold;
+}
+
+.serviceName{
+    max-width: 25%;
+}
+
+
+.groupName{
+    max-width: 30%;
+}
+
+.actions div{
+    display: flex;
+}
+
+.tag{
+    margin: 0 3px;
 }

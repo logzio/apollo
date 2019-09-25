@@ -145,13 +145,14 @@ export const getLiveLogsWebSocketUrl = (lastCreatedPod, container, environmentId
 
 /***********    HISTORY DEPLOYMENT API:   ***************/
 
-export const getDeploymentHistory = async (descending, pageNumber, pageSize, searchTerm) => {
+export const getDeploymentHistory = async (descending, pageNumber, pageSize, searchTerm, sortByColName) => {
   try {
     const { data = null } = await axios.post(`${baseUrl}/deployment-history`, {
       descending,
       pageNumber,
       pageSize,
       searchTerm,
+      colName: sortByColName,
     });
     return data;
   } catch (error) {
@@ -163,3 +164,4 @@ export const getDeployableVersionById = async deployableVersionId =>
   await fetchData(`deployable-version/${deployableVersionId}`);
 export const getDeploymentEnvStatus = async deploymentId => await fetchData(`deployment/${deploymentId}/envstatus`);
 export const getDeploymentById = async deploymentId => await fetchData(`deployment/${deploymentId}/`);
+export const getAllGroups = async () => await fetchData(`group/`);

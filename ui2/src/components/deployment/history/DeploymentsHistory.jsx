@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import {
@@ -8,6 +8,7 @@ import {
   getServices,
   getDeploymentById,
   deploy,
+  getAllGroups,
 } from '../../../store/actions/deploymentActions';
 import { AppTable } from '../../../common/Table';
 import { tableColumns } from '../../../utils/tableColumns';
@@ -16,6 +17,7 @@ import { DeploymentDetailsView } from './DeploymentDetailsView';
 import { EnvStatusView } from './EnvStatusView';
 import { AppModal } from '../../../common/Modal';
 import { AppButton } from '../../../common/Button';
+import _ from 'lodash';
 import './DeploymentsHistory.css';
 
 const PlainHistoryDeployment = ({
@@ -32,6 +34,9 @@ const PlainHistoryDeployment = ({
   deploymentDetails,
   getDeploymentById,
   deploy,
+  getAllGroups,
+  allGroups,
+  isLoading,
 }) => {
   const [showModalInfo, toggleShowModalInfo] = useState(false);
   const [showModalEnv, toggleShowModalEnv] = useState(false);
@@ -60,8 +65,9 @@ const PlainHistoryDeployment = ({
     );
   };
 
-  const handlePageSelection = (page, pageSize) => {
-    pageSize && getDeploymentHistory(true, page, pageSize, searchValue);
+  const handleChange = (pagination, filters, sorter) => {
+    const order = sorter.order !== 'ascend';
+    getDeploymentHistory(order, pagination.current, pagination.pageSize);
   };
 
   const handleViewCommitDetails = ({ deployableVersionId }) => {
@@ -82,16 +88,20 @@ const PlainHistoryDeployment = ({
 
   const handleSearch = searchValue => {
     setSearchValue(searchValue);
-    getDeploymentHistory(true, defaultCurrentPage, pageSize, searchValue);
+    delayedSearch(searchValue);
   };
+
+  const delayedSearch = useRef(
+    _.debounce(searchValue => getDeploymentHistory(true, defaultCurrentPage, pageSize, searchValue), 700),
+  ).current;
 
   const columns = tableColumns(
     ['id', 'lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status', 'actions'],
     ['#', 'Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Status', 'Actions'],
     [
-      { title: tagListTitles.DETAILS, color: '#465BA4', onClick: handleViewCommitDetails },
-      { title: tagListTitles.BACK, color: '#BD656A', onClick: handleRevert },
-      { title: tagListTitles.STATUS, color: '#33C737', onClick: handleViewEnvStatus },
+      { title: tagListTitles.DETAILS, color: '#1890ff', onClick: handleViewCommitDetails },
+      { title: tagListTitles.BACK, color: '#1890ff', onClick: handleRevert },
+      { title: tagListTitles.STATUS, color: '#1890ff', onClick: handleViewEnvStatus },
     ],
   );
 
@@ -106,6 +116,8 @@ const PlainHistoryDeployment = ({
           envStatus={envStatus}
           services={services}
           getServices={getServices}
+          getAllGroups={getAllGroups}
+          groups={allGroups}
           selectedEnv={selectedEnv}
         />
       )}
@@ -160,17 +172,27 @@ const PlainHistoryDeployment = ({
         pagination={{
           pageSize: pageSize,
           total: deploymentsHistoryDetails && deploymentsHistoryDetails.recordsFiltered,
-          onChange: handlePageSelection,
         }}
         handleSearch={handleSearch}
         searchValue={searchValue}
+        onChange={handleChange}
+        loading={isLoading}
       />
     </div>
   );
 };
 
 const mapStateToProps = ({
-  deploy: { deploymentsHistory, deploymentsHistoryDetails, deployableVersion, envStatus, services, deploymentDetails },
+  deploy: {
+    deploymentsHistory,
+    deploymentsHistoryDetails,
+    deployableVersion,
+    envStatus,
+    services,
+    deploymentDetails,
+    allGroups,
+    isLoading,
+  },
 }) => ({
   deploymentsHistory,
   deploymentsHistoryDetails,
@@ -178,6 +200,8 @@ const mapStateToProps = ({
   envStatus,
   services,
   deploymentDetails,
+  allGroups,
+  isLoading,
 });
 
 export const DeploymentsHistory = connect(
@@ -189,5 +213,6 @@ export const DeploymentsHistory = connect(
     getServices,
     getDeploymentById,
     deploy,
+    getAllGroups,
   },
 )(PlainHistoryDeployment);

@@ -60,6 +60,9 @@ import {
   GET_DEPLOYMENT_REQUEST,
   GET_DEPLOYMENT_SUCCESS,
   GET_DEPLOYMENT_FAILURE,
+  GET_ALL_GROUPS_REQUEST,
+  GET_ALL_GROUPS_SUCCESS,
+  GET_ALL_GROUPS_FAILURE,
 } from './index';
 import { ongoing as mock } from './mock';
 
@@ -418,13 +421,13 @@ export const revertDeployment = deploymentId => {
   };
 };
 
-export const getDeploymentHistory = (descending, pageNumber, pageSize, searchTerm) => {
+export const getDeploymentHistory = (descending, pageNumber, pageSize, searchTerm, sortByColName) => {
   return async dispatch => {
     dispatch({
       type: GET_DEPLOYMENT_HISTORY_REQUEST,
     });
     try {
-      const data = await API.getDeploymentHistory(descending, pageNumber, pageSize, searchTerm);
+      const data = await API.getDeploymentHistory(descending, pageNumber, pageSize, searchTerm, sortByColName);
       dispatch({
         type: GET_DEPLOYMENT_HISTORY_SUCCESS,
         payload: data,
@@ -495,6 +498,27 @@ export const getDeploymentById = deploymentId => {
     } catch (error) {
       dispatch({
         type: GET_DEPLOYMENT_FAILURE,
+        error,
+      });
+      errorHandler(error);
+    }
+  };
+};
+
+export const getAllGroups = () => {
+  return async dispatch => {
+    dispatch({
+      type: GET_ALL_GROUPS_REQUEST,
+    });
+    try {
+      const data = await API.getAllGroups();
+      dispatch({
+        type: GET_ALL_GROUPS_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: GET_ALL_GROUPS_FAILURE,
         error,
       });
       errorHandler(error);

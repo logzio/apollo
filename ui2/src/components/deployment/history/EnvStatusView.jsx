@@ -2,13 +2,22 @@ import React, { useEffect } from 'react';
 import { AppModal } from '../../../common/Modal';
 import { AppButton } from '../../../common/Button';
 import { Spinner } from '../../../common/Spinner';
-import _ from 'lodash';
 import { tableColumns } from '../../../utils/tableColumns';
 import { AppTable } from '../../../common/Table';
+import _ from 'lodash';
 
-export const EnvStatusView = ({ toggleShowModal, envStatus, getServices, services, selectedEnv }) => {
+export const EnvStatusView = ({
+  toggleShowModal,
+  envStatus,
+  getServices,
+  services,
+  selectedEnv,
+  getAllGroups,
+  groups,
+}) => {
   useEffect(() => {
     getServices();
+    getAllGroups();
   }, []);
 
   const renderEnvStatus = () => {
@@ -16,32 +25,51 @@ export const EnvStatusView = ({ toggleShowModal, envStatus, getServices, service
     let data = [];
 
     _.forEach(envStatusObj, (lastVersion, serviceId) => {
-      services.map(({ id, name }) => {
+      services.map(({ id, name: serviceName }) => {
         if (serviceId === id.toString()) {
-          // if (!_.isString(lastVersion)) {
-          //   _.forEach(lastVersion, (lastGroupVersion, groupId) => {});
-          // }
-          data = [
-            ...data,
-            {
-              id: id,
-              key: serviceId,
-              serviceName: name,
-              deployableVersion: lastVersion,
-            },
-          ];
+          if (!_.isString(lastVersion)) {
+            _.forEach(lastVersion, (lastGroupVersion, groupId) => {
+              groups.map(({ id, name: groupName }) => {
+                if (groupId === id.toString()) {
+                  data = [
+                    ...data,
+                    {
+                      id: id,
+                      key: serviceId,
+                      serviceName: serviceName,
+                      groupName: groupName,
+                      lastVersion: lastGroupVersion,
+                    },
+                  ];
+                }
+              });
+            });
+          } else {
+            data = [
+              ...data,
+              {
+                id: id,
+                key: serviceId,
+                serviceName: serviceName,
+                lastVersion: lastVersion,
+              },
+            ];
+          }
         }
       });
     });
 
-    debugger;
     return data;
   };
 
-  const columns = tableColumns(['serviceName'], ['Service Name']);
+  const columns = tableColumns(
+    ['serviceName', 'groupName', 'lastVersion'],
+    ['Service Name', 'Group Name', 'Last Commit'],
+  );
 
   return (
     <AppModal
+      className={'env-status'}
       visible={true}
       toggleModal={toggleShowModal}
       onClose={() => {
@@ -50,7 +78,7 @@ export const EnvStatusView = ({ toggleShowModal, envStatus, getServices, service
       title={`Environment status - ${selectedEnv}`}
       footer={[<AppButton label={'Close'} className={'modal-btn'} key="back" onClick={() => toggleShowModal(false)} />]}
     >
-      {envStatus && services ? (
+      {envStatus && services && groups ? (
         <AppTable
           columns={columns}
           data={() => renderEnvStatus()}

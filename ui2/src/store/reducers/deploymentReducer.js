@@ -54,6 +54,9 @@ import {
   GET_DEPLOYMENT_REQUEST,
   GET_DEPLOYMENT_SUCCESS,
   GET_DEPLOYMENT_FAILURE,
+  GET_ALL_GROUPS_REQUEST,
+  GET_ALL_GROUPS_SUCCESS,
+  GET_ALL_GROUPS_FAILURE,
   LOUGOUT,
 } from '../actions';
 
@@ -79,6 +82,7 @@ const initialState = {
   deployableVersion: null,
   error: null,
   deploymentDetails: null,
+  allGroups: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -203,10 +207,16 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_ENV_STATUS_FAILURE:
       return { ...state, isLoading: false, error: action.error };
     case GET_DEPLOYMENT_REQUEST:
-      return { ...state, isLoading: true};
+      return { ...state, isLoading: true };
     case GET_DEPLOYMENT_SUCCESS:
       return { ...state, deploymentDetails: action.payload, isLoading: false };
     case GET_DEPLOYMENT_FAILURE:
+      return { ...state, isLoading: false };
+    case GET_ALL_GROUPS_REQUEST:
+      return { ...state, isLoading: true };
+    case GET_ALL_GROUPS_SUCCESS:
+      return { ...state, allGroups: action.payload, isLoading: false };
+    case GET_ALL_GROUPS_FAILURE:
       return { ...state, isLoading: false };
     case LOUGOUT:
       return initialState;
