@@ -14,7 +14,7 @@ export const errorHandler = (error, customMsg) => {
 
     switch (status) {
       case 403:
-      case 404:
+        // case 404:
         historyBrowser.push({
           pathname: '/error',
           search: `?status=${status}`,

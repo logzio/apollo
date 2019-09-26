@@ -43,3 +43,36 @@ code {
 .ant-layout{
     background: white;
 }
+
+.actions div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+tbody > tr .table-action-button {
+    visibility:hidden;
+    transition: opacity 1s ease-in-out;
+}
+
+tbody > tr:hover .table-action-button {
+    visibility:visible;
+}
+
+.ant-modal-body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 250px;
+}
+
+
+@media screen and (max-height: 1000px) {
+    .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td {
+        padding: 5px 8px;
+    }
+
+    .id{
+        max-width: 7%;
+    }
+}

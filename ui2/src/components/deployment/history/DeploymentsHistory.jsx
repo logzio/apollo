@@ -97,11 +97,11 @@ const PlainHistoryDeployment = ({
 
   const columns = tableColumns(
     ['id', 'lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status', 'actions'],
-    ['#', 'Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Status', 'Actions'],
+    ['#', 'Last Update', 'Service', 'Environment', 'Group', 'Initiated By', 'Status'],
     [
-      { title: tagListTitles.DETAILS, color: '#1890ff', onClick: handleViewCommitDetails },
-      { title: tagListTitles.BACK, color: '#1890ff', onClick: handleRevert },
-      { title: tagListTitles.STATUS, color: '#1890ff', onClick: handleViewEnvStatus },
+      { title: tagListTitles.DETAILS, onClick: handleViewCommitDetails },
+      { title: tagListTitles.BACK, onClick: handleRevert },
+      { title: tagListTitles.STATUS, onClick: handleViewEnvStatus },
     ],
   );
 
@@ -164,13 +164,12 @@ const PlainHistoryDeployment = ({
       <AppTable
         columns={columns}
         data={formattedData}
-        scroll={{ y: 800 }}
         showSearch={true}
         searchColumns={['id', 'lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
         showSelection={false}
-        emptyMsg={"There aren't deployments"}
+        emptyMsg={"There aren't deployments to present"}
         pagination={{
-          pageSize: pageSize,
+          pageSize,
           total: deploymentsHistoryDetails && deploymentsHistoryDetails.recordsFiltered,
         }}
         handleSearch={handleSearch}

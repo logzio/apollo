@@ -2,23 +2,9 @@
     min-width: 12%;
 }
 
-.id{
-    max-width: 7%;
+.id, .status, .actions {
     display: flex;
     justify-content: center;
-}
-
-.status, .actions {
-    display: flex;
-    justify-content: center;
-}
-
-.ant-modal-body{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 250px;
-
 }
 
 .modal-content-term{
@@ -37,19 +23,26 @@
     font-weight: bold;
 }
 
-.serviceName{
+.ant-modal-body .serviceName{
     max-width: 25%;
 }
 
-
-.groupName{
+.ant-modal-body .groupName{
     max-width: 30%;
 }
 
-.actions div{
-    display: flex;
+.environmentName{
+    max-width: 40%;
 }
 
-.tag{
-    margin: 0 3px;
+.userEmail{
+    max-width: 14%;
+}
+
+.lastUpdate, .serviceName{
+    max-width: 12%;
+}
+
+.id, .actions, .status{
+    max-width: 8%;
 }

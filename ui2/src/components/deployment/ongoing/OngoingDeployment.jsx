@@ -123,11 +123,11 @@ const PlainOngoingDeployment = ({
 
   const columns = tableColumns(
     ['lastUpdate', 'serviceName', 'environmentName', 'userEmail', 'deploymentMessage', 'status', 'actions'],
-    ['Last Update', 'Service', 'Environment', 'Initiated By', 'Deployment Message', 'Status', 'Actions'],
+    ['Last Update', 'Service', 'Environment', 'Initiated By', 'Deployment Message', 'Status'],
     [
-      { title: tagListTitles.LOGS, color: '#465BA4', onClick: handleViewLogsAction },
-      { title: tagListTitles.REVERT, color: '#BD656A', onClick: handleRevertDeploymentAction },
-      { title: tagListTitles.GROUP, color: '#33C737', onClick: handleViewSelectedGroup },
+      { title: tagListTitles.REVERT, onClick: handleRevertDeploymentAction },
+      { title: tagListTitles.LOGS, onClick: handleViewLogsAction },
+      { title: tagListTitles.GROUP, onClick: handleViewSelectedGroup },
     ],
   );
 
