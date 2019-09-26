@@ -1,7 +1,56 @@
 .app-btn {
     width: 100%;
 }
+.ant-btn[disabled]{
+    height: 40px;
+    width: inherit;
+}
+
+.table-submit-button{
+    width: initial;
+    margin: 10px 5px;
+    height: 40px;
+    font-weight: bold;
+}
 
 .table-button{
     width: initial;
+    margin: 10px 5px;
+    height: 40px;
+    font-weight: bold;
+    background-color: #F2F2F2;
+}
+
+.ant-btn:active.table-button, .ant-btn:focus.table-button{
+    background-color: #EAEFF1;
+}
+
+.table-button:hover{
+    background-color: #EAEFF1;
+}
+
+.modal-btn{
+    width: initial;
+}
+
+.table-action-button{
+    margin: 0 4px;
+    opacity: 0.7;
+}
+
+.table-action-button.details, .table-action-button.group{
+    background-color: rgb(11, 124, 173);
+    border: rgb(11, 124, 173);
+}
+
+
+.table-action-button.back, .table-action-button.revert{
+    background-color: rgb(182, 18, 4);
+    border: rgb(182, 18, 4);
+}
+
+
+.table-action-button.env-status, .table-action-button.view-logs{
+    background-color: rgb(73, 164, 70);
+    border: rgb(73, 164, 70);
 }

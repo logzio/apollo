@@ -1,32 +1,73 @@
-import React from 'react';
-import { Table } from 'antd';
-import _ from 'lodash';
+import React, { useState, useEffect } from 'react';
+import { Table, Empty } from 'antd';
+import { AppSearch } from '../common/Search';
+import { AppSkeleton } from './Skeleton';
 import './Table.css';
 
-export const AppTable = ({ filteredItems, onItemSelectAll, onItemSelect, selectedKeys, ...props }) => {
-  const rowSelection = {
-    onSelectAll: (isSelected, allRows) => {
-      const allRowsKeys = allRows && allRows.map(item => item.key);
-      const currentKeysSelection = isSelected
-        ? _.difference(allRowsKeys, selectedKeys)
-        : _.difference(selectedKeys, allRowsKeys);
-      onItemSelectAll(currentKeysSelection, isSelected);
-    },
-    onSelect: (item, isSelected) => onItemSelect(item.key, isSelected),
-    selectedRowKeys: selectedKeys,
+export const AppTable = ({
+  data,
+  searchColumns,
+  showSearch,
+  emptyMsg,
+  rowSelection,
+  handleRowSelection,
+  rowClassName,
+  expandableColumn,
+  expandIconAsCell,
+  expandable,
+  pagination,
+  handleSearch,
+  searchValue,
+  ...props
+}) => {
+  const [defaultSearchValue, setDefaultSearchValue] = useState(null);
+  const [filteredData, setFilteredData] = useState(data);
+
+  useEffect(() => {
+    setFilteredData(data);
+  }, [data]);
+
+  const defaultHandleSearch = searchValue => {
+    setDefaultSearchValue(searchValue);
+    const filteredData = data.filter(dataItem =>
+      searchColumns
+        .map(
+          colName =>
+            !!dataItem[colName]
+              .toString()
+              .toLowerCase()
+              .includes(searchValue.toLowerCase()),
+        )
+        .includes(true),
+    );
+    setFilteredData(filteredData);
   };
 
   return (
-    <Table
-      className="app-table"
-      dataSource={filteredItems}
-      rowSelection={rowSelection}
-      size={'small'}
-      pagination={false}
-      onRow={item => ({
-        onClick: () => onItemSelect(item.key, !selectedKeys.includes(item.key)),
-      })}
-      {...props}
-    />
+    <>
+      {showSearch && (
+        <AppSearch
+          onSearch={handleSearch ? handleSearch : defaultHandleSearch}
+          onChange={handleSearch ? handleSearch : defaultHandleSearch}
+          value={searchValue ? searchValue : defaultSearchValue}
+        />
+      )}
+      {!filteredData ? (
+        <AppSkeleton />
+      ) : (
+        <Table
+          className="app-table"
+          dataSource={filteredData}
+          rowSelection={rowSelection}
+          size={'small'}
+          pagination={pagination}
+          onRow={handleRowSelection}
+          locale={{
+            emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={<span>{emptyMsg}</span>} />,
+          }}
+          {...props}
+        />
+      )}
+    </>
   );
 };

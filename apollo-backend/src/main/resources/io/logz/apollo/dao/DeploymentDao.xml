@@ -87,15 +87,18 @@
     </select>
 
     <sql id="getAllFilteredDeploymentHistory">
-        SELECT dep.id, dep.last_update, env.name as environment_name, ser.name as service_name, dep.deployable_version_id, dep.group_name, dep.user_email, dep.status, dep.deployment_message
+        SELECT dep.id, dep.last_update, env.name as environment_name, ser.name as service_name,
+        dep.deployable_version_id, dep.group_name, dep.user_email, dep.status, dep.deployment_message
         FROM deployment as dep
         INNER JOIN environment as env on dep.environment_id = env.id
         INNER JOIN service as ser on dep.service_id = ser.id
-        WHERE env.name LIKE #{searchTerm}
-        OR ser.name LIKE #{searchTerm}
-        OR dep.user_email LIKE #{searchTerm}
-        OR dep.group_name LIKE #{searchTerm}
-        OR dep.deployment_message LIKE #{searchTerm}
+        <if test="searchTerm != null">
+            WHERE env.name LIKE #{searchTerm}
+            OR ser.name LIKE #{searchTerm}
+            OR dep.user_email LIKE #{searchTerm}
+            OR dep.group_name LIKE #{searchTerm}
+            OR dep.deployment_message LIKE #{searchTerm}
+        </if>
     </sql>
 
     <select id="filterDeploymentHistoryDetails" resultType="io.logz.apollo.models.DeploymentHistoryDetails">
@@ -110,8 +113,10 @@
     </select>
 
     <insert id="addDeployment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO deployment (environment_id, service_id, deployable_version_id, user_email, status, source_version, group_name, deployment_params, deployment_message)
-        VALUES (#{environmentId}, #{serviceId}, #{deployableVersionId}, #{userEmail}, #{status}, #{sourceVersion}, #{groupName}, #{deploymentParams}, #{deploymentMessage})
+        INSERT INTO deployment (environment_id, service_id, deployable_version_id, user_email, status, source_version,
+        group_name, deployment_params, deployment_message)
+        VALUES (#{environmentId}, #{serviceId}, #{deployableVersionId}, #{userEmail}, #{status}, #{sourceVersion},
+        #{groupName}, #{deploymentParams}, #{deploymentMessage})
     </insert>
 
     <update id="updateDeploymentStatus">

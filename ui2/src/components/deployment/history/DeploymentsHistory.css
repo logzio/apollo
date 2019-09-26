@@ -1,0 +1,48 @@
+.environmentName{
+    min-width: 12%;
+}
+
+.id, .status, .actions {
+    display: flex;
+    justify-content: center;
+}
+
+.modal-content-term{
+    width: 100%;
+}
+
+.ant-table-column-sorter{
+    visibility: hidden;
+}
+
+.id .ant-table-column-sorter{
+    visibility: visible;
+}
+
+.warning-text{
+    font-weight: bold;
+}
+
+.ant-modal-body .serviceName{
+    max-width: 25%;
+}
+
+.ant-modal-body .groupName{
+    max-width: 30%;
+}
+
+.environmentName{
+    max-width: 40%;
+}
+
+.userEmail{
+    max-width: 14%;
+}
+
+.lastUpdate, .serviceName{
+    max-width: 12%;
+}
+
+.id, .actions, .status{
+    max-width: 8%;
+}

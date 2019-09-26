@@ -1,0 +1,28 @@
+.deploymentMessage{
+    min-width: 30%;
+}
+
+.environmentName{
+    min-width: 12%;
+}
+
+.status, .actions, .group{
+    display: flex;
+    justify-content: center;
+}
+
+.modal-content-term{
+    width: 100%;
+}
+
+.actions .ant-table-column-sorter{
+    visibility: hidden;
+}
+
+.ant-modal-body .actions, .ant-modal-body .status{
+    max-width: 50%;
+}
+
+.ant-modal-body .table-action-button {
+    visibility:visible;
+}

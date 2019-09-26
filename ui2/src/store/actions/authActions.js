@@ -11,7 +11,9 @@ import {
   LOUGOUT,
   APP_INIT,
 } from './index';
+import { errorHandler } from '../../utils/errorHandler';
 import * as API from '../../api/api';
+import { clearExpiredCache, clearCache } from '../../utils/cacheService';
 
 export const signup = userDetails => {
   return async dispatch => {
@@ -57,6 +59,7 @@ export const login = userDetails => {
 
 export const logout = () => {
   return dispatch => {
+    clearCache();
     API.appLogout();
     dispatch({
       type: LOUGOUT,
@@ -66,6 +69,7 @@ export const logout = () => {
 
 export const appInit = () => {
   return dispatch => {
+    clearExpiredCache();
     const loggedIn = API.appInit();
     dispatch({
       type: APP_INIT,
@@ -90,6 +94,7 @@ export const getDeploymentRoles = () => {
         type: GET_DEP_ROLE_FAILURE,
         error,
       });
+      errorHandler(error);
     }
   };
 };

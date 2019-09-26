@@ -1,9 +1,33 @@
 import React, { useEffect } from 'react';
+import { AppTransfer } from '../../../common/Transfer';
+import { parse } from 'query-string';
 
-export const SelectGrourp = ({ handleBreadcrumbs }) => {
+export const SelectGroup = ({ handleBreadcrumbs, match, search, getGroups, groups, selectGroups }) => {
+  const { service: serviceId, environment: environmentsId } = parse(search);
+
   useEffect(() => {
-    handleBreadcrumbs(`${window.location.href}`, 'group');
+    handleBreadcrumbs('group');
+    environmentsId.split(',').map(environmentId => getGroups(environmentId, serviceId));
   }, []);
 
-  return <div>hi</div>;
+  const handleGroupsSelection = groupsId => {
+    selectGroups(groupsId.map(groupId => groups.find(service => service.id.toString() === groupId)));
+  };
+
+  return (
+    <div>
+      <AppTransfer
+        data={groups}
+        searchColumns={['name', 'scalingFactor', 'jsonParams']}
+        leftColTitles={['name', 'scalingFactor', 'jsonParams', 'environmentId']}
+        rightColTitles={['name']}
+        columnTitles={['Name', 'Scaling Factor', 'Parameters', 'Environment']}
+        linkTo={'version'}
+        addSearch={`${search}&group`}
+        match={match}
+        handleSelection={handleGroupsSelection}
+        showDefaultSelection={true}
+      />
+    </div>
+  );
 };
