@@ -164,10 +164,10 @@ const PlainOngoingDeployment = ({
       )}
       <AppTable
         columns={columns}
-        data={formattedData}
+        data={formattedData()}
         scroll={{ y: 650 }} //600
         showSearch={true}
-        searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'groupName', 'userEmail', 'status']}
+        searchColumns={['lastUpdate', 'serviceName', 'environmentName', 'userEmail', 'deploymentMessage', 'status']}
         showSelection={false}
         emptyMsg={"There aren't ongoing deployments"}
         pagination={false}

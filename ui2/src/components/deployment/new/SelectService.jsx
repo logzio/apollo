@@ -34,7 +34,7 @@ export const SelectService = ({
       <AppTransfer
         data={services}
         searchColumns={['name']}
-        leftColTitles={['name']}
+        leftColTitles={['name', 'actions']}
         rightColTitles={['name']}
         columnTitles={['Name']}
         predefinedGroups={servicesStacks}

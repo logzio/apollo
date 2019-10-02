@@ -63,7 +63,7 @@ const getActionBadges = (tagList, { status, groupName, ...rest }) => {
             case tagListTitles.STATUS:
               return actionButton('history', 'env-status', tagListTitles.STATUS);
             default:
-              return actionButton('info');
+              return actionButton('check');
           }
         })}
       </div>
@@ -78,7 +78,7 @@ const getAuthorProfile = (userProfileUrl, userProfileName) => (
   </div>
 );
 
-const costumeRender = (dataCategory, index, tagList, record, text) => {
+const costumeRender = (dataCategory, index, record, text, tagList) => {
   switch (dataCategory) {
     case category.ACTIONS:
       return getActionBadges(tagList, record);
@@ -86,7 +86,7 @@ const costumeRender = (dataCategory, index, tagList, record, text) => {
       return getStatusTag(record.status, record.groupRecords);
     case category.AUTHOR:
       return getAuthorProfile(record.committerAvatarUrl, record.committerName);
-    case 'deploymentMessage':
+    case category.MESSAGE:
       return (
         <AppEllipsis tooltipText={record.deploymentMessage} isEllipsis={record.deploymentMessage.length > 30}>
           {record.deploymentMessage}
@@ -110,6 +110,7 @@ export const transferTableColumns = (dataCategories, columnTitles) =>
   dataCategories.map((dataCategory, index) => ({
     dataIndex: dataCategory,
     title: columnTitles[index],
+    render: (text, record) => costumeRender(dataCategory, index, record, text),
   }));
 
 export const tableColumns = (dataCategories, columnTitles, tagList) =>
@@ -118,5 +119,5 @@ export const tableColumns = (dataCategories, columnTitles, tagList) =>
     title: columnTitles[index],
     className: dataCategory,
     sorter: (recordA, recordB) => handleSort(recordA, recordB, dataCategory),
-    render: (text, record) => costumeRender(dataCategory, index, tagList, record, text),
+    render: (text, record) => costumeRender(dataCategory, index, record, text, tagList),
   }));

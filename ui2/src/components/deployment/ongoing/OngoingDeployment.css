@@ -15,14 +15,14 @@
     width: 100%;
 }
 
-.actions .ant-table-column-sorter{
-    visibility: hidden;
-}
+/*.actions .ant-table-column-sorter{*/
+/*    visibility: hidden;*/
+/*}*/
 
 .ant-modal-body .actions, .ant-modal-body .status{
     max-width: 50%;
 }
 
 .ant-modal-body .table-action-button {
-    visibility:visible;
+    visibility: visible;
 }

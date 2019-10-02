@@ -13,6 +13,7 @@ export const category = {
   AUTHOR: 'author',
   LAST_UPDATED: 'lastUpdate',
   VERSION_ID: 'deployableVersionId',
+  MESSAGE: 'deploymentMessage',
 };
 
 export const tagListTitles = {
