@@ -1,7 +1,8 @@
 .app-btn {
     width: 100%;
 }
-.ant-btn[disabled]{
+
+.ant-btn[disabled], .ant-transfer-operation .ant-btn{
     height: 40px;
     width: inherit;
 }

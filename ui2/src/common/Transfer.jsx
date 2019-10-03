@@ -79,6 +79,8 @@ export const AppTransfer = ({
             }
             setTargetKeys(targetKeys);
           }}
+          operations={['Select', 'Remove']}
+          operationStyle={{ width: '100px' }}
           titles={[`Please select at least one ${currentTable}`, `Selected items`]}
           {...props}
         >

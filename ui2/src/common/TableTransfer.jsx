@@ -73,6 +73,10 @@ export const AppTableTransfer = ({
     onClick: () => {
       handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
     },
+    onDoubleClick: () => {
+      const keys = targetKeys ? targetKeys : [];
+      setTargetKeys && setTargetKeys([...keys, key]);
+    },
   });
 
   return (
@@ -108,14 +112,16 @@ export const AppTableTransfer = ({
       {!leftPanel && (
         <div>
           <AppButton
-            label={'Reset'}
+            label={'Remove all'}
             className={'table-button'}
             onClick={() => {
+              onItemSelectAll(targetKeys, false);
               setTargetKeys([]);
               setSelectedGroupService(null);
               toggleSelectedNonGroupService(false);
               toggleDisabledPredefinedGroups(false);
             }}
+            disabled={_.isEmpty(targetKeys)}
           />
         </div>
       )}
