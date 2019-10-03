@@ -1,3 +1,7 @@
+.ongoing-deployment{
+    margin-top: 50px;
+}
+
 .ongoing-deployment .deploymentMessage{
     min-width: 30%;
 }
