@@ -85,7 +85,15 @@ const NewDeploymentComponent = ({
       <Route
         path={`${match.url}/group`}
         render={({ match }) => (
-          <SelectGroup match={match} search={search} selectGroups={selectGroups} groups={groups} {...props} />
+          <SelectGroup
+            match={match}
+            search={search}
+            selectGroups={selectGroups}
+            groups={groups}
+            environments={environments}
+            getSelectedEnv={getSelectedEnv}
+            {...props}
+          />
         )}
       />
       <Route

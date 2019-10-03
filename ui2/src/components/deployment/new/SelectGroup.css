@@ -1,0 +1,13 @@
+.select-group .geoRegion, .select-group .availability{
+    max-width: 15%;
+}
+
+.select-group .scalingFactor{
+    max-width: 15%;
+    display: flex;
+    justify-content: center;
+}
+
+.select-group .environmentName{
+    max-width: 22%;
+}

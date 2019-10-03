@@ -106,7 +106,7 @@ const PlainHistoryDeployment = ({
   );
 
   return (
-    <div>
+    <div className={'deployments-history'}>
       {showModalInfo && (
         <DeploymentDetailsView toggleShowModal={toggleShowModalInfo} deployableVersion={deployableVersion} />
       )}

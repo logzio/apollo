@@ -61,3 +61,7 @@
 .hide-row-expand-icon .ant-table-row-expand-icon{
     display: none;
 }
+
+.ant-table-row td:hover{
+    overflow: hidden;
+}

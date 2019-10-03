@@ -4,3 +4,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+div.ant-typography{
+    margin-bottom: 0;
+}

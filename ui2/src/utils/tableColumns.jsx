@@ -78,6 +78,12 @@ const getAuthorProfile = (userProfileUrl, userProfileName) => (
   </div>
 );
 
+const handleEllipsisText = (text, limitLength) => (
+  <AppEllipsis tooltipText={text} isEllipsis={text.length > limitLength}>
+    {text}
+  </AppEllipsis>
+);
+
 const costumeRender = (dataCategory, index, record, text, tagList) => {
   switch (dataCategory) {
     case category.ACTIONS:
@@ -87,11 +93,11 @@ const costumeRender = (dataCategory, index, record, text, tagList) => {
     case category.AUTHOR:
       return getAuthorProfile(record.committerAvatarUrl, record.committerName);
     case category.MESSAGE:
-      return (
-        <AppEllipsis tooltipText={record.deploymentMessage} isEllipsis={record.deploymentMessage.length > 30}>
-          {record.deploymentMessage}
-        </AppEllipsis>
-      );
+      return handleEllipsisText(record.deploymentMessage, 30);
+    case category.KUBERNETES:
+      return handleEllipsisText(record.kubernetesMaster, 30);
+    case category.PARAMS:
+      return handleEllipsisText(record.jsonParams, 40);
     default:
       return <div>{text}</div>;
   }
@@ -105,13 +111,6 @@ const handleSort = (recordA, recordB, dataCategory) => {
   }
   return valueA.localeCompare(valueB);
 };
-
-export const transferTableColumns = (dataCategories, columnTitles) =>
-  dataCategories.map((dataCategory, index) => ({
-    dataIndex: dataCategory,
-    title: columnTitles[index],
-    render: (text, record) => costumeRender(dataCategory, index, record, text),
-  }));
 
 export const tableColumns = (dataCategories, columnTitles, tagList) =>
   dataCategories.map((dataCategory, index) => ({

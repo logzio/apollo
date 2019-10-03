@@ -75,7 +75,7 @@ export const SelectVersion = ({
   };
 
   return (
-    <>
+    <div className={'select-version'}>
       <div className="header">
         <AppButton
           onClick={() => toggleShowModal(true)}
@@ -131,6 +131,6 @@ export const SelectVersion = ({
         rowSelection={rowSelection}
         pagination={false}
       />
-    </>
+    </div>
   );
 };

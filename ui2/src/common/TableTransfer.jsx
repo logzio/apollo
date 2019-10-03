@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import _ from 'lodash';
 import { AppTable } from './Table';
 import { AppButton } from '../common/Button';
-import { transferTableColumns } from '../utils/tableColumns';
+import { tableColumns } from '../utils/tableColumns';
 
 export const AppTableTransfer = ({
   direction,
@@ -28,11 +28,8 @@ export const AppTableTransfer = ({
   const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
   const [selectedButton, toggleSelectedButton] = useState(false);
   const leftPanel = direction === 'left';
-  const scroll = leftPanel ? { x: 900, y: 580 } : { x: 400, y: 580 };
-
-  const columns = leftPanel
-    ? transferTableColumns(leftColTitles, columnTitles)
-    : transferTableColumns(rightColTitles, columnTitles);
+  const scroll = leftPanel ? { x: 900, y: 580 } : { x: 200, y: 580 };
+  const columns = leftPanel ? tableColumns(leftColTitles, columnTitles) : tableColumns(rightColTitles, columnTitles);
 
   const handleOnSelect = (key, isPartOfGroup, isSelected) => {
     if (isPartOfGroup) {

@@ -132,7 +132,7 @@ const PlainOngoingDeployment = ({
   );
 
   return (
-    <div>
+    <div className={'ongoing-deployment'}>
       {showModal && (
         <LiveLogsView
           toggleShowModal={toggleShowModal}

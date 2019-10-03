@@ -30,7 +30,7 @@ export const SelectService = ({
     selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
 
   return (
-    <div>
+    <div className={'select-service'}>
       <AppTransfer
         data={services}
         searchColumns={['name']}

@@ -1,12 +1,3 @@
-.environmentName{
-    min-width: 12%;
-}
-
-.id, .status, .actions {
-    display: flex;
-    justify-content: center;
-}
-
 .modal-content-term{
     width: 100%;
 }
@@ -31,18 +22,31 @@
     max-width: 30%;
 }
 
-.environmentName{
+.deployments-history .environmentName{
     max-width: 40%;
+    min-width: 12%;
 }
 
-.userEmail{
+.deployments-history .userEmail{
     max-width: 14%;
 }
 
-.lastUpdate, .serviceName{
+.deployments-history .lastUpdate, .deployments-history .serviceName{
     max-width: 12%;
 }
 
-.id, .actions, .status{
+.deployments-history .id, .deployments-history .actions, .deployments-history .status{
     max-width: 8%;
+    display: flex;
+    justify-content: center;
+}
+
+@media screen and (max-width: 1700px) {
+    .deployments-history .serviceName{
+        max-width: 10%;
+    }
+
+    .deployments-history .actions, .deployments-history .status{
+        max-width: 8%;
+    }
 }

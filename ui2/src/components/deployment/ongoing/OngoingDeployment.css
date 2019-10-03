@@ -1,12 +1,26 @@
-.deploymentMessage{
+.ongoing-deployment .deploymentMessage{
     min-width: 30%;
 }
 
-.environmentName{
+.ongoing-deployment .environmentName{
+    max-width: 40%;
     min-width: 12%;
 }
 
-.status, .actions, .group{
+.ongoing-deployment .userEmail{
+    max-width: 14%;
+}
+
+.ongoing-deployment .lastUpdate{
+    max-width: 10%;
+}
+
+.ongoing-deployment .serviceName{
+    max-width: 9%;
+}
+
+.ongoing-deployment .actions, .ongoing-deployment .status{
+    max-width: 10%;
     display: flex;
     justify-content: center;
 }
@@ -15,14 +29,31 @@
     width: 100%;
 }
 
-/*.actions .ant-table-column-sorter{*/
-/*    visibility: hidden;*/
-/*}*/
-
 .ant-modal-body .actions, .ant-modal-body .status{
     max-width: 50%;
+    display: flex;
+    justify-content: center;
 }
 
 .ant-modal-body .table-action-button {
     visibility: visible;
+}
+
+.ant-modal-body .serviceName{
+    max-width: 25%;
+}
+
+.ant-modal-body .groupName{
+    max-width: 30%;
+}
+
+
+@media screen and (max-width: 1700px) {
+    .ongoing-deployment .lastUpdate, .ongoing-deployment .userEmail{
+        max-width: 12%;
+    }
+
+    .ongoing-deployment .actions, .ongoing-deployment .status{
+        max-width: 8%;
+    }
 }

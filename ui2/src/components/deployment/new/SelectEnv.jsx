@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { AppTransfer } from '../../../common/Transfer';
 import { Spinner } from '../../../common/Spinner';
+import './SelectEnv.css';
 
 export const SelectEnvironment = ({
   getEnvironments,
@@ -49,20 +50,22 @@ export const SelectEnvironment = ({
   }
 
   return (
-    <AppTransfer
-      data={environments}
-      searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
-      leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
-      columnTitles={['Name', 'Region', 'Availability', 'Kubernetes Master']}
-      rightColTitles={['name']}
-      predefinedGroups={environmentsStacks}
-      showDefaultSelection={false}
-      selectGroup={stackSelection}
-      linkTo={isServicePartOfGroup() ? 'group' : 'version'}
-      addSearch={`${search}&environment`}
-      match={match}
-      emptyMsg={'Please select environments from the left panel'}
-      handleSelection={handleEnvironmentsSelection}
-    />
+    <div className={'select-env'}>
+      <AppTransfer
+        data={environments}
+        searchColumns={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
+        leftColTitles={['name', 'geoRegion', 'availability', 'kubernetesMaster']}
+        columnTitles={['Name', 'Region', 'Availability', 'Kubernetes Master']}
+        rightColTitles={['name']}
+        predefinedGroups={environmentsStacks}
+        showDefaultSelection={false}
+        selectGroup={stackSelection}
+        linkTo={isServicePartOfGroup() ? 'group' : 'version'}
+        addSearch={`${search}&environment`}
+        match={match}
+        emptyMsg={'Please select environments from the left panel'}
+        handleSelection={handleEnvironmentsSelection}
+      />
+    </div>
   );
 };

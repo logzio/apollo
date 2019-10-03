@@ -14,6 +14,8 @@ export const category = {
   LAST_UPDATED: 'lastUpdate',
   VERSION_ID: 'deployableVersionId',
   MESSAGE: 'deploymentMessage',
+  KUBERNETES: 'kubernetesMaster',
+  PARAMS: 'jsonParams',
 };
 
 export const tagListTitles = {

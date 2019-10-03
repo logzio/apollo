@@ -9,15 +9,10 @@ th.ant-table-selection-column{
     visibility: hidden;
 }
 
-/*.status, .actions{*/
-/*    display: flex;*/
-/*    justify-content: center;*/
-/*}*/
-
-.shortendCommitSha, .commitDate, .commitAuthor{
+.select-version .shortendCommitSha, .select-version .commitDate{
     max-width: 13%;
 }
 
-.author{
+.select-version .author{
     max-width: 20%;
 }
