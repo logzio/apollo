@@ -187,7 +187,7 @@ export const getLastCommitFromBranch = (branchName, deployableVersionId) => {
         type: GET_BRANCH_LATEST_VERSION_FAILURE,
         error,
       });
-      errorHandler(error);
+      errorHandler(error, 'Could not get latest commit on this branch!'); //TEMP error notification
     }
   };
 };
@@ -371,7 +371,7 @@ export const getContainers = (environmentId, serviceId) => {
         type: GET_CONTAINERS_FAILURE,
         error,
       });
-      errorHandler(error, 'Could not find the latest running pod for this deployment, please try again!');
+      errorHandler(error, 'Could not find the latest running pod for this deployment, please try again!'); //TEMP error notification
     }
   };
 };
@@ -393,7 +393,7 @@ export const getGroupContainers = (environmentId, serviceId, groupName) => {
         type: GET_GROUP_CONTAINERS_FAILURE,
         error,
       });
-      errorHandler(error, 'Could not find the latest running pod for this deployment, please try again!');
+      errorHandler(error, 'Could not find the latest running pod for this deployment, please try again!'); //TEMP error notification
     }
   };
 };

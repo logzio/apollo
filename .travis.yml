@@ -20,8 +20,11 @@ cache:
 
 install: ./mvnw install -DskipTests -Dgpg.skip
 
+before_script:
+  - yarn --cwd ui2 install
+
 script:
-  - ./mvnw test && ./ui/build.sh
+  - ./mvnw test && yarn --cwd ui2 build && ./ui/build.sh
 
 after_success:
   - if [ "$BRANCH" == "master" ]; then
@@ -30,4 +33,11 @@ after_success:
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
     docker push logzio/apollo:$TRAVIS_COMMIT;
     docker push logzio/apollo:latest;
+    fi
+    if [ "$BRANCH" == "DEV-15603-tests-and-ui" ]; then
+    docker build -t logzio/apollo:$TRAVIS_COMMIT .;
+    docker tag logzio/apollo:$TRAVIS_COMMIT logzio/apollo:ifat;
+    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+    docker push logzio/apollo:$TRAVIS_COMMIT;
+    docker push logzio/apollo:ifat;
     fi

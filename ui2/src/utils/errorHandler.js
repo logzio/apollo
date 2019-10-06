@@ -10,7 +10,11 @@ export const errorHandler = (error, customMsg) => {
 
   if (!_.isNil(status) && !_.isNil(error.message)) {
     const description = _.isString(data) ? data : data.error;
-    const errorNotification = appNotification(error.message, description ? description : customMsg, 'frown');
+    const errorNotification = appNotification(
+      error.message,
+      customMsg && description ? `${customMsg} ${description}` : customMsg, //<============================================
+      'frown',
+    );
 
     switch (status) {
       case 403:
