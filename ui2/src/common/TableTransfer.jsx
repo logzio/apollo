@@ -31,21 +31,26 @@ export const AppTableTransfer = ({
   const scroll = leftPanel ? { x: 900, y: 580 } : { x: 200, y: 580 };
   const columns = leftPanel ? tableColumns(leftColTitles, columnTitles) : tableColumns(rightColTitles, columnTitles);
 
-  const handleOnSelect = (key, isPartOfGroup, isSelected) => {
+  const defineSelection = (key, isPartOfGroup) => {
     if (isPartOfGroup) {
+      toggleSelectedNonGroupService(false);
       toggleDisabledPredefinedGroups(leftPanel ? !disabledPredefinedGroups : true);
       setSelectedGroupService(selectedGroupService && leftPanel ? null : key);
-      return onItemSelect(key, isSelected);
+    } else {
+      toggleSelectedNonGroupService(leftPanel);
     }
-    toggleSelectedNonGroupService(leftPanel);
+  };
+
+  const handleOnSelect = (key, isPartOfGroup, isSelected) => {
+    defineSelection(key, isPartOfGroup);
     return onItemSelect(key, isSelected);
   };
 
-  const handleDisabledRaws = record => {
+  const handleDisabledRaws = (key, isPartOfGroup) => {
     return (
-      (record.isPartOfGroup === true && targetKeys.length > 0) ||
-      (selectedGroupService && selectedGroupService !== record.key) ||
-      (record.isPartOfGroup === true && selectedNonGroupService && selectedKeys.length > 0)
+      (isPartOfGroup === true && targetKeys.length > 0 && leftPanel) ||
+      (selectedGroupService && selectedGroupService !== key && leftPanel) ||
+      (isPartOfGroup === true && selectedNonGroupService && selectedKeys.length > 0 && leftPanel)
     );
   };
 
@@ -61,20 +66,35 @@ export const AppTableTransfer = ({
       handleOnSelect(key, isPartOfGroup, isSelected);
     },
     selectedRowKeys: selectedKeys,
-    getCheckboxProps: record => ({
-      disabled: leftPanel ? handleDisabledRaws(record) : null,
+    getCheckboxProps: ({ key, isPartOfGroup }) => ({
+      disabled: leftPanel ? handleDisabledRaws(key, isPartOfGroup) : null,
     }),
   };
 
-  const handleRowSelection = ({ key, isPartOfGroup }) => ({
-    onClick: () => {
-      handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
-    },
-    onDoubleClick: () => {
-      const keys = targetKeys ? targetKeys : [];
-      setTargetKeys && setTargetKeys([...keys, key]);
-    },
-  });
+  const handleRowSelection = ({ key, isPartOfGroup }) => {
+    const isDisabled = handleDisabledRaws(key, isPartOfGroup);
+
+    return {
+      onClick: () => {
+        if (!isDisabled) {
+          handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
+        }
+      },
+      onDoubleClick: () => {
+        if (!isDisabled) {
+          defineSelection(key, isPartOfGroup);
+          if (leftPanel) {
+            const keys = targetKeys ? targetKeys : [];
+            setTargetKeys && setTargetKeys([...keys, key]);
+          } else {
+            const remainTargetKeys = targetKeys.filter(targetKey => targetKey !== key);
+            setTargetKeys && setTargetKeys(remainTargetKeys);
+            isPartOfGroup && setSelectedGroupService(null);
+          }
+        }
+      },
+    };
+  };
 
   return (
     <div>
@@ -112,10 +132,10 @@ export const AppTableTransfer = ({
             label={'Remove all'}
             className={'table-button'}
             onClick={() => {
-              onItemSelectAll(targetKeys, false);
-              setTargetKeys([]);
-              setSelectedGroupService(null);
               toggleSelectedNonGroupService(false);
+              onItemSelectAll(targetKeys, false);
+              setSelectedGroupService(null);
+              setTargetKeys([]);
               toggleDisabledPredefinedGroups(false);
             }}
             disabled={_.isEmpty(targetKeys)}
