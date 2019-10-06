@@ -22,6 +22,7 @@ export const signup = userDetails => {
     });
     try {
       const data = await API.signup(userDetails);
+      await API.addUserRole(userDetails.deploymentRoleId, userDetails.userEmail); //TEMP - should be fixed on server side
       dispatch({
         type: SIGNUP_SUCCESS,
         payload: data,

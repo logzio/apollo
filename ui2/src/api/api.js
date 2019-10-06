@@ -27,6 +27,16 @@ export const signup = async user => {
   }
 };
 
+export const addUserRole = async (deploymentRoleId, userEmail) => {
+  try {
+    const { data = null } = await axios.post(`${baseUrl}/deployment-roles/add-user`, { deploymentRoleId, userEmail });
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error("User doesn't have the required role"); //TEMP - depend on server side
+  }
+};
+
 export const login = async user => {
   try {
     const { data = null } = await axios.post(`${baseUrl}/_login/`, user);

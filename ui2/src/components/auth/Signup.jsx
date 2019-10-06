@@ -11,7 +11,7 @@ const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoadin
     try {
       await signup(userDetails);
       resetForm();
-      appNotification(`${userDetails.firstName} ${userDetails.lastName} was added`);
+      appNotification(`${userDetails.firstName} ${userDetails.lastName} was added`, '', 'smile');
     } catch (error) {
       setSubmitting(false);
     }

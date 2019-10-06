@@ -64,7 +64,6 @@ import {
   GET_ALL_GROUPS_SUCCESS,
   GET_ALL_GROUPS_FAILURE,
 } from './index';
-import { ongoing as mock } from './mock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -344,7 +343,6 @@ export const getOngoingDeployments = () => {
       dispatch({
         type: GET_ONGOING_DEPLOYMENT_SUCCESS,
         payload: data,
-        // payload: mock,
       });
     } catch (error) {
       dispatch({
