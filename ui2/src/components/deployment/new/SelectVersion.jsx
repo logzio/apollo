@@ -34,10 +34,10 @@ export const SelectVersion = ({
         ...dataItem,
         id: id,
         key: id.toString(),
-        commitDate: moment(commitDate).format('DD/MM/YY, h:mm:ss'),
-        shortendCommitSha: gitCommitSha.slice(0, 7),
+        commitDate: commitDate && moment(commitDate).format('DD/MM/YY, h:mm:ss'),
+        shortendCommitSha: gitCommitSha && gitCommitSha.slice(0, 7),
         gitCommitSha: gitCommitSha,
-        commitMessage: commitMessage.split('*').shift(),
+        commitMessage: commitMessage && commitMessage.split('*').shift(),
       };
     });
 
@@ -124,7 +124,6 @@ export const SelectVersion = ({
         )}
         data={formattedData}
         scroll={{ y: 690 }}
-        // scroll={{ y: 540 }}
         showSearch={true}
         searchColumns={['commitDate', 'gitCommitSha', 'commitMessage', 'committerName']}
         handleRowSelection={handleRowSelection}

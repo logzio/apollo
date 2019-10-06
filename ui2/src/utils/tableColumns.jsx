@@ -73,8 +73,8 @@ const getActionBadges = (tagList, { status, groupName, ...rest }) => {
 
 const getAuthorProfile = (userProfileUrl, userProfileName) => (
   <div className="user-profile">
-    <img className="image-table" src={userProfileUrl} alt="user-profile" />
-    <div>{userProfileName}</div>
+    {userProfileUrl && <img className="image-table" src={userProfileUrl} alt="user-profile" />}
+    {userProfileName && <div>{userProfileName}</div>}
   </div>
 );
 
