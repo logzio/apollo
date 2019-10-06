@@ -1,7 +1,6 @@
 language: java
 jdk:
   - oraclejdk8
-node_js: "12.11.1"
 
 env:
   global:
@@ -10,6 +9,8 @@ env:
   - secure: bSkR/FIHTu4SWd8ay1sKX4EKFjcwz+kVYNir/JPKaMEYPlvsypxFRcLvpipUHW+bEaPudQhNuHKcoPiqMFc79/XVVeMmSy4IIJQ8oEAWZd/W0P8JO9pi2yRfUs0yZWxLwX0Fus5wULVbNjakNgpp5rB4dOggwnM08dy3A4oGKFZitSIRBqnrAqmkWCebTDjP+6NruFl5yXXXd7/7WoL0d66DrS+bhDajNtsicjFmHU5zEIFOdmAnF+O6h1+0EKa8E8qMibWkTz2AmY7iXwwxzvstsoVzM67oEBdy/ur8yJLbkmgERdO17nHxKSXhx7Z1IBCNyPlORYweULm1qRO1sF9EQOWIEmRemlBZD3GctdHcX+ck/XBK1/WQ9Twb4Np5n0++hyul9xZtTDVxKmjjPLj8FL+BHQj42rZNxpu7eDmZEJx1VMX2lHTYwCDTGl+cMCO1yXQUYepk5WivcE5lDpq+cqg4x1qM6TmCyyT/BAjqqk0SHujxk4Jf8dhwqP8bwrvqqv8id4hHKD15kA1ulF2m6tsTirNN/LqmwYTzTPfM+1iZqyRYfoQCMLQzOd7giegkJIIE4UWHxnn3B1bVVlywXuqN9zOtg+KlWqfh/WWctuYrluyMclA19KXFxLqcKic/DoPLQ2RRTMgdlpzNwB87w5xi4p6GsS7wBR8XXPY=
   - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else
     echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+  - NODE_VERSION="12.11.1"
+
 sudo: required
 
 services:
@@ -18,6 +19,9 @@ services:
 cache:
   directories:
     - '$HOME/.m2'
+
+before_install:
+  - nvm install $NODE_VERSION
 
 install: ./mvnw install -DskipTests -Dgpg.skip
 
