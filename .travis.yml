@@ -22,11 +22,9 @@ cache:
 
 before_install:
   - nvm install $NODE_VERSION
+  - npm install -g react-scripts
 
-install: ./mvnw install -DskipTests -Dgpg.skip
-
-before_script:
-  - yarn --cwd ui2 install
+install: ./mvnw install -DskipTests -Dgpg.skip && yarn --cwd ui2 install
 
 script:
   - ./mvnw test && yarn --cwd ui2 build && ./ui/build.sh
