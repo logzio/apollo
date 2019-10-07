@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { isNil, isString } from 'lodash';
 import { appNotification } from '../common/notification';
 import { historyBrowser } from './history';
 
@@ -8,11 +8,11 @@ export const errorHandler = (error, customMsg) => {
   }
   const { status, data } = error.response;
 
-  if (!_.isNil(status) && !_.isNil(error.message)) {
-    const description = _.isString(data) ? data : data.error;
+  if (!isNil(status) && !isNil(error.message)) {
+    const description = isString(data) ? data : data.error;
     const errorNotification = appNotification(
       error.message,
-      customMsg && description ? `${customMsg} ${description}` : customMsg, //<============================================
+      description ? `${customMsg} ${description}` : customMsg,
       'frown',
     );
 

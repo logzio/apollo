@@ -15,7 +15,7 @@ import { tableColumns } from '../../../utils/tableColumns';
 import { LiveLogsView } from './LiveLogsView';
 import { GroupView } from './GroupView';
 import { category, tagListTitles } from '../../../utils/tableConfig';
-import _ from 'lodash';
+import { chain, forEach, groupBy, partition, reverse, sortBy } from 'lodash';
 import './OngoingDeployment.css';
 
 const PlainOngoingDeployment = ({
@@ -63,18 +63,18 @@ const PlainOngoingDeployment = ({
   };
 
   const filteredData = () => {
-    const [groupsRecords, nonGroupsRecords] = _.partition(
+    const [groupsRecords, nonGroupsRecords] = partition(
       ongoingDeployments,
       ongoingDeployment => ongoingDeployment.groupName !== null,
     );
-    const groupedRecords = _.chain(groupsRecords)
+    const groupedRecords = chain(groupsRecords)
       .groupBy(category.VERSION_ID)
-      .mapValues(sortedGroupsRecords => _.groupBy(sortedGroupsRecords, groupRecord => groupRecord.environmentId))
+      .mapValues(sortedGroupsRecords => groupBy(sortedGroupsRecords, groupRecord => groupRecord.environmentId))
       .value();
 
     let formattedData = [...nonGroupsRecords];
-    _.forEach(groupedRecords, groupedRecordsByVersionId => {
-      _.forEach(groupedRecordsByVersionId, groupedRecordsByEnvId => {
+    forEach(groupedRecords, groupedRecordsByVersionId => {
+      forEach(groupedRecordsByVersionId, groupedRecordsByEnvId => {
         formattedData.push({
           ...groupedRecordsByEnvId[0],
           groupRecords: groupedRecordsByEnvId,
@@ -85,7 +85,7 @@ const PlainOngoingDeployment = ({
   };
 
   const formattedData = () => {
-    const sortedData = _.reverse(_.sortBy(filteredData(), category.LAST_UPDATED));
+    const sortedData = reverse(sortBy(filteredData(), category.LAST_UPDATED));
     return (
       ongoingDeployments &&
       sortedData.map(({ id, lastUpdate, serviceId, environmentId, groupName, ...dataItem }) => {

@@ -3,11 +3,11 @@ import { AppTag } from '../common/Tag';
 import { AppButton } from '../common/Button';
 import { AppEllipsis } from '../common/Ellipsis';
 import { deploymentStatus, category, tagListTitles } from './tableConfig';
-import _ from 'lodash';
+import { countBy, isString } from 'lodash';
 
 const getStatusTag = (status, groupRecords) => {
   if (groupRecords) {
-    const finishedDeploymentSize = _.countBy(groupRecords, category.STATUS)[deploymentStatus.DONE];
+    const finishedDeploymentSize = countBy(groupRecords, category.STATUS)[deploymentStatus.DONE];
     return <AppTag color={'#40C9BA'}>{`${finishedDeploymentSize}/${groupRecords.length}`}</AppTag>;
   }
   switch (status) {
@@ -106,7 +106,7 @@ const costumeRender = (dataCategory, index, record, text, tagList) => {
 const handleSort = (recordA, recordB, dataCategory) => {
   const valueA = recordA[dataCategory];
   const valueB = recordB[dataCategory];
-  if (!_.isString(valueA) || !_.isString(valueB)) {
+  if (!isString(valueA) || !isString(valueB)) {
     return;
   }
   return valueA.localeCompare(valueB);

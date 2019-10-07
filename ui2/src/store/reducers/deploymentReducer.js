@@ -59,8 +59,7 @@ import {
   GET_ALL_GROUPS_FAILURE,
   LOUGOUT,
 } from '../actions';
-
-import _ from 'lodash';
+import { unionWith, isEqual } from 'lodash';
 const initialState = {
   services: null,
   servicesStacks: null,
@@ -134,7 +133,7 @@ export default function deploymentsReducer(state = initialState, action) {
     case GET_GROUPS_REQUEST:
       return { ...state, isLoading: true };
     case GET_GROUPS_SUCCESS:
-      return { ...state, groups: _.unionWith(state.groups, action.payload, _.isEqual), isLoading: false };
+      return { ...state, groups: unionWith(state.groups, action.payload, isEqual), isLoading: false };
     case GET_GROUPS_FAILURE:
       return { ...state, isLoading: false };
     case NEW_DEPLOYMENT_REQUEST:

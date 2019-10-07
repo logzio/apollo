@@ -4,7 +4,7 @@ import { AppButton } from '../../../common/Button';
 import { Spinner } from '../../../common/Spinner';
 import { tableColumns } from '../../../utils/tableColumns';
 import { AppTable } from '../../../common/Table';
-import _ from 'lodash';
+import { forEach, isString } from 'lodash';
 
 export const EnvStatusView = ({
   toggleShowModal,
@@ -24,11 +24,11 @@ export const EnvStatusView = ({
     const envStatusObj = JSON.parse(envStatus);
     let data = [];
 
-    _.forEach(envStatusObj, (lastVersion, serviceId) => {
+    forEach(envStatusObj, (lastVersion, serviceId) => {
       services.map(({ id, name: serviceName }) => {
         if (serviceId === id.toString()) {
-          if (!_.isString(lastVersion)) {
-            _.forEach(lastVersion, (lastGroupVersion, groupId) => {
+          if (!isString(lastVersion)) {
+            forEach(lastVersion, (lastGroupVersion, groupId) => {
               groups.map(({ id, name: groupName }) => {
                 if (groupId === id.toString()) {
                   data = [

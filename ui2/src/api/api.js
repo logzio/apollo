@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { logout } from '../store/actions/authActions';
-import React from 'react';
 
 const baseUrl = 'http://localhost:8081';
 export const wsUrl = `${document.location.protocol === 'https:' ? 'wss' : 'ws'}://${document.location.host}/ws`;
@@ -92,15 +91,14 @@ export const deploy = async (
   isEmergencyDeployment,
 ) => {
   try {
-    // const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
-    //   serviceIdsCsv: serviceIdsCsv,
-    //   environmentIdsCsv: environmentIdsCsv,
-    //   deployableVersionId: deployableVersionId,
-    //   deploymentMessage: deploymentMessage,
-    //   isEmergencyDeployment: isEmergencyDeployment,
-    // });
-    // return data;
-    return 'hi';
+    const { data = null } = await axios.post(`${baseUrl}/deployment/`, {
+      serviceIdsCsv: serviceIdsCsv,
+      environmentIdsCsv: environmentIdsCsv,
+      deployableVersionId: deployableVersionId,
+      deploymentMessage: deploymentMessage,
+      isEmergencyDeployment: isEmergencyDeployment,
+    });
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -116,16 +114,15 @@ export const deployGroup = async (
   isEmergencyDeployment,
 ) => {
   try {
-    // const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
-    //   serviceIdsCsv: serviceIdsCsv,
-    //   environmentIdsCsv: environmentIdsCsv,
-    //   deployableVersionId: deployableVersionId,
-    //   deploymentMessage: deploymentMessage,
-    //   groupIdsCsv: groupIdsCsv,
-    //   isEmergencyDeployment: isEmergencyDeployment,
-    // });
-    // return data;
-    return 'hi';
+    const { data = null } = await axios.post(`${baseUrl}/deployment-groups/`, {
+      serviceIdsCsv: serviceIdsCsv,
+      environmentIdsCsv: environmentIdsCsv,
+      deployableVersionId: deployableVersionId,
+      deploymentMessage: deploymentMessage,
+      groupIdsCsv: groupIdsCsv,
+      isEmergencyDeployment: isEmergencyDeployment,
+    });
+    return data;
   } catch (error) {
     console.error(error);
     throw error;

@@ -265,23 +265,21 @@ export const deployGroup = (
       type: NEW_GROUP_DEPLOYMENT_REQUEST,
     });
     try {
-      //Temp, so I wouldn't deploy!
-      // const data = await API.deployGroup(
-      //   serviceIdsCsv,
-      //   environmentIdsCsv,
-      //   deployableVersionId,
-      //   deploymentMessage,
-      // groupIdsCsv,
-      //   isEmergencyDeployment,
-      // );
+      const data = await API.deployGroup(
+        serviceIdsCsv,
+        environmentIdsCsv,
+        deployableVersionId,
+        deploymentMessage,
+        groupIdsCsv,
+        isEmergencyDeployment,
+      );
       appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
       dispatch({
         type: NEW_GROUP_DEPLOYMENT_SUCCESS,
-        // payload: data,
-        payload: 'temp',
+        payload: data,
       });
     } catch (error) {
       dispatch({

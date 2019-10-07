@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import {
@@ -17,7 +17,7 @@ import { DeploymentDetailsView } from './DeploymentDetailsView';
 import { EnvStatusView } from './EnvStatusView';
 import { AppModal } from '../../../common/Modal';
 import { AppButton } from '../../../common/Button';
-import _ from 'lodash';
+import { debounce } from 'lodash';
 import './DeploymentsHistory.css';
 
 const PlainHistoryDeployment = ({
@@ -92,7 +92,7 @@ const PlainHistoryDeployment = ({
   };
 
   const delayedSearch = useRef(
-    _.debounce(searchValue => getDeploymentHistory(true, defaultCurrentPage, pageSize, searchValue), 700),
+    debounce(searchValue => getDeploymentHistory(true, defaultCurrentPage, pageSize, searchValue), 700),
   ).current;
 
   const columns = tableColumns(

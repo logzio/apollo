@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import _ from 'lodash';
+import { isEmpty, difference } from 'lodash';
 import { AppTable } from './Table';
 import { AppButton } from '../common/Button';
 import { tableColumns } from '../utils/tableColumns';
@@ -58,8 +58,8 @@ export const AppTableTransfer = ({
     onSelectAll: (isSelected, allRows) => {
       const allRowsKeys = allRows && allRows.map(item => item.key);
       const currentKeysSelection = isSelected
-        ? _.difference(allRowsKeys, selectedKeys)
-        : _.difference(selectedKeys, allRowsKeys);
+        ? difference(allRowsKeys, selectedKeys)
+        : difference(selectedKeys, allRowsKeys);
       onItemSelectAll(currentKeysSelection, isSelected);
     },
     onSelect: ({ key, isPartOfGroup }, isSelected) => {
@@ -138,7 +138,7 @@ export const AppTableTransfer = ({
               setTargetKeys([]);
               toggleDisabledPredefinedGroups(false);
             }}
-            disabled={_.isEmpty(targetKeys)}
+            disabled={isEmpty(targetKeys)}
           />
         </div>
       )}

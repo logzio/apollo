@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Transfer } from 'antd';
-import _ from 'lodash';
+import { difference } from 'lodash';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { AppTableTransfer } from './TableTransfer';
@@ -34,11 +34,11 @@ export const AppTransfer = ({
 
   const handleGroupSelection = predefinedGroupId => {
     const keys = selectGroup(predefinedGroupId);
-    const addedKeys = _.difference(keys, targetKeys);
+    const addedKeys = difference(keys, targetKeys);
     if (addedKeys.length) {
       setTargetKeys([...targetKeys, ...addedKeys]);
     } else {
-      setTargetKeys(_.difference(targetKeys, keys));
+      setTargetKeys(difference(targetKeys, keys));
     }
   };
 
