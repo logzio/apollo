@@ -1,88 +1,157 @@
 import React, { useState } from 'react';
-import { Transfer } from 'antd';
-import _ from 'lodash';
+import { isEmpty, difference } from 'lodash';
 import { AppTable } from './Table';
-import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { tableColumns } from '../utils/tableColumns';
-import './TableTransfer.css';
 
-export const TableTransfer = ({
-  data,
-  searchColumns,
+export const AppTableTransfer = ({
+  direction,
+  filteredItems,
+  onItemSelectAll,
+  onItemSelect,
+  selectedKeys,
+  disabledPredefinedGroups,
+  selectedGroupService,
   rightColTitles,
   leftColTitles,
-  selectGroup,
+  columnTitles,
+  toggleDisabledPredefinedGroups,
+  setSelectedGroupService,
+  targetKeys,
+  setTargetKeys,
   predefinedGroups,
-  linkTo,
-  addSearch,
+  handleGroupSelection,
+  formattedData,
+  showDefaultSelection,
   ...props
 }) => {
-  const [targetKeys, setTargetKeys] = useState([]);
-  const [showSearch] = useState(!!searchColumns);
-  const formattedData = data.map(({ id, ...rest }) => ({ ...rest, key: id.toString() }));
+  const [selectedNonGroupService, toggleSelectedNonGroupService] = useState(false);
+  const [selectedButton, toggleSelectedButton] = useState(false);
+  const leftPanel = direction === 'left';
+  const scroll = leftPanel ? { x: 900, y: 580 } : { x: 200, y: 580 };
+  const columns = leftPanel ? tableColumns(leftColTitles, columnTitles) : tableColumns(rightColTitles, columnTitles);
 
-  const handleSearch = (inputValue, item) =>
-    searchColumns.map(searchCol => item[searchCol] && item[searchCol].indexOf(inputValue) !== -1).includes(true);
-
-  const handleGroupSelection = predefinedGroupId => {
-    const keys = selectGroup(predefinedGroupId);
-    const addedKeys = _.difference(keys, targetKeys);
-    if (addedKeys.length) {
-      setTargetKeys([...targetKeys, ...addedKeys]);
+  const defineSelection = (key, isPartOfGroup) => {
+    if (isPartOfGroup) {
+      toggleSelectedNonGroupService(false);
+      toggleDisabledPredefinedGroups(leftPanel ? !disabledPredefinedGroups : true);
+      setSelectedGroupService(selectedGroupService && leftPanel ? null : key);
     } else {
-      setTargetKeys(_.difference(targetKeys, keys));
+      toggleSelectedNonGroupService(leftPanel);
     }
   };
 
-  return (
-    <Transfer
-      className="table-transfer"
-      dataSource={formattedData}
-      filterOption={handleSearch}
-      showSelectAll={false}
-      targetKeys={targetKeys}
-      showSearch={showSearch}
-      onChange={targetKeys => setTargetKeys(targetKeys)}
-      {...props}
-    >
-      {({ direction, filteredItems, onItemSelectAll, onItemSelect, selectedKeys }) => {
-        const columns = direction === 'left' ? tableColumns(leftColTitles) : tableColumns(rightColTitles);
-        const scroll = direction === 'left' ? { x: 1000, y: 600 } : { x: 500, y: 600 };
+  const handleOnSelect = (key, isPartOfGroup, isSelected) => {
+    defineSelection(key, isPartOfGroup);
+    return onItemSelect(key, isSelected);
+  };
 
-        return (
-          <div>
-            {direction === 'left' && (
-              <>
-                {predefinedGroups.map(({ id, name }) => (
-                  <AppButton key={id} label={name} className={'table-button'} onClick={() => handleGroupSelection(id)} />
-                ))}
-                <Link
-                  to={{
-                    pathname: linkTo,
-                    search: `${addSearch}=${targetKeys}`,
-                  }}
-                >
-                  <AppButton label={'NEXT'} disabled={!targetKeys.length} className={'table-button'} />
-                </Link>
-              </>
-            )}
-            {direction === 'right' && (
-              <div>
-                <AppButton label={'Reset'} className={'table-button'} onClick={() => setTargetKeys([])} />
-              </div>
-            )}
-            <AppTable
-              columns={columns}
-              filteredItems={filteredItems}
-              onItemSelectAll={onItemSelectAll}
-              onItemSelect={onItemSelect}
-              selectedKeys={selectedKeys}
-              scroll={scroll}
+  const handleDisabledRaws = (key, isPartOfGroup) => {
+    return (
+      (isPartOfGroup === true && targetKeys.length > 0 && leftPanel) ||
+      (selectedGroupService && selectedGroupService !== key && leftPanel) ||
+      (isPartOfGroup === true && selectedNonGroupService && selectedKeys.length > 0 && leftPanel)
+    );
+  };
+
+  const rowSelection = {
+    onSelectAll: (isSelected, allRows) => {
+      const allRowsKeys = allRows && allRows.map(item => item.key);
+      const currentKeysSelection = isSelected
+        ? difference(allRowsKeys, selectedKeys)
+        : difference(selectedKeys, allRowsKeys);
+      onItemSelectAll(currentKeysSelection, isSelected);
+    },
+    onSelect: ({ key, isPartOfGroup }, isSelected) => {
+      handleOnSelect(key, isPartOfGroup, isSelected);
+    },
+    selectedRowKeys: selectedKeys,
+    getCheckboxProps: ({ key, isPartOfGroup }) => ({
+      disabled: leftPanel ? handleDisabledRaws(key, isPartOfGroup) : null,
+    }),
+  };
+
+  const handleRowSelection = ({ key, isPartOfGroup }) => {
+    const isDisabled = handleDisabledRaws(key, isPartOfGroup);
+
+    return {
+      onClick: () => {
+        if (!isDisabled) {
+          handleOnSelect(key, isPartOfGroup, !selectedKeys.includes(key));
+        }
+      },
+      onDoubleClick: () => {
+        if (!isDisabled) {
+          defineSelection(key, isPartOfGroup);
+          if (leftPanel) {
+            const keys = targetKeys ? targetKeys : [];
+            setTargetKeys && setTargetKeys([...keys, key]);
+          } else {
+            const remainTargetKeys = targetKeys.filter(targetKey => targetKey !== key);
+            setTargetKeys && setTargetKeys(remainTargetKeys);
+            isPartOfGroup && setSelectedGroupService(null);
+          }
+        }
+      },
+    };
+  };
+
+  return (
+    <div>
+      {leftPanel && (
+        <div className="header-left-transfer-table">
+          {predefinedGroups &&
+            predefinedGroups.map(({ id, name }) => (
+              <AppButton
+                key={id}
+                label={name}
+                className={'table-button'}
+                onClick={() => {
+                  toggleSelectedButton(!selectedButton);
+                  handleGroupSelection(id);
+                }}
+                icon={'block'}
+                disabled={disabledPredefinedGroups}
+              />
+            ))}
+          {showDefaultSelection && (
+            <AppButton
+              label={'Select all'}
+              className={'table-button'}
+              onClick={() => {
+                setTargetKeys(filteredItems.map(({ key }) => key));
+              }}
+              icon={'block'}
             />
-          </div>
-        );
-      }}
-    </Transfer>
+          )}
+        </div>
+      )}
+      {!leftPanel && (
+        <div>
+          <AppButton
+            label={'Remove all'}
+            className={'table-button'}
+            onClick={() => {
+              toggleSelectedNonGroupService(false);
+              onItemSelectAll(targetKeys, false);
+              setSelectedGroupService(null);
+              setTargetKeys([]);
+              toggleDisabledPredefinedGroups(false);
+            }}
+            disabled={isEmpty(targetKeys)}
+          />
+        </div>
+      )}
+      <AppTable
+        columns={columns}
+        data={filteredItems}
+        scroll={scroll}
+        rowSelection={rowSelection}
+        handleOnSelect={handleOnSelect}
+        handleRowSelection={handleRowSelection}
+        pagination={false}
+        {...props}
+      />
+    </div>
   );
 };

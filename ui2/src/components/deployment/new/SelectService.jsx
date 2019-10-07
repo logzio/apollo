@@ -1,11 +1,20 @@
 import React, { useEffect } from 'react';
-import { TableTransfer } from '../../../common/TableTransfer';
-import { Spinner } from '../../../common/Spinner';
+import { AppTransfer } from '../../../common/Transfer';
+import { cacheKeys } from '../../../utils/cacheConfig';
+import { removeFromCache } from '../../../utils/cacheService';
 
-export const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStacks, servicesStacks, resetBreadcrumbs, match }) => {
+export const SelectService = ({
+  getServices,
+  services,
+  handleBreadcrumbs,
+  getServicesStacks,
+  servicesStacks,
+  match,
+  selectServices,
+}) => {
   useEffect(() => {
-    resetBreadcrumbs();
-    handleBreadcrumbs(`${match.url}`, 'service');
+    removeFromCache(cacheKeys.DEPLOYABLE_VERSIONS);
+    handleBreadcrumbs('service');
     getServices();
     getServicesStacks();
   }, []);
@@ -17,21 +26,25 @@ export const SelectService = ({ getServices, services, handleBreadcrumbs, getSer
       .map(selectedService => selectedService.id.toString());
   };
 
-  if (!services || !servicesStacks) {
-    return <Spinner />;
-  }
+  const handleServicesSelection = servicesId =>
+    selectServices(servicesId.map(serviceId => services.find(service => service.id.toString() === serviceId)));
 
   return (
-    <div>
-      <TableTransfer
+    <div className={'select-service'}>
+      <AppTransfer
         data={services}
         searchColumns={['name']}
-        leftColTitles={['name']}
+        leftColTitles={['name', 'actions']}
         rightColTitles={['name']}
+        columnTitles={['Name']}
         predefinedGroups={servicesStacks}
+        showDefaultSelection={false}
         selectGroup={stackSelection}
         linkTo={'environment'}
         addSearch={'service'}
+        match={match}
+        handleSelection={handleServicesSelection}
+        emptyMsg={'Please select services from the left panel'}
       />
     </div>
   );

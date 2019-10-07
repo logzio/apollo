@@ -1,0 +1,7 @@
+.select-env .geoRegion, .select-env .availability{
+    max-width: 20%;
+}
+
+.select-env .kubernetesMaster{
+    max-width: 25%;
+}

@@ -23,7 +23,8 @@
 }
 
 .container-content {
-    margin-top: 70px;
+    margin-top: 20px;
+    height: 100%;
 }
 
 .container-breadcrumb:last-of-type{

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { SignupForm } from './SignupForm';
-import { notification } from 'antd';
+import { appNotification } from '../../common/notification';
 import { connect } from 'react-redux';
 import { signup, getDeploymentRoles, login } from '../../store/actions/authActions';
 import { Spinner } from '../../common/Spinner';
@@ -11,9 +11,7 @@ const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoadin
     try {
       await signup(userDetails);
       resetForm();
-      notification.open({
-        message: `${userDetails.firstName} ${userDetails.lastName} was added`,
-      });
+      appNotification(`${userDetails.firstName} ${userDetails.lastName} was added`, '', 'smile');
     } catch (error) {
       setSubmitting(false);
     }
@@ -30,6 +28,7 @@ const SignupComponent = ({ signup, getDeploymentRoles, depRoles, error, isLoadin
 
   return (
     <div className="signup">
+      <div className="signup-title med-title">Please add new user details...</div>
       <div className="form-error">{error}</div>
       <SignupForm handleSubmit={handleSubmit} options={depRoles} isLoading={isLoading} />
     </div>
