@@ -26,6 +26,9 @@ before_install:
 
 install: ./mvnw install -DskipTests -Dgpg.skip && yarn --cwd ui2 install
 
+before_script:
+  - export CI=false
+
 script:
   - ./mvnw test && yarn --cwd ui2 build && ./ui/build.sh
 
