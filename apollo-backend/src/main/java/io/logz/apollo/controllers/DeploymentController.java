@@ -1,6 +1,7 @@
 package io.logz.apollo.controllers;
 
 import com.google.common.base.Splitter;
+import io.logz.apollo.database.OrderDirection;
 import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.LockService;
 import io.logz.apollo.common.HttpStatus;
@@ -10,6 +11,7 @@ import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.DeploymentHistory;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
@@ -163,5 +165,23 @@ public class DeploymentController {
         } finally {
             lockService.releaseLock(lockName);
         }
+    }
+
+    @LoggedIn
+    @POST("/deployment-history")
+    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize,  String searchTerm, Req req) {
+
+        DeploymentHistory deploymentHistory = new DeploymentHistory();
+        int start = (pageNumber - 1) * pageSize;
+        String search = searchTerm != null ? "%" + searchTerm + "%" : null;
+        OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
+
+        deploymentHistory.pageNumber = pageNumber;
+        deploymentHistory.pageSize = pageSize;
+        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+        deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
+        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
+
+        assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
     }
 }
