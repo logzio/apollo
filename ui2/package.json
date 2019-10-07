@@ -5,7 +5,7 @@
   "scripts": {
     "start-1": "react-scripts start",
     "start": "EXTEND_ESLINT=true react-scripts start",
-    "build": "set \"CI=false\" && react-scripts build",
+    "build": "set CI=false && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint -c .eslintrc.js 'src/**/*.jsx?'"
