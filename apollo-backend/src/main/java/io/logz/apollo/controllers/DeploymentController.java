@@ -11,6 +11,7 @@ import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.DeploymentHistory;
+import io.logz.apollo.models.DeploymentHistoryDetails;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
@@ -171,18 +172,22 @@ public class DeploymentController {
 
     @LoggedIn
     @POST("/deployment-history")
-    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize,  String searchTerm, Req req) {
+    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
 
-        DeploymentHistory deploymentHistory = new DeploymentHistory();
+
         int start = (pageNumber - 1) * pageSize;
         String search = searchTerm != null ? "%" + searchTerm + "%" : null;
         OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
+        int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+        int recordsTotal = deploymentDao.getTotalDeploymentsCount();
+        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
 
-        deploymentHistory.pageNumber = pageNumber;
-        deploymentHistory.pageSize = pageSize;
-        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
-        deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
-        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
+        DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
+//        deploymentHistory.pageNumber = pageNumber;
+//        deploymentHistory.pageSize = pageSize;
+//        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+//        deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
+//        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
 
         assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
     }
