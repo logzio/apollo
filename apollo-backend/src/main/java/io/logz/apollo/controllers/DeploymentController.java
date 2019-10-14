@@ -173,21 +173,12 @@ public class DeploymentController {
     @LoggedIn
     @POST("/deployment-history")
     public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
-
-
-        int start = (pageNumber - 1) * pageSize;
         String search = searchTerm != null ? "%" + searchTerm + "%" : null;
         OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
         int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
         int recordsTotal = deploymentDao.getTotalDeploymentsCount();
-        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
-
+        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, (pageNumber - 1) * pageSize, pageSize);
         DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
-//        deploymentHistory.pageNumber = pageNumber;
-//        deploymentHistory.pageSize = pageSize;
-//        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
-//        deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
-//        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
 
         assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
     }
