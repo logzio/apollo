@@ -8,10 +8,7 @@ import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.excpetions.ApolloDeploymentException;
-import io.logz.apollo.models.DeployableVersion;
-import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.MultiDeploymentResponseObject;
-import io.logz.apollo.models.DeploymentHistory;
+import io.logz.apollo.models.*;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
@@ -169,19 +166,18 @@ public class DeploymentController {
 
     @LoggedIn
     @POST("/deployment-history")
-    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize,  String searchTerm, Req req) {
-
-        DeploymentHistory deploymentHistory = new DeploymentHistory();
-        int start = (pageNumber - 1) * pageSize;
+    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
         String search = searchTerm != null ? "%" + searchTerm + "%" : null;
         OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
-
-        deploymentHistory.pageNumber = pageNumber;
-        deploymentHistory.pageSize = pageSize;
-        deploymentHistory.recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
-        deploymentHistory.recordsTotal = deploymentDao.getTotalDeploymentsCount();
-        deploymentHistory.data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, start, pageSize);
+        int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+        int recordsTotal = deploymentDao.getTotalDeploymentsCount();
+        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, getOffset(pageNumber, pageSize), pageSize);
+        DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
 
         assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
+    }
+
+    private int getOffset(int pageNumber, int pageSize) {
+        return (pageNumber - 1) * pageSize;
     }
 }
