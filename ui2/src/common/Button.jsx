@@ -15,7 +15,7 @@ export const AppCheckboxButton = ({ label, id, className, icon, ...props }) => (
     <input id={`input-${id}`} type="checkbox" className="input-checkbox" {...props} />
     <div className="checkbox-label table-button">
       <div>{label}</div>
-      <Icon type={icon} />
+      <Icon type={icon} className="checkbox-icon" />
     </div>
   </label>
 );

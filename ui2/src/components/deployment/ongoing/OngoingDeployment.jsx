@@ -159,7 +159,8 @@ const PlainOngoingDeployment = ({
             toggleShowRevertModal(false);
           }}
         >
-          Are you sure you want to revert this deployment?
+          This will revert your deployment. All of the docker will return to their previous state. If you want to, you
+          will need to deploy again. No way back from here.
         </AppModal>
       )}
       <AppTable

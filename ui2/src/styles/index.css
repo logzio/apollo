@@ -61,9 +61,8 @@ tbody > tr:hover .table-action-button {
 
 .ant-modal-body{
     display: flex;
-    justify-content: center;
     align-items: center;
-    min-height: 250px;
+    padding: 35px;
 }
 
 
