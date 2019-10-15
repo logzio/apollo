@@ -8,7 +8,11 @@ import { countBy, isString } from 'lodash';
 const getStatusTag = (status, groupRecords) => {
   if (groupRecords) {
     const finishedDeploymentSize = countBy(groupRecords, category.STATUS)[deploymentStatus.DONE];
-    return <AppTag color={'#40C9BA'}>{`${finishedDeploymentSize}/${groupRecords.length}`}</AppTag>;
+    return (
+      <AppTag color={'#40C9BA'}>
+        {`${finishedDeploymentSize ? finishedDeploymentSize : 0} / ${groupRecords.length}`}
+      </AppTag>
+    );
   }
   switch (status) {
     case deploymentStatus.PENDING_CANCELLATION:
