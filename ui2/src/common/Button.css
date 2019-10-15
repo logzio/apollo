@@ -55,3 +55,30 @@
     background-color: rgb(73, 164, 70);
     border: rgb(73, 164, 70);
 }
+
+
+
+.input-testtt {
+    display: none;
+}
+
+.header-left-transfer-table{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.testtt-label {
+    padding: 20px;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    /*width: 100%;*/
+    min-width: 190px;
+}
+.input-testtt:checked + .testtt-label {
+    background: #444;
+    color: #fff;
+}

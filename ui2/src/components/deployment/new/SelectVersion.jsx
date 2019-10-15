@@ -81,6 +81,7 @@ export const SelectVersion = ({
           onClick={() => toggleShowModal(true)}
           label="Find latest commit from branch"
           className="table-button"
+          disabled={!versions}
         />
         <AppButton
           label="Find latest commit from master"
@@ -88,6 +89,7 @@ export const SelectVersion = ({
           onClick={() => {
             handleBranchSelection('master');
           }}
+          disabled={!versions}
         />
         <AppButton
           type="primary"

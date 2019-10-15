@@ -183,4 +183,17 @@ public class DeploymentController {
         assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
     }
 
+//    @LoggedIn
+//    @POST("/deployment-history")
+//    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
+//        String search = searchTerm != null ? "%" + searchTerm + "%" : null;
+//        OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
+//        int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+//        int recordsTotal = deploymentDao.getTotalDeploymentsCount();
+//        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, (pageNumber - 1) * pageSize, pageSize);
+//        DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
+//
+//        assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
+//    }
+
 }

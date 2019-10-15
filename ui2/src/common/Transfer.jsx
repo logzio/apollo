@@ -47,6 +47,7 @@ export const AppTransfer = ({
   return (
     <>
       <div className="submit-transfer-table">
+        <div className="small-title">{`Select your ${currentTable}`}</div>
         <Link
           to={{
             pathname: linkTo,
@@ -54,7 +55,7 @@ export const AppTransfer = ({
           }}
         >
           <AppButton
-            label={`Select your ${currentTable}`}
+            label={`Choose ${currentTable}`}
             disabled={!targetKeys.length}
             className={'table-submit-button'}
             type="primary"

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { isEmpty, difference } from 'lodash';
 import { AppTable } from './Table';
-import { AppButton } from '../common/Button';
+import { AppButton, AppCheckboxButton } from '../common/Button';
 import { tableColumns } from '../utils/tableColumns';
 
 export const AppTableTransfer = ({
@@ -90,6 +90,7 @@ export const AppTableTransfer = ({
             const remainTargetKeys = targetKeys.filter(targetKey => targetKey !== key);
             setTargetKeys && setTargetKeys(remainTargetKeys);
             isPartOfGroup && setSelectedGroupService(null);
+            toggleDisabledPredefinedGroups(false);
           }
         }
       },
@@ -102,16 +103,16 @@ export const AppTableTransfer = ({
         <div className="header-left-transfer-table">
           {predefinedGroups &&
             predefinedGroups.map(({ id, name }) => (
-              <AppButton
+              <AppCheckboxButton
+                id={id}
                 key={id}
                 label={name}
-                className={'table-button'}
                 onClick={() => {
                   toggleSelectedButton(!selectedButton);
                   handleGroupSelection(id);
                 }}
-                icon={'block'}
                 disabled={disabledPredefinedGroups}
+                icon={'block'}
               />
             ))}
           {showDefaultSelection && (

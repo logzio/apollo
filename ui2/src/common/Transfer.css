@@ -1,7 +1,8 @@
 .submit-transfer-table{
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .header-left-transfer-table{
@@ -15,4 +16,8 @@
 .ant-transfer-list-header-title{
     margin-right: 5px;
     font-weight: bolder;
+}
+
+.ant-transfer-list{
+    min-width: 400px;
 }
