@@ -20,7 +20,7 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
     appInit();
   }, []);
 
-  const [collapsed, toggleCollapse] = useState(true);
+  const [collapsed, toggleCollapse] = useState(false);
   const isAuthenticate = !!getAuthToken();
   const AppRoute = ({ path, ...props }) => {
     return isAuthenticate ? (

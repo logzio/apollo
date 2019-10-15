@@ -65,6 +65,10 @@ tbody > tr:hover .table-action-button {
     padding: 35px;
 }
 
+.ant-modal-footer .ant-btn[disabled]{
+    height: 32px;
+}
+
 .modal-spinner-wrapper{
     display: flex;
     justify-content: center;
