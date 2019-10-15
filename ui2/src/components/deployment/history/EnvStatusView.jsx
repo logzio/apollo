@@ -87,7 +87,9 @@ export const EnvStatusView = ({
           pagination={false}
         />
       ) : (
-        <Spinner />
+        <div className="modal-spinner-wrapper">
+          <Spinner />
+        </div>
       )}
     </AppModal>
   );

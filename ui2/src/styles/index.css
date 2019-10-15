@@ -65,6 +65,12 @@ tbody > tr:hover .table-action-button {
     padding: 35px;
 }
 
+.modal-spinner-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
 
 @media screen and (max-height: 1000px) {
     .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td {

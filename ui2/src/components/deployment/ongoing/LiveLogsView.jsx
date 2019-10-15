@@ -71,7 +71,9 @@ export const LiveLogsView = ({ environmentId, containers, lastCreatedPod, toggle
           </div>
         ))
       ) : (
-        <Spinner />
+        <div className="modal-spinner-wrapper">
+          <Spinner />
+        </div>
       )}
     </AppModal>
   );

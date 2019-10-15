@@ -23,7 +23,9 @@ export const DeploymentDetailsView = ({ toggleShowModal, deployableVersion }) =>
         commitUrl={deployableVersion.commitUrl}
       />
     ) : (
-      <Spinner />
+      <div className="modal-spinner-wrapper">
+        <Spinner />
+      </div>
     )}
   </AppModal>
 );
