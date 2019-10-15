@@ -7,6 +7,9 @@
 
 .header-left-transfer-table{
     min-height: 60px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .ant-transfer-list-header{

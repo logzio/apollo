@@ -11,9 +11,9 @@ export const AppButton = ({ label, className, isLoading, tooltipText, ...props }
 );
 
 export const AppCheckboxButton = ({ label, id, className, icon, ...props }) => (
-  <label htmlFor={`input${id}`} key={id} className="testtt">
-    <input id={`input${id}`} type="checkbox" className="input-testtt" {...props} />
-    <div className="testtt-label table-button">
+  <label htmlFor={`input-${id}`} key={id}>
+    <input id={`input-${id}`} type="checkbox" className="input-checkbox" {...props} />
+    <div className="checkbox-label table-button">
       <div>{label}</div>
       <Icon type={icon} />
     </div>
