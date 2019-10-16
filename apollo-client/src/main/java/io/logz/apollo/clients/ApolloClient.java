@@ -17,6 +17,7 @@ import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Notification;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.DeploymentHistory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -353,4 +354,13 @@ public class ApolloClient {
     public void deleteStackService(int id) throws IOException {
         genericApolloClient.delete("/services-stack/" + id);
     }
+
+//    public DeploymentHistory getFilteredDeploymentsHistory(DeploymentHistory deploymentHistory) throws ApolloClientException {
+//        String requestBody = Common.generateJson("descending", deploymentHistory.getName(),
+//                "pageNumber", String.valueOf(deploymentHistory.getEnvironmentId()),
+//                "pageSize", String.valueOf(deploymentHistory.getServiceId()),
+//                "searchTerm", String.valueOf(deploymentHistory.getType()));
+//
+//        return genericApolloClient.postAndGetResult("/deployment-history", requestBody, new TypeReference<DeploymentHistory>() {});
+//    }
 }
