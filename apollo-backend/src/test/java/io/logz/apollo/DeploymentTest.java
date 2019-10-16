@@ -89,34 +89,49 @@ public class DeploymentTest {
 
         verifyGetAllHistoryDeployments(emptySearchTerm, testDeployment2);
         verifyGetAllHistoryDeployments(globalSearchTerm, testDeployment2);
-        verifyGetFilteredHistoryDeployments(randomSearchTerm, testDeployment2);
+        verifyGetFilteredHistoryDeployments(randomSearchTerm);
+        verifyGetAscendingHistoryDeployments(testDeployment1);
     }
 
     private void verifyGetAllHistoryDeployments(String searchTerm, Deployment testDeployment) throws ApolloClientException {
         int pageNumber = 1;
-        int pageSize = 1;
+        int pageSize = 50;
         Boolean descending = true;
 
         DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, searchTerm);
+
         assertThat(deploymentsHistoryFromApi).isNotNull();
 
         Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
                 .filter(deployment -> deployment.getId() == testDeployment.getId()).findFirst();
+
         assertThat(data).isPresent();
         assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
         assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsTotal());
     }
 
-    private void verifyGetFilteredHistoryDeployments(String searchTerm, Deployment testDeployment) throws ApolloClientException {
+    private void verifyGetFilteredHistoryDeployments(String searchTerm) throws ApolloClientException {
         int pageNumber = 1;
-        int pageSize = 1;
+        int pageSize = 50;
         Boolean descending = true;
 
         DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, searchTerm);
-        assertThat(deploymentsHistoryFromApi).isNotNull();
 
+        assertThat(deploymentsHistoryFromApi).isNotNull();
         assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isNotEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
         assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
+    }
+
+    private void verifyGetAscendingHistoryDeployments(Deployment testDeployment) throws ApolloClientException {
+        int pageNumber = 1;
+        int pageSize = 50;
+        Boolean descending = false;
+        String searchTerm = null;
+
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, searchTerm);
+
+        assertThat(deploymentsHistoryFromApi).isNotNull();
+        assertThat(deploymentsHistoryFromApi.getData().get(0).getId()).isEqualTo(testDeployment.getId());
     }
 
     @Test
