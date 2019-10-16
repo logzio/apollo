@@ -18,6 +18,7 @@ import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
@@ -115,10 +116,10 @@ public class DeploymentController {
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
 
             if (serviceDeployableVersion == null) {
-                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId));
+                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() + " is not applicable on service " + serviceId));
             } else {
                 try {
-                        Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), isEmergencyDeployment, req);
+                    Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), isEmergencyDeployment, req);
                     responseObject.addSuccessful(environmentId, serviceId, deployment);
                 } catch (ApolloDeploymentException e) {
                     responseObject.addUnsuccessful(environmentId, serviceId, e);
@@ -167,14 +168,20 @@ public class DeploymentController {
     @LoggedIn
     @POST("/deployment-history")
     public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
-        String search = searchTerm != null ? "%" + searchTerm + "%" : null;
-        OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
-        int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
-        int recordsTotal = deploymentDao.getTotalDeploymentsCount();
-        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, getOffset(pageNumber, pageSize), pageSize);
-        DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
+        try {
+            String search = searchTerm != null ? "%" + searchTerm + "%" : null;
+            OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
 
-        assignJsonResponseToReq(req, HttpStatus.OK, deploymentHistory);
+            int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+            int recordsTotal = deploymentDao.getTotalDeploymentsCount();
+            List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, getOffset(pageNumber, pageSize), pageSize);
+
+            DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
+
+            assignJsonResponseToReq(req, HttpStatus.CREATED, deploymentHistory);
+        } catch (NumberFormatException e) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     private int getOffset(int pageNumber, int pageSize) {
