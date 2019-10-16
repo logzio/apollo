@@ -81,6 +81,29 @@ public class DeploymentTest {
     }
 
     @Test
+    public void testGetFilteredDeployments() throws Exception {
+        Environment testEnv = createAndSubmitEnvironment(apolloTestClient);
+        Service testService = createAndSubmitService(apolloTestClient);
+        DeployableVersion testDeployableVersion = createAndSubmitDeployableVersion(apolloTestClient, testService);
+        Deployment testDeployment = createAndSubmitDeployment(apolloTestClient);
+//        createAndSubmitDeployableVersion(apolloTestClient, service2, deployableVersion1.getGithubRepositoryUrl(), deployableVersion1.getGitCommitSha());
+
+//        String envIdsCsv = String.valueOf(env1.getId()) + "," + String.valueOf(env2.getId());
+//        String serviceIdsCsv = String.valueOf(service1.getId()) + "," + String.valueOf(service2.getId());
+//
+//        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+//        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+//
+//        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, serviceIdsCsv, deployableVersion1.getId(), false);
+//
+//        assertThat(result.getSuccessful().size()).isEqualTo(4);
+//        assertThat(result.getUnsuccessful().size()).isEqualTo(0);
+//
+//        Deployment deployment = result.getSuccessful().get(0).getDeployment();
+//        assertThat(apolloTestClient.getDeployment(deployment.getId())).isNotNull();
+    }
+
+    @Test
     public void testSimultaneousDeployments() throws Exception {
 
         Deployment deployment1 = createAndSubmitDeployment(apolloTestClient);

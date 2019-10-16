@@ -5,21 +5,8 @@ import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
-import io.logz.apollo.models.BlockerDefinition;
-import io.logz.apollo.models.DeployableVersion;
-import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.DeploymentPermission;
-import io.logz.apollo.models.DeploymentRole;
-import io.logz.apollo.models.Environment;
-import io.logz.apollo.models.EnvironmentsStack;
-import io.logz.apollo.models.Group;
-import io.logz.apollo.models.MultiDeploymentResponseObject;
-import io.logz.apollo.models.Notification;
+import io.logz.apollo.models.*;
 import io.logz.apollo.models.Notification.NotificationType;
-import io.logz.apollo.models.Service;
-import io.logz.apollo.models.ServicesStack;
-import io.logz.apollo.models.StackType;
-import io.logz.apollo.models.User;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -426,4 +413,20 @@ public class ModelsGenerator {
         apolloTestAdminClient.addDeploymentPermissionToDeploymentRole(newDeploymentRole.getId(), newDeploymentPermission.getId());
         apolloTestAdminClient.addUserToRole(apolloTestClient.getTestUser().getUserEmail(), newDeploymentRole.getId());
     }
+//
+//    public static DeploymentHistory createDeploymentHistory(int pageNumber, int pageSize, String searchTerm) {
+//        int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+//        int recordsTotal = deploymentDao.getTotalDeploymentsCount();
+//        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, getOffset(pageNumber, pageSize), pageSize);
+//
+//        return createDeployment(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
+//    }
+//
+//    public static DeploymentHistory createDeploymentHistory(int pageNumber, int pageSize, int recordsTotal, int recordsFiltered, List<DeploymentHistoryDetails> data) {
+//
+//        DeploymentHistory testDeploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
+//        return testDeploymentHistory;
+//    }
+
+
 }
