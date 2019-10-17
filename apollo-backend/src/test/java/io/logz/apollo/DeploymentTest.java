@@ -9,8 +9,14 @@ import io.logz.apollo.helpers.RealDeploymentGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
 import io.logz.apollo.kubernetes.ApolloToKubernetes;
 import io.logz.apollo.kubernetes.ApolloToKubernetesStore;
-import io.logz.apollo.models.*;
-import org.jetbrains.annotations.NotNull;
+import io.logz.apollo.models.DeployableVersion;
+import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.DeploymentHistory;
+import io.logz.apollo.models.DeploymentHistoryDetails;
+import io.logz.apollo.models.DeploymentPermission;
+import io.logz.apollo.models.Environment;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.Service;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -78,47 +84,43 @@ public class DeploymentTest {
     }
 
     @Test
-    public void testGetDeploymentHistory() throws Exception {
+    public void testDeploymentHistory() throws Exception {
         int pageNumber = 1;
         int pageSize = 50;
         Boolean descending = true;
 
-        createAndSubmitDeployment(apolloTestClient);
-        Deployment currentTestDeployment = createAndSubmitDeployment(apolloTestClient);
+        Deployment testDeployment = createAndSubmitDeployment(apolloTestClient);
 
         String emptySearchTerm = null;
         String randomSearchTerm = Common.randomStr(25);
         String userEmail = apolloTestClient.getTestUser().getUserEmail();
 
-        verifyGetAllHistoryDeployments(emptySearchTerm, currentTestDeployment, pageNumber, pageSize, descending);
+        verifyGetAllHistoryDeployments(emptySearchTerm, testDeployment, pageNumber, pageSize, descending);
         verifyDeploymentsFilteringByNonCommonTerm(randomSearchTerm, pageNumber, pageSize, descending);
         verifyGetFilteredDeploymentsByEmail(userEmail, pageNumber, pageSize, descending);
-        verifyGetAscendingHistoryDeployments(currentTestDeployment, pageNumber, pageSize);
-    }
-
-    @NotNull
-    private DeploymentHistory getDeploymentHistoryFromApi(String searchTerm, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
-
-        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, searchTerm);
-        assertThat(deploymentsHistoryFromApi).isNotNull();
-
-        return deploymentsHistoryFromApi;
     }
 
     private void verifyGetAllHistoryDeployments(String emptySearchTerm, Deployment testDeployment, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
 
-        DeploymentHistory deploymentsHistoryFromApi = getDeploymentHistoryFromApi(emptySearchTerm, pageNumber, pageSize, descending);
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, emptySearchTerm);
         assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
         assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsTotal());
+
+        String testEnvName = apolloTestClient.getEnvironment(testDeployment.getEnvironmentId()).getName();
+        String testServiceName = apolloTestClient.getService(testDeployment.getServiceId()).getName();
 
         Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
                 .filter(deployment -> deployment.getId() == testDeployment.getId()).findFirst();
         assertThat(data).isPresent();
+        assertThat(data.get().getEnvironmentName()).isEqualTo(testEnvName);
+        assertThat(data.get().getServiceName()).isEqualTo(testServiceName);
+        assertThat(data.get().getDeployableVersionId()).isEqualTo(testDeployment.getDeployableVersionId());
+        assertThat(data.get().getStatus().toString().equals(String.valueOf(Deployment.DeploymentStatus.PENDING))).isTrue();
     }
 
     private void verifyDeploymentsFilteringByNonCommonTerm(String searchTerm, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
 
-        DeploymentHistory deploymentsHistoryFromApi = getDeploymentHistoryFromApi(searchTerm, pageNumber, pageSize, descending);
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, searchTerm);
         assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isNotEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
         assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
     }
@@ -126,23 +128,11 @@ public class DeploymentTest {
 
     private void verifyGetFilteredDeploymentsByEmail(String userEmail, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
 
-        DeploymentHistory deploymentsHistoryFromApi = getDeploymentHistoryFromApi(userEmail, pageNumber, pageSize, descending);
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, userEmail);
 
         Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
                 .filter(deployment -> deployment.getUserEmail().equals(userEmail)).findFirst();
         assertThat(data).isPresent();
-    }
-
-    private void verifyGetAscendingHistoryDeployments(Deployment testDeployment, int pageNumber, int pageSize) throws ApolloClientException {
-        Boolean descending = false;
-        String searchTerm = null;
-
-        DeploymentHistory deploymentsHistoryFromApi = getDeploymentHistoryFromApi(searchTerm, pageNumber, pageSize, descending);
-        assertThat(deploymentsHistoryFromApi.getData().get(getLastDeploymentIndex(deploymentsHistoryFromApi)).getId()).isEqualTo(testDeployment.getId());
-    }
-
-    private int getLastDeploymentIndex(DeploymentHistory deploymentsHistoryFromApi) {
-        return deploymentsHistoryFromApi.getRecordsFiltered() - 1;
     }
 
     @Test
