@@ -168,13 +168,14 @@ public class DeploymentController {
     @LoggedIn
     @POST("/deployment-history")
     public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
-        try {
-            String search = searchTerm != null ? "%" + searchTerm + "%" : null;
-            OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
+        String search = searchTerm != null ? "%" + searchTerm + "%" : null;
+        OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
+        int pageInitIndex = getPageInitIndex(pageNumber, pageSize);
 
-            int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+        try {
             int recordsTotal = deploymentDao.getTotalDeploymentsCount();
-            List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, getOffset(pageNumber, pageSize), pageSize);
+            int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
+            List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, pageInitIndex, pageSize);
 
             DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
 
@@ -184,7 +185,7 @@ public class DeploymentController {
         }
     }
 
-    private int getOffset(int pageNumber, int pageSize) {
+    private int getPageInitIndex(int pageNumber, int pageSize) {
         return (pageNumber - 1) * pageSize;
     }
 }
