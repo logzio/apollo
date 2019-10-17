@@ -147,4 +147,5 @@ public class DeploymentTest {
         Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(),
                 RealDeploymentGenerator.DEFAULT_INGRESS_LABLE_KEY, ingressValue);
     }
+
 }
