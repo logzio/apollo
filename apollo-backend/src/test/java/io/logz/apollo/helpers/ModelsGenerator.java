@@ -413,20 +413,4 @@ public class ModelsGenerator {
         apolloTestAdminClient.addDeploymentPermissionToDeploymentRole(newDeploymentRole.getId(), newDeploymentPermission.getId());
         apolloTestAdminClient.addUserToRole(apolloTestClient.getTestUser().getUserEmail(), newDeploymentRole.getId());
     }
-//
-//    public static DeploymentHistory createDeploymentHistory(int pageNumber, int pageSize, String searchTerm) {
-//        int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
-//        int recordsTotal = deploymentDao.getTotalDeploymentsCount();
-//        List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, getOffset(pageNumber, pageSize), pageSize);
-//
-//        return createDeployment(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
-//    }
-//
-//    public static DeploymentHistory createDeploymentHistory(int pageNumber, int pageSize, int recordsTotal, int recordsFiltered, List<DeploymentHistoryDetails> data) {
-//
-//        DeploymentHistory testDeploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
-//        return testDeploymentHistory;
-//    }
-
-
 }
