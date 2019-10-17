@@ -84,7 +84,7 @@ public class DeploymentTest {
         int pageSize = 50;
 
         String emptySearchTerm = null;
-        String randomSearchTerm = Common.randomStr(20);
+        String randomSearchTerm = Common.randomStr(25);
         String globalSearchTerm = apolloTestClient.getTestUser().getUserEmail();
 
         Deployment testDeployment1 = createAndSubmitDeployment(apolloTestClient);
