@@ -97,7 +97,7 @@ public class DeploymentTest {
 
         verifyGetAllHistoryDeployments(emptySearchTerm, testDeployment, pageNumber, pageSize, descending);
         verifyDeploymentsFilteringByNonCommonTerm(randomSearchTerm, pageNumber, pageSize, descending);
-        verifyGetFilteredDeploymentsByEmail(userEmail, pageNumber, pageSize, descending);
+        verifyGetFilteredDeploymentsByEmail(userEmail, testDeployment, pageNumber, pageSize, descending);
     }
 
     private void verifyGetAllHistoryDeployments(String emptySearchTerm, Deployment testDeployment, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
@@ -106,16 +106,10 @@ public class DeploymentTest {
         assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
         assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsTotal());
 
-        String testEnvName = apolloTestClient.getEnvironment(testDeployment.getEnvironmentId()).getName();
-        String testServiceName = apolloTestClient.getService(testDeployment.getServiceId()).getName();
-
         Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
                 .filter(deployment -> deployment.getId() == testDeployment.getId()).findFirst();
-        assertThat(data).isPresent();
-        assertThat(data.get().getEnvironmentName()).isEqualTo(testEnvName);
-        assertThat(data.get().getServiceName()).isEqualTo(testServiceName);
-        assertThat(data.get().getDeployableVersionId()).isEqualTo(testDeployment.getDeployableVersionId());
-        assertThat(data.get().getStatus().toString().equals(String.valueOf(Deployment.DeploymentStatus.PENDING))).isTrue();
+
+        verifyDeploymentDetails(testDeployment, data);
     }
 
     private void verifyDeploymentsFilteringByNonCommonTerm(String searchTerm, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
@@ -126,13 +120,26 @@ public class DeploymentTest {
     }
 
 
-    private void verifyGetFilteredDeploymentsByEmail(String userEmail, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
+    private void verifyGetFilteredDeploymentsByEmail(String userEmail, Deployment testDeployment, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
 
         DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, userEmail);
 
         Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
                 .filter(deployment -> deployment.getUserEmail().equals(userEmail)).findFirst();
+
+        verifyDeploymentDetails(testDeployment, data);
+    }
+
+    private void verifyDeploymentDetails(Deployment testDeployment, Optional<DeploymentHistoryDetails> data) throws ApolloClientException {
+
+        String testEnvName = apolloTestClient.getEnvironment(testDeployment.getEnvironmentId()).getName();
+        String testServiceName = apolloTestClient.getService(testDeployment.getServiceId()).getName();
+
         assertThat(data).isPresent();
+        assertThat(data.get().getEnvironmentName()).isEqualTo(testEnvName);
+        assertThat(data.get().getServiceName()).isEqualTo(testServiceName);
+        assertThat(data.get().getDeployableVersionId()).isEqualTo(testDeployment.getDeployableVersionId());
+        assertThat(data.get().getStatus().toString().equals(String.valueOf(Deployment.DeploymentStatus.PENDING))).isTrue();
     }
 
     @Test
