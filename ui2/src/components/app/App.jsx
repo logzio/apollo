@@ -52,7 +52,7 @@ const AppComponent = ({ appInit, logout, isAdmin }) => {
               <AppRoute path="/deployment/history" title={'Deployments History'} component={DeploymentsHistory} />
               <AppRoute path="/error" component={ErrorPage} />
               {!isAuthenticate && <Route path="/auth/login" component={Login} />}
-              {isAuthenticate ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
+              {isAuthenticate ? <Redirect to={`/deployment/new`} /> : <Redirect to={`/auth/login`} />}
             </Switch>
           </Layout.Content>
         </Layout>
