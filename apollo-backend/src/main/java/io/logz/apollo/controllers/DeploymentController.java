@@ -1,18 +1,15 @@
 package io.logz.apollo.controllers;
 
 import com.google.common.base.Splitter;
-import io.logz.apollo.database.OrderDirection;
 import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.LockService;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.excpetions.ApolloDeploymentException;
-import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.DeploymentHistoryDetails;
-import io.logz.apollo.models.DeploymentHistory;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
@@ -119,10 +116,10 @@ public class DeploymentController {
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
 
             if (serviceDeployableVersion == null) {
-                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() + " is not applicable on service " + serviceId));
+                responseObject.addUnsuccessful(environmentId, serviceId, new ApolloDeploymentException("DeployableVersion with sha" + deployableVersion.getGitCommitSha() +  " is not applicable on service " + serviceId));
             } else {
                 try {
-                    Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), isEmergencyDeployment, req);
+                        Deployment deployment = deploymentHandler.addDeployment(environmentId, serviceId, serviceDeployableVersion.getId(), deploymentMessage, groupName, Optional.empty(), isEmergencyDeployment, req);
                     responseObject.addSuccessful(environmentId, serviceId, deployment);
                 } catch (ApolloDeploymentException e) {
                     responseObject.addUnsuccessful(environmentId, serviceId, e);
@@ -166,29 +163,5 @@ public class DeploymentController {
         } finally {
             lockService.releaseLock(lockName);
         }
-    }
-
-    @LoggedIn
-    @POST("/deployment-history")
-    public void fetchPaginatedDeploymentHistory(Boolean descending, int pageNumber, int pageSize, String searchTerm, Req req) {
-        String search = searchTerm != null ? "%" + searchTerm + "%" : null;
-        OrderDirection orderDirection = descending ? OrderDirection.DESC : OrderDirection.ASC;
-        int pageInitIndex = getPageInitIndex(pageNumber, pageSize);
-
-        try {
-            int recordsTotal = deploymentDao.getTotalDeploymentsCount();
-            int recordsFiltered = deploymentDao.getFilteredDeploymentHistoryCount(search);
-            List<DeploymentHistoryDetails> data = deploymentDao.filterDeploymentHistoryDetails(search, orderDirection, pageInitIndex, pageSize);
-
-            DeploymentHistory deploymentHistory = new DeploymentHistory(pageNumber, pageSize, recordsTotal, recordsFiltered, data);
-
-            assignJsonResponseToReq(req, HttpStatus.CREATED, deploymentHistory);
-        } catch (NumberFormatException e) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    private int getPageInitIndex(int pageNumber, int pageSize) {
-        return (pageNumber - 1) * pageSize;
     }
 }
