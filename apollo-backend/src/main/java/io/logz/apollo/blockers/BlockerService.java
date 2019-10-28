@@ -1,6 +1,5 @@
 package io.logz.apollo.blockers;
 
-import io.logz.apollo.controllers.StackService;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.Deployment;
@@ -30,15 +29,13 @@ public class BlockerService {
 
     private final BlockerDefinitionDao blockerDefinitionDao;
     private final BlockerInjectableCommons blockerInjectableCommons;
-    private final StackService stackService;
     private final Map<String, Class<? extends BlockerFunction>> blockerTypeNameBindings;
     private final Reflections reflections;
 
     @Inject
-    public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons, StackService stackService) {
+    public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons) {
         this.blockerDefinitionDao = requireNonNull(blockerDefinitionDao);
         this.blockerInjectableCommons = requireNonNull(blockerInjectableCommons);
-        this.stackService = requireNonNull(stackService);
 
         blockerTypeNameBindings = new HashMap<>();
         reflections = new Reflections("io.logz.apollo.blockers.types");
@@ -125,14 +122,14 @@ public class BlockerService {
         }
 
             if (blocker.getStackId() != null) {
-                switch (stackService.getStackType(blocker.getStackId())) {
+                switch (blockerInjectableCommons.getStackService().getStackType(blocker.getStackId())) {
                     case ENVIRONMENTS:
-                        if (stackService.getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
+                        if (blockerInjectableCommons.getStackService().getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
                             environmentToCheck = deployment.getEnvironmentId();
                         }
                         break;
                     case SERVICES:
-                        if (stackService.getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
+                        if (blockerInjectableCommons.getStackService().getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
                             serviceToCheck = deployment.getServiceId();
                         }
                         break;

@@ -107,8 +107,13 @@ public class BlockerDefinitionController {
         if (serviceId != null && !serviceId.equals("null"))
             serviceIdParsed = Integer.parseInt(serviceId);
 
-        if (stackId != null && !stackId.equals("null"))
+        if (stackId != null && !stackId.equals("null")) {
             stackIdParsed = Integer.parseInt(stackId);
+            if (environmentId != null && !environmentId.equals("null") || serviceId != null && !serviceId.equals("null")) {
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add a stack blocker that is also an environment or a service blocker. stackId - %s, environmentId - %s, serviceId - %s", stackId, environmentId, serviceId));
+                return;
+            }
+        }
 
         BlockerDefinition blockerDefinition = new BlockerDefinition();
 
@@ -147,8 +152,12 @@ public class BlockerDefinitionController {
         if (serviceId != null && !serviceId.equals("null"))
             serviceIdParsed = Integer.parseInt(serviceId);
 
-        if (stackId != null && !stackId.equals("null"))
+        if (stackId != null && !stackId.equals("null")) {
             stackIdParsed = Integer.parseInt(stackId);
+            if (environmentId != null && !environmentId.equals("null") || serviceId != null && !serviceId.equals("null")) {
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to update a stack blocker that is also an environment or a service blocker. stackId - {}, environmentId - {}, serviceId - {}", stackId, environmentId, serviceId));
+            }
+        }
 
         blockerDefinition.setName(name);
         blockerDefinition.setEnvironmentId(environmentIdParsed);

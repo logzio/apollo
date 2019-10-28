@@ -2,6 +2,7 @@ package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.models.BlockerDefinition;
@@ -195,6 +196,27 @@ public class BlockerTest {
                                                                                                                                                     .hasMessageContaining("Deployment is currently blocked");
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, okService, okDeployableVersion);
+    }
+
+    @Test
+    public void testAddingInvalidBlockers() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        Stack servicesStack = ModelsGenerator.createAndSubmitServicesStack(apolloTestClient, Arrays.asList(service.getId()));
+
+        String errorMessage = "Trying to add a stack blocker that is also an environment or a service blocker. ";
+
+        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, service, servicesStack)).isInstanceOf(ApolloClientException.class)
+                                                                                                                                                                   .hasMessageContaining(errorMessage + String.format("stackId - %s, environmentId - null, serviceId - %s", servicesStack.getId(), service.getId()));
+
+        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, servicesStack)).isInstanceOf(ApolloClientException.class)
+                                                                                                                                                                   .hasMessageContaining(errorMessage + String.format("stackId - %s, environmentId - %s, serviceId - null", servicesStack.getId(), environment.getId()));
+
+        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, service, servicesStack)).isInstanceOf(ApolloClientException.class)
+                                                                                                                                                                .hasMessageContaining(errorMessage + String.format("stackId - %s, environmentId - %s, serviceId - %s", servicesStack.getId(), environment.getId(), service.getId()));
     }
 
     @Test

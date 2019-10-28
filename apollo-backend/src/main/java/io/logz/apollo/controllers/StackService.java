@@ -7,6 +7,8 @@ import io.logz.apollo.models.EnvironmentsStack;
 import io.logz.apollo.models.ServicesStack;
 import io.logz.apollo.models.Stack;
 import io.logz.apollo.models.StackType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -17,6 +19,7 @@ public class StackService {
     private final StackDao stackDao;
     private final EnvironmentsStackDao environmentsStackDao;
     private final ServicesStackDao servicesStackDao;
+    private static final Logger logger = LoggerFactory.getLogger(StackService.class);
 
     @Inject
     public StackService(StackDao stackDao, EnvironmentsStackDao environmentsStackDao, ServicesStackDao servicesStackDao) {
@@ -28,11 +31,16 @@ public class StackService {
     public Stack getStack(int id) {
         switch(stackDao.getStackType(id)) {
             case ENVIRONMENTS:
-                return stackDao.getEnvironmentsStack(id);
+                EnvironmentsStack environmentsStack = stackDao.getEnvironmentsStack(id);
+                environmentsStack.setEnvironments(environmentsStackDao.getEnvironments(id));
+                return environmentsStack;
             case SERVICES:
-                return stackDao.getServicesStack(id);
+                ServicesStack servicesStack = stackDao.getServicesStack(id);
+                servicesStack.setServices(servicesStackDao.getServices(id));
+                return servicesStack;
             default:
-                 throw new EnumConstantNotPresentException(StackType.class, "Unknown Enum type - " + stackDao.getStackType(id));
+                logger.error("Trying to create unknown stack type");
+                throw new RuntimeException("Unknown stack type - " + stackDao.getStackType(id));
         }
     }
 
@@ -41,14 +49,10 @@ public class StackService {
     }
 
     public EnvironmentsStack getEnvironmentsStack(int id) {
-        EnvironmentsStack environmentsStack = stackDao.getEnvironmentsStack(id);
-        environmentsStack.setEnvironments(environmentsStackDao.getEnvironments(id));
-        return environmentsStack;
+        return (EnvironmentsStack) getStack(id);
     }
 
     public ServicesStack getServicesStack(int id) {
-        ServicesStack servicesStack = stackDao.getServicesStack(id);
-        servicesStack.setServices(servicesStackDao.getServices(id));
-        return servicesStack;
+        return (ServicesStack) getStack(id);
     }
 }
