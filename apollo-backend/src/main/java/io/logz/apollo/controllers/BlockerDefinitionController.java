@@ -33,7 +33,6 @@ import static java.util.Objects.requireNonNull;
 public class BlockerDefinitionController {
 
     private final static String CSV_DELIMITER = ",";
-    private final static String STRING_DELIMITER = "','";
 
     private static final Logger logger = LoggerFactory.getLogger(BlockerDefinitionController.class);
 
@@ -126,6 +125,7 @@ public class BlockerDefinitionController {
         blockerDefinition.setActive(isActive);
 
         blockerDefinitionDao.addBlockerDefinition(blockerDefinition);
+        logger.info(String.format("Added blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.CREATED, blockerDefinition);
     }
 
@@ -168,6 +168,7 @@ public class BlockerDefinitionController {
         blockerDefinition.setActive(isActive);
 
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
+        logger.info(String.format("Updated blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
     }
 
@@ -211,7 +212,7 @@ public class BlockerDefinitionController {
         }
 
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
-
+        logger.info(String.format("Updated blocker's activeness: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
     }
 }
