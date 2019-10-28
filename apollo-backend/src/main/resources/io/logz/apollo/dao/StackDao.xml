@@ -4,8 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.logz.apollo.dao.StackDao">
 
-    <select id="getStack" resultType="io.logz.apollo.models.Stack">
-        SELECT *
+    <select id="getStackType" resultType="io.logz.apollo.models.StackType">
+        SELECT stack_type
         FROM stack
         WHERE id = #{id}
     </select>
@@ -20,17 +20,6 @@
         SELECT *
         FROM stack
         WHERE id = #{id} AND stack_type = "SERVICES"
-    </select>
-
-    <select id="getAllStacks" resultType="io.logz.apollo.models.Stack">
-        SELECT *
-        FROM stack
-    </select>
-
-    <select id="getAllStackFromType" resultType="io.logz.apollo.models.Stack">
-        SELECT *
-        FROM stack
-        WHERE stack_type = #{stackType}
     </select>
 
     <select id="getAllEnvironmentsStacks" resultType="io.logz.apollo.models.EnvironmentsStack">

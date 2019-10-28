@@ -10,15 +10,18 @@ public class Blocker {
     private final String typeName;
     private final Integer serviceId;
     private final Integer environmentId;
+    private final Integer stackId;
     private final Boolean isActive;
     private final BlockerFunction blockerFunction;
 
-    public Blocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId, Boolean isActive, BlockerFunction blockerFunction) {
+    public Blocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId, Integer stackId,
+                   Boolean isActive, BlockerFunction blockerFunction) {
         this.id = id;
         this.name = name;
         this.typeName = typeName;
         this.serviceId = serviceId;
         this.environmentId = environmentId;
+        this.stackId = stackId;
         this.isActive = isActive;
         this.blockerFunction = blockerFunction;
     }
@@ -35,6 +38,10 @@ public class Blocker {
 
     public Integer getEnvironmentId() {
         return environmentId;
+    }
+
+    public Integer getStackId() {
+        return stackId;
     }
 
     public Boolean getActive() {

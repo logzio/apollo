@@ -95,6 +95,7 @@ public class ApolloAdminClient {
         String requestBody = Common.generateJson("name", blockerDefinition.getName(),
                 "environmentId", String.valueOf(blockerDefinition.getEnvironmentId()),
                 "serviceId", String.valueOf(blockerDefinition.getServiceId()),
+                "stackId", String.valueOf(blockerDefinition.getStackId()),
                 "isActive", String.valueOf(blockerDefinition.getActive()),
                 "blockerTypeName", blockerDefinition.getBlockerTypeName(),
                 "blockerJsonConfiguration", blockerDefinition.getBlockerJsonConfiguration());
@@ -107,6 +108,7 @@ public class ApolloAdminClient {
                 "name", blockerDefinition.getName(),
                 "environmentId", String.valueOf(blockerDefinition.getEnvironmentId()),
                 "serviceId", String.valueOf(blockerDefinition.getServiceId()),
+                "stackId", String.valueOf(blockerDefinition.getStackId()),
                 "isActive", String.valueOf(blockerDefinition.getActive()),
                 "blockerTypeName", blockerDefinition.getBlockerTypeName(),
                 "blockerJsonConfiguration", blockerDefinition.getBlockerJsonConfiguration());

@@ -10,6 +10,7 @@ import io.logz.apollo.models.DeploymentRole;
 import io.logz.apollo.models.EnvironmentsStack;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.ServicesStack;
+import io.logz.apollo.models.Stack;
 import io.logz.apollo.models.StackType;
 import io.logz.apollo.models.User;
 import io.logz.apollo.models.BlockerDefinition;
@@ -333,11 +334,41 @@ public class ModelsGenerator {
         return blockerDefinition;
     }
 
+    public static BlockerDefinition createBlockerDefinition(Environment environment, Service service, Stack stack, String blockerTypeName, String blockerJsonConfiguration) {
+        BlockerDefinition blockerDefinition = new BlockerDefinition();
+
+        if (environment != null)
+            blockerDefinition.setEnvironmentId(environment.getId());
+
+        if (service != null)
+            blockerDefinition.setServiceId(service.getId());
+
+        if (stack != null)
+            blockerDefinition.setStackId(stack.getId());
+
+        blockerDefinition.setName("blocker-" + Common.randomStr(5));
+        blockerDefinition.setBlockerTypeName(blockerTypeName);
+        blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
+        blockerDefinition.setActive(true);
+
+        return blockerDefinition;
+    }
+
     public static BlockerDefinition createAndSubmitBlocker(ApolloTestAdminClient apolloTestAdminClient, String blockerTypeName,
                                                            String blockerJsonConfiguration, Environment environment,
                                                            Service service) throws Exception {
 
         BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, blockerTypeName, blockerJsonConfiguration);
+        testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
+
+        return testBlockerDefinition;
+    }
+
+    public static BlockerDefinition createAndSubmitBlocker(ApolloTestAdminClient apolloTestAdminClient, String blockerTypeName,
+                                                           String blockerJsonConfiguration, Environment environment,
+                                                           Service service, Stack stack) throws Exception {
+
+        BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, stack, blockerTypeName, blockerJsonConfiguration);
         testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
 
         return testBlockerDefinition;
