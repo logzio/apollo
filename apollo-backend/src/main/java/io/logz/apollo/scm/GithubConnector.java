@@ -31,9 +31,13 @@ public class GithubConnector {
 
             // If no user or oauth was provided, attempt to go anonymous
             if (StringUtils.isEmpty(apolloConfiguration.getScm().getGithubLogin()) || StringUtils.isEmpty(apolloConfiguration.getScm().getGithubOauthToken())) {
+                logger.info("Trying to connect anonymously to GitHub");
                 gitHub = GitHub.connectAnonymously();
+                logger.info("Succeeded to connect anonymously to GitHub");
             } else {
+                logger.info("Trying to connect to GitHub");
                 gitHub = GitHub.connect(apolloConfiguration.getScm().getGithubLogin(), apolloConfiguration.getScm().getGithubOauthToken());
+                logger.info("Succeeded to connect to GitHub");
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not open connection to Github!", e);
@@ -46,14 +50,19 @@ public class GithubConnector {
             GHCommit commit = gitHub.getRepository(githubRepo).getCommit(sha);
 
             GHUser author = commit.getAuthor();
+            logger.info("Author of commit sha {} is {}", sha, author);
             String committerName = (author == null) ? null : author.getName();
             if (committerName == null || committerName.isEmpty()) {
+                logger.info("Committer name of commit sha {} is {}", sha, committerName);
                 committerName = author.getLogin();
+
+                logger.info("Committer name of commit sha {} is {} got log in", sha, committerName);
             }
 
             CommitDetails commitDetails = new CommitDetails(sha, commit.getHtmlUrl().toString(),
                     commit.getCommitShortInfo().getMessage(), commit.getCommitDate(), commit.getLastStatus(),
                     author.getAvatarUrl(), committerName);
+            logger.info("CommitDetails: {}", commitDetails);
             return Optional.of(commitDetails);
         } catch (IOException e) {
             logger.warn("Could not get commit details from Github!", e);
