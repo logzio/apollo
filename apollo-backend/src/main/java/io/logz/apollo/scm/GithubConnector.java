@@ -46,14 +46,18 @@ public class GithubConnector {
             GHCommit commit = gitHub.getRepository(githubRepo).getCommit(sha);
 
             GHUser author = commit.getAuthor();
+            logger.info("Author of commit sha {} is {}", sha, author);
             String committerName = (author == null) ? null : author.getName();
             if (committerName == null || committerName.isEmpty()) {
+                logger.info("Committer name of commit sha {} is {}", sha, committerName);
                 committerName = author.getLogin();
+                logger.info("Committer name of commit sha {} is {} got log in", sha, committerName);
             }
 
             CommitDetails commitDetails = new CommitDetails(sha, commit.getHtmlUrl().toString(),
                     commit.getCommitShortInfo().getMessage(), commit.getCommitDate(), commit.getLastStatus(),
                     author.getAvatarUrl(), committerName);
+            logger.info("CommitDetails: {}", commitDetails);
             return Optional.of(commitDetails);
         } catch (IOException e) {
             logger.warn("Could not get commit details from Github!", e);
