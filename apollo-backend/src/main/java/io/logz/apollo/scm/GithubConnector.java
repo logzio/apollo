@@ -55,6 +55,7 @@ public class GithubConnector {
             if (committerName == null || committerName.isEmpty()) {
                 logger.info("Committer name of commit sha {} is {}", sha, committerName);
                 committerName = author.getLogin();
+
                 logger.info("Committer name of commit sha {} is {} got log in", sha, committerName);
             }
 
