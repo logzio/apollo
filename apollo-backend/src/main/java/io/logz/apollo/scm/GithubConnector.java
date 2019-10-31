@@ -31,9 +31,13 @@ public class GithubConnector {
 
             // If no user or oauth was provided, attempt to go anonymous
             if (StringUtils.isEmpty(apolloConfiguration.getScm().getGithubLogin()) || StringUtils.isEmpty(apolloConfiguration.getScm().getGithubOauthToken())) {
+                logger.info("Trying to connect anonymously to GitHub");
                 gitHub = GitHub.connectAnonymously();
+                logger.info("Succeeded to connect anonymously to GitHub");
             } else {
+                logger.info("Trying to connect to GitHub");
                 gitHub = GitHub.connect(apolloConfiguration.getScm().getGithubLogin(), apolloConfiguration.getScm().getGithubOauthToken());
+                logger.info("Succeeded to connect to GitHub");
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not open connection to Github!", e);
@@ -51,6 +55,7 @@ public class GithubConnector {
             if (committerName == null || committerName.isEmpty()) {
                 logger.info("Committer name of commit sha {} is {}", sha, committerName);
                 committerName = author.getLogin();
+
                 logger.info("Committer name of commit sha {} is {} got log in", sha, committerName);
             }
 
