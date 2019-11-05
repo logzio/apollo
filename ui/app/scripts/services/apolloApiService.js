@@ -8,6 +8,10 @@ angular
 
 
 function ApiService($q, $http){
+    var getAllStacks = function() {
+        return $http.get(CONFIG.appUrl + 'stack');
+    };
+
     var getAllEnvironmentsStacks = function() {
         return $http.get(CONFIG.appUrl + 'environments-stack');
     };
@@ -289,22 +293,24 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + "blocker-definition");
     };
     
-    var addBlocker = function (name, environmentId, serviceId, isActive, blockerTypeName, blockerJsonConfiguration) {
+    var addBlocker = function (name, environmentId, serviceId, stackId, isActive, blockerTypeName, blockerJsonConfiguration) {
         return $http.post(CONFIG.appUrl + "blocker-definition", {
             name: name,
             environmentId: environmentId,
             serviceId: serviceId,
+            stackId: stackId,
             isActive: isActive,
             blockerTypeName: blockerTypeName,
             blockerJsonConfiguration: blockerJsonConfiguration
         });
     };
 
-    var updateBlocker = function (id, name, environmentId, serviceId, isActive, blockerTypeName, blockerJsonConfiguration) {
+    var updateBlocker = function (id, name, environmentId, serviceId, stackId, isActive, blockerTypeName, blockerJsonConfiguration) {
         return $http.put(CONFIG.appUrl + "blocker-definition/" + id, {
             name: name,
             environmentId: environmentId,
             serviceId: serviceId,
+            stackId: stackId,
             isActive: isActive,
             blockerTypeName: blockerTypeName,
             blockerJsonConfiguration: blockerJsonConfiguration
@@ -345,6 +351,7 @@ function ApiService($q, $http){
     };
 
     return {
+        getAllStacks: getAllStacks,
         getAllEnvironmentsStacks: getAllEnvironmentsStacks,
         getAllServicesStacks: getAllServicesStacks,
         getAllUsers: getAllUsers,
