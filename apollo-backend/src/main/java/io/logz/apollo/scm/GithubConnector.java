@@ -50,13 +50,12 @@ public class GithubConnector {
             GHCommit commit = gitHub.getRepository(githubRepo).getCommit(sha);
 
             GHUser author = commit.getAuthor();
-            logger.info("Author of commit sha {} is {}", sha, author);
+            logger.info("1) Author of commit sha {} is {}", sha, author);
             String committerName = (author == null) ? null : author.getName();
             if (committerName == null || committerName.isEmpty()) {
-                logger.info("Committer name of commit sha {} is {}", sha, committerName);
+                logger.info("2) Committer name of commit sha {} is {}", sha, committerName);
                 committerName = author.getLogin();
-
-                logger.info("Committer name of commit sha {} is {} got log in", sha, committerName);
+                logger.info("3) Committer name of commit sha {} is {}", sha, committerName);
             }
 
             CommitDetails commitDetails = new CommitDetails(sha, commit.getHtmlUrl().toString(),
