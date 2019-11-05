@@ -11,7 +11,6 @@ angular.module('apollo')
       $scope.timeBasedBlockerStartTime = {date: new Date()};
       $scope.timeBasedBlockerEndTime = {date: new Date()};
       $scope.allStacks = [];
-      $scope.blockersStacks = [];
 
       $scope.toggleSelectedDay = function toggleSelectedDay(day) {
           var id = $scope.selectedDays.indexOf(day);
@@ -181,21 +180,13 @@ angular.module('apollo')
       });
 
       apolloApiService.getAllStacks().then(function(response) {
-        response.data.forEach(function(stack) {
-            $scope.allStacks.push(stack);
-        });
-      });
+          var tempStacks = {};
+          response.data.forEach(function(stack) {
+            tempStacks[stack.id] = stack;
+          });
 
-      $scope.getStack = function(stackId) {
-        if ($scope.allStacks.length === 0) {
-            return;
-        }
-        $scope.allStacks.find(function(stack) {
-           if (stack.id === stackId) {
-                $scope.blockersStacks[stackId] = stack;
-           };
-        });
-      };
+        $scope.allStacks = tempStacks;
+      });
 
       function updateBlockers() {
           apolloApiService.getAllBlockers().then(function(response) {

@@ -36,7 +36,7 @@
                                 <td>{{blocker.name}}</td>
                                 <td>{{allServices[blocker.serviceId].name || "*"}}</td>
                                 <td>{{allEnvironments[blocker.environmentId].name || "*"}}</td>
-                                <td>{{getStack(blocker.stackId)}}{{blockersStacks[blocker.stackId].name || "*"}}</td>
+                                <td>{{allStacks[blocker.stackId].name || "*"}}</td>
                                 <td>{{blocker.startedAt | date:'dd/MM/yy HH:mm:ss'}}</td>
                                 <td>{{blocker.active}}</td>
                                 <td>{{blocker.blockerTypeName}}</td>
