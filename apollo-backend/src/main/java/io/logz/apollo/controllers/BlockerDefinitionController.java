@@ -114,12 +114,7 @@ public class BlockerDefinitionController {
             }
         }
 
-        if (availability != null && !availability.isEmpty()) {
-            if (environmentId != null && !environmentId.equals("null")) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", availability, environmentId));
-                return;
-            }
-        }
+        checkAvailabilityBlockerValidation(availability, environmentId, "add", req);
 
         BlockerDefinition blockerDefinition = new BlockerDefinition();
 
@@ -167,12 +162,7 @@ public class BlockerDefinitionController {
             }
         }
 
-        if (availability != null && !availability.isEmpty()) {
-            if (environmentId != null && !environmentId.equals("null")) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to update an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", availability, environmentId));
-                return;
-            }
-        }
+        checkAvailabilityBlockerValidation(availability, environmentId, "update", req);
 
         blockerDefinition.setName(name);
         blockerDefinition.setEnvironmentId(environmentIdParsed);
@@ -186,6 +176,15 @@ public class BlockerDefinitionController {
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
         logger.info(String.format("Updated blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
+    }
+
+    private void checkAvailabilityBlockerValidation(String availability, String environmentId, String methodType, Req req) {
+        if (availability != null && !availability.isEmpty()) {
+            if (environmentId != null && !environmentId.equals("null")) {
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to %s an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", methodType, availability, environmentId));
+                return;
+            }
+        }
     }
 
     @Administrator
