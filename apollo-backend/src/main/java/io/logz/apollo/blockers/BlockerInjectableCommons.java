@@ -4,6 +4,7 @@ import io.logz.apollo.controllers.StackService;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
+import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.EnvironmentsStackDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.dao.ServicesStackDao;
@@ -29,11 +30,13 @@ public class BlockerInjectableCommons {
     private final EnvironmentsStackDao environmentsStackDao;
     private final ServicesStackDao servicesStackDao;
     private final ServiceDao serviceDao;
+    private final EnvironmentDao environmentDao;
     private final StackService stackService;
 
     @Inject
     public BlockerInjectableCommons(GithubConnector githubConnector, BlockerDefinitionDao blockerDefinitionDao, DeployableVersionDao deployableVersionDao, DeploymentDao deploymentDao,
-                                    StackDao stackDao, EnvironmentsStackDao environmentsStackDao, ServicesStackDao servicesStackDao, ServiceDao serviceDao, StackService stackService) {
+                                    StackDao stackDao, EnvironmentsStackDao environmentsStackDao, ServicesStackDao servicesStackDao, ServiceDao serviceDao, EnvironmentDao environmentDao,
+                                    StackService stackService) {
         this.githubConnector = requireNonNull(githubConnector);
         this.blockerDefinitionDao = requireNonNull(blockerDefinitionDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
@@ -42,6 +45,7 @@ public class BlockerInjectableCommons {
         this.environmentsStackDao = requireNonNull(environmentsStackDao);
         this.servicesStackDao = requireNonNull(servicesStackDao);
         this.serviceDao = requireNonNull(serviceDao);
+        this.environmentDao = requireNonNull(environmentDao);
         this.stackService = requireNonNull(stackService);
     }
 
@@ -62,6 +66,8 @@ public class BlockerInjectableCommons {
     public ServicesStackDao getServicesStackDao() { return servicesStackDao; }
 
     public ServiceDao getServiceDao() { return serviceDao; }
+
+    public EnvironmentDao getEnvironmentDao() { return environmentDao; }
 
     public StackService getStackService() { return stackService; }
 }

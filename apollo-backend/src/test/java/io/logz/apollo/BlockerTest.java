@@ -199,6 +199,68 @@ public class BlockerTest {
     }
 
     @Test
+    public void testBlockByAvailability() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        String availability = "BLOCK-ME-1";
+        Environment environment1 = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
+        Service blockedService = ModelsGenerator.createAndSubmitService(apolloTestClient);
+
+        createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService, null, availability);
+        DeployableVersion deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, blockedService);
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment1, blockedService, deployableVersion1)).isInstanceOf(Exception.class)
+                                                                                                                                                           .hasMessageContaining("Deployment is currently blocked");
+        availability = "BLOCK-ME-2";
+        Environment environment2 = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
+        Service service2 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+
+        createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, null, null, availability);
+        DeployableVersion deployableVersion2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service2);
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment2, service2, deployableVersion2)).isInstanceOf(Exception.class)
+                                                                                                                                      .hasMessageContaining("Deployment is currently blocked");
+
+    }
+
+    @Test
+    public void testNonBlockedDeploymentWithAvailabilityBlocker() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        String availability = "BLOCK-ME-3";
+        Environment environment1 = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
+        Service blockedService1 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        Service service1 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+
+        createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService1, null, availability);
+        DeployableVersion deployableVersion1 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service1);
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment1, service1, deployableVersion1);
+
+        availability = "BLOCK-ME-4";
+        Environment environment2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient); //Random availability
+        Service blockedService2 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        Service service2 = ModelsGenerator.createAndSubmitService(apolloTestClient);
+
+        createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService2, null, availability);
+        DeployableVersion deployableVersion2 = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service2);
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment2, service2, deployableVersion2);
+    }
+
+    @Test
+    public void testCreatingInvalidAvailabilityBlocker() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        String availability = "BLOCK-ME-5";
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
+        String errorMessage = String.format("Trying to add an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", availability, environment.getId());
+
+        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, null, availability))
+                .isInstanceOf(ApolloClientException.class)
+                .hasMessageContaining(errorMessage);
+    }
+
+    @Test
     public void testAddingInvalidBlockers() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();

@@ -96,6 +96,7 @@ public class ApolloAdminClient {
                 "environmentId", String.valueOf(blockerDefinition.getEnvironmentId()),
                 "serviceId", String.valueOf(blockerDefinition.getServiceId()),
                 "stackId", String.valueOf(blockerDefinition.getStackId()),
+                "availability", blockerDefinition.getAvailability(),
                 "isActive", String.valueOf(blockerDefinition.getActive()),
                 "blockerTypeName", blockerDefinition.getBlockerTypeName(),
                 "blockerJsonConfiguration", blockerDefinition.getBlockerJsonConfiguration());
@@ -109,6 +110,7 @@ public class ApolloAdminClient {
                 "environmentId", String.valueOf(blockerDefinition.getEnvironmentId()),
                 "serviceId", String.valueOf(blockerDefinition.getServiceId()),
                 "stackId", String.valueOf(blockerDefinition.getStackId()),
+                "availability", blockerDefinition.getAvailability(),
                 "isActive", String.valueOf(blockerDefinition.getActive()),
                 "blockerTypeName", blockerDefinition.getBlockerTypeName(),
                 "blockerJsonConfiguration", blockerDefinition.getBlockerJsonConfiguration());
