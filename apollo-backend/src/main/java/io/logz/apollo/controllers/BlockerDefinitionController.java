@@ -179,12 +179,15 @@ public class BlockerDefinitionController {
     }
 
     private void checkAvailabilityBlockerValidation(String availability, String environmentId, String methodType, Req req) {
-        if (availability != null && !availability.isEmpty()) {
-            if (environmentId != null && !environmentId.equals("null")) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to %s an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", methodType, availability, environmentId));
+        if (availability == null || availability.isEmpty()) {
+            return;
+        } else {
+            if (environmentId == null || environmentId.equals("null")) {
                 return;
             }
         }
+        assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to %s an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", methodType, availability, environmentId));
+        throw new RuntimeException(String.format("Trying to %s an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", methodType, availability, environmentId));
     }
 
     @Administrator
