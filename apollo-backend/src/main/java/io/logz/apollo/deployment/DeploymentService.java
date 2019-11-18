@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Singleton
 public class DeploymentService {
     private static final Logger logger = LoggerFactory.getLogger(DeploymentService.class);
+    private final Duration RUNNING_DEPLOYMENT_TIMEOUT = Duration.ofHours(12);
 
     private final DeploymentDao deploymentDao;
     private final ScheduledExecutorService executor;
@@ -31,13 +32,13 @@ public class DeploymentService {
 
     @PostConstruct
     private void scheduleTask() {
-        executor.scheduleWithFixedDelay(this::cancelStuckDeployments, 0L, 5, TimeUnit.MINUTES);
+        executor.scheduleWithFixedDelay(this::cancelStuckDeployments, 0L, 30, TimeUnit.MINUTES);
     }
 
     private void cancelStuckDeployments() {
         try {
             List<Deployment> stuckDeployments = deploymentDao.getAllRunningDeployments().stream()
-                    .filter(deployment -> deployment.getLastUpdate().toInstant().isBefore(Instant.now().minus(Duration.ofHours(2))))
+                    .filter(deployment -> deployment.getLastUpdate().toInstant().isBefore(Instant.now().minus(RUNNING_DEPLOYMENT_TIMEOUT)))
                     .collect(Collectors.toList());
 
             logger.warn("Found {} stuck deployments, cancelling the following ids: {}", stuckDeployments.size(), stuckDeployments);
