@@ -93,9 +93,9 @@ public class ApolloAdminClient {
 
     public BlockerDefinition addBlocker(BlockerDefinition blockerDefinition) throws ApolloClientException {
         String requestBody = Common.generateJson("name", blockerDefinition.getName(),
-                "environmentId", String.valueOf(blockerDefinition.getEnvironmentId()),
-                "serviceId", String.valueOf(blockerDefinition.getServiceId()),
-                "stackId", String.valueOf(blockerDefinition.getStackId()),
+                "environmentId", transferToString(blockerDefinition.getEnvironmentId()),
+                "serviceId", transferToString(blockerDefinition.getServiceId()),
+                "stackId", transferToString(blockerDefinition.getStackId()),
                 "availability", blockerDefinition.getAvailability(),
                 "isActive", String.valueOf(blockerDefinition.getActive()),
                 "blockerTypeName", blockerDefinition.getBlockerTypeName(),
@@ -107,9 +107,9 @@ public class ApolloAdminClient {
     public BlockerDefinition updateBlocker(BlockerDefinition blockerDefinition) throws ApolloClientException {
         String requestBody = Common.generateJson("id", String.valueOf(blockerDefinition.getId()),
                 "name", blockerDefinition.getName(),
-                "environmentId", String.valueOf(blockerDefinition.getEnvironmentId()),
-                "serviceId", String.valueOf(blockerDefinition.getServiceId()),
-                "stackId", String.valueOf(blockerDefinition.getStackId()),
+                "environmentId", transferToString(blockerDefinition.getEnvironmentId()),
+                "serviceId", transferToString(blockerDefinition.getServiceId()),
+                "stackId", transferToString(blockerDefinition.getStackId()),
                 "availability", blockerDefinition.getAvailability(),
                 "isActive", String.valueOf(blockerDefinition.getActive()),
                 "blockerTypeName", blockerDefinition.getBlockerTypeName(),
@@ -150,4 +150,12 @@ public class ApolloAdminClient {
                                     "userEmail", user.getUserEmail(),
                                     "password", plainPassword);
     }
+
+    private String transferToString(Object object) {
+        if (object != null) {
+            return String.valueOf(object);
+        }
+        return null;
+    }
+
 }

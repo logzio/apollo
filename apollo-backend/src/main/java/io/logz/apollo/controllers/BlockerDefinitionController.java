@@ -87,7 +87,7 @@ public class BlockerDefinitionController {
 
     @Administrator
     @POST("/blocker-definition")
-    public void addBlockerDefinition(String name, String environmentId, String serviceId, String stackId, String availability,
+    public void addBlockerDefinition(String name, Integer environmentId, Integer serviceId, Integer stackId, String availability,
                                      Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
 
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
@@ -96,32 +96,17 @@ public class BlockerDefinitionController {
             return;
         }
 
-        Integer environmentIdParsed = null;
-        Integer serviceIdParsed = null;
-        Integer stackIdParsed = null;
-
-        if (environmentId != null && !environmentId.equals("null"))
-            environmentIdParsed = Integer.parseInt(environmentId);
-
-        if (serviceId != null && !serviceId.equals("null"))
-            serviceIdParsed = Integer.parseInt(serviceId);
-
-        if (stackId != null && !stackId.equals("null")) {
-            stackIdParsed = Integer.parseInt(stackId);
-            if (environmentId != null && !environmentId.equals("null") || serviceId != null && !serviceId.equals("null")) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add a stack blocker that is also an environment or a service blocker. stackId - %s, environmentId - %s, serviceId - %s", stackId, environmentId, serviceId));
-                return;
-            }
+        if (!isValid(availability, stackId, environmentId, serviceId)) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add invalid blocker. stackId - %s, environmentId - %s, serviceId - %s, availability - %s", stackId, environmentId, serviceId, availability));
+            return;
         }
-
-        checkAvailabilityBlockerValidation(availability, environmentId, "add", req);
 
         BlockerDefinition blockerDefinition = new BlockerDefinition();
 
         blockerDefinition.setName(name);
-        blockerDefinition.setEnvironmentId(environmentIdParsed);
-        blockerDefinition.setServiceId(serviceIdParsed);
-        blockerDefinition.setStackId(stackIdParsed);
+        blockerDefinition.setEnvironmentId(environmentId);
+        blockerDefinition.setServiceId(serviceId);
+        blockerDefinition.setStackId(stackId);
         blockerDefinition.setAvailability(availability);
         blockerDefinition.setBlockerTypeName(blockerTypeName);
         blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
@@ -134,7 +119,7 @@ public class BlockerDefinitionController {
 
     @Administrator
     @PUT("/blocker-definition/{id}")
-    public void updateBlockerDefinition(int id, String name, String environmentId, String serviceId, String stackId, String availability,
+    public void updateBlockerDefinition(int id, String name, Integer environmentId, Integer serviceId, Integer stackId, String availability,
                                         Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
 
         BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
@@ -145,29 +130,14 @@ public class BlockerDefinitionController {
             return;
         }
 
-        Integer environmentIdParsed = null;
-        Integer serviceIdParsed = null;
-        Integer stackIdParsed = null;
-
-        if (environmentId != null && !environmentId.equals("null"))
-            environmentIdParsed = Integer.parseInt(environmentId);
-
-        if (serviceId != null && !serviceId.equals("null"))
-            serviceIdParsed = Integer.parseInt(serviceId);
-
-        if (stackId != null && !stackId.equals("null")) {
-            stackIdParsed = Integer.parseInt(stackId);
-            if (environmentId != null && !environmentId.equals("null") || serviceId != null && !serviceId.equals("null")) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to update a stack blocker that is also an environment or a service blocker. stackId - {}, environmentId - {}, serviceId - {}", stackId, environmentId, serviceId));
-            }
+        if (!isValid(availability, stackId, environmentId, serviceId)) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to update invalid blocker. stackId - {}, environmentId - {}, serviceId - {}, availability - {}", stackId, environmentId, serviceId, availability));
         }
 
-        checkAvailabilityBlockerValidation(availability, environmentId, "update", req);
-
         blockerDefinition.setName(name);
-        blockerDefinition.setEnvironmentId(environmentIdParsed);
-        blockerDefinition.setServiceId(serviceIdParsed);
-        blockerDefinition.setStackId(stackIdParsed);
+        blockerDefinition.setEnvironmentId(environmentId);
+        blockerDefinition.setServiceId(serviceId);
+        blockerDefinition.setStackId(stackId);
         blockerDefinition.setAvailability(availability);
         blockerDefinition.setBlockerTypeName(blockerTypeName);
         blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
@@ -178,16 +148,22 @@ public class BlockerDefinitionController {
         assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
     }
 
-    private void checkAvailabilityBlockerValidation(String availability, String environmentId, String methodType, Req req) {
-        if (availability == null || availability.isEmpty()) {
-            return;
-        } else {
-            if (environmentId == null || environmentId.equals("null")) {
-                return;
+    private boolean isValid(String availability, Integer stackId, Integer environmentId, Integer serviceId) {
+        if (stackId != null && !stackId.equals("null")) {
+            if (environmentId != null || serviceId != null) {
+                logger.error("Error trying to create invalid stack blocker with environment or service. stackId - {}, environmentId - {}, serviceId - {}", stackId, environmentId, serviceId);
+                return false;
             }
         }
-        assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to %s an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", methodType, availability, environmentId));
-        throw new RuntimeException(String.format("Trying to %s an availability blocker that is also an environment blocker. availability - %s, environmentId - %s", methodType, availability, environmentId));
+
+        if (availability != null) {
+            if (environmentId != null) {
+                logger.error("Error trying to create invalid availability blocker with environment. environmentId - {}, availability - {}", environmentId, availability);
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Administrator
