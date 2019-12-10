@@ -40,11 +40,11 @@ public class ModelsGenerator {
     public static int DEFAULT_SCALING_FACTOR = 3;
     private static int DEFAULT_CONCURRENCY_LIMIT = KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1;
 
-    public static Environment createEnvironment(String additionalParams, int concurrencyLimit) {
+    public static Environment createEnvironment(String additionalParams, int concurrencyLimit, String availability) {
         Environment testEnvironment = new Environment();
         testEnvironment.setName("env-name-" + Common.randomStr(5));
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
-        testEnvironment.setAvailability("PROD-" + Common.randomStr(5));
+        testEnvironment.setAvailability(availability);
         testEnvironment.setKubernetesMaster("kube.prod." + Common.randomStr(5));
         testEnvironment.setKubernetesToken("AaBbCc" + Common.randomStr(10));
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
@@ -56,30 +56,38 @@ public class ModelsGenerator {
         return testEnvironment;
     }
 
+    public static String generateRandomAvailability() {
+        return "PROD-" + Common.randomStr(5);
+    }
+
     public static Environment createEnvironment(String additionalParams) {
-        return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT);
+        return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
     }
 
     public static Environment createEnvironment() {
         return createEnvironment(null);
     }
 
-    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams, int concurrencyLimit) throws ApolloClientException {
-        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams, concurrencyLimit);
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams, int concurrencyLimit, String availability) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams, concurrencyLimit, availability);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
     }
 
+    public static Environment createAndSubmitEnvironment(String availability, ApolloTestClient apolloTestClient) throws ApolloClientException {
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, availability);
+    }
+
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, additionalParams, DEFAULT_CONCURRENCY_LIMIT);
+        return createAndSubmitEnvironment(apolloTestClient, additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, int concurrencyLimit) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, null, concurrencyLimit);
+        return createAndSubmitEnvironment(apolloTestClient, null, concurrencyLimit, generateRandomAvailability());
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT);
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
     }
 
     public static Service createService(boolean isPartOfGroup) {
@@ -334,7 +342,7 @@ public class ModelsGenerator {
         return blockerDefinition;
     }
 
-    public static BlockerDefinition createBlockerDefinition(Environment environment, Service service, Stack stack, String blockerTypeName, String blockerJsonConfiguration) {
+    public static BlockerDefinition createBlockerDefinition(Environment environment, Service service, Stack stack, String availability, String blockerTypeName, String blockerJsonConfiguration) {
         BlockerDefinition blockerDefinition = new BlockerDefinition();
 
         if (environment != null)
@@ -350,6 +358,7 @@ public class ModelsGenerator {
         blockerDefinition.setBlockerTypeName(blockerTypeName);
         blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
         blockerDefinition.setActive(true);
+        blockerDefinition.setAvailability(availability);
 
         return blockerDefinition;
     }
@@ -368,7 +377,17 @@ public class ModelsGenerator {
                                                            String blockerJsonConfiguration, Environment environment,
                                                            Service service, Stack stack) throws Exception {
 
-        BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, stack, blockerTypeName, blockerJsonConfiguration);
+        BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, stack, null, blockerTypeName, blockerJsonConfiguration);
+        testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
+
+        return testBlockerDefinition;
+    }
+
+    public static BlockerDefinition createAndSubmitBlocker(ApolloTestAdminClient apolloTestAdminClient, String blockerTypeName,
+                                                           String blockerJsonConfiguration, Environment environment,
+                                                           Service service, Stack stack, String availability) throws Exception {
+
+        BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, stack, availability, blockerTypeName, blockerJsonConfiguration);
         testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
 
         return testBlockerDefinition;
