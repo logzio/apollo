@@ -3,6 +3,7 @@ package io.logz.apollo.controllers;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.blockers.BlockerService;
 import io.logz.apollo.common.HttpStatus;
@@ -37,11 +38,13 @@ public class BlockerDefinitionController {
     private static final Logger logger = LoggerFactory.getLogger(BlockerDefinitionController.class);
 
     private final BlockerDefinitionDao blockerDefinitionDao;
+    private final StackDao stackDao;
     private final BlockerService blockerService;
 
     @Inject
-    public BlockerDefinitionController(BlockerDefinitionDao blockerDefinitionDao, BlockerService blockerService) {
+    public BlockerDefinitionController(BlockerDefinitionDao blockerDefinitionDao, StackDao stackDao, BlockerService blockerService) {
         this.blockerDefinitionDao = requireNonNull(blockerDefinitionDao);
+        this.stackDao = requireNonNull(stackDao);
         this.blockerService = requireNonNull(blockerService);
     }
 
@@ -149,16 +152,26 @@ public class BlockerDefinitionController {
     }
 
     private boolean isValid(String availability, Integer stackId, Integer environmentId, Integer serviceId) {
-        if (stackId != null && !stackId.equals("null")) {
-            if (environmentId != null || serviceId != null) {
-                logger.error("Error trying to create invalid stack blocker with environment or service. stackId - {}, environmentId - {}, serviceId - {}", stackId, environmentId, serviceId);
-                return false;
+        if (stackId != null) {
+            switch (stackDao.getStackType(stackId)) {
+                case ENVIRONMENTS:
+                    if (environmentId != null) {
+                        logger.error("Error trying to add invalid stack blocker with environment. stackId - {}, environmentId - {}", stackId, environmentId);
+                        return false;
+                    }
+                    break;
+                case SERVICES:
+                    if (serviceId != null) {
+                        logger.error("Error trying to add invalid stack blocker with service. stackId - {}, serviceId - {}", stackId, serviceId);
+                        return false;
+                    }
+                    break;
             }
         }
 
         if (availability != null) {
             if (environmentId != null) {
-                logger.error("Error trying to create invalid availability blocker with environment. environmentId - {}, availability - {}", environmentId, availability);
+                logger.error("Error trying to add invalid availability blocker with environment. environmentId - {}, availability - {}", environmentId, availability);
                 return false;
             }
         }

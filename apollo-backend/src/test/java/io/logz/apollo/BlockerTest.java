@@ -206,10 +206,15 @@ public class BlockerTest {
         String availability = "BLOCK-ME-1";
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
         Service blockedService = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion blockedDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, blockedService);
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
 
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService, null, availability);
-        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, blockedService);
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, blockedService, deployableVersion)).isInstanceOf(Exception.class)
+
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, blockedService, blockedDeployableVersion)).isInstanceOf(Exception.class)
                                                                                                                                                            .hasMessageContaining("Deployment is currently blocked");
     }
 
@@ -219,43 +224,16 @@ public class BlockerTest {
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
 
         String availability = "BLOCK-ME-2";
-        Environment environment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
+        Environment blockedEnvironment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
+        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
+
+        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
 
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, null, null, availability);
-        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
-        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(Exception.class)
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, service, deployableVersion)).isInstanceOf(Exception.class)
                                                                                                                                          .hasMessageContaining("Deployment is currently blocked");
-    }
-
-    @Test
-    public void testNonBlockedDeploymentWithAvailabilityBlockerOnSpecificService() throws Exception {
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
-        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
-
-        String availability = "BLOCK-ME-3";
-        Environment environment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient); //Environment in this availability
-        Service blockedService = ModelsGenerator.createAndSubmitService(apolloTestClient);
-        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
-
-        createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService, null, availability);
-        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
-        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
-    }
-
-    @Test
-    public void testNonBlockedDeploymentWithAnotherAvailabilityBlocker() throws Exception {
-        ApolloTestClient apolloTestClient = Common.signupAndLogin();
-        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
-
-        String availability = "BLOCK-ME-4";
-        Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient); //Random availability
-        Service blockedService = ModelsGenerator.createAndSubmitService(apolloTestClient);
-        Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
-
-        createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, blockedService, null, availability);
-        DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service);
-        ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
     }
 
     @Test
@@ -263,9 +241,9 @@ public class BlockerTest {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
 
-        String availability = "BLOCK-ME-5";
+        String availability = "BLOCK-ME-3";
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
-        String errorMessage = String.format("Trying to add invalid blocker. stackId - null, environmentId - %s, serviceId - null, availability - %s", environment.getId(), availability);
+        String errorMessage = "Trying to add invalid blocker.";
 
         assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, null, availability))
                 .isInstanceOf(ApolloClientException.class)
@@ -280,17 +258,18 @@ public class BlockerTest {
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
         Stack servicesStack = ModelsGenerator.createAndSubmitServicesStack(apolloTestClient, Arrays.asList(service.getId()));
+        Stack environmentsStack = ModelsGenerator.createAndSubmitEnvironmentsStack(apolloTestClient, Arrays.asList(environment.getId()));
+
+        ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, servicesStack);
+        ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, service, environmentsStack);
 
         String errorMessage = "Trying to add invalid blocker. ";
 
-        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, service, servicesStack)).isInstanceOf(ApolloClientException.class)
-                                                                                                                                                                   .hasMessageContaining(errorMessage + String.format("stackId - %s, environmentId - null, serviceId - %s, availability - null", servicesStack.getId(), service.getId()));
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, service, servicesStack)).isInstanceOf(ApolloClientException.class)
+                                                                                                                                                                   .hasMessageContaining(errorMessage);
 
-        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, servicesStack)).isInstanceOf(ApolloClientException.class)
-                                                                                                                                                                   .hasMessageContaining(errorMessage + String.format("stackId - %s, environmentId - %s, serviceId - null", servicesStack.getId(), environment.getId()));
-
-        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, service, servicesStack)).isInstanceOf(ApolloClientException.class)
-                                                                                                                                                                .hasMessageContaining(errorMessage + String.format("stackId - %s, environmentId - %s, serviceId - %s", servicesStack.getId(), environment.getId(), service.getId()));
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, service, servicesStack)).isInstanceOf(ApolloClientException.class)
+                                                                                                                                                                .hasMessageContaining(errorMessage);
     }
 
     @Test
