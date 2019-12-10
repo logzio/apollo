@@ -135,6 +135,7 @@ public class BlockerDefinitionController {
 
         if (!isValid(availability, stackId, environmentId, serviceId)) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to update invalid blocker. stackId - {}, environmentId - {}, serviceId - {}, availability - {}", stackId, environmentId, serviceId, availability));
+            return;
         }
 
         blockerDefinition.setName(name);
