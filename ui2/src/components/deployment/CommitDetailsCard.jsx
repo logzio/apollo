@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppCard } from '../../common/Card';
 
-export const DeploymentDetailsCard = ({
+export const CommitDetailsCard = ({
   committerAvatarUrl,
   committerName,
   gitCommitSha,

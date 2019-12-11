@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
-import { SelectService } from '../../components/deployment/new/SelectService';
+import { SelectService } from '../../components/deployment/new/select/SelectService';
 import { App } from '../../components/app/App';
 import { Login } from '../../components/auth/Login';
 import configureStore from 'redux-mock-store';

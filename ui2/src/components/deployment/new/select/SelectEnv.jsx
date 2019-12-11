@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { AppTransfer } from '../../../common/Transfer';
-import { Spinner } from '../../../common/Spinner';
+import { AppTransfer } from '../../../../common/Transfer';
+import { Spinner } from '../../../../common/Spinner';
 import './SelectEnv.css';
 
 export const SelectEnvironment = ({

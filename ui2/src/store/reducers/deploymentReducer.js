@@ -72,7 +72,7 @@ const initialState = {
   environmentsStacks: null,
   versions: null,
   groups: [],
-  newDeployment: null,
+  newDeploymentStatus: null,
   ongoingDeployments: null,
   containers: null,
   lastCreatedPod: null,
@@ -139,13 +139,13 @@ export default function deploymentsReducer(state = initialState, action) {
     case NEW_DEPLOYMENT_REQUEST:
       return { ...state, isLoading: true };
     case NEW_DEPLOYMENT_SUCCESS:
-      return { ...state, newDeployment: action.payload, isLoading: false };
+      return { ...state, newDeploymentStatus: action.payload, isLoading: false };
     case NEW_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
     case NEW_GROUP_DEPLOYMENT_REQUEST:
       return { ...state, isLoading: true };
     case NEW_GROUP_DEPLOYMENT_SUCCESS:
-      return { ...state, newDeployment: action.payload, isLoading: false };
+      return { ...state, newDeploymentStatus: action.payload, isLoading: false };
     case NEW_GROUP_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
     case GET_ONGOING_DEPLOYMENT_REQUEST:

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start-1": "react-scripts start",
-    "start": "EXTEND_ESLINT=true react-scripts start",
+    "start": "react-scripts start",
+    "start-1": "EXTEND_ESLINT=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

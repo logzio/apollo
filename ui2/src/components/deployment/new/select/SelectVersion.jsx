@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { AppTable } from '../../../common/Table';
-import { AppModal } from '../../../common/Modal';
-import { AppInput } from '../../../common/FormFields';
-import { AppButton } from '../../../common/Button';
-import { tableColumns } from '../../../utils/tableColumns';
+import { AppTable } from '../../../../common/Table';
+import { AppModal } from '../../../../common/Modal';
+import { AppInput } from '../../../../common/FormFields';
+import { AppButton } from '../../../../common/Button';
+import { tableColumns } from '../../../../utils/tableColumns';
 import { parse } from 'query-string';
-import { historyBrowser } from '../../../utils/history';
+import { historyBrowser } from '../../../../utils/history';
 import moment from 'moment';
 import './SelectVersion.css';
 

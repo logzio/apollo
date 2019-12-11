@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { AppTransfer } from '../../../common/Transfer';
+import { AppTransfer } from '../../../../common/Transfer';
 import { parse } from 'query-string';
 import './SelectGroup.css';
 

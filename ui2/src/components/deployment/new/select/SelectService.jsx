@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { AppTransfer } from '../../../common/Transfer';
-import { cacheKeys } from '../../../utils/cacheConfig';
-import { removeFromCache } from '../../../utils/cacheService';
+import { AppTransfer } from '../../../../common/Transfer';
+import { cacheKeys } from '../../../../utils/cacheConfig';
+import { removeFromCache } from '../../../../utils/cacheService';
 
 export const SelectService = ({
   getServices,

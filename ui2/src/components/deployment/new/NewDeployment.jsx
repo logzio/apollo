@@ -16,11 +16,11 @@ import {
   deploy,
   deployGroup,
 } from '../../../store/actions/deploymentActions';
-import { SelectService } from './SelectService';
-import { SelectEnvironment } from './SelectEnv';
-import { SelectGroup } from './SelectGroup';
-import { SelectVersion } from './SelectVersion';
-import { VerifyDeployment } from './VerifyDeployment';
+import { SelectService } from './select/SelectService';
+import { SelectEnvironment } from './select/SelectEnv';
+import { SelectGroup } from './select/SelectGroup';
+import { SelectVersion } from './select/SelectVersion';
+import { VerifyDeployment } from './verify/VerifyDeployment';
 import { getFromCache } from '../../../utils/cacheService';
 import { cacheKeys } from '../../../utils/cacheConfig';
 import { parse } from 'query-string';
@@ -138,6 +138,7 @@ const mapStateToProps = ({
     selectedEnvironments,
     selectedGroups,
     selectedVersion,
+    newDeployment,
   },
 }) => ({
   services,
@@ -151,6 +152,7 @@ const mapStateToProps = ({
   selectedEnvironments,
   selectedGroups,
   selectedVersion,
+  newDeployment,
 });
 
 export const NewDeployment = connect(
