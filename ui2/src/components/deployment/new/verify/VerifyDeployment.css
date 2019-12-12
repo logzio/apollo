@@ -3,8 +3,12 @@
     height: 20px;
 }
 
-.emergency-modal-btn{
-    margin-right: 205px;
+.ant-modal-footer{
+    display: flex;
+}
+
+.ant-modal-footer .cancel-modal-btn{
+    margin-left: auto;
 }
 
 .deploy{
