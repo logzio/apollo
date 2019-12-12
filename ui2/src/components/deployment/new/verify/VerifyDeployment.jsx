@@ -4,6 +4,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { Spinner } from '../../../../common/Spinner';
 import { parse } from 'query-string';
 import { DeploymentDetailsContainer } from './DeploymentDetailsContainer';
+import { BlockedDeploymentsModal } from './BlockedDeploymentsModal';
 import './VerifyDeployment.css';
 
 export const VerifyDeployment = ({
@@ -110,8 +111,16 @@ export const VerifyDeployment = ({
       <ConfirmModal
         isLoading={isLoading}
         handleDeploy={handleDeploy}
+        // showModal={showModal}
+        // toggleShowModal={toggleShowModal}
+      />
+      <BlockedDeploymentsModal
         showModal={showModal}
         toggleShowModal={toggleShowModal}
+        blockedDeployments={[
+          { environment: 1, service: 2, group: 3, reason: 4 },
+          { environment: 1, service: 2, group: 3, reason: 4 },
+        ]}
       />
     </div>
   );
