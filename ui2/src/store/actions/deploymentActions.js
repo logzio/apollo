@@ -225,22 +225,20 @@ export const deploy = (
       type: NEW_DEPLOYMENT_REQUEST,
     });
     try {
-      //Temp, so I wouldn't deploy!
-      // const data = await API.deploy(
-      //   serviceIdsCsv,
-      //   environmentIdsCsv,
-      //   deployableVersionId,
-      //   deploymentMessage,
-      //   isEmergencyDeployment,
-      // );
+      const data = await API.deploy(
+        serviceIdsCsv,
+        environmentIdsCsv,
+        deployableVersionId,
+        deploymentMessage,
+        isEmergencyDeployment,
+      );
       appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
       historyBrowser.push({
         pathname: '/deployment/ongoing',
       });
       dispatch({
         type: NEW_DEPLOYMENT_SUCCESS,
-        // payload: data,
-        payload: 'temp',
+        payload: data,
       });
     } catch (error) {
       dispatch({

@@ -8,6 +8,7 @@ export const ConfirmModal = ({ toggleShowModal, showModal, handleDeploy, isLoadi
       visible={showModal}
       toggleModal={toggleShowModal}
       title="Fashizle?"
+      class="confirm-modal"
       footer={[
         <AppButton
           label={'Emergency'}
@@ -18,7 +19,12 @@ export const ConfirmModal = ({ toggleShowModal, showModal, handleDeploy, isLoadi
           tooltipText={"Deploy while ignoring environment's concurrency limits!"}
           isLoading={isLoading}
         />,
-        <AppButton label={'Cancel'} className={'modal-btn cancel-modal-btn'} key="back" onClick={() => toggleShowModal(false)} />,
+        <AppButton
+          label={'Cancel'}
+          className={'modal-btn cancel-modal-btn'}
+          key="back"
+          onClick={() => toggleShowModal(false)}
+        />,
         <AppButton
           label={'Deploy'}
           className={'modal-btn'}

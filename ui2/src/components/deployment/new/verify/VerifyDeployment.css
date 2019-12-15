@@ -3,7 +3,7 @@
     height: 20px;
 }
 
-.ant-modal-footer{
+.confirm-modal .ant-modal-footer{
     display: flex;
 }
 
