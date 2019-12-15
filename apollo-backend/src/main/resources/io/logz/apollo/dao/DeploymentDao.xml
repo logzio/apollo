@@ -45,7 +45,7 @@
     <select id="getAllOngoingDeployments" resultType="io.logz.apollo.models.Deployment">
         SELECT *
         FROM deployment
-        WHERE status = "STARTED" OR status ="CANCELING"
+        WHERE status in ("STARTED", "CANCELING")
     </select>
 
     <select id="getAllStartedDeployments" resultType="io.logz.apollo.models.Deployment">
