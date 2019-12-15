@@ -19,7 +19,6 @@ public class ApolloApplication {
 
     private static final Logger logger = LoggerFactory.getLogger(ApolloApplication.class);
 
-    
     private final ConfigurationProvider<ApolloConfiguration> configurationProvider;
     private LifecycleManager lifecycleManager;
     private Injector injector;

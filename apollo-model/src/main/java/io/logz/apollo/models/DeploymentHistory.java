@@ -9,6 +9,8 @@ public class DeploymentHistory {
     public int pageSize;
     public List<DeploymentHistoryDetails> data;
 
+    public DeploymentHistory() {}
+
     public DeploymentHistory(int currentPageNumber, int recordsSize, int recordsNum, int recordsFilteredNum, List<DeploymentHistoryDetails> filteredData) {
         recordsTotal = recordsNum;
         recordsFiltered = recordsFilteredNum;

@@ -1,6 +1,7 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.Fabric8TestMethods;
 import io.logz.apollo.helpers.ModelsGenerator;
@@ -10,6 +11,8 @@ import io.logz.apollo.kubernetes.ApolloToKubernetes;
 import io.logz.apollo.kubernetes.ApolloToKubernetesStore;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.DeploymentHistory;
+import io.logz.apollo.models.DeploymentHistoryDetails;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
@@ -81,6 +84,65 @@ public class DeploymentTest {
     }
 
     @Test
+    public void testDeploymentHistory() throws Exception {
+        int pageNumber = 1;
+        int pageSize = 50;
+        Boolean descending = true;
+
+        Deployment testDeployment = createAndSubmitDeployment(apolloTestClient);
+
+        String emptySearchTerm = null;
+        String randomSearchTerm = Common.randomStr(25);
+        String userEmail = apolloTestClient.getTestUser().getUserEmail();
+
+        verifyGetAllHistoryDeployments(emptySearchTerm, testDeployment, pageNumber, pageSize, descending);
+        verifyDeploymentsFilteringByNonCommonTerm(randomSearchTerm, pageNumber, pageSize, descending);
+        verifyGetFilteredDeploymentsByEmail(userEmail, testDeployment, pageNumber, pageSize, descending);
+    }
+
+    private void verifyGetAllHistoryDeployments(String emptySearchTerm, Deployment testDeployment, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
+
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, emptySearchTerm);
+        assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
+        assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsTotal());
+
+        Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
+                .filter(deployment -> deployment.getId() == testDeployment.getId()).findFirst();
+
+        verifyDeploymentDetails(testDeployment, data);
+    }
+
+    private void verifyDeploymentsFilteringByNonCommonTerm(String searchTerm, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
+
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, searchTerm);
+        assertThat(deploymentsHistoryFromApi.getRecordsTotal()).isNotEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
+        assertThat(deploymentsHistoryFromApi.getData().size()).isEqualTo(deploymentsHistoryFromApi.getRecordsFiltered());
+    }
+
+
+    private void verifyGetFilteredDeploymentsByEmail(String userEmail, Deployment testDeployment, int pageNumber, int pageSize, Boolean descending) throws ApolloClientException {
+
+        DeploymentHistory deploymentsHistoryFromApi = apolloTestClient.getDeploymentsHistory(descending, pageNumber, pageSize, userEmail);
+
+        Optional<DeploymentHistoryDetails> data = deploymentsHistoryFromApi.getData().stream()
+                .filter(deployment -> deployment.getUserEmail().equals(userEmail)).findFirst();
+
+        verifyDeploymentDetails(testDeployment, data);
+    }
+
+    private void verifyDeploymentDetails(Deployment testDeployment, Optional<DeploymentHistoryDetails> data) throws ApolloClientException {
+
+        String testEnvName = apolloTestClient.getEnvironment(testDeployment.getEnvironmentId()).getName();
+        String testServiceName = apolloTestClient.getService(testDeployment.getServiceId()).getName();
+
+        assertThat(data).isPresent();
+        assertThat(data.get().getEnvironmentName()).isEqualTo(testEnvName);
+        assertThat(data.get().getServiceName()).isEqualTo(testServiceName);
+        assertThat(data.get().getDeployableVersionId()).isEqualTo(testDeployment.getDeployableVersionId());
+        assertThat(data.get().getStatus().toString().equals(String.valueOf(Deployment.DeploymentStatus.PENDING))).isTrue();
+    }
+
+    @Test
     public void testSimultaneousDeployments() throws Exception {
 
         Deployment deployment1 = createAndSubmitDeployment(apolloTestClient);
@@ -109,7 +171,7 @@ public class DeploymentTest {
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
 
-        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, serviceIdsCsv, deployableVersion1.getId());
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, serviceIdsCsv, deployableVersion1.getId(), false);
 
         assertThat(result.getSuccessful().size()).isEqualTo(4);
         assertThat(result.getUnsuccessful().size()).isEqualTo(0);
