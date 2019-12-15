@@ -38,7 +38,7 @@ after_success:
     docker push logzio/apollo:$TRAVIS_COMMIT;
     docker push logzio/apollo:latest;
     fi
-  - if [ "$BRANCH" == "DEV-15603-tests-and-ui" ]; then
+  - if [ "$BRANCH" == "DEV-16985-Deploy-Apollo" ]; then
     docker build -t logzio/apollo:$TRAVIS_COMMIT .;
     docker tag logzio/apollo:$TRAVIS_COMMIT logzio/apollo:ifat;
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
