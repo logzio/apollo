@@ -13,6 +13,7 @@ public interface DeploymentDao {
     Deployment getDeployment(int id);
     List<Deployment> getAllDeployments();
     List<Deployment> getAllRunningDeployments();
+    List<Deployment> getAllOngoingDeployments();
     List<Deployment> getAllStartedDeployments();
     List<Deployment> getRunningAndJustFinishedDeployments();
     List<Deployment> getLatestDeployments();
