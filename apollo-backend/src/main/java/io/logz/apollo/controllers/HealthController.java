@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
@@ -35,7 +36,12 @@ public class HealthController {
     public void getHealth(Req req) {
         Map<Integer, Boolean> environmentsHealthMap = kubernetesHealth.getEnvironmentsHealthMap();
         if (environmentsHealthMap.containsValue(false)) {
-            environmentsHealthMap.keySet().forEach(environmentId ->
+            Stream<Integer> unhealthyEnvironmentIds = environmentsHealthMap
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue().equals(false))
+                    .map(Map.Entry::getKey);
+            unhealthyEnvironmentIds.forEach(environmentId ->
                     logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environmentId, environmentDao.getEnvironment(environmentId).getName()));
             assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, environmentsHealthMap);
         } else {
