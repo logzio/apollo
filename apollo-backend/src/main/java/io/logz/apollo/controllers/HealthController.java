@@ -36,13 +36,12 @@ public class HealthController {
     public void getHealth(Req req) {
         Map<Integer, Boolean> environmentsHealthMap = kubernetesHealth.getEnvironmentsHealthMap();
         if (environmentsHealthMap.containsValue(false)) {
-            Stream<Integer> unhealthyEnvironmentIds = environmentsHealthMap
+            environmentsHealthMap
                     .entrySet()
                     .stream()
-                    .filter(entry -> entry.getValue().equals(false))
-                    .map(Map.Entry::getKey);
-            unhealthyEnvironmentIds.forEach(environmentId ->
-                    logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environmentId, environmentDao.getEnvironment(environmentId).getName()));
+                    .filter(environment -> environment.getValue().equals(false))
+                    .forEach(environment ->
+                        logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environment.getKey(), environmentDao.getEnvironment(environment.getKey()).getName()));
             assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, environmentsHealthMap);
         } else {
             assignJsonResponseToReq(req, HttpStatus.OK, environmentsHealthMap);
