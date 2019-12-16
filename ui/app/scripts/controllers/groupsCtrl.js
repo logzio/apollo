@@ -50,7 +50,7 @@ angular.module('apollo')
           }
 
           if (!$scope.currentGroup) {
-              apolloApiService.createGroup(groupName, environmentId, serviceId, defaultScalingFactor, jsonParams).then(function (response) {
+              apolloApiService.createGroup(groupName, serviceId, environmentId, defaultScalingFactor, jsonParams).then(function (response) {
                   usSpinnerService.stop('group-spinner');
                   growl.success("Successfully added group " + groupName + "!");
                   updateGroups();
