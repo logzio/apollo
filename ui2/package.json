@@ -5,7 +5,7 @@
   "scripts": {
     "start": "react-scripts start",
     "start-1": "EXTEND_ESLINT=true react-scripts start",
-    "build": "react-scripts build",
+    "build": "PUBLIC_URL=newApollo react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint -c .eslintrc.js 'src/**/*.jsx?'"
