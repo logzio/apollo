@@ -9,10 +9,8 @@ import org.rapidoid.annotation.GET;
 import org.rapidoid.http.Req;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.slf4j.MDC;
 import java.util.Map;
-import java.util.stream.Stream;
-
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
 
@@ -36,12 +34,14 @@ public class HealthController {
     public void getHealth(Req req) {
         Map<Integer, Boolean> environmentsHealthMap = kubernetesHealth.getEnvironmentsHealthMap();
         if (environmentsHealthMap.containsValue(false)) {
-            environmentsHealthMap
-                    .entrySet()
-                    .stream()
-                    .filter(environment -> environment.getValue().equals(false))
-                    .forEach(environment ->
-                        logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environment.getKey(), environmentDao.getEnvironment(environment.getKey()).getName()));
+            environmentsHealthMap.entrySet()
+                                 .stream()
+                                 .filter(environment -> !environment.getValue())
+                                 .forEach(environment -> {
+                                     MDC.put("environmentId", String.valueOf(environment.getKey()));
+                                     MDC.put("environmentName", String.valueOf(environment.getValue()));
+                                     logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environment.getKey(), environmentDao.getEnvironment(environment.getKey()).getName());
+                                 });
             assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, environmentsHealthMap);
         } else {
             assignJsonResponseToReq(req, HttpStatus.OK, environmentsHealthMap);
