@@ -39,7 +39,7 @@ public class HealthController {
                                  .filter(environment -> !environment.getValue())
                                  .forEach(environment -> {
                                      MDC.put("environmentId", String.valueOf(environment.getKey()));
-                                     MDC.put("environmentName", String.valueOf(environment.getValue()));
+                                     MDC.put("environmentName", String.valueOf(environmentDao.getEnvironment(environment.getKey()).getName()));
                                      logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environment.getKey(), environmentDao.getEnvironment(environment.getKey()).getName());
                                  });
             assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, environmentsHealthMap);
