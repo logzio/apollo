@@ -5,6 +5,8 @@ import io.logz.apollo.auth.TokenConverter;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.DeploymentPermissionDao;
+import io.logz.apollo.dao.UserDao;
+import io.logz.apollo.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +36,12 @@ public class AuthenticationFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     private final DeploymentPermissionDao deploymentPermissionDao;
+    private final UserDao userDao;
 
     @Inject
-    public AuthenticationFilter(DeploymentPermissionDao deploymentPermissionDao) {
+    public AuthenticationFilter(DeploymentPermissionDao deploymentPermissionDao, UserDao userDao) {
         this.deploymentPermissionDao = requireNonNull(deploymentPermissionDao);
+        this.userDao = requireNonNull(userDao);
     }
 
     @Override
@@ -61,7 +65,11 @@ public class AuthenticationFilter implements Filter {
             int environmentId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_ENVIRONMENT_KEY);
             int serviceId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_SERVICE_KEY);
 
-            if (PermissionsValidator.isAllowedToDeploy(serviceId, environmentId, deploymentPermissionDao.getPermissionsByUser(userName))) {
+            User user = userDao.getUser(userName);
+            boolean isAdmin = user.isAdmin();
+            boolean isExecAllowed = user.isExecAllowed();
+
+            if (PermissionsValidator.isAllowedToOpenExec(serviceId, environmentId, deploymentPermissionDao.getPermissionsByUser(userName), isAdmin, isExecAllowed)) {
                 logger.info("Granted Live-Session permission to user {} on service {} and environment {}", userName, serviceId, environmentId);
                 filterChain.doFilter(servletRequest, servletResponse);
             } else {

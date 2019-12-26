@@ -11,6 +11,7 @@ public class User {
     private String hashedPassword;
     private Boolean isAdmin;
     private Boolean isEnabled;
+    private Boolean isExecAllowed;
 
     public User() {
 
@@ -40,6 +41,10 @@ public class User {
         return isEnabled;
     }
 
+    public boolean isExecAllowed() {
+        return isExecAllowed;
+    }
+
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
@@ -62,5 +67,9 @@ public class User {
 
     public void setEnabled(Boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public void setExecAllowed(Boolean execAllowed) {
+        isExecAllowed = execAllowed;
     }
 }
