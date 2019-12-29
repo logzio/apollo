@@ -452,6 +452,7 @@ public class ModelsGenerator {
         testUser.setHashedPassword(PasswordManager.encryptPassword(Common.DEFAULT_PASSWORD));
         testUser.setAdmin(admin);
         testUser.setEnabled(true);
+        testUser.setExecAllowed(true);
 
         return testUser;
     }
