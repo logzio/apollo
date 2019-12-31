@@ -5,6 +5,8 @@ import io.logz.apollo.auth.TokenConverter;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.common.StringParser;
 import io.logz.apollo.dao.DeploymentPermissionDao;
+import io.logz.apollo.dao.UserDao;
+import io.logz.apollo.models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +35,11 @@ public class AuthenticationFilter implements Filter {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
 
-    private final DeploymentPermissionDao deploymentPermissionDao;
+    private final AuthenticationService authenticationService;
 
     @Inject
-    public AuthenticationFilter(DeploymentPermissionDao deploymentPermissionDao) {
-        this.deploymentPermissionDao = requireNonNull(deploymentPermissionDao);
+    public AuthenticationFilter(AuthenticationService authenticationService) {
+        this.authenticationService = requireNonNull(authenticationService);
     }
 
     @Override
@@ -61,7 +63,7 @@ public class AuthenticationFilter implements Filter {
             int environmentId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_ENVIRONMENT_KEY);
             int serviceId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_SERVICE_KEY);
 
-            if (PermissionsValidator.isAllowedToDeploy(serviceId, environmentId, deploymentPermissionDao.getPermissionsByUser(userName))) {
+            if (PermissionsValidator.isAllowedToExec(serviceId, environmentId, authenticationService.getPermissionsByUser(userName), authenticationService.isAdmin(userName), authenticationService.isExecAllowed(userName))) {
                 logger.info("Granted Live-Session permission to user {} on service {} and environment {}", userName, serviceId, environmentId);
                 filterChain.doFilter(servletRequest, servletResponse);
             } else {

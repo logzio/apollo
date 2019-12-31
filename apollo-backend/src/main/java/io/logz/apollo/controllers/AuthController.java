@@ -65,6 +65,7 @@ public class AuthController {
         newUser.setHashedPassword(PasswordManager.encryptPassword(password));
         newUser.setAdmin(false);
         newUser.setEnabled(true);
+        newUser.setExecAllowed(true);
         userDao.addUser(newUser);
 
         return newUser;
@@ -80,6 +81,7 @@ public class AuthController {
         user.setHashedPassword(PasswordManager.encryptPassword(password));
         user.setAdmin(isAdmin);
         user.setEnabled(isEnabled);
+        user.setExecAllowed(true);
         userDao.updateUser(user);
 
         return user;
