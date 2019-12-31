@@ -94,7 +94,7 @@ angular.module('apollo')
 
                         // Now we can deploy
                         apolloApiService.createNewDeployment(selectedDeployment.deployableVersionId,
-                            selectedDeployment.serviceId, selectedDeployment.environmentId).then(function (response) {
+                            selectedDeployment.serviceId, selectedDeployment.environmentId, "", false).then(function (response) {
 
                             // Wait a bit to let the deployment be in the DB
                             setTimeout(function () {

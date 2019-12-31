@@ -74,6 +74,10 @@ public class DeploymentHandler {
         String userEmail = req.token().get("_user").toString();
         String sourceVersion = null;
 
+        if (isEmergencyDeployment == null) {
+            isEmergencyDeployment = false;
+        }
+
         try {
             // Get the current commit sha from kubernetes so we can revert if necessary
             Environment environment = environmentDao.getEnvironment(environmentId);
