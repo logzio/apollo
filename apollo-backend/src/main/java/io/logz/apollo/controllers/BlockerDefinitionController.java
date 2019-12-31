@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.BlockerDefinition;
-import io.logz.apollo.blockers.BlockerService;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import org.rapidoid.annotation.Controller;
