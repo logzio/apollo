@@ -4,7 +4,7 @@ import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
-import io.logz.apollo.blockers.BlockerService;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.controllers.DeploymentController;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;

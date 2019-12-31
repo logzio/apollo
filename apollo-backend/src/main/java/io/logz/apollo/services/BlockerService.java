@@ -1,5 +1,9 @@
-package io.logz.apollo.blockers;
+package io.logz.apollo.services;
 
+import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.blockers.BlockerFunction;
+import io.logz.apollo.blockers.BlockerInjectableCommons;
+import io.logz.apollo.blockers.BlockerType;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.Deployment;

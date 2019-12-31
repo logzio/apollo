@@ -1,8 +1,9 @@
-package io.logz.apollo.websockets.exec;
+package io.logz.apollo.services;
 
 import io.logz.apollo.dao.DeploymentPermissionDao;
 import io.logz.apollo.dao.UserDao;
 import io.logz.apollo.models.DeploymentPermission;
+import io.logz.apollo.models.User;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,6 +11,7 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
+//Class in progress
 @Singleton
 public class AuthenticationService {
 
@@ -22,12 +24,8 @@ public class AuthenticationService {
         this.userDao = requireNonNull(userDao);
     }
 
-    public boolean isAdmin(String userName) {
-        return userDao.getUser(userName).isAdmin();
-    }
-
-    public boolean isExecAllowed(String userName) {
-        return userDao.getUser(userName).isExecAllowed();
+    public User getUser(String userName) {
+        return userDao.getUser(userName);
     }
 
     public List<DeploymentPermission> getPermissionsByUser(String userName) {

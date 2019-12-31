@@ -2,13 +2,13 @@ package io.logz.apollo.di;
 
 import com.google.inject.AbstractModule;
 import io.logz.apollo.ApolloApplication;
-import io.logz.apollo.blockers.BlockerService;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.notifications.ApolloNotifications;
 import io.logz.apollo.rest.RestServer;
 import io.logz.apollo.websockets.WebSocketServer;
-import io.logz.apollo.websockets.exec.AuthenticationService;
+import io.logz.apollo.services.AuthenticationService;
 import org.rapidoid.annotation.Controller;
 import org.reflections.Reflections;
 

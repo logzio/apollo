@@ -1,6 +1,6 @@
 package io.logz.apollo.blockers;
 
-import io.logz.apollo.controllers.StackService;
+import io.logz.apollo.services.StackService;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
