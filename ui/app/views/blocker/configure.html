@@ -24,6 +24,7 @@
                                 <th>Service</th>
                                 <th>Environment</th>
                                 <th>Stack</th>
+                                <th>Availability</th>
                                 <th>Started</th>
                                 <th>Active</th>
                                 <th>Type</th>
@@ -37,6 +38,7 @@
                                 <td>{{allServices[blocker.serviceId].name || "*"}}</td>
                                 <td>{{allEnvironments[blocker.environmentId].name || "*"}}</td>
                                 <td>{{allStacks[blocker.stackId].name || "*"}}</td>
+                                <td>{{allBlockersAvailabilities[blocker.id] || "*"}}</td>
                                 <td>{{blocker.startedAt | date:'dd/MM/yy HH:mm:ss'}}</td>
                                 <td>{{blocker.active}}</td>
                                 <td>{{blocker.blockerTypeName}}</td>
@@ -81,6 +83,12 @@
                             <div class="col-lg-3 text-center">
                                 <span class="apollo-form-headline">Environment</span> <br>
                                 <select class="form-control apollo-filter" ng-model="blockerEnvironment" ng-options="environment.name for environment in allEnvironments">
+                                    <option value="">*</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 text-center">
+                                <span class="apollo-form-headline">Availability</span> <br>
+                                <select class="form-control apollo-filter" ng-model="blockerAvailability" ng-options="availability for availability in availabilities ">
                                     <option value="">*</option>
                                 </select>
                             </div>

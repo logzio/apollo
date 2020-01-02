@@ -11,6 +11,9 @@ angular.module('apollo')
       $scope.timeBasedBlockerStartTime = {date: new Date()};
       $scope.timeBasedBlockerEndTime = {date: new Date()};
       $scope.allStacks = [];
+      $scope.allAvailabilities = [];
+      $scope.allBlockersAvailabilities = [];
+      $scope.availabilities = [];
 
       $scope.toggleSelectedDay = function toggleSelectedDay(day) {
           var id = $scope.selectedDays.indexOf(day);
@@ -38,6 +41,7 @@ angular.module('apollo')
           $scope.blockerService = $scope.allServices[blocker.serviceId];
           $scope.blockerEnvironment = $scope.allEnvironments[blocker.environmentId];
           $scope.blockerStack = $scope.allStacks[blocker.stackId];
+          $scope.blockerAvailability = $scope.allBlockersAvailabilities[blocker.id];
           $scope.blockerActive = blocker.active;
 
           $scope.blockerTypeName = blocker.blockerTypeName;
@@ -87,6 +91,7 @@ angular.module('apollo')
           var serviceId = null;
           var environmentId = null;
           var stackId = null;
+          var availability = null;
           var isActive = $scope.blockerActive;
           var blockerName = $scope.blockerName;
           var blockerTypeName = $scope.blockerTypeName;
@@ -102,6 +107,10 @@ angular.module('apollo')
 
           if ($scope.blockerStack) {
               stackId = $scope.blockerStack.id;
+          }
+
+          if ($scope.blockerAvailability) {
+              availability = $scope.blockerAvailability;
           }
 
           switch (blockerTypeName){
@@ -133,7 +142,7 @@ angular.module('apollo')
           }
 
           if (!$scope.currentBlocker) {
-              apolloApiService.addBlocker(blockerName, environmentId, serviceId, stackId,  isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
+              apolloApiService.addBlocker(blockerName, environmentId, serviceId, stackId, availability, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
                   usSpinnerService.stop('blocker-spinner');
                   growl.success("Successfully added blocker " + blockerName + "!");
                   updateBlockers();
@@ -142,7 +151,7 @@ angular.module('apollo')
                   growl.error("Could not add blocker! got: " + error.statusText)
               });
           } else {
-              apolloApiService.updateBlocker($scope.currentBlocker.id, blockerName, environmentId, serviceId, stackId, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
+              apolloApiService.updateBlocker($scope.currentBlocker.id, blockerName, environmentId, serviceId, stackId, availability, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
                   usSpinnerService.stop('blocker-spinner');
                   growl.success("Successfully updated blocker " + blockerName + "!");
                   updateBlockers();
@@ -165,8 +174,10 @@ angular.module('apollo')
           var tempEnvironment = {};
           response.data.forEach(function(environment) {
               tempEnvironment[environment.id] = environment;
+              $scope.allAvailabilities[environment.id] = environment.availability;
           });
-        
+
+          $scope.availabilities = $scope.allAvailabilities.filter((x, i, a) => a.indexOf(x) == i)
           $scope.allEnvironments = tempEnvironment;
       });
                 
@@ -191,11 +202,14 @@ angular.module('apollo')
       function updateBlockers() {
           apolloApiService.getAllBlockers().then(function(response) {
               var tempBlockers = {};
+              var tempAvailabilities = {};
               response.data.forEach(function(blocker) {
                   tempBlockers[blocker.id] = blocker;
+                  tempAvailabilities[blocker.id] = blocker.availability;
               });
 
               $scope.allBlockers = tempBlockers;
+              $scope.allBlockersAvailabilities = tempAvailabilities;
           });
       }
 
