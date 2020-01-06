@@ -7,6 +7,7 @@ import io.logz.apollo.common.StringParser;
 import io.logz.apollo.services.AuthenticationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -60,6 +61,9 @@ public class AuthenticationFilter implements Filter {
             int serviceId = StringParser.getIntFromQueryString(((HttpServletRequest) servletRequest).getQueryString(), ContainerExecEndpoint.QUERY_STRING_SERVICE_KEY);
 
             if (PermissionsValidator.isAllowedToExec(serviceId, environmentId, authenticationService.getPermissionsByUser(userName), authenticationService.getUser(userName).isAdmin(), authenticationService.getUser(userName).isExecAllowed())) {
+                MDC.put("serviceId", String.valueOf(serviceId));
+                MDC.put("environmentId", String.valueOf(environmentId));
+                MDC.put("userName", userName);
                 logger.info("Granted Live-Session permission to user {} on service {} and environment {}", userName, serviceId, environmentId);
                 filterChain.doFilter(servletRequest, servletResponse);
             } else {
