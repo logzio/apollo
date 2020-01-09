@@ -1,4 +1,4 @@
-package io.logz.apollo.controllers;
+package io.logz.apollo.services;
 
 import io.logz.apollo.dao.EnvironmentsStackDao;
 import io.logz.apollo.dao.ServicesStackDao;

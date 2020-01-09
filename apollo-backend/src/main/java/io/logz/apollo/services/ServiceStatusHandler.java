@@ -1,4 +1,4 @@
-package io.logz.apollo.status;
+package io.logz.apollo.services;
 
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.DeploymentDao;

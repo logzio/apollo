@@ -139,7 +139,7 @@
                                             ng-click="selectPod(podStatus)" data-toggle="modal" data-target="#confirm-modal">
                                         <i class="fa fa-times"></i>
                                     </button>
-                                    <button type="button" class="btn btn-success btn-circle" uib-tooltip="Live Terminal" data-toggle="modal" data-target="#select-container"
+                                    <button type="button" class="btn btn-success btn-circle" uib-tooltip="Live Terminal" data-toggle="modal" data-target="#agree-to-open-exec"
                                             ng-click="selectPod(podStatus);setWebsocketScope('exec')">
                                         <i class="fa fa-terminal"></i>
                                     </button>
@@ -187,29 +187,49 @@
         </div>
     </div>
 
-    <div class="modal fade" id="select-container" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal fade" id="agree-to-open-exec" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h4 class="modal-title">Select a container</h4>
+                    <h4 class="modal-title">Are you sure you wanna do this?</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="row text-center">
-                            <button type="button" class="btn btn-outline btn-primary btn-lg apollo-version-selector"
-                                    ng-repeat="container in selectedPodStatus.containers" ng-click="startWebSocket(container)" data-toggle="modal" data-target="#select-container,#live-session">
-                                {{container}}
-                            </button>
-                        </div>
-                    </div>
+                    This will automatically grant you exec permissions to a running live container, this session will be documented and monitored. <br>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#select-container">I agree</button>
                 </div>
+
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="select-container" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Select a container</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="row text-center">
+                        <button type="button" class="btn btn-outline btn-primary btn-lg apollo-version-selector"
+                                ng-repeat="container in selectedPodStatus.containers" ng-click="startWebSocket(container)" data-toggle="modal" data-target="#select-container,#live-session">
+                            {{container}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="modal fade" id="live-session" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">

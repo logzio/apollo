@@ -4,7 +4,7 @@ import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
-import io.logz.apollo.blockers.BlockerService;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.controllers.DeploymentController;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;
@@ -73,6 +73,10 @@ public class DeploymentHandler {
         // Get the username from the token
         String userEmail = req.token().get("_user").toString();
         String sourceVersion = null;
+
+        if (isEmergencyDeployment == null) {
+            isEmergencyDeployment = false;
+        }
 
         try {
             // Get the current commit sha from kubernetes so we can revert if necessary
