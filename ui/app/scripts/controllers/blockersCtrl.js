@@ -11,9 +11,8 @@ angular.module('apollo')
       $scope.timeBasedBlockerStartTime = {date: new Date()};
       $scope.timeBasedBlockerEndTime = {date: new Date()};
       $scope.allStacks = [];
-      $scope.allAvailabilities = [];
-      $scope.allBlockersAvailabilities = [];
-      $scope.availabilities = [];
+      $scope.allAvailabilitiesWithoutDuplicates = [];
+      $scope.allBlockersAvailabilitiesList = [];
 
       $scope.toggleSelectedDay = function toggleSelectedDay(day) {
           var id = $scope.selectedDays.indexOf(day);
@@ -41,7 +40,7 @@ angular.module('apollo')
           $scope.blockerService = $scope.allServices[blocker.serviceId];
           $scope.blockerEnvironment = $scope.allEnvironments[blocker.environmentId];
           $scope.blockerStack = $scope.allStacks[blocker.stackId];
-          $scope.blockerAvailability = $scope.allBlockersAvailabilities[blocker.id];
+          $scope.blockerAvailability = $scope.allBlockersAvailabilitiesList[blocker.id];
           $scope.blockerActive = blocker.active;
 
           $scope.blockerTypeName = blocker.blockerTypeName;
@@ -91,7 +90,7 @@ angular.module('apollo')
           var serviceId = null;
           var environmentId = null;
           var stackId = null;
-          var availability = null;
+          var availability = $scope.blockerAvailability;
           var isActive = $scope.blockerActive;
           var blockerName = $scope.blockerName;
           var blockerTypeName = $scope.blockerTypeName;
@@ -107,10 +106,6 @@ angular.module('apollo')
 
           if ($scope.blockerStack) {
               stackId = $scope.blockerStack.id;
-          }
-
-          if ($scope.blockerAvailability) {
-              availability = $scope.blockerAvailability;
           }
 
           switch (blockerTypeName){
@@ -174,10 +169,10 @@ angular.module('apollo')
           var tempEnvironment = {};
           response.data.forEach(function(environment) {
               tempEnvironment[environment.id] = environment;
-              $scope.allAvailabilities[environment.id] = environment.availability;
+              $scope.allAvailabilitiesWithoutDuplicates[environment.id] = environment.availability;
           });
 
-          $scope.availabilities = $scope.allAvailabilities.filter((x, i, a) => a.indexOf(x) == i)
+          $scope.allAvailabilitiesWithoutDuplicates = $scope.allAvailabilitiesWithoutDuplicates.filter((x, i, a) => a.indexOf(x) == i)
           $scope.allEnvironments = tempEnvironment;
       });
                 
@@ -202,14 +197,14 @@ angular.module('apollo')
       function updateBlockers() {
           apolloApiService.getAllBlockers().then(function(response) {
               var tempBlockers = {};
-              var tempAvailabilities = {};
+              var orderedAvailabilitiesByBlockersIds = [];
               response.data.forEach(function(blocker) {
                   tempBlockers[blocker.id] = blocker;
-                  tempAvailabilities[blocker.id] = blocker.availability;
+                  orderedAvailabilitiesByBlockersIds[blocker.id] = blocker.availability;
               });
 
               $scope.allBlockers = tempBlockers;
-              $scope.allBlockersAvailabilities = tempAvailabilities;
+              $scope.allBlockersAvailabilitiesList = orderedAvailabilitiesByBlockersIds;
           });
       }
 

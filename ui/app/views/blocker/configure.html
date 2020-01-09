@@ -38,7 +38,7 @@
                                 <td>{{allServices[blocker.serviceId].name || "*"}}</td>
                                 <td>{{allEnvironments[blocker.environmentId].name || "*"}}</td>
                                 <td>{{allStacks[blocker.stackId].name || "*"}}</td>
-                                <td>{{allBlockersAvailabilities[blocker.id] || "*"}}</td>
+                                <td>{{allBlockersAvailabilitiesList[blocker.id] || "*"}}</td>
                                 <td>{{blocker.startedAt | date:'dd/MM/yy HH:mm:ss'}}</td>
                                 <td>{{blocker.active}}</td>
                                 <td>{{blocker.blockerTypeName}}</td>
@@ -88,7 +88,7 @@
                             </div>
                             <div class="col-lg-3 text-center">
                                 <span class="apollo-form-headline">Availability</span> <br>
-                                <select class="form-control apollo-filter" ng-model="blockerAvailability" ng-options="availability for availability in availabilities ">
+                                <select class="form-control apollo-filter" ng-model="blockerAvailability" ng-options="availability for availability in allAvailabilitiesWithoutDuplicates">
                                     <option value="">*</option>
                                 </select>
                             </div>
