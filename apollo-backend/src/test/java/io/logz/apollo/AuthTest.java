@@ -1,5 +1,6 @@
 package io.logz.apollo;
 
+import io.logz.apollo.clients.ApolloWebSocketClient;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.User;
 import io.logz.apollo.clients.ApolloTestAdminClient;

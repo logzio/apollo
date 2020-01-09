@@ -14,15 +14,17 @@ import java.util.concurrent.TimeUnit;
 
 public class ApolloWebSocketClient {
 
-    private OkHttpClient client;
+    private final URI uri;
+    private final WebSocketListener webSocketListener;
+    private final OkHttpClient client;
+    private final CookieManager cookieManager;
 
-    public ApolloWebSocketClient(String token, String protocol, String hostname, int port, WebSocketListener webSocketListener) throws URISyntaxException {
+    public ApolloWebSocketClient(String protocol, String hostname, int port, WebSocketListener webSocketListener) throws URISyntaxException {
 
-        String uri = protocol + "://" + hostname + ":" + port;
-
-        CookieManager cookieManager =  new CookieManager();
+        uri = new URI(protocol + "://" + hostname + ":" + port);
+        this.webSocketListener = webSocketListener;
+        cookieManager =  new CookieManager();
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
-        cookieManager.getCookieStore().add(new URI(uri), new HttpCookie("_token", token));
 
         client = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
@@ -30,9 +32,15 @@ public class ApolloWebSocketClient {
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .cookieJar(new JavaNetCookieJar(cookieManager))
                 .build();
+    }
 
+    public void setToken(String token) {
+        cookieManager.getCookieStore().add(uri, new HttpCookie("_token", token));
+    }
+
+    public void start() {
         Request request = new Request.Builder()
-                .url(uri)
+                .url(uri.toString())
                 .build();
 
         client.newWebSocket(request, webSocketListener);

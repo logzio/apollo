@@ -211,4 +211,8 @@ class GenericApolloClient {
             throw new ApolloClientException("Could not determine if login succeeded", e);
         }
     }
+
+    public String getToken() {
+        return token;
+    }
 }
