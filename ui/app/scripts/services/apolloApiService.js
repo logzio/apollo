@@ -293,24 +293,26 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + "blocker-definition");
     };
     
-    var addBlocker = function (name, environmentId, serviceId, stackId, isActive, blockerTypeName, blockerJsonConfiguration) {
+    var addBlocker = function (name, environmentId, serviceId, stackId, availability, isActive, blockerTypeName, blockerJsonConfiguration) {
         return $http.post(CONFIG.appUrl + "blocker-definition", {
             name: name,
             environmentId: environmentId,
             serviceId: serviceId,
             stackId: stackId,
+            availability: availability,
             isActive: isActive,
             blockerTypeName: blockerTypeName,
             blockerJsonConfiguration: blockerJsonConfiguration
         });
     };
 
-    var updateBlocker = function (id, name, environmentId, serviceId, stackId, isActive, blockerTypeName, blockerJsonConfiguration) {
+    var updateBlocker = function (id, name, environmentId, serviceId, stackId, availability, isActive, blockerTypeName, blockerJsonConfiguration) {
         return $http.put(CONFIG.appUrl + "blocker-definition/" + id, {
             name: name,
             environmentId: environmentId,
             serviceId: serviceId,
             stackId: stackId,
+            availability: availability,
             isActive: isActive,
             blockerTypeName: blockerTypeName,
             blockerJsonConfiguration: blockerJsonConfiguration
