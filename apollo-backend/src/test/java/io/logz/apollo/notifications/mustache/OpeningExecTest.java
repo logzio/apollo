@@ -28,7 +28,7 @@ public class OpeningExecTest
     @Test
     public void test() throws Exception {
 
-        ApolloWebSocketClient apolloWebSocketClient = standaloneApollo.createTestWebSocketClient(new ApolloWebSocketListener());
+        ApolloWebSocketClient apolloWebSocketClient = standaloneApollo.createTestWebSocketClient();
 
         ApolloTestAdminClient apolloTestAdminClient = standaloneApollo.createTestAdminClient();
         ApolloTestClient apolloTestClient = standaloneApollo.createTestClient();
@@ -44,32 +44,32 @@ public class OpeningExecTest
         apolloWebSocketClient.start();
     }
 
-    class ApolloWebSocketListener extends WebSocketListener {
-
-        private AtomicInteger openSessionCounter;
-        private AtomicInteger failedSessionCounter;
-
-        public ApolloWebSocketListener() {
-            openSessionCounter = new AtomicInteger(0);
-            failedSessionCounter = new AtomicInteger(0);
-        }
-
-        @Override
-        public void onOpen(WebSocket webSocket, Response response) {
-            openSessionCounter.incrementAndGet();
-        }
-
-        @Override
-        public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
-            failedSessionCounter.incrementAndGet();
-        }
-
-        public AtomicInteger getOpenSessionCounter() {
-            return openSessionCounter;
-        }
-
-        public AtomicInteger getFailedSessionCounter() {
-            return failedSessionCounter;
-        }
-    }
+//    class ApolloWebSocketListener extends WebSocketListener {
+//
+//        private AtomicInteger openSessionCounter;
+//        private AtomicInteger failedSessionCounter;
+//
+//        public ApolloWebSocketListener() {
+//            openSessionCounter = new AtomicInteger(0);
+//            failedSessionCounter = new AtomicInteger(0);
+//        }
+//
+//        @Override
+//        public void onOpen(WebSocket webSocket, Response response) {
+//            openSessionCounter.incrementAndGet();
+//        }
+//
+//        @Override
+//        public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
+//            failedSessionCounter.incrementAndGet();
+//        }
+//
+//        public AtomicInteger getOpenSessionCounter() {
+//            return openSessionCounter;
+//        }
+//
+//        public AtomicInteger getFailedSessionCounter() {
+//            return failedSessionCounter;
+//        }
+//    }
 }
