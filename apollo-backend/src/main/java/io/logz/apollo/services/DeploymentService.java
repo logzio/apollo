@@ -31,10 +31,10 @@ public class DeploymentService {
         try {
             DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployment.getDeployableVersionId());
             Service service = serviceDao.getService(deployment.getServiceId());
-            MDC.put("tags", String.format("service-name:%s, user:%s", service.getName(), deployment.getUserEmail()));
-            logger.info("<a href='{}'>github commit</a>",deployableVersion.getCommitUrl());
+            MDC.put("markers", String.format("service-name:%s", service.getName()));
+            logger.info("<a href='{}'>{} Deployed Commit</a>", deployableVersion.getCommitUrl(), deployment.getUserEmail());
         } finally {
-            MDC.remove("tags");
+            MDC.remove("markers");
         }
     }
 }
