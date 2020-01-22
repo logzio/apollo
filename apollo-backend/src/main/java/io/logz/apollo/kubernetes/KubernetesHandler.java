@@ -20,6 +20,7 @@ import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.PodStatus;
 import io.logz.apollo.models.Service;
 import io.logz.apollo.notifications.ApolloNotifications;
+import io.logz.apollo.services.DeploymentService;
 import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -46,21 +47,25 @@ public class KubernetesHandler {
     private final KubernetesClient kubernetesClient;
     private final Environment environment;
     private final ApolloNotifications apolloNotifications;
+    private final DeploymentService deploymentService;
 
     @VisibleForTesting
     KubernetesHandler(ApolloToKubernetesStore apolloToKubernetesStore, KubernetesClient kubernetesClient,
-                      Environment environment, ApolloNotifications apolloNotifications) {
+                      Environment environment, ApolloNotifications apolloNotifications, DeploymentService deploymentService) {
         this.apolloToKubernetesStore = requireNonNull(apolloToKubernetesStore);
         this.kubernetesClient = requireNonNull(kubernetesClient);
         this.environment = requireNonNull(environment);
         this.apolloNotifications = requireNonNull(apolloNotifications);
+        this.deploymentService = requireNonNull(deploymentService);
+
     }
 
     public KubernetesHandler(ApolloToKubernetesStore apolloToKubernetesStore, Environment environment,
-                             ApolloNotifications apolloNotifications) {
+                             ApolloNotifications apolloNotifications, DeploymentService deploymentService) {
         this.apolloToKubernetesStore = requireNonNull(apolloToKubernetesStore);
         this.environment = requireNonNull(environment);
         this.apolloNotifications = requireNonNull(apolloNotifications);
+        this.deploymentService = requireNonNull(deploymentService);
 
         this.kubernetesClient = createKubernetesClient(environment);
     }
@@ -172,6 +177,7 @@ public class KubernetesHandler {
             logger.info("Deployment id {} is done deploying", deployment.getId());
             apolloNotifications.notify(Deployment.DeploymentStatus.DONE, deployment);
             deployment.setStatus(Deployment.DeploymentStatus.DONE);
+            deploymentService.logDeploymentDescription(deployment);
         } else if (deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELING)) {
             logger.info("Deployment id {} is done canceling", deployment.getId());
             apolloNotifications.notify(Deployment.DeploymentStatus.CANCELED, deployment);
