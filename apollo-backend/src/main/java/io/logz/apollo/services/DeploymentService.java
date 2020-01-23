@@ -25,7 +25,7 @@ public class DeploymentService {
     private final EnvironmentDao environmentDao;
 
     @Inject
-    public DeploymentService(ServiceDao serviceDao, DeployableVersionDao deployableVersionDao, EnvironmentDao environmentDao) {
+    public DeploymentService(ServiceDao serviceDao, DeployableVersionDao deployableVersionDao,EnvironmentDao environmentDao) {
         this.serviceDao = requireNonNull(serviceDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.environmentDao = requireNonNull(environmentDao);
@@ -35,13 +35,13 @@ public class DeploymentService {
         try {
             DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployment.getDeployableVersionId());
             Service service = serviceDao.getService(deployment.getServiceId());
-            Environment environment = environmentDao.getEnvironment(deployment.getEnvironmentId());
-            MDC.put("markers", String.format("service-name:%s, user:%s", service.getName(), deployment.getUserEmail()));
-            MDC.put("environment", environment.getName());
-            logger.info("<a href='{}'>github commit</a>", deployableVersion.getCommitUrl());
+            Environment env = environmentDao.getEnvironment(deployment.getEnvironmentId());
+            MDC.put("markers", String.format("service-name:%s", service.getName()));
+            MDC.put("env", env.getAvailability());
+            logger.info("<a href='{}'>{} Deployed commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
         } finally {
             MDC.remove("markers");
-            MDC.remove("environment");
+            MDC.remove("env");
         }
     }
 }
