@@ -41,6 +41,7 @@ public class DeploymentService {
             logger.info("<a href='{}'>{} commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
         } finally {
             MDC.remove("markers");
+            MDC.remove("env");
         }
     }
 }
