@@ -38,7 +38,7 @@ public class DeploymentService {
             Environment env = environmentDao.getEnvironment(deployment.getEnvironmentId());
             MDC.put("markers", String.format("service-name:%s", service.getName()));
             MDC.put("env", env.getAvailability());
-            logger.info("<a href='{}'>{} commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
+            logger.info("<a href='{}'>{} Deployed commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
         } finally {
             MDC.remove("markers");
             MDC.remove("env");
