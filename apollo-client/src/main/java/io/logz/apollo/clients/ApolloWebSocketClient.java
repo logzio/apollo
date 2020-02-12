@@ -20,14 +20,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ApolloWebSocketClient extends WebSocketListener {
 
     private final URI uri;
-//    private final WebSocketListener webSocketListener;
+    private final WebSocketListener webSocketListener;
     private final OkHttpClient client;
     private final CookieManager cookieManager;
 
-    public ApolloWebSocketClient(String protocol, String hostname, int port) throws URISyntaxException {
+    public ApolloWebSocketClient(String protocol, String hostname, int port, WebSocketListener webSocketListener) throws URISyntaxException {
 
         uri = new URI(protocol + "://" + hostname + ":" + port);
-//        this.webSocketListener = webSocketListener;
+        this.webSocketListener = webSocketListener;
         cookieManager =  new CookieManager();
         cookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
@@ -49,7 +49,7 @@ public class ApolloWebSocketClient extends WebSocketListener {
 //                .url("ws://echo.websocket.org")
                 .build();
 
-        client.newWebSocket(request, this);
+        client.newWebSocket(request, webSocketListener);
     }
 
     public void shutdown() {
@@ -57,40 +57,40 @@ public class ApolloWebSocketClient extends WebSocketListener {
     }
 
 
-        private AtomicInteger openSessionCounter = new AtomicInteger(0);
-        private AtomicInteger failedSessionCounter = new AtomicInteger(0);
-
-    @Override
-    public void onOpen(WebSocket webSocket, Response response) {
-            openSessionCounter.incrementAndGet();
-        }
-
-    @Override public void onMessage(WebSocket webSocket, ByteString bytes) {
-        openSessionCounter.incrementAndGet();
-    }
-
-
-    @Override
-    public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
-            failedSessionCounter.incrementAndGet();
-        }
-
-    @Override
-    public void onClosing(WebSocket webSocket, int code, String reason) {
-        failedSessionCounter.incrementAndGet();
-    }
-
-    @Override
-    public void onClosed(WebSocket webSocket, int code, String reason) {
-        failedSessionCounter.incrementAndGet();
-    }
-
-        public AtomicInteger getOpenSessionCounter() {
-            return openSessionCounter;
-        }
-
-        public AtomicInteger getFailedSessionCounter() {
-            return failedSessionCounter;
-        }
+//        private AtomicInteger openSessionCounter = new AtomicInteger(0);
+//        private AtomicInteger failedSessionCounter = new AtomicInteger(0);
+//
+//    @Override
+//    public void onOpen(WebSocket webSocket, Response response) {
+//            openSessionCounter.incrementAndGet();
+//        }
+//
+//    @Override public void onMessage(WebSocket webSocket, ByteString bytes) {
+//        openSessionCounter.incrementAndGet();
+//    }
+//
+//
+//    @Override
+//    public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
+//            failedSessionCounter.incrementAndGet();
+//        }
+//
+//    @Override
+//    public void onClosing(WebSocket webSocket, int code, String reason) {
+//        failedSessionCounter.incrementAndGet();
+//    }
+//
+//    @Override
+//    public void onClosed(WebSocket webSocket, int code, String reason) {
+//        failedSessionCounter.incrementAndGet();
+//    }
+//
+//        public AtomicInteger getOpenSessionCounter() {
+//            return openSessionCounter;
+//        }
+//
+//        public AtomicInteger getFailedSessionCounter() {
+//            return failedSessionCounter;
+//        }
 
 }

@@ -108,9 +108,9 @@ public class StandaloneApollo {
         return new ApolloTestClient(ModelsGenerator.createRegularUser(), hostname, apolloConfiguration.getApi().getPort(), protocol);
     }
 
-    public ApolloWebSocketClient createTestWebSocketClient() {
+    public ApolloWebSocketClient createTestWebSocketClient(WebSocketListener webSocketListener) {
         try {
-            return new ApolloWebSocketClient(wsProtocol, hostname, apolloConfiguration.getWebsocket().getPort());
+            return new ApolloWebSocketClient(wsProtocol, hostname, apolloConfiguration.getWebsocket().getPort(), webSocketListener);
         } catch (URISyntaxException e) {
             throw  new RuntimeException("Could not create apollo websocket client", e);
         }
