@@ -1,10 +1,13 @@
 package io.logz.apollo.transformers.deployment;
 
 import com.google.common.collect.ImmutableMap;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.LabelSelectorRequirement;
+import io.fabric8.kubernetes.api.model.LabelSelectorRequirementBuilder;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.logz.apollo.kubernetes.ApolloToKubernetes;
 import io.logz.apollo.transformers.LabelsNormalizer;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -43,6 +46,16 @@ public class DeploymentLabelsTransformer implements BaseDeploymentTransformer {
 
         // And notify all back to the deployment
         deployment.getMetadata().setLabels(labelsFromDeployment);
+
+//        List<LabelSelectorRequirement> matchExpressions = deployment.getSpec().getSelector().getMatchExpressions();
+//        LabelSelectorRequirement labelSelectorRequirement = new LabelSelectorRequirementBuilder()
+//                .withNewKey(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey())
+//                .withOperator("In")
+//                .addNewValue(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierValue(apolloEnvironment, apolloService, Optional.ofNullable(apolloDeployment.getGroupName())))
+//                .build();
+//
+//        matchExpressions.add(labelSelectorRequirement);
+//        deployment.getSpec().getSelector().setMatchExpressions(matchExpressions);
 
         // We also need to tag the pod
         Map<String, String> labelsFromDeploymentPod = deployment.getSpec().getTemplate().getMetadata().getLabels();
