@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
+import io.fabric8.kubernetes.api.model.LabelSelectorBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
@@ -130,6 +131,10 @@ public class ApolloToKubernetes {
             deploymentTransformers.forEach(transformer ->
                     transformer.transform(deployment, apolloDeployment, apolloService, apolloEnvironment, apolloDeployableVersion, groupDao.getGroupByName(groupName)));
 
+            LabelSelectorBuilder labelSelectorBuilder = new LabelSelectorBuilder();
+            deployment.getSpec().getTemplate().getMetadata().getLabels()
+                      .forEach(labelSelectorBuilder::addToMatchLabels);
+            deployment.getSpec().setSelector(labelSelectorBuilder.build());
             return deployment;
 
         } catch (IOException e) {
