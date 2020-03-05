@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.logz.apollo.dao.DeploymentApiVersionDao">
+
+    <select id="getApiVersion" resultType="String">
+        SELECT api_version
+        FROM deployment_api_version
+        WHERE service_id = #{serviceId} AND environment_id = #{environmentId}
+    </select>
+
+</mapper>

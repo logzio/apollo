@@ -1,6 +1,7 @@
 package io.logz.apollo.kubernetes;
 
 import io.logz.apollo.dao.DeployableVersionDao;
+import io.logz.apollo.dao.DeploymentApiVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.GroupDao;
@@ -30,16 +31,18 @@ public class ApolloToKubernetesStore {
     private final DeploymentDao deploymentDao;
     private final ServiceDao serviceDao;
     private final GroupDao groupDao;
+    private final DeploymentApiVersionDao deploymentApiVersionDao;
 
     @Inject
     public ApolloToKubernetesStore(DeployableVersionDao deployableVersionDao, EnvironmentDao environmentDao,
-                                   DeploymentDao deploymentDao, ServiceDao serviceDao, GroupDao groupDao) {
+                                   DeploymentDao deploymentDao, ServiceDao serviceDao, GroupDao groupDao,  DeploymentApiVersionDao deploymentApiVersionDao) {
         this.mappers = new ConcurrentHashMap<>();
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.environmentDao = requireNonNull(environmentDao);
         this.deploymentDao = requireNonNull(deploymentDao);
         this.serviceDao = requireNonNull(serviceDao);
         this.groupDao = requireNonNull(groupDao);
+        this.deploymentApiVersionDao = requireNonNull(deploymentApiVersionDao);
     }
 
     public ApolloToKubernetes getOrCreateApolloToKubernetes(Deployment deployment) {
@@ -51,6 +54,6 @@ public class ApolloToKubernetesStore {
         Environment environment = environmentDao.getEnvironment(deployment.getEnvironmentId());
         Service service = serviceDao.getService(deployment.getServiceId());
 
-        return new ApolloToKubernetes(deploymentDao, deployableVersion, environment, deployment, service, groupDao);
+        return new ApolloToKubernetes(deploymentDao, deployableVersion, environment, deployment, service, groupDao, deploymentApiVersionDao);
     }
 }

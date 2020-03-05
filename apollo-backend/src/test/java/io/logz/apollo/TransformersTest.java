@@ -2,6 +2,7 @@ package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.dao.DeployableVersionDao;
+import io.logz.apollo.dao.DeploymentApiVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.GroupDao;
@@ -202,12 +203,13 @@ public class TransformersTest {
         DeploymentDao deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
         ServiceDao serviceDao = standaloneApollo.getInstance(ServiceDao.class);
         GroupDao groupDao = standaloneApollo.getInstance(GroupDao.class);
+        DeploymentApiVersionDao deploymentApiVersionDao = standaloneApollo.getInstance(DeploymentApiVersionDao.class);
 
         DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployment.getDeployableVersionId());
         Environment environment = environmentDao.getEnvironment(deployment.getEnvironmentId());
         Service service = serviceDao.getService(deployment.getServiceId());
 
-        return new ApolloToKubernetes(deploymentDao, deployableVersion, environment, deployment, service, groupDao);
+        return new ApolloToKubernetes(deploymentDao, deployableVersion, environment, deployment, service, groupDao, deploymentApiVersionDao);
     }
 
 }

@@ -3,6 +3,7 @@ package io.logz.apollo.di;
 import io.logz.apollo.configuration.DatabaseConfiguration;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.dao.DeployableVersionDao;
+import io.logz.apollo.dao.DeploymentApiVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentRoleDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;
@@ -58,6 +59,7 @@ public class ApolloMyBatisModule extends MyBatisModule {
         addMapperClass(EnvironmentsStackDao.class);
         addMapperClass(ServicesStackDao.class);
         addMapperClass(StackDao.class);
+        addMapperClass(DeploymentApiVersionDao.class);
     }
 
     private void createDataSource() {

@@ -9,6 +9,7 @@ import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.logz.apollo.common.Encryptor;
+import io.logz.apollo.dao.DeploymentApiVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.excpetions.ApolloParseException;
@@ -56,6 +57,7 @@ public class ApolloToKubernetes {
 
     private final DeploymentDao deploymentDao;
     private final GroupDao groupDao;
+    private final DeploymentApiVersionDao deploymentApiVersionDao;
 
     private final TemplateInjector templateInjector;
 
@@ -67,12 +69,14 @@ public class ApolloToKubernetes {
                               io.logz.apollo.models.Environment apolloEnvironment,
                               io.logz.apollo.models.Deployment apolloDeployment,
                               io.logz.apollo.models.Service apolloService,
-                              GroupDao groupDao) {
+                              GroupDao groupDao,
+                              DeploymentApiVersionDao deploymentApiVersionDao) {
         this.apolloDeployableVersion = requireNonNull(apolloDeployableVersion);
         this.apolloEnvironment = requireNonNull(apolloEnvironment);
         this.apolloDeployment = requireNonNull(apolloDeployment);
         this.apolloService = requireNonNull(apolloService);
         this.deploymentDao = requireNonNull(deploymentDao);
+        this.deploymentApiVersionDao = requireNonNull(deploymentApiVersionDao);
         this.groupDao = requireNonNull(groupDao);
         this.groupName = apolloDeployment.getGroupName();
 
@@ -104,6 +108,16 @@ public class ApolloToKubernetes {
         templateInjector = new TemplateInjector();
     }
 
+    private String getApiVersion() {
+        String apiVersion =
+                (apiVersion = deploymentApiVersionDao.getApiVersion(apolloService.getId(), apolloEnvironment.getId())) != null
+                        ? apiVersion : deploymentApiVersionDao.getApiVersion(apolloService.getId(), -1);
+        if (apiVersion != null) {
+            return apiVersion;
+        }
+        return "apps/v1";
+    }
+
     public Deployment getKubernetesDeployment() throws ApolloParseException, IOException {
         try {
             // Update the deployment, as it could have changed since (Status)
@@ -121,6 +135,8 @@ public class ApolloToKubernetes {
             if (apolloService.getIsPartOfGroup()) {
                 additionalParams.putAll(jsonToMap(apolloDeployment.getDeploymentParams()));
             }
+
+            additionalParams.put("apiVersion", getApiVersion());
 
             // Convert the deployment object to fabric8 model
             Deployment deployment = getClassFromYamlWithParameters(deploymentYaml, additionalParams, Deployment.class);
