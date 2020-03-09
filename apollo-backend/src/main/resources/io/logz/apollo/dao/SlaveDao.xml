@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.logz.apollo.dao.SlaveDao">
+    <select id="getAllSlaves" resultType="io.logz.apollo.models.Slave">
+        SELECT *
+        FROM slave
+    </select>
+
+    <insert id="addSlave">
+        INSERT INTO slave (slave_id, environment_id)
+        VALUES (#{slaveId}, #{environmentId})
+    </insert>
+
+    <update id="keepalive">
+        UPDATE slave SET
+        last_keepalive=now(),
+        WHERE
+        slave_id=#{slave_id}
+    </update>
+
+    <delete id="removeAllSlavesById">
+        DELETE FROM slave
+        WHERE slave_id=#{slaveId}
+    </delete>
+</mapper>
