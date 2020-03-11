@@ -34,6 +34,8 @@ public class SlaveService {
     private final ApolloConfiguration apolloConfiguration;
     private final SlaveDao slaveDao;
 
+    private boolean started = false;
+
     @Inject
     public SlaveService(ApolloConfiguration apolloConfiguration, SlaveDao slaveDao) {
         this.slaveDao = requireNonNull(slaveDao);
@@ -60,13 +62,15 @@ public class SlaveService {
             scheduledExecutorService.scheduleWithFixedDelay(this::keepAlive,
                     0, apolloConfiguration.getSlave().getKeepaliveIntervalSeconds(),
                     TimeUnit.SECONDS);
+
+            started = true;
         }
     }
 
     @PreDestroy
     public void stop() {
+        started = false;
         scheduledExecutorService.shutdownNow();
-
         slaveDao.getAllSlaves()
                 .stream()
                 .filter(slave -> slave.getSlaveId().equals(slaveId))
@@ -88,6 +92,10 @@ public class SlaveService {
                         >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)
                 .map(Slave::getEnvironmentId)
                 .collect(Collectors.toList());
+    }
+
+    public boolean isStarted() {
+        return started;
     }
 
     private void claimSlave() {

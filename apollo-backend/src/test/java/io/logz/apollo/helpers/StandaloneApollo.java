@@ -8,18 +8,22 @@ import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.configuration.DatabaseConfiguration;
 import io.logz.apollo.configuration.KubernetesConfiguration;
 import io.logz.apollo.configuration.ScmConfiguration;
+import io.logz.apollo.configuration.SlaveConfiguration;
 import io.logz.apollo.configuration.WebsocketConfiguration;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.kubernetes.KubernetesHealth;
 import io.logz.apollo.scm.GithubConnector;
+import io.logz.apollo.services.SlaveService;
 import org.apache.commons.lang3.StringUtils;
 import org.conf4j.core.ConfigurationProvider;
 
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class StandaloneApollo {
 
@@ -53,7 +57,8 @@ public class StandaloneApollo {
                 databaseConfiguration,
                 new KubernetesConfiguration(1, 1),
                 new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
-                new WebsocketConfiguration(Common.getAvailablePort(), 5)
+                new WebsocketConfiguration(Common.getAvailablePort(), 5),
+                new SlaveConfiguration(1)
         );
 
         // Start apollo
@@ -74,6 +79,21 @@ public class StandaloneApollo {
         }
 
         return instance;
+    }
+
+    public ApolloApplication createAndStartSlave(List<Integer> environmentIds) {
+        if (instance == null) {
+            throw new RuntimeException("Can't create slave without master first");
+        }
+
+        System.setProperty(SlaveService.SLAVE_PROPERTY, "true");
+        System.setProperty(SlaveService.SLAVE_CSV_ENVIRONMENTS,
+                environmentIds.stream().map(Object::toString).collect(Collectors.joining(",")));
+
+        ApolloApplication apolloApplication = new ApolloApplication(createConfigurationProvider(apolloConfiguration));
+        apolloApplication.start();
+
+        return apolloApplication;
     }
 
     public GithubConnector getGithubConnector() {

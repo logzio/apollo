@@ -190,7 +190,8 @@ public class KubernetesMonitor {
         return Boolean.valueOf(System.getenv(LOCAL_RUN_PROPERTY)) || Boolean.valueOf(System.getProperty(LOCAL_RUN_PROPERTY));
     }
 
-    private List<Integer> getScopedEnvironments() {
+    @VisibleForTesting
+    public List<Integer> getScopedEnvironments() {
         if (slaveService.getSlave()) {
             return slaveService.getEnvironmentIds();
         } else { // I am the master, need all unattended environments
