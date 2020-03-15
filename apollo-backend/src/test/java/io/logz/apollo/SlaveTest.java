@@ -1,6 +1,7 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
@@ -34,26 +35,27 @@ public class SlaveTest {
     @Test
     public void testSlaveOwnership() throws ApolloClientException {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
-        Environment environment1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
-        Environment environment2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
-        Environment environment3 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
-        Environment environment4 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        EnvironmentDao environmentDao = standaloneApollo.getInstance(EnvironmentDao.class);
 
-        List<Integer> slaveEnvironmentIds = Arrays.asList(environment1.getId(), environment2.getId());
-        List<Integer> masterEnvironmentIds = Arrays.asList(environment3.getId(), environment4.getId());
-        List<Integer> allEnvironmentIds = Stream.concat(slaveEnvironmentIds.stream(), masterEnvironmentIds.stream()).sorted().collect(Collectors.toList());
+        Environment slaveEnvironment1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Environment slaveEnvironment2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Environment masterEnvironment1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Environment masterEnvironment2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+
+        List<Integer> allEnvironmentIds = environmentDao.getAllEnvironments().stream().map(Environment::getId).collect(Collectors.toList());
 
         List<Integer> masterScopedEnvironments = standaloneApollo.getInstance(KubernetesMonitor.class).getScopedEnvironments();
         assertThat(getCsvFromList(allEnvironmentIds)).isEqualTo(getCsvFromList(masterScopedEnvironments));
 
-        ApolloApplication slave = standaloneApollo.createAndStartSlave(slaveEnvironmentIds);
+        ApolloApplication slave = standaloneApollo.createAndStartSlave(Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()));
         waitUntilSlaveStarted(slave);
 
         masterScopedEnvironments = standaloneApollo.getInstance(KubernetesMonitor.class).getScopedEnvironments();
-        assertThat(getCsvFromList(masterEnvironmentIds)).isEqualTo(getCsvFromList(masterScopedEnvironments));
+        assertThat(masterScopedEnvironments).contains(masterEnvironment1.getId(), masterEnvironment2.getId());
+        assertThat(masterScopedEnvironments).doesNotContain(slaveEnvironment1.getId(), slaveEnvironment2.getId());
 
         List<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(KubernetesMonitor.class).getScopedEnvironments();
-        assertThat(getCsvFromList(slaveEnvironmentIds)).isEqualTo(getCsvFromList(slaveScopedEnvironments));
+        assertThat(slaveScopedEnvironments).containsOnly(slaveEnvironment1.getId(), slaveEnvironment2.getId());
     }
 
     private void waitUntilSlaveStarted(ApolloApplication apolloApplication) {
