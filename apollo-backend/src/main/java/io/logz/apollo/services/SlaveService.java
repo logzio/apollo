@@ -1,6 +1,7 @@
 package io.logz.apollo.services;
 
 import com.google.common.base.Splitter;
+import io.logz.apollo.common.EnvironmentVariableGetter;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.dao.SlaveDao;
 import io.logz.apollo.models.Slave;
@@ -19,6 +20,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static io.logz.apollo.common.EnvironmentVariableGetter.getEnvVarOrProperty;
 import static java.util.Objects.requireNonNull;
 
 @Singleton
@@ -41,7 +43,7 @@ public class SlaveService {
         this.slaveDao = requireNonNull(slaveDao);
         this.apolloConfiguration = requireNonNull(apolloConfiguration);
 
-        isSlave = Boolean.parseBoolean(System.getenv(SLAVE_PROPERTY));
+        isSlave = Boolean.parseBoolean(getEnvVarOrProperty(SLAVE_PROPERTY));
         environmentIds = parseEnvironmentIds();
 
         if (isSlave && environmentIds == null) {
@@ -117,7 +119,7 @@ public class SlaveService {
 
     private List<Integer> parseEnvironmentIds() {
         try {
-            String envVar = System.getenv(SLAVE_CSV_ENVIRONMENTS);
+            String envVar = getEnvVarOrProperty(SLAVE_CSV_ENVIRONMENTS);
             if (envVar == null) {
                 return null;
             }

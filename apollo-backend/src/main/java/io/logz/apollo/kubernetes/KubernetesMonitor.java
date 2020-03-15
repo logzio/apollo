@@ -29,6 +29,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static io.logz.apollo.common.EnvironmentVariableGetter.getEnvVarOrProperty;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -187,7 +188,7 @@ public class KubernetesMonitor {
     }
 
     private boolean isLocalRun() {
-        return Boolean.valueOf(System.getenv(LOCAL_RUN_PROPERTY)) || Boolean.valueOf(System.getProperty(LOCAL_RUN_PROPERTY));
+        return Boolean.parseBoolean(getEnvVarOrProperty(LOCAL_RUN_PROPERTY));
     }
 
     @VisibleForTesting
@@ -195,10 +196,12 @@ public class KubernetesMonitor {
         if (slaveService.getSlave()) {
             return slaveService.getEnvironmentIds();
         } else { // I am the master, need all unattended environments
-            List<Integer> scopedEnvironments = environmentDao.getAllEnvironments().stream().map(Environment::getId).collect(Collectors.toList());
-            slaveService.getAllValidSlavesEnvironmentIds().stream().map(scopedEnvironments::remove);
-
-            return scopedEnvironments;
+            List<Integer> ownedEnvironments = slaveService.getAllValidSlavesEnvironmentIds();
+            return environmentDao.getAllEnvironments()
+                    .stream()
+                    .map(Environment::getId)
+                    .filter(id -> !ownedEnvironments.contains(id))
+                    .collect(Collectors.toList());
         }
     }
 }
