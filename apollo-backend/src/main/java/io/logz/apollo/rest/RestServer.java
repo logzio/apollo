@@ -2,11 +2,13 @@ package io.logz.apollo.rest;
 
 import com.google.inject.Injector;
 import io.logz.apollo.auth.PasswordManager;
+import io.logz.apollo.models.Slave;
 import io.logz.apollo.models.User;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.configuration.ApiConfiguration;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.dao.UserDao;
+import io.logz.apollo.services.SlaveService;
 import org.rapidoid.integrate.GuiceBeans;
 import org.rapidoid.integrate.Integrate;
 import org.rapidoid.security.Role;
@@ -33,16 +35,23 @@ public class RestServer {
     private final ApolloConfiguration configuration;
     private final Injector injector;
     private final UserDao userDao;
+    private final SlaveService slaveService;
 
     @Inject
-    public RestServer(ApolloConfiguration configuration, Injector injector, UserDao userDao) {
+    public RestServer(ApolloConfiguration configuration, Injector injector, UserDao userDao, SlaveService slaveService) {
         this.configuration = requireNonNull(configuration);
         this.injector = requireNonNull(injector);
         this.userDao = requireNonNull(userDao);
+        this.slaveService = requireNonNull(slaveService);
     }
 
     @PostConstruct
     public void start() {
+        if (slaveService.getSlave()) {
+            logger.info("Since I am slave, not starting the API...");
+            return;
+        }
+
         registerLoginProvider();
         registerRolesProvider();
 

@@ -8,6 +8,7 @@ import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.notifications.ApolloNotifications;
 import io.logz.apollo.rest.RestServer;
 import io.logz.apollo.services.DeploymentService;
+import io.logz.apollo.services.SlaveService;
 import io.logz.apollo.websockets.WebSocketServer;
 import io.logz.apollo.services.AuthenticationService;
 import org.rapidoid.annotation.Controller;
@@ -35,6 +36,7 @@ public class ApolloModule extends AbstractModule {
         bind(AuthenticationService.class).asEagerSingleton();
         bind(ApolloNotifications.class).asEagerSingleton();
         bind(DeploymentService.class).asEagerSingleton();
+        bind(SlaveService.class).asEagerSingleton();
 
         bindControllers();
     }
