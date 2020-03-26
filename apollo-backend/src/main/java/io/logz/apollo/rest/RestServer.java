@@ -2,7 +2,6 @@ package io.logz.apollo.rest;
 
 import com.google.inject.Injector;
 import io.logz.apollo.auth.PasswordManager;
-import io.logz.apollo.models.Slave;
 import io.logz.apollo.models.User;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.configuration.ApiConfiguration;
@@ -47,7 +46,7 @@ public class RestServer {
 
     @PostConstruct
     public void start() {
-        if (slaveService.getSlave()) {
+        if (slaveService.isRunningInSlaveMode()) {
             logger.info("Since I am slave, not starting the API...");
             return;
         }

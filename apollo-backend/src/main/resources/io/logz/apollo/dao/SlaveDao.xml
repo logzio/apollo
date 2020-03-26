@@ -6,23 +6,28 @@
 <mapper namespace="io.logz.apollo.dao.SlaveDao">
     <select id="getAllSlaves" resultType="io.logz.apollo.models.Slave">
         SELECT *
-        FROM slave
+        FROM slaves
     </select>
 
     <insert id="addSlave">
-        INSERT INTO slave (slave_id, environment_id)
+        INSERT INTO slaves (slave_id, environment_id)
         VALUES (#{slaveId}, #{environmentId})
     </insert>
 
     <update id="keepalive">
-        UPDATE slave SET
+        UPDATE slaves SET
         last_keepalive=now(),
         WHERE
         slave_id=#{slave_id}
     </update>
 
     <delete id="removeAllSlavesById">
-        DELETE FROM slave
+        DELETE FROM slaves
         WHERE slave_id=#{slaveId}
+    </delete>
+
+    <delete id="cleanupDeadSlaves">
+        DELETE FROM slaves
+        WHERE TIMESTAMPDIFF(second, last_keepalive, now()) >= #{oldestValidKeepAlive};
     </delete>
 </mapper>

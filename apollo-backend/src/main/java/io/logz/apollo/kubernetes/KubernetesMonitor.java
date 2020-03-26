@@ -7,13 +7,11 @@ import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.ServiceDao;
-import io.logz.apollo.dao.SlaveDao;
 import io.logz.apollo.deployment.DeploymentEnvStatusManager;
 import io.logz.apollo.excpetions.ApolloNotFoundException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
-import io.logz.apollo.models.Slave;
 import io.logz.apollo.services.SlaveService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +25,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static io.logz.apollo.common.EnvironmentVariableGetter.getEnvVarOrProperty;
 import static java.util.Objects.requireNonNull;
@@ -106,7 +103,7 @@ public class KubernetesMonitor {
     public void monitor() {
         // Defensive try, just to make sure nothing will close our executor service
         try {
-            List<Integer> scopedEnvironments = getScopedEnvironments();
+            List<Integer> scopedEnvironments = slaveService.getScopedEnvironments();
             deploymentDao.getAllRunningDeployments().forEach(deployment -> {
 
                 if (!scopedEnvironments.contains(deployment.getEnvironmentId())) {
@@ -189,19 +186,5 @@ public class KubernetesMonitor {
 
     private boolean isLocalRun() {
         return Boolean.parseBoolean(getEnvVarOrProperty(LOCAL_RUN_PROPERTY));
-    }
-
-    @VisibleForTesting
-    public List<Integer> getScopedEnvironments() {
-        if (slaveService.getSlave()) {
-            return slaveService.getEnvironmentIds();
-        } else { // I am the master, need all unattended environments
-            List<Integer> ownedEnvironments = slaveService.getAllValidSlavesEnvironmentIds();
-            return environmentDao.getAllEnvironments()
-                    .stream()
-                    .map(Environment::getId)
-                    .filter(id -> !ownedEnvironments.contains(id))
-                    .collect(Collectors.toList());
-        }
     }
 }

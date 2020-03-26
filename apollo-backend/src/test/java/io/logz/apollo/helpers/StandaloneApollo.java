@@ -58,7 +58,7 @@ public class StandaloneApollo {
                 new KubernetesConfiguration(1, 1),
                 new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
                 new WebsocketConfiguration(Common.getAvailablePort(), 5),
-                new SlaveConfiguration(1)
+                new SlaveConfiguration(1, "slave", "environments")
         );
 
         // Start apollo

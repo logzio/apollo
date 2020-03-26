@@ -42,19 +42,18 @@ public class SlaveTest {
         Environment masterEnvironment1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Environment masterEnvironment2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
 
-        List<Integer> allEnvironmentIds = environmentDao.getAllEnvironments().stream().map(Environment::getId).collect(Collectors.toList());
-
-        List<Integer> masterScopedEnvironments = standaloneApollo.getInstance(KubernetesMonitor.class).getScopedEnvironments();
+        List<Integer> allEnvironmentIds =  apolloTestClient.getAllEnvironments().stream().map(Environment::getId).collect(Collectors.toList());
+        List<Integer> masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
         assertThat(getCsvFromList(allEnvironmentIds)).isEqualTo(getCsvFromList(masterScopedEnvironments));
 
         ApolloApplication slave = standaloneApollo.createAndStartSlave(Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()));
         waitUntilSlaveStarted(slave);
 
-        masterScopedEnvironments = standaloneApollo.getInstance(KubernetesMonitor.class).getScopedEnvironments();
-        assertThat(masterScopedEnvironments).contains(masterEnvironment1.getId(), masterEnvironment2.getId());
+        masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
+        assertThat(masterScopedEnvironments).containsExactlyInAnyOrder(masterEnvironment1.getId(), masterEnvironment2.getId());
         assertThat(masterScopedEnvironments).doesNotContain(slaveEnvironment1.getId(), slaveEnvironment2.getId());
 
-        List<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(KubernetesMonitor.class).getScopedEnvironments();
+        List<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(SlaveService.class).getScopedEnvironments();
         assertThat(slaveScopedEnvironments).containsOnly(slaveEnvironment1.getId(), slaveEnvironment2.getId());
     }
 

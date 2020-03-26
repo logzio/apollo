@@ -67,7 +67,7 @@ public class WebSocketServer {
     @PostConstruct
     public void start() {
         try {
-            if (slaveService.getSlave()) {
+            if (slaveService.isRunningInSlaveMode()) {
                 logger.info("Since I am slave, not starting the Websocket service...");
                 return;
             }

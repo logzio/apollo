@@ -1,10 +1,13 @@
 package io.logz.apollo.services;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
-import io.logz.apollo.common.EnvironmentVariableGetter;
 import io.logz.apollo.configuration.ApolloConfiguration;
+import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.SlaveDao;
+import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Slave;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 
 import static io.logz.apollo.common.EnvironmentVariableGetter.getEnvVarOrProperty;
 import static java.util.Objects.requireNonNull;
+import static org.hibernate.internal.util.collections.CollectionHelper.isEmpty;
 
 @Singleton
 public class SlaveService {
@@ -30,29 +34,33 @@ public class SlaveService {
     public static final String SLAVE_PROPERTY = "slave";
     public static final String SLAVE_CSV_ENVIRONMENTS = "environments";
     private final String slaveId;
-    private final ScheduledExecutorService scheduledExecutorService;
+    private final ScheduledExecutorService keepaliveExecutorService;
     private final Boolean isSlave;
     private final List<Integer> environmentIds;
     private final ApolloConfiguration apolloConfiguration;
     private final SlaveDao slaveDao;
+    private final EnvironmentDao environmentDao;
 
     private boolean started = false;
 
     @Inject
-    public SlaveService(ApolloConfiguration apolloConfiguration, SlaveDao slaveDao) {
+    public SlaveService(ApolloConfiguration apolloConfiguration, SlaveDao slaveDao, EnvironmentDao environmentDao) {
         this.slaveDao = requireNonNull(slaveDao);
+        this.environmentDao = requireNonNull(environmentDao);
         this.apolloConfiguration = requireNonNull(apolloConfiguration);
 
-        isSlave = Boolean.parseBoolean(getEnvVarOrProperty(SLAVE_PROPERTY));
+        isSlave = Boolean.parseBoolean(getEnvVarOrProperty(apolloConfiguration.getSlave().getSlaveProperty()));
         environmentIds = parseEnvironmentIds();
 
-        if (isSlave && environmentIds == null) {
+        if (isSlave && isEmpty(environmentIds)) {
             logger.error("Slave must be bundled with a valid list of environments! Bailing..");
             throw new RuntimeException("Could not understand slaves params");
         }
 
         slaveId = UUID.randomUUID().toString();
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        keepaliveExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder()
+                                            .namingPattern("slave-keepalive-pinger")
+                                            .build());
     }
 
     @PostConstruct
@@ -61,7 +69,7 @@ public class SlaveService {
 
         if (isSlave) {
             claimSlave();
-            scheduledExecutorService.scheduleWithFixedDelay(this::keepAlive,
+            keepaliveExecutorService.scheduleWithFixedDelay(this::keepAlive,
                     0, apolloConfiguration.getSlave().getKeepaliveIntervalSeconds(),
                     TimeUnit.SECONDS);
 
@@ -72,15 +80,11 @@ public class SlaveService {
     @PreDestroy
     public void stop() {
         started = false;
-        scheduledExecutorService.shutdownNow();
-        slaveDao.getAllSlaves()
-                .stream()
-                .filter(slave -> slave.getSlaveId().equals(slaveId))
-                .findFirst()
-                .ifPresent(slave -> slaveDao.removeAllSlavesById(slave.getSlaveId()));
+        keepaliveExecutorService.shutdownNow();
+        slaveDao.removeAllSlavesById(slaveId);
     }
 
-    public Boolean getSlave() {
+    public Boolean isRunningInSlaveMode() {
         return isSlave;
     }
 
@@ -100,6 +104,20 @@ public class SlaveService {
         return started;
     }
 
+    @VisibleForTesting
+    public List<Integer> getScopedEnvironments() {
+        if (isSlave) {
+            return getEnvironmentIds();
+        } else { // I am the master, need all unattended environments
+            List<Integer> ownedEnvironments = getAllValidSlavesEnvironmentIds();
+            return environmentDao.getAllEnvironments()
+                                 .stream()
+                                 .map(Environment::getId)
+                                 .filter(id -> !ownedEnvironments.contains(id))
+                                 .collect(Collectors.toList());
+        }
+    }
+
     private void claimSlave() {
         environmentIds.forEach(environmentId -> {
             Slave slave = new Slave();
@@ -111,15 +129,12 @@ public class SlaveService {
     }
 
     private void keepAlive() {
-        slaveDao.getAllSlaves()
-                .stream()
-                .filter(slave -> slave.getSlaveId().equals(slaveId))
-                .forEach(slave -> slaveDao.keepalive(slave.getSlaveId()));
+        slaveDao.keepalive(slaveId);
     }
 
     private List<Integer> parseEnvironmentIds() {
         try {
-            String envVar = getEnvVarOrProperty(SLAVE_CSV_ENVIRONMENTS);
+            String envVar = getEnvVarOrProperty(apolloConfiguration.getSlave().getSlaveCsvEnvironments());
             if (envVar == null) {
                 return null;
             }
@@ -130,14 +145,12 @@ public class SlaveService {
                     .collect(Collectors.toList());
 
         } catch (NumberFormatException e) {
-            logger.error("Could not parse int list from {}", SLAVE_CSV_ENVIRONMENTS);
+            logger.error("Could not parse int list from {}", apolloConfiguration.getSlave().getSlaveCsvEnvironments());
             return null;
         }
     }
 
     private void cleanupUnusedSlaves() {
-        slaveDao.getAllSlaves().stream().filter(slave -> slave.getSecondsSinceLastKeepalive() >=
-                apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 4)
-                .forEach(slave -> slaveDao.removeAllSlavesById(slave.getSlaveId()));
+        slaveDao.cleanupDeadSlaves(apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 4);
     }
 }
