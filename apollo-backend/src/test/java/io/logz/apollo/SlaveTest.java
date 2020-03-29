@@ -50,7 +50,7 @@ public class SlaveTest {
         waitUntilSlaveStarted(slave);
 
         masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
-        assertThat(masterScopedEnvironments).containsExactlyInAnyOrder(masterEnvironment1.getId(), masterEnvironment2.getId());
+        assertThat(masterScopedEnvironments).contains(masterEnvironment1.getId(), masterEnvironment2.getId());
         assertThat(masterScopedEnvironments).doesNotContain(slaveEnvironment1.getId(), slaveEnvironment2.getId());
 
         List<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(SlaveService.class).getScopedEnvironments();
