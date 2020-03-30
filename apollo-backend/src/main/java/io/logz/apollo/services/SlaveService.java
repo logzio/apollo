@@ -117,6 +117,7 @@ public class SlaveService {
     }
 
     private void claimSlave() {
+        logger.info("@@@ claim slave: " + environmentIds);
         environmentIds.forEach(environmentId -> {
             Slave slave = new Slave();
             slave.setSlaveId(slaveId);
