@@ -31,8 +31,6 @@ import static org.hibernate.internal.util.collections.CollectionHelper.isEmpty;
 public class SlaveService {
     private static final Logger logger = LoggerFactory.getLogger(SlaveService.class);
 
-    public static final String SLAVE_PROPERTY = "slave";
-    public static final String SLAVE_CSV_ENVIRONMENTS = "environments";
     private final String slaveId;
     private final ScheduledExecutorService keepaliveExecutorService;
     private final Boolean isSlave;
@@ -49,7 +47,7 @@ public class SlaveService {
         this.environmentDao = requireNonNull(environmentDao);
         this.apolloConfiguration = requireNonNull(apolloConfiguration);
 
-        isSlave = Boolean.parseBoolean(getEnvVarOrProperty(apolloConfiguration.getSlave().getSlaveProperty()));
+        isSlave = apolloConfiguration.getSlave().isSlave();
         environmentIds = parseEnvironmentIds();
 
         if (isSlave && isEmpty(environmentIds)) {
@@ -134,7 +132,7 @@ public class SlaveService {
 
     private List<Integer> parseEnvironmentIds() {
         try {
-            String envVar = getEnvVarOrProperty(apolloConfiguration.getSlave().getSlaveCsvEnvironments());
+            String envVar = apolloConfiguration.getSlave().getSlaveCsvEnvironments();
             if (envVar == null) {
                 return null;
             }

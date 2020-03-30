@@ -13,9 +13,9 @@ import io.logz.apollo.configuration.WebsocketConfiguration;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.kubernetes.KubernetesHealth;
 import io.logz.apollo.scm.GithubConnector;
-import io.logz.apollo.services.SlaveService;
 import org.apache.commons.lang3.StringUtils;
 import org.conf4j.core.ConfigurationProvider;
+import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 import java.io.IOException;
@@ -35,6 +35,7 @@ public class StandaloneApollo {
     private final KubernetesMonitor kubernetesMonitor;
     private final KubernetesHealth kubernetesHealth;
     private final GithubConnector githubConnector;
+    private final DatabaseConfiguration databaseConfiguration;
 
     private ApolloConfiguration apolloConfiguration;
 
@@ -44,7 +45,7 @@ public class StandaloneApollo {
 
         // Start DB and match configuration
         ApolloMySQL apolloMySQL = new ApolloMySQL();
-        DatabaseConfiguration databaseConfiguration = new DatabaseConfiguration(
+        databaseConfiguration = new DatabaseConfiguration(
                 apolloMySQL.getMappedPort(),
                 apolloMySQL.getContainerIpAddress(),
                 apolloMySQL.getUsername(),
@@ -52,14 +53,7 @@ public class StandaloneApollo {
                 apolloMySQL.getSchema()
         );
 
-        apolloConfiguration = new ApolloConfiguration(
-                new ApiConfiguration(Common.getAvailablePort(), "0.0.0.0", "secret"),
-                databaseConfiguration,
-                new KubernetesConfiguration(1, 1),
-                new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
-                new WebsocketConfiguration(Common.getAvailablePort(), 5),
-                new SlaveConfiguration(1, "slave", "environments")
-        );
+        apolloConfiguration = createApolloConfiguration(false, "");
 
         // Start apollo
         apolloApplication = new ApolloApplication(createConfigurationProvider(apolloConfiguration));
@@ -71,6 +65,18 @@ public class StandaloneApollo {
         Runtime.getRuntime().addShutdownHook(new Thread(apolloApplication::shutdown));
 
         githubConnector = new GithubConnector(apolloConfiguration);
+    }
+
+    @NotNull
+    private ApolloConfiguration createApolloConfiguration(boolean isSlave, String slaveCsvEnvironments) {
+        return new ApolloConfiguration(
+                new ApiConfiguration(Common.getAvailablePort(), "0.0.0.0", "secret"),
+                databaseConfiguration,
+                new KubernetesConfiguration(1, 1),
+                new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
+                new WebsocketConfiguration(Common.getAvailablePort(), 5),
+                new SlaveConfiguration(1, isSlave, slaveCsvEnvironments)
+        );
     }
 
     public static StandaloneApollo getOrCreateServer() throws ScriptException, IOException, SQLException {
@@ -86,8 +92,7 @@ public class StandaloneApollo {
             throw new RuntimeException("Can't create slave without master first");
         }
 
-        System.setProperty(SlaveService.SLAVE_PROPERTY, "true");
-        System.setProperty(SlaveService.SLAVE_CSV_ENVIRONMENTS,
+        ApolloConfiguration apolloConfiguration = createApolloConfiguration(true,
                 environmentIds.stream().map(Object::toString).collect(Collectors.joining(",")));
 
         ApolloApplication apolloApplication = new ApolloApplication(createConfigurationProvider(apolloConfiguration));

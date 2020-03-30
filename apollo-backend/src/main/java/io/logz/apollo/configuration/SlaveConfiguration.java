@@ -6,15 +6,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SlaveConfiguration {
 
     private int keepaliveIntervalSeconds;
-    private String slaveProperty;
+    private boolean isSlave;
     private String slaveCsvEnvironments;
 
     @JsonCreator
     public SlaveConfiguration(@JsonProperty("keepaliveIntervalSeconds") int keepaliveIntervalSeconds,
-                              @JsonProperty("slaveProperty") String slaveProperty,
+                              @JsonProperty("isSlave") boolean isSlave,
                               @JsonProperty("slaveCsvEnvironments") String slaveCsvEnvironments) {
         this.keepaliveIntervalSeconds = keepaliveIntervalSeconds;
-        this.slaveProperty = slaveProperty;
+        this.isSlave = isSlave;
         this.slaveCsvEnvironments = slaveCsvEnvironments;
     }
 
@@ -22,8 +22,8 @@ public class SlaveConfiguration {
         return keepaliveIntervalSeconds;
     }
     
-    public String getSlaveProperty() {
-        return slaveProperty;
+    public boolean isSlave() {
+        return isSlave;
     }
 
     public String getSlaveCsvEnvironments() {
