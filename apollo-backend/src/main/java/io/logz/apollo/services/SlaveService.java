@@ -105,14 +105,18 @@ public class SlaveService {
     @VisibleForTesting
     public List<Integer> getScopedEnvironments() {
         if (isSlave) {
+            logger.info("@@@ I am a slave, my envs are: "+getEnvironmentIds());
             return getEnvironmentIds();
         } else { // I am the master, need all unattended environments
             List<Integer> ownedEnvironments = getAllValidSlavesEnvironmentIds();
-            return environmentDao.getAllEnvironments()
-                                 .stream()
-                                 .map(Environment::getId)
-                                 .filter(id -> !ownedEnvironments.contains(id))
-                                 .collect(Collectors.toList());
+            logger.info("@@@ all valid slaves env: " + ownedEnvironments);
+            List<Integer> list = environmentDao.getAllEnvironments()
+                                                  .stream()
+                                                  .map(Environment::getId)
+                                                  .filter(id -> !ownedEnvironments.contains(id))
+                                                  .collect(Collectors.toList());
+            logger.info("@@@ master env: " + list);
+            return list;
         }
     }
 
