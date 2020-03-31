@@ -93,18 +93,25 @@ public class SlaveService {
     public List<Integer> getAllValidSlavesEnvironmentIds() {
         List<String> collect = slaveDao.getAllSlaves().stream().map(Slave::getSlaveId).collect(Collectors.toList());
         logger.info("%%% all slaves in db - " + collect);
-        slaveDao.getAllSlaves().stream().forEach(slave -> logger.info("*** slave id - " + slave.getSlaveId()
-                + ", slave getEnvironmentId - " + slave.getEnvironmentId()
-                + ", slave getLastKeepalive - " + slave.getLastKeepalive()
-                + ", slave getSecondsSinceLastKeepalive - " + slave.getSecondsSinceLastKeepalive()
+        slaveDao.getAllSlaves().stream().forEach(slave -> logger.info("***1 slave id - " + slave.getSlaveId()
+                + ", ***2 slave getEnvironmentId - " + slave.getEnvironmentId()
+                + ", ***3 slave getLastKeepalive - " + slave.getLastKeepalive()
+                + ", ***4 slave getSecondsSinceLastKeepalive - " + slave.getSecondsSinceLastKeepalive()
         ));
         logger.info("*** keepaliveIntervalSeconds - " + apolloConfiguration.getSlave().getKeepaliveIntervalSeconds());
         logger.info("*** keepaliveIntervalSeconds * 2 - " + apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2);
-        return slaveDao.getAllSlaves().stream()
-                .filter(slave -> slave.getSecondsSinceLastKeepalive()
-                        >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)
-                .map(Slave::getEnvironmentId)
-                .collect(Collectors.toList());
+        List<Integer> collect1 = slaveDao.getAllSlaves().stream()
+                                         .filter(slave -> slave.getSecondsSinceLastKeepalive()
+                                                 >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)
+                                         .map(Slave::getEnvironmentId)
+                                         .collect(Collectors.toList());
+        logger.info("*** getAllValidSlavesEnvironmentIds: " + collect1);
+        slaveDao.getAllSlaves().stream().forEach(slave ->
+            logger.info("***!!! slave id - " + slave.getSlaveId()
+                    + " is slave.getSecondsSinceLastKeepalive() >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2"
+                    + (slave.getSecondsSinceLastKeepalive() >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)));
+
+        return collect1;
     }
 
     public boolean isStarted() {
