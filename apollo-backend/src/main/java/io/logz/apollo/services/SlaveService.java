@@ -23,7 +23,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static io.logz.apollo.common.EnvironmentVariableGetter.getEnvVarOrProperty;
 import static java.util.Objects.requireNonNull;
 import static org.hibernate.internal.util.collections.CollectionHelper.isEmpty;
 
@@ -108,7 +107,9 @@ public class SlaveService {
         logger.info("*** getAllValidSlavesEnvironmentIds: " + collect1);
         slaveDao.getAllSlaves().stream().forEach(slave ->
             logger.info("***!!! slave id - " + slave.getSlaveId()
-                    + " is slave.getSecondsSinceLastKeepalive() >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2"
+                    + " getSecondsSinceLastKeepalive: " + slave.getSecondsSinceLastKeepalive()
+                    + " apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2 : " + apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2
+                    + " is slave.getSecondsSinceLastKeepalive() >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2 : "
                     + (slave.getSecondsSinceLastKeepalive() >= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)));
 
         return collect1;
