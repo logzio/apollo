@@ -10,7 +10,6 @@ angular.module('apollo')
       $scope.selectedDays = [];
       $scope.timeBasedBlockerStartTime = {date: new Date()};
       $scope.timeBasedBlockerEndTime = {date: new Date()};
-      $scope.branchBlockerName = null;
       $scope.allStacks = [];
       $scope.allAvailabilitiesWithoutDuplicates = [];
       $scope.allBlockersAvailabilitiesList = [];
@@ -25,7 +24,7 @@ angular.module('apollo')
           }
       };
 
-      $scope.setBranchBlockerName = function setBranchBlockerName(branchBlockerName) {
+      $scope.setBranchBlockerName = function(branchBlockerName) {
         $scope.branchBlockerName = branchBlockerName;
       };
 

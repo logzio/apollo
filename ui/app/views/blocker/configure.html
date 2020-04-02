@@ -179,7 +179,7 @@
                                                 <div class="form control" ng-class="{'has-error': blockerForm.branchBlockerNameInput.$error.pattern}">
                                                     <input class="form-control" type="text" name="branchBlockerNameInput"
                                                            ng-model="branchBlockerName" ng-required="true" ng-pattern="/^[a-zA-Z0-9-_/]*$/"
-                                                           placeholder="branchBlockerName" ng-change="setBranchBlockerName(branchBlockerName)">
+                                                           placeholder="master / develop / .." ng-change="setBranchBlockerName(branchBlockerName)">
                                                 </div>
                                             </div>
                                         </div>
