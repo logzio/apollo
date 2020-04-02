@@ -50,12 +50,7 @@ public class SlaveTest {
         waitUntilSlaveStarted(slave);
 
         masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
-        logger.info("!!! masterScopedEnvironments: " + masterScopedEnvironments);
-        logger.info("!!! masterEnvironment1 id: " + masterEnvironment1.getId());
-        logger.info("!!! masterEnvironment2 id: " + masterEnvironment2.getId());
         assertThat(masterScopedEnvironments).contains(masterEnvironment1.getId(), masterEnvironment2.getId());
-        logger.info("!!! slaveEnvironment1 id: " + slaveEnvironment1.getId());
-        logger.info("!!! slaveEnvironment2 id: " + slaveEnvironment2.getId());
         assertThat(masterScopedEnvironments).doesNotContain(slaveEnvironment1.getId(), slaveEnvironment2.getId());
 
         List<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(SlaveService.class).getScopedEnvironments();

@@ -10,13 +10,13 @@
     </select>
 
     <insert id="addSlave">
-        INSERT INTO slaves (slave_id, environment_id)
-        VALUES (#{slaveId}, #{environmentId})
+        INSERT INTO slaves (slave_id, environment_id, last_keepalive)
+        VALUES (#{slaveId}, #{environmentId}, #{lastKeepalive})
     </insert>
 
     <update id="keepalive">
         UPDATE slaves SET
-        last_keepalive=now(),
+        last_keepalive=#{lastKeepalive},
         WHERE
         slave_id=#{slave_id}
     </update>
@@ -24,10 +24,5 @@
     <delete id="removeAllSlavesById">
         DELETE FROM slaves
         WHERE slave_id=#{slaveId}
-    </delete>
-
-    <delete id="cleanupDeadSlaves">
-        DELETE FROM slaves
-        WHERE TIMESTAMPDIFF(second, last_keepalive, now()) >= #{oldestValidKeepAlive};
     </delete>
 </mapper>
