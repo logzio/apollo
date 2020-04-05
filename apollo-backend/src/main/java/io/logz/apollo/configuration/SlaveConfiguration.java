@@ -3,6 +3,8 @@ package io.logz.apollo.configuration;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 public class SlaveConfiguration {
 
     private int keepaliveIntervalSeconds;
@@ -13,9 +15,11 @@ public class SlaveConfiguration {
     public SlaveConfiguration(@JsonProperty("keepaliveIntervalSeconds") int keepaliveIntervalSeconds,
                               @JsonProperty("isSlave") boolean isSlave,
                               @JsonProperty("slaveCsvEnvironments") String slaveCsvEnvironments) {
-        this.keepaliveIntervalSeconds = keepaliveIntervalSeconds;
-        this.isSlave = isSlave;
-        this.slaveCsvEnvironments = slaveCsvEnvironments;
+        if (!isSlave | isNotBlank(slaveCsvEnvironments)) {
+            this.keepaliveIntervalSeconds = keepaliveIntervalSeconds;
+            this.isSlave = isSlave;
+            this.slaveCsvEnvironments = slaveCsvEnvironments;
+        }
     }
 
     public int getKeepaliveIntervalSeconds() {

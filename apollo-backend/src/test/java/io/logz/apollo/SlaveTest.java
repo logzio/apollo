@@ -6,7 +6,6 @@ import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
-import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.services.SlaveService;
 import org.junit.Test;
@@ -19,7 +18,6 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

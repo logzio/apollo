@@ -150,6 +150,6 @@ public class SlaveService {
     private void cleanupUnusedSlaves() {
         slaveDao.getAllSlaves().stream().filter(slave -> slave.getSecondsSinceLastKeepalive() >=
                 apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 4)
-                .forEach(slave -> slaveDao.removeAllSlavesById(slave.getSlaveId()));
+                .forEach(slave -> slaveDao.removeEnvironmentFromSlave(slave.getSlaveId(), slave.getEnvironmentId()));
     }
 }

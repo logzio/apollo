@@ -67,11 +67,6 @@ public class WebSocketServer {
     @PostConstruct
     public void start() {
         try {
-            if (slaveService.isRunningInSlaveMode()) {
-                logger.info("Since I am slave, not starting the Websocket service...");
-                return;
-            }
-
             logger.info("Starting Jetty server");
             server.start();
         } catch (Exception e) {

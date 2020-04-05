@@ -25,4 +25,9 @@
         DELETE FROM slaves
         WHERE slave_id=#{slaveId}
     </delete>
+
+    <delete id="removeEnvironmentFromSlave">
+        DELETE FROM slaves
+        WHERE slave_id=#{slaveId} AND environment_id=#{environmentId}
+    </delete>
 </mapper>

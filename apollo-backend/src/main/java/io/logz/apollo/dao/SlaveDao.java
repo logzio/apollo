@@ -10,4 +10,5 @@ public interface SlaveDao {
     void keepalive(String slaveId, Date lastKeepalive);
     void addSlave(Slave slave);
     void removeAllSlavesById(String slaveId);
+    void removeEnvironmentFromSlave(String slaveId, int environmentId);
 }

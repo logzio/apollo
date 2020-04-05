@@ -107,36 +107,10 @@ public class KubernetesMonitor {
             deploymentDao.getAllRunningDeployments().forEach(deployment -> {
 
                 if (!scopedEnvironments.contains(deployment.getEnvironmentId())) {
-                    logger.info("Deployment {} is of environment {} which is out of scope for me, skipping.",
+                    logger.debug("Deployment {} is of environment {} which is out of scope for me, skipping.",
                             deployment.getId(), deployment.getEnvironmentId());
                 } else {
-                    Environment relatedEnv = environmentDao.getEnvironment(deployment.getEnvironmentId());
-                    KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(relatedEnv);
-
-                    Deployment returnedDeployment;
-
-                    switch (deployment.getStatus()) {
-                        case PENDING:
-                            if (isDeployAllowed(deployment, environmentDao, deploymentDao)) {
-                                returnedDeployment = kubernetesHandler.startDeployment(deployment);
-                            } else {
-                                logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());
-                                returnedDeployment = deployment;
-                            }
-                            break;
-                        case PENDING_CANCELLATION:
-                            returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
-                            break;
-                        default:
-                            returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
-                            break;
-                    }
-
-                    deploymentDao.updateDeploymentStatus(deployment.getId(), returnedDeployment.getStatus());
-
-                    if (deployment.getStatus().equals(Deployment.DeploymentStatus.DONE) || deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELED)) {
-                        deploymentEnvStatusManager.updateDeploymentEnvStatus(deployment, deploymentEnvStatusManager.getDeploymentCurrentEnvStatus(deployment, kubernetesHandler));
-                    }
+                    monitorDeploymentStatus(deployment);
                 }
             });
         } catch (Exception e) {
@@ -162,6 +136,36 @@ public class KubernetesMonitor {
             });
         } catch (Exception e) {
             logger.error("Got unexpected exception in the scaling monitoring thread! swallow and moving on..", e);
+        }
+    }
+
+    private void monitorDeploymentStatus(Deployment deployment) {
+        Environment relatedEnv = environmentDao.getEnvironment(deployment.getEnvironmentId());
+        KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(relatedEnv);
+
+        Deployment returnedDeployment;
+
+        switch (deployment.getStatus()) {
+            case PENDING:
+                if (isDeployAllowed(deployment, environmentDao, deploymentDao)) {
+                    returnedDeployment = kubernetesHandler.startDeployment(deployment);
+                } else {
+                    logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());
+                    returnedDeployment = deployment;
+                }
+                break;
+            case PENDING_CANCELLATION:
+                returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
+                break;
+            default:
+                returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
+                break;
+        }
+
+        deploymentDao.updateDeploymentStatus(deployment.getId(), returnedDeployment.getStatus());
+
+        if (deployment.getStatus().equals(Deployment.DeploymentStatus.DONE) || deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELED)) {
+            deploymentEnvStatusManager.updateDeploymentEnvStatus(deployment, deploymentEnvStatusManager.getDeploymentCurrentEnvStatus(deployment, kubernetesHandler));
         }
     }
 
