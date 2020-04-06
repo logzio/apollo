@@ -19,7 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 public class SlaveTest {
 
@@ -44,7 +46,7 @@ public class SlaveTest {
         List<Integer> masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
         assertThat(getCsvFromList(allEnvironmentIds)).isEqualTo(getCsvFromList(masterScopedEnvironments));
 
-        ApolloApplication slave = standaloneApollo.createAndStartSlave(Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()));
+        ApolloApplication slave = standaloneApollo.createAndStartSlave("tahat123", Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()));
         waitUntilSlaveStarted(slave);
 
         masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
@@ -57,18 +59,13 @@ public class SlaveTest {
 
     private void waitUntilSlaveStarted(ApolloApplication apolloApplication) {
         SlaveService slaveService = apolloApplication.getInjector().getInstance(SlaveService.class);
-        int retry = 10;
-        for(int i = 0; i <= retry; i++) {
-            if (slaveService.isStarted()) {
-                logger.info("Slave is up!");
-                return;
-            }
 
-            logger.info("Slave not up yet, waiting a sec. ({}/{})", i, retry);
-            Common.waitABit(1);
-        }
+        await("Waiting to slave to start")
+                .pollInterval(1, SECONDS)
+                .atMost(10, SECONDS)
+                .until(slaveService::isStarted);
 
-        throw new  RuntimeException("Reached max retries waiting for slave to be up!");
+        logger.info("Slave is up!");
     }
 
     private String getCsvFromList(List<Integer> list) {

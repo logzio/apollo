@@ -53,7 +53,7 @@ public class StandaloneApollo {
                 apolloMySQL.getSchema()
         );
 
-        apolloConfiguration = createApolloConfiguration(false, "");
+        apolloConfiguration = createApolloConfiguration(null, false, "");
 
         // Start apollo
         apolloApplication = new ApolloApplication(createConfigurationProvider(apolloConfiguration));
@@ -68,14 +68,14 @@ public class StandaloneApollo {
     }
 
     @NotNull
-    private ApolloConfiguration createApolloConfiguration(boolean isSlave, String slaveCsvEnvironments) {
+    private ApolloConfiguration createApolloConfiguration(String slaveId, boolean isSlave, String slaveCsvEnvironments) {
         return new ApolloConfiguration(
                 new ApiConfiguration(Common.getAvailablePort(), "0.0.0.0", "secret"),
                 databaseConfiguration,
                 new KubernetesConfiguration(1, 1),
                 new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
                 new WebsocketConfiguration(Common.getAvailablePort(), 5),
-                new SlaveConfiguration(1, isSlave, slaveCsvEnvironments)
+                new SlaveConfiguration(slaveId,1, isSlave, slaveCsvEnvironments)
         );
     }
 
@@ -87,12 +87,12 @@ public class StandaloneApollo {
         return instance;
     }
 
-    public ApolloApplication createAndStartSlave(List<Integer> environmentIds) {
+    public ApolloApplication createAndStartSlave(String slaveId, List<Integer> environmentIds) {
         if (instance == null) {
             throw new RuntimeException("Can't create slave without master first");
         }
 
-        ApolloConfiguration apolloConfiguration = createApolloConfiguration(true,
+        ApolloConfiguration apolloConfiguration = createApolloConfiguration(slaveId, true,
                 environmentIds.stream().map(Object::toString).collect(Collectors.joining(",")));
 
         ApolloApplication apolloApplication = new ApolloApplication(createConfigurationProvider(apolloConfiguration));

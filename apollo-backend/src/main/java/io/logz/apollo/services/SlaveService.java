@@ -54,7 +54,7 @@ public class SlaveService {
             throw new RuntimeException("Could not understand slaves params");
         }
 
-        slaveId = UUID.randomUUID().toString();
+        slaveId = apolloConfiguration.getSlave().getSlaveId();
         keepaliveExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder()
                                             .namingPattern("slave-keepalive-pinger")
                                             .build());
@@ -65,7 +65,7 @@ public class SlaveService {
         cleanupUnusedSlaves();
 
         if (isSlave) {
-            claimSlave();
+            claimSlaveEnvironments();
             keepaliveExecutorService.scheduleWithFixedDelay(this::keepAlive,
                     0, apolloConfiguration.getSlave().getKeepaliveIntervalSeconds(),
                     TimeUnit.SECONDS);
@@ -89,14 +89,6 @@ public class SlaveService {
         return environmentIds;
     }
 
-    public List<Integer> getAllValidSlavesEnvironmentIds() {
-        return slaveDao.getAllSlaves().stream()
-                       .filter(slave -> slave.getSecondsSinceLastKeepalive()
-                               <= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)
-                       .map(Slave::getEnvironmentId)
-                       .collect(Collectors.toList());
-    }
-
     public boolean isStarted() {
         return started;
     }
@@ -106,7 +98,11 @@ public class SlaveService {
         if (isSlave) {
             return getEnvironmentIds();
         } else { // I am the master, need all unattended environments
-            List<Integer> ownedEnvironments = getAllValidSlavesEnvironmentIds();
+            List<Integer> ownedEnvironments = slaveDao.getAllSlaves().stream()
+                                                      .filter(slave -> slave.getSecondsSinceLastKeepalive()
+                                                              <= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)
+                                                      .map(Slave::getEnvironmentId)
+                                                      .collect(Collectors.toList());
             return environmentDao.getAllEnvironments()
                                                   .stream()
                                                   .map(Environment::getId)
@@ -115,7 +111,7 @@ public class SlaveService {
         }
     }
 
-    private void claimSlave() {
+    private void claimSlaveEnvironments() {
         environmentIds.forEach(environmentId -> {
             Slave slave = new Slave();
             slave.setSlaveId(slaveId);
