@@ -16,7 +16,9 @@ import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -43,8 +45,8 @@ public class SlaveTest {
         Environment masterEnvironment2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
 
         List<Integer> allEnvironmentIds =  apolloTestClient.getAllEnvironments().stream().map(Environment::getId).collect(Collectors.toList());
-        List<Integer> masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
-        assertThat(getCsvFromList(allEnvironmentIds)).isEqualTo(getCsvFromList(masterScopedEnvironments));
+        Set<Integer> masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
+        assertThat(getCsvFromCollection(allEnvironmentIds)).isEqualTo(getCsvFromCollection(masterScopedEnvironments));
 
         ApolloApplication slave = standaloneApollo.createAndStartSlave("tahat123", Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()));
         waitUntilSlaveStarted(slave);
@@ -53,7 +55,7 @@ public class SlaveTest {
         assertThat(masterScopedEnvironments).contains(masterEnvironment1.getId(), masterEnvironment2.getId());
         assertThat(masterScopedEnvironments).doesNotContain(slaveEnvironment1.getId(), slaveEnvironment2.getId());
 
-        List<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(SlaveService.class).getScopedEnvironments();
+        Set<Integer> slaveScopedEnvironments = slave.getInjector().getInstance(SlaveService.class).getScopedEnvironments();
         assertThat(slaveScopedEnvironments).containsOnly(slaveEnvironment1.getId(), slaveEnvironment2.getId());
     }
 
@@ -63,12 +65,12 @@ public class SlaveTest {
         await("Waiting to slave to start")
                 .pollInterval(1, SECONDS)
                 .atMost(10, SECONDS)
-                .until(slaveService::isStarted);
+                .until(slaveService::getIsStarted);
 
         logger.info("Slave is up!");
     }
 
-    private String getCsvFromList(List<Integer> list) {
+    private String getCsvFromCollection(Collection<Integer> list) {
         return list.stream().map(Object::toString).collect(Collectors.joining(","));
     }
 }
