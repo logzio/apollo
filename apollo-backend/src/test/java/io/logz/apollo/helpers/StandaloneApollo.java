@@ -70,12 +70,12 @@ public class StandaloneApollo {
     @NotNull
     private ApolloConfiguration createApolloConfiguration(String slaveId, boolean isSlave, String slaveCsvEnvironments, boolean disableApiServer) {
         return new ApolloConfiguration(
-                new ApiConfiguration(Common.getAvailablePort(), "0.0.0.0", "secret"),
+                new ApiConfiguration(Common.getAvailablePort(), "0.0.0.0", "secret", disableApiServer),
                 databaseConfiguration,
                 new KubernetesConfiguration(1, 1),
                 new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
                 new WebsocketConfiguration(Common.getAvailablePort(), 5),
-                new SlaveConfiguration(slaveId,1, isSlave, slaveCsvEnvironments, disableApiServer)
+                new SlaveConfiguration(slaveId,1, isSlave, slaveCsvEnvironments)
         );
     }
 
