@@ -47,7 +47,7 @@ public class RestServer {
     @PostConstruct
     public void start() {
         if (configuration.getApi().isDisableApiServer()) {
-            logger.info("Since I am slave, not starting the API...");
+            logger.info("Not starting the API...");
             return;
         }
 
