@@ -113,7 +113,7 @@
                     <h4 class="modal-title">Pods Details</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="table-responsive" ng-repeat="podStatus in selectedStatus.podStatuses">
+                    <div class="table-responsive">
                         <table class="table">
                             <thead>
                             <tr>
@@ -127,7 +127,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
+                            <tr ng-repeat="podStatus in selectedStatus.podStatuses">
                                 <td>{{podStatus.name}}</td>
                                 <td>{{podStatus.hostIp}}</td>
                                 <td>{{podStatus.podIp}}</td>
