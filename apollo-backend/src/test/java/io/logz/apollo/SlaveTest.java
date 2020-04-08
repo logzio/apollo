@@ -46,7 +46,7 @@ public class SlaveTest {
         List<Integer> masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
         assertThat(getCsvFromList(allEnvironmentIds)).isEqualTo(getCsvFromList(masterScopedEnvironments));
 
-        ApolloApplication slave = standaloneApollo.createAndStartSlave("tahat123", Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()));
+        ApolloApplication slave = standaloneApollo.createAndStartSlave("tahat123", Arrays.asList(slaveEnvironment1.getId(), slaveEnvironment2.getId()), true);
         waitUntilSlaveStarted(slave);
 
         masterScopedEnvironments = standaloneApollo.getInstance(SlaveService.class).getScopedEnvironments();
