@@ -17,10 +17,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -33,12 +34,12 @@ public class SlaveService {
     private final String slaveId;
     private final ScheduledExecutorService keepaliveExecutorService;
     private final Boolean isSlave;
-    private final List<Integer> environmentIds;
+    private final Set<Integer> environmentIds;
     private final ApolloConfiguration apolloConfiguration;
     private final SlaveDao slaveDao;
     private final EnvironmentDao environmentDao;
 
-    private boolean started = false;
+    private AtomicBoolean isStarted = new AtomicBoolean(false);
 
     @Inject
     public SlaveService(ApolloConfiguration apolloConfiguration, SlaveDao slaveDao, EnvironmentDao environmentDao) {
@@ -64,37 +65,36 @@ public class SlaveService {
     public void start() {
         cleanupUnusedSlaves();
 
-        if (isSlave) {
+        if (isSlave && isStarted.compareAndSet(false, true)) {
             claimSlaveEnvironments();
             keepaliveExecutorService.scheduleWithFixedDelay(this::keepAlive,
                     0, apolloConfiguration.getSlave().getKeepaliveIntervalSeconds(),
                     TimeUnit.SECONDS);
-
-            started = true;
         }
     }
 
     @PreDestroy
     public void stop() {
-        started = false;
-        keepaliveExecutorService.shutdownNow();
-        slaveDao.removeAllSlavesById(slaveId);
+        if (isStarted.compareAndSet(true, false)) {
+            keepaliveExecutorService.shutdownNow();
+            slaveDao.removeAllSlavesById(slaveId);
+        }
     }
 
-    public Boolean isRunningInSlaveMode() {
+    public boolean isRunningInSlaveMode() {
         return isSlave;
     }
 
-    public List<Integer> getEnvironmentIds() {
+    public Set<Integer> getEnvironmentIds() {
         return environmentIds;
     }
 
-    public boolean isStarted() {
-        return started;
+    public boolean getIsStarted() {
+        return isStarted.get();
     }
 
     @VisibleForTesting
-    public List<Integer> getScopedEnvironments() {
+    public Set<Integer> getScopedEnvironments() {
         if (isSlave) {
             return getEnvironmentIds();
         } else { // I am the master, need all unattended environments
@@ -107,7 +107,7 @@ public class SlaveService {
                                                   .stream()
                                                   .map(Environment::getId)
                                                   .filter(id -> !ownedEnvironments.contains(id))
-                                                  .collect(Collectors.toList());
+                                                  .collect(Collectors.toSet());
         }
     }
 
@@ -125,7 +125,7 @@ public class SlaveService {
         slaveDao.keepalive(slaveId, new Date());
     }
 
-    private List<Integer> parseEnvironmentIds() {
+    private Set<Integer> parseEnvironmentIds() {
         try {
             String envVar = apolloConfiguration.getSlave().getSlaveCsvEnvironments();
             if (envVar == null) {
@@ -135,7 +135,7 @@ public class SlaveService {
             return Splitter.on(",").trimResults()
                     .splitToList(envVar)
                     .stream().map(Integer::parseInt)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
 
         } catch (NumberFormatException e) {
             logger.error("Could not parse int list from {}", apolloConfiguration.getSlave().getSlaveCsvEnvironments());

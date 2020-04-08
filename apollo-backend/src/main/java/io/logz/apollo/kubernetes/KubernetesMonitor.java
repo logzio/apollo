@@ -20,7 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -103,7 +103,7 @@ public class KubernetesMonitor {
     public void monitor() {
         // Defensive try, just to make sure nothing will close our executor service
         try {
-            List<Integer> scopedEnvironments = slaveService.getScopedEnvironments();
+            Set<Integer> scopedEnvironments = slaveService.getScopedEnvironments();
             deploymentDao.getAllRunningDeployments().forEach(deployment -> {
 
                 if (!scopedEnvironments.contains(deployment.getEnvironmentId())) {
