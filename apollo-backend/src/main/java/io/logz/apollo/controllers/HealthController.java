@@ -11,6 +11,8 @@ import org.rapidoid.http.Req;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,13 +41,16 @@ public class HealthController {
     public void getHealth(Req req) {
         Set<Integer> scopedEnvironments = slaveService.getScopedEnvironments();
         Map<Integer, Boolean> environmentsHealthMap = kubernetesHealth.getEnvironmentsHealthMap();
+
+        Map<Integer, Boolean> scopedEnvironmentsHealthMap = new HashMap<>(environmentsHealthMap);
+
         environmentsHealthMap.keySet()
                              .stream()
                              .filter(envId -> !scopedEnvironments.contains(envId))
-                             .forEach(environmentsHealthMap::remove);
+                             .forEach(scopedEnvironmentsHealthMap::remove);
 
-        if (environmentsHealthMap.containsValue(false)) {
-            environmentsHealthMap.entrySet()
+        if (scopedEnvironmentsHealthMap.containsValue(false)) {
+            scopedEnvironmentsHealthMap.entrySet()
                                  .stream()
                                  .filter(environment -> !environment.getValue())
                                  .forEach(environment -> {
@@ -53,9 +58,9 @@ public class HealthController {
                                      MDC.put("environmentName", String.valueOf(environmentDao.getEnvironment(environment.getKey()).getName()));
                                      logger.error("Unhealthy environment, environmentId: {}, environmentName: {}.", environment.getKey(), environmentDao.getEnvironment(environment.getKey()).getName());
                                  });
-            assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, environmentsHealthMap);
+            assignJsonResponseToReq(req, HttpStatus.INTERNAL_SERVER_ERROR, scopedEnvironmentsHealthMap);
         } else {
-            assignJsonResponseToReq(req, HttpStatus.OK, environmentsHealthMap);
+            assignJsonResponseToReq(req, HttpStatus.OK, scopedEnvironmentsHealthMap);
         }
     }
 }
