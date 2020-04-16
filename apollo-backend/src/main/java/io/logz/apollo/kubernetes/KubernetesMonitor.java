@@ -12,6 +12,7 @@ import io.logz.apollo.excpetions.ApolloNotFoundException;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
+import io.logz.apollo.services.SlaveService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,11 +20,13 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import static io.logz.apollo.common.EnvironmentVariableGetter.getEnvVarOrProperty;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -45,11 +48,13 @@ public class KubernetesMonitor {
     private final DeploymentDao deploymentDao;
     private final ServiceDao serviceDao;
     private final GroupDao groupDao;
+    private final SlaveService slaveService;
 
     @Inject
     public KubernetesMonitor(KubernetesHandlerStore kubernetesHandlerStore, ApolloConfiguration apolloConfiguration,
                              EnvironmentDao environmentDao, DeploymentDao deploymentDao, ServiceDao serviceDao,
-                             GroupDao groupDao, DeploymentEnvStatusManager deploymentEnvStatusManager) {
+                             GroupDao groupDao, DeploymentEnvStatusManager deploymentEnvStatusManager,
+                             SlaveService slaveService) {
         this.deploymentEnvStatusManager = requireNonNull(deploymentEnvStatusManager);
         this.kubernetesHandlerStore = requireNonNull(kubernetesHandlerStore);
         this.apolloConfiguration = requireNonNull(apolloConfiguration);
@@ -57,6 +62,7 @@ public class KubernetesMonitor {
         this.deploymentDao = requireNonNull(deploymentDao);
         this.serviceDao = requireNonNull(serviceDao);
         this.groupDao = requireNonNull(groupDao);
+        this.slaveService = requireNonNull(slaveService);
 
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder().setNameFormat("kubernetes-monitor-%d").build();
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(namedThreadFactory);
@@ -97,34 +103,14 @@ public class KubernetesMonitor {
     public void monitor() {
         // Defensive try, just to make sure nothing will close our executor service
         try {
+            Set<Integer> scopedEnvironments = slaveService.getScopedEnvironments();
             deploymentDao.getAllRunningDeployments().forEach(deployment -> {
 
-                Environment relatedEnv = environmentDao.getEnvironment(deployment.getEnvironmentId());
-                KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(relatedEnv);
-
-                Deployment returnedDeployment;
-
-                switch (deployment.getStatus()) {
-                    case PENDING:
-                        if (isDeployAllowed(deployment, environmentDao, deploymentDao)) {
-                            returnedDeployment = kubernetesHandler.startDeployment(deployment);
-                        } else {
-                            logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());
-                            returnedDeployment = deployment;
-                        }
-                        break;
-                    case PENDING_CANCELLATION:
-                        returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
-                        break;
-                    default:
-                        returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
-                        break;
-                }
-
-                deploymentDao.updateDeploymentStatus(deployment.getId(), returnedDeployment.getStatus());
-
-                if (deployment.getStatus().equals(Deployment.DeploymentStatus.DONE) || deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELED)) {
-                    deploymentEnvStatusManager.updateDeploymentEnvStatus(deployment, deploymentEnvStatusManager.getDeploymentCurrentEnvStatus(deployment, kubernetesHandler));
+                if (!scopedEnvironments.contains(deployment.getEnvironmentId())) {
+                    logger.debug("Deployment {} is of environment {} which is out of scope for me, skipping.",
+                            deployment.getId(), deployment.getEnvironmentId());
+                } else {
+                    monitorDeploymentStatus(deployment);
                 }
             });
         } catch (Exception e) {
@@ -153,6 +139,36 @@ public class KubernetesMonitor {
         }
     }
 
+    private void monitorDeploymentStatus(Deployment deployment) {
+        Environment relatedEnv = environmentDao.getEnvironment(deployment.getEnvironmentId());
+        KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(relatedEnv);
+
+        Deployment returnedDeployment;
+
+        switch (deployment.getStatus()) {
+            case PENDING:
+                if (isDeployAllowed(deployment, environmentDao, deploymentDao)) {
+                    returnedDeployment = kubernetesHandler.startDeployment(deployment);
+                } else {
+                    logger.info("Environment {} concurrency limit reached, not starting new deployment {} until one is done.", deployment.getEnvironmentId(), deployment.getId());
+                    returnedDeployment = deployment;
+                }
+                break;
+            case PENDING_CANCELLATION:
+                returnedDeployment = kubernetesHandler.cancelDeployment(deployment);
+                break;
+            default:
+                returnedDeployment = kubernetesHandler.monitorDeployment(deployment);
+                break;
+        }
+
+        deploymentDao.updateDeploymentStatus(deployment.getId(), returnedDeployment.getStatus());
+
+        if (deployment.getStatus().equals(Deployment.DeploymentStatus.DONE) || deployment.getStatus().equals(Deployment.DeploymentStatus.CANCELED)) {
+            deploymentEnvStatusManager.updateDeploymentEnvStatus(deployment, deploymentEnvStatusManager.getDeploymentCurrentEnvStatus(deployment, kubernetesHandler));
+        }
+    }
+
     @VisibleForTesting
     public boolean isDeployAllowed(Deployment deployment, EnvironmentDao environmentDao, DeploymentDao deploymentDao) {
         return isDeployedEnvironmentConcurrencyLimitPermitsDeployment(deployment, environmentDao, deploymentDao) || deployment.getEmergencyDeployment();
@@ -173,6 +189,6 @@ public class KubernetesMonitor {
     }
 
     private boolean isLocalRun() {
-        return Boolean.valueOf(System.getenv(LOCAL_RUN_PROPERTY)) || Boolean.valueOf(System.getProperty(LOCAL_RUN_PROPERTY));
+        return Boolean.parseBoolean(getEnvVarOrProperty(LOCAL_RUN_PROPERTY));
     }
 }

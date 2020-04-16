@@ -13,7 +13,7 @@ angular.module('apollo')
             $scope.selectedService = null;
             $scope.selectedEnvironment = null;
             $scope.selectedGroupName = null;
-            $scope.serviceGroups = null;
+            $scope.serviceGroups = [];
             $scope.kubernetesDeploymentStatus = [];
             $scope.selectedPodStatus = null;
 
@@ -50,6 +50,11 @@ angular.module('apollo')
                     }
                     apolloApiService.getGroupsPerServiceAndEnvironment($scope.selectedEnvironment.id, $scope.selectedService.id).then(function (response) {
                         $scope.serviceGroups = response.data;
+                        $scope.serviceGroups.sort(function(a, b){
+                           if(a.name < b.name) { return -1; }
+                           if(a.name > b.name) { return 1; }
+                           return 0;
+                        })
                         if (response.data.length === 0) {
                             growl.error("No available groups for the service and environment you selected", {ttl:7000});
                             return;
