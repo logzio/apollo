@@ -26,6 +26,7 @@
         FROM groups
         WHERE service_id=#{serviceId}
         AND environment_id=#{environmentId}
+        ORDER BY name
     </select>
 
     <select id="getScalingFactor" resultType="int">
