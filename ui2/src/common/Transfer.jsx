@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Transfer } from 'antd';
-import { difference } from 'lodash';
+import { difference, isNil } from 'lodash';
 import { Link } from 'react-router-dom';
 import { AppButton } from '../common/Button';
 import { AppTableTransfer } from './TableTransfer';
@@ -15,6 +15,7 @@ export const AppTransfer = ({
   addSearch,
   match,
   handleSelection,
+  predefinedGroups,
   ...props
 }) => {
   const [targetKeys, setTargetKeys] = useState([]);
@@ -63,7 +64,7 @@ export const AppTransfer = ({
           />
         </Link>
       </div>
-      {!data ? (
+      {!data || isNil(predefinedGroups) ? (
         <AppSkeleton />
       ) : (
         <Transfer
@@ -100,6 +101,7 @@ export const AppTransfer = ({
               onItemSelectAll={onItemSelectAll}
               onItemSelect={onItemSelect}
               selectedKeys={selectedKeys}
+              predefinedGroups={predefinedGroups}
               {...props}
             />
           )}
