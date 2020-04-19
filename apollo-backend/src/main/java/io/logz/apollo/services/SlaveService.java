@@ -63,6 +63,8 @@ public class SlaveService {
 
     @PostConstruct
     public void start() {
+        logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, environmentIds);
+
         cleanupUnusedSlaves();
 
         if (isSlave && isStarted.compareAndSet(false, true)) {
