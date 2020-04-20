@@ -140,7 +140,7 @@ public class SlaveService {
                     .collect(Collectors.toSet());
 
         } catch (NumberFormatException e) {
-            logger.error("Could not parse int list from {}", apolloConfiguration.getSlave().getSlaveCsvEnvironments());
+            logger.error("Could not parse int list from {} for slave - {}", apolloConfiguration.getSlave().getSlaveCsvEnvironments(), slaveId);
             return null;
         }
     }
