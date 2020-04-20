@@ -63,7 +63,7 @@ public class SlaveService {
 
     @PostConstruct
     public void start() {
-        logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, environmentIds);
+        logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, apolloConfiguration.getSlave().getSlaveCsvEnvironments());
 
         cleanupUnusedSlaves();
 
