@@ -1,6 +1,7 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.dao.SlaveDao;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
@@ -62,7 +63,7 @@ public class SlaveTest {
 
     @Test
     public void testLastKeepalive() throws ApolloClientException {
-        String slaveId = "tahat1234";
+        String slaveId = "tahat124";
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         SlaveDao slaveDao = standaloneApollo.getInstance(SlaveDao.class);
 
@@ -71,10 +72,29 @@ public class SlaveTest {
         waitUntilSlaveStarted(slaveConfiguration);
 
         Date slaveLastKeepalive = slaveDao.getSlave(slaveId, slaveEnvironment.getId()).getLastKeepalive();
-        Common.waitABit(5);
+        int keepaliveIntervalSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getSlave().getKeepaliveIntervalSeconds();
+        Common.waitABit(keepaliveIntervalSeconds *2);
         Date updatedSlaveLastKeepalive = slaveDao.getSlave(slaveId, slaveEnvironment.getId()).getLastKeepalive();
 
         assertThat(updatedSlaveLastKeepalive).isAfter(slaveLastKeepalive);
+    }
+
+    @Test
+    public void testCleanupUnusedSlaves() throws ApolloClientException {
+        String slaveId = "tahat125";
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        SlaveDao slaveDao = standaloneApollo.getInstance(SlaveDao.class);
+
+        Environment slaveEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        ApolloApplication slaveConfiguration = standaloneApollo.createAndStartSlave(slaveId, Collections.singletonList(slaveEnvironment.getId()), true);
+        waitUntilSlaveStarted(slaveConfiguration);
+
+        slaveConfiguration.getInjector().getInstance(SlaveService.class).stop();
+
+        int keepaliveIntervalSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getSlave().getKeepaliveIntervalSeconds();
+        Common.waitABit(keepaliveIntervalSeconds *2);
+
+        assertThat(slaveDao.getSlave(slaveId, slaveEnvironment.getId())).isNull();
     }
 
     private void waitUntilSlaveStarted(ApolloApplication apolloApplication) {
