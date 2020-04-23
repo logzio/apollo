@@ -9,12 +9,6 @@
         FROM slaves
     </select>
 
-    <select id="getSlave" resultType="io.logz.apollo.models.Slave">
-        SELECT *
-        FROM slaves
-        WHERE slave_id=#{slaveId} AND environment_id=#{environmentId}
-    </select>
-
     <insert id="addSlave">
         INSERT INTO slaves (slave_id, environment_id, last_keepalive)
         VALUES (#{slaveId}, #{environmentId}, #{lastKeepalive})
@@ -22,8 +16,9 @@
 
     <update id="keepalive">
         UPDATE slaves SET
-        last_keepalive=#{lastKeepalive}
-        WHERE slave_id=#{slaveId}
+        last_keepalive=#{lastKeepalive},
+        WHERE
+        slave_id=#{slave_id}
     </update>
 
     <delete id="removeAllSlavesById">
