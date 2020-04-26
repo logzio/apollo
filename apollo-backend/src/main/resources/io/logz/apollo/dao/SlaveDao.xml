@@ -6,23 +6,33 @@
 <mapper namespace="io.logz.apollo.dao.SlaveDao">
     <select id="getAllSlaves" resultType="io.logz.apollo.models.Slave">
         SELECT *
-        FROM slave
+        FROM slaves
+    </select>
+
+    <select id="getSlave" resultType="io.logz.apollo.models.Slave">
+        SELECT *
+        FROM slaves
+        WHERE slave_id=#{slaveId} AND environment_id=#{environmentId}
     </select>
 
     <insert id="addSlave">
-        INSERT INTO slave (slave_id, environment_id)
-        VALUES (#{slaveId}, #{environmentId})
+        INSERT INTO slaves (slave_id, environment_id, last_keepalive)
+        VALUES (#{slaveId}, #{environmentId}, #{lastKeepalive})
     </insert>
 
     <update id="keepalive">
-        UPDATE slave SET
-        last_keepalive=now(),
-        WHERE
-        slave_id=#{slave_id}
+        UPDATE slaves SET
+        last_keepalive=#{lastKeepalive}
+        WHERE slave_id=#{slaveId}
     </update>
 
     <delete id="removeAllSlavesById">
-        DELETE FROM slave
+        DELETE FROM slaves
         WHERE slave_id=#{slaveId}
+    </delete>
+
+    <delete id="removeEnvironmentFromSlave">
+        DELETE FROM slaves
+        WHERE slave_id=#{slaveId} AND environment_id=#{environmentId}
     </delete>
 </mapper>

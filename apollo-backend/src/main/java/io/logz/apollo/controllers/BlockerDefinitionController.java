@@ -92,6 +92,8 @@ public class BlockerDefinitionController {
     @POST("/blocker-definition")
     public void addBlockerDefinition(String name, Integer environmentId, Integer serviceId, Integer stackId, String availability,
                                      Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
+        String userEmail = req.token().get("_user").toString();
+        logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
             logger.warn("Could not find proper class that annotated with {}", blockerTypeName);
@@ -124,6 +126,8 @@ public class BlockerDefinitionController {
     @PUT("/blocker-definition/{id}")
     public void updateBlockerDefinition(int id, String name, Integer environmentId, Integer serviceId, Integer stackId, String availability,
                                         Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
+        String userEmail = req.token().get("_user").toString();
+        logger.info("User: {} has just updated blocker, id:{}, name:{}", userEmail, id, name);
 
         BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
 
@@ -183,6 +187,9 @@ public class BlockerDefinitionController {
     @Administrator
     @DELETE("/blocker-definition/{id}")
     public void deleteBlockerDefinition(int id, Req req) {
+        String userEmail = req.token().get("_user").toString();
+        logger.info("User: {} has just deleted blocker, id:{}", userEmail, id);
+
         blockerDefinitionDao.deleteBlockerDefinition(id);
         assignJsonResponseToReq(req, HttpStatus.OK, "deleted");
     }

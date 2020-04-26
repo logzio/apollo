@@ -23,6 +23,11 @@ angular.module('apollo')
             $scope.selectedDays.push(day);
           }
       };
+
+      $scope.setBranchBlockerName = function(branchBlockerName) {
+        $scope.branchBlockerName = branchBlockerName;
+      };
+
       $scope.setBlockerTypeName = function (name) {
           $scope.blockerTypeName = name;
       };
@@ -131,7 +136,7 @@ angular.module('apollo')
 
               case "branch":
                   jsonParams = {
-                      "branchName": $scope.branchBlockerName
+                      branchName: $scope.branchBlockerName
                   };
                   break;
           }

@@ -2,10 +2,13 @@
     <!-- Use -->
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
 
+    <property name="ADDITIONAL_FIELDS" value="region=${REGION};pod-name=${KUBE_POD_NAME}"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d [%thread] %-5level %logger{35} - %msg %n</pattern>
         </encoder>
+        <additionalFields>${ADDITIONAL_FIELDS}</additionalFields>
     </appender>
 
     <root level="info">
