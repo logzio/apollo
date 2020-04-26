@@ -410,4 +410,15 @@ public class ApolloClient {
         return genericApolloClient.postAndGetResult("/deployment-history", requestBody, new TypeReference<DeploymentHistory>() {
         });
     }
+
+    public boolean isDeploymentShouldBeCanceled(int id, TimeUnit timeUnit, int timeout) throws ApolloClientException {
+        return genericApolloClient.getResult("/should-cancel-deployment/" + id + "/time-unit/" + timeUnit + "/timeout/" + timeout, new TypeReference<Boolean>() {
+        });
+    }
+
+    public Deployment cancelDeployment(Deployment deployment) throws ApolloClientException {
+        String requestBody = Common.generateJson("id", String.valueOf(deployment.getId()));
+        return genericApolloClient.putAndGetResult("/cancel-deployment", requestBody, new TypeReference<Deployment>() {
+        });
+    }
 }
