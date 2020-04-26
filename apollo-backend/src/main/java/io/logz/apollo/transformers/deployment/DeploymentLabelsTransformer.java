@@ -47,16 +47,6 @@ public class DeploymentLabelsTransformer implements BaseDeploymentTransformer {
         // And notify all back to the deployment
         deployment.getMetadata().setLabels(labelsFromDeployment);
 
-//        List<LabelSelectorRequirement> matchExpressions = deployment.getSpec().getSelector().getMatchExpressions();
-//        LabelSelectorRequirement labelSelectorRequirement = new LabelSelectorRequirementBuilder()
-//                .withNewKey(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey())
-//                .withOperator("In")
-//                .addNewValue(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierValue(apolloEnvironment, apolloService, Optional.ofNullable(apolloDeployment.getGroupName())))
-//                .build();
-//
-//        matchExpressions.add(labelSelectorRequirement);
-//        deployment.getSpec().getSelector().setMatchExpressions(matchExpressions);
-
         // We also need to tag the pod
         Map<String, String> labelsFromDeploymentPod = deployment.getSpec().getTemplate().getMetadata().getLabels();
         labelsFromDeploymentPod.put(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
