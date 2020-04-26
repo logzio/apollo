@@ -56,7 +56,6 @@ public class KubernetesHandlerTest {
 
     private static final String LOG_MESSAGE_IN_POD = "test log message to search..";
 
-    //    private static KubernetesMockClient kubernetesMockClient;
     private static RealDeploymentGenerator notFinishedDeployment;
     private static RealDeploymentGenerator finishedDeployment;
     private static RealDeploymentGenerator finishedDeploymentForEnvTest;
