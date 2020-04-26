@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
-import io.fabric8.kubernetes.api.model.LabelSelectorBuilder;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
@@ -14,6 +13,7 @@ import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.excpetions.ApolloParseException;
 import io.logz.apollo.notifications.mustache.TemplateInjector;
 import io.logz.apollo.transformers.LabelsNormalizer;
+import io.logz.apollo.transformers.deployment.AppsDeploymentTranformer;
 import io.logz.apollo.transformers.deployment.BaseDeploymentTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentEnvironmentVariableTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentImageNameTransformer;
@@ -82,7 +82,8 @@ public class ApolloToKubernetes {
         deploymentTransformers = Sets.newHashSet(Arrays.asList(
                 new DeploymentImageNameTransformer(),
                 new DeploymentLabelsTransformer(),
-                new DeploymentEnvironmentVariableTransformer()
+                new DeploymentEnvironmentVariableTransformer(),
+                new AppsDeploymentTranformer()
         ));
 
         if (apolloService.getIsPartOfGroup() != null && apolloService.getIsPartOfGroup()) {
@@ -131,10 +132,6 @@ public class ApolloToKubernetes {
             deploymentTransformers.forEach(transformer ->
                     transformer.transform(deployment, apolloDeployment, apolloService, apolloEnvironment, apolloDeployableVersion, groupDao.getGroupByName(groupName)));
 
-            LabelSelectorBuilder labelSelectorBuilder = new LabelSelectorBuilder();
-            deployment.getSpec().getTemplate().getMetadata().getLabels()
-                      .forEach(labelSelectorBuilder::addToMatchLabels);
-            deployment.getSpec().setSelector(labelSelectorBuilder.build());
             return deployment;
 
         } catch (IOException e) {
