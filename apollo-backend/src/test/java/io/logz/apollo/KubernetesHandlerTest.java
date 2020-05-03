@@ -37,8 +37,6 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import javax.script.ScriptException;
@@ -77,9 +75,6 @@ public class KubernetesHandlerTest {
     public static KubernetesServer server = new KubernetesServer();
 
     private static KubernetesClient client;
-
-    private static final Logger logger = LoggerFactory.getLogger(KubernetesHandlerTest.class);
-
 
     @BeforeClass
     public static void initialize() throws ScriptException, IOException, SQLException, ApolloClientException {
@@ -305,8 +300,6 @@ public class KubernetesHandlerTest {
                                               .build())
                               .build())
               .always();
-
-        logger.info("");
     }
 
     private static String getUrlEscapedLabel(String labelName, String labelValue) {
@@ -361,7 +354,5 @@ public class KubernetesHandlerTest {
               .withPath(String.format("/api/v1/namespaces/%s/pods/%s", realDeploymentGenerator.getEnvironment().getKubernetesNamespace(), podStatus.getName()))
               .andReturn(HttpStatus.OK, pod)
               .always();
-
-        logger.info("");
     }
 }
