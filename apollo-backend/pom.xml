@@ -117,13 +117,15 @@
         </dependency>
         <dependency>
             <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-model</artifactId>
-            <version>1.0.65</version>
+            <artifactId>kubernetes-client</artifactId>
+            <version>4.3.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-server-mock -->
         <dependency>
             <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-client</artifactId>
-            <version>1.4.33</version>
+            <artifactId>kubernetes-server-mock</artifactId>
+            <version>4.3.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
