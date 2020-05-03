@@ -73,12 +73,12 @@ public class KubernetesHandler {
     Deployment startDeployment(Deployment deployment) {
         try {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
-            io.fabric8.kubernetes.api.model.apps.Deployment kubernetesDeployment = apolloToKubernetes.getKubernetesDeployment();
+            io.fabric8.kubernetes.api.model.extensions.Deployment kubernetesDeployment = apolloToKubernetes.getKubernetesDeployment();
             io.fabric8.kubernetes.api.model.Service kubernetesService = apolloToKubernetes.getKubernetesService();
             io.fabric8.kubernetes.api.model.extensions.Ingress kubernetesIngress = apolloToKubernetes.getKubernetesIngress();
 
             kubernetesClient
-                    .apps()
+                    .extensions()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .createOrReplace(kubernetesDeployment);
@@ -112,9 +112,9 @@ public class KubernetesHandler {
     Deployment cancelDeployment(Deployment deployment) {
         try {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
-            io.fabric8.kubernetes.api.model.apps.Deployment kubernetesDeployment = apolloToKubernetes.getKubernetesDeployment();
+            io.fabric8.kubernetes.api.model.extensions.Deployment kubernetesDeployment = apolloToKubernetes.getKubernetesDeployment();
             kubernetesClient
-                    .apps()
+                    .extensions()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .createOrReplace(kubernetesDeployment);
@@ -133,8 +133,8 @@ public class KubernetesHandler {
 
         try {
             ApolloToKubernetes apolloToKubernetes = apolloToKubernetesStore.getOrCreateApolloToKubernetes(deployment);
-            Optional<io.fabric8.kubernetes.api.model.apps.Deployment> returnedDeployment = kubernetesClient
-                    .apps()
+            Optional<io.fabric8.kubernetes.api.model.extensions.Deployment> returnedDeployment = kubernetesClient
+                    .extensions()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(), apolloToKubernetes.getApolloDeploymentUniqueIdentifierValue())
@@ -144,7 +144,7 @@ public class KubernetesHandler {
                     .findFirst();
 
             if (returnedDeployment.isPresent()) {
-                io.fabric8.kubernetes.api.model.apps.DeploymentStatus deploymentStatus = returnedDeployment.get().getStatus();
+                io.fabric8.kubernetes.api.model.extensions.DeploymentStatus deploymentStatus = returnedDeployment.get().getStatus();
 
                 Integer totalReplicas = deploymentStatus.getReplicas();
 
@@ -191,7 +191,7 @@ public class KubernetesHandler {
 
     public KubernetesDeploymentStatus getCurrentStatus(Service service, Optional<String> groupName) {
 
-        io.fabric8.kubernetes.api.model.apps.Deployment deployment = getKubernetesDeployment(service, groupName);
+        io.fabric8.kubernetes.api.model.extensions.Deployment deployment = getKubernetesDeployment(service, groupName);
 
         if (deployment == null) {
             logger.warn("Could not find deployment for environment {} and service {}, can't return the status!", environment.getId(), service.getId());
@@ -242,14 +242,14 @@ public class KubernetesHandler {
 
     public void restartAllPods(Service service, Optional<String> groupName) throws ApolloKubernetesException, ApolloNotFoundException {
         try {
-            io.fabric8.kubernetes.api.model.apps.Deployment deployment = getKubernetesDeployment(service, groupName);
+            io.fabric8.kubernetes.api.model.extensions.Deployment deployment = getKubernetesDeployment(service, groupName);
 
             if (deployment == null) {
                 throw new ApolloNotFoundException("Deployment not found!");
             }
             // There's no option to force kubernetes deployment to restart all pods gradually, so we have to edit an innocuous field of the deployment
             kubernetesClient
-                    .apps()
+                    .extensions()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .withName(deployment.getMetadata().getName())
@@ -330,9 +330,9 @@ public class KubernetesHandler {
 
             return Optional.of(
                     ((DefaultKubernetesClient) kubernetesClient)
-                            .getHttpClient()
-                            .newCall(request)
-                            .execute());
+                    .getHttpClient()
+                    .newCall(request)
+                    .execute());
         } catch (IOException e) {
             logger.warn("Got IOException while proxy the request to jolokia!", e);
             return Optional.empty();
@@ -356,13 +356,13 @@ public class KubernetesHandler {
         }
 
         Optional<Pod> newestPod = podList.getItems()
-                                         .stream()
-                                         .sorted((o1, o2) -> {
-                                             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                                             LocalDateTime pod1 = LocalDateTime.parse(o1.getStatus().getStartTime(), formatter);
-                                             LocalDateTime pod2 = LocalDateTime.parse(o2.getStatus().getStartTime(), formatter);
-                                             return pod1.compareTo(pod2);
-                                         }).findFirst();
+                .stream()
+                .sorted((o1, o2) -> {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    LocalDateTime pod1 = LocalDateTime.parse(o1.getStatus().getStartTime(), formatter);
+                    LocalDateTime pod2 = LocalDateTime.parse(o2.getStatus().getStartTime(), formatter);
+                    return pod1.compareTo(pod2);
+                }).findFirst();
 
         return newestPod.map(pod -> pod
                 .getMetadata()
@@ -451,7 +451,7 @@ public class KubernetesHandler {
     }
 
     public int getScalingFactor(Service service, String groupName) throws ApolloNotFoundException {
-        io.fabric8.kubernetes.api.model.apps.Deployment kubernetesDeployment = getKubernetesDeployment(service, Optional.of(groupName));
+        io.fabric8.kubernetes.api.model.extensions.Deployment kubernetesDeployment = getKubernetesDeployment(service, Optional.of(groupName));
 
         if (kubernetesDeployment == null) {
             throw new ApolloNotFoundException("Could not find deployment for environment " + environment.getId() + ", service "
@@ -462,7 +462,7 @@ public class KubernetesHandler {
     }
 
     public void setScalingFactor(Service service, String groupName, int scalingFactor) throws ApolloNotFoundException {
-        io.fabric8.kubernetes.api.model.apps.Deployment kubernetesDeployment = getKubernetesDeployment(service, Optional.of(groupName));
+        io.fabric8.kubernetes.api.model.extensions.Deployment kubernetesDeployment = getKubernetesDeployment(service, Optional.of(groupName));
 
         if (kubernetesDeployment == null) {
             throw new ApolloNotFoundException("Could not find deployment for environment " + environment.getId() + ", service "
@@ -470,17 +470,17 @@ public class KubernetesHandler {
         }
 
         kubernetesClient
-                .apps()
+                .extensions()
                 .deployments()
                 .inNamespace(environment.getKubernetesNamespace())
                 .withName(kubernetesDeployment.getMetadata().getName())
                 .scale(scalingFactor);
     }
 
-    private io.fabric8.kubernetes.api.model.apps.Deployment getKubernetesDeployment(Service service, Optional<String> groupName) {
+    private io.fabric8.kubernetes.api.model.extensions.Deployment getKubernetesDeployment(Service service, Optional<String> groupName) {
 
         return kubernetesClient
-                .apps()
+                .extensions()
                 .deployments()
                 .inNamespace(environment.getKubernetesNamespace())
                 .withLabel(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
@@ -495,7 +495,7 @@ public class KubernetesHandler {
     public Boolean isEnvironmentHealthy() {
         try {
             kubernetesClient
-                    .apps()
+                    .extensions()
                     .deployments()
                     .inNamespace(environment.getKubernetesNamespace())
                     .list();

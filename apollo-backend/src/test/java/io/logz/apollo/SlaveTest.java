@@ -68,8 +68,8 @@ public class SlaveTest {
         SlaveDao slaveDao = standaloneApollo.getInstance(SlaveDao.class);
 
         Environment slaveEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
-        ApolloApplication slaveApplication = standaloneApollo.createAndStartSlave(slaveId, Collections.singletonList(slaveEnvironment.getId()), true);
-        waitUntilSlaveStarted(slaveApplication);
+        ApolloApplication slaveConfiguration = standaloneApollo.createAndStartSlave(slaveId, Collections.singletonList(slaveEnvironment.getId()), true);
+        waitUntilSlaveStarted(slaveConfiguration);
 
         Date slaveLastKeepalive = slaveDao.getSlave(slaveId, slaveEnvironment.getId()).getLastKeepalive();
         int keepaliveIntervalSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getSlave().getKeepaliveIntervalSeconds();
@@ -86,10 +86,10 @@ public class SlaveTest {
         SlaveDao slaveDao = standaloneApollo.getInstance(SlaveDao.class);
 
         Environment slaveEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
-        ApolloApplication slaveApplication = standaloneApollo.createAndStartSlave(slaveId, Collections.singletonList(slaveEnvironment.getId()), true);
-        waitUntilSlaveStarted(slaveApplication);
+        ApolloApplication slaveConfiguration = standaloneApollo.createAndStartSlave(slaveId, Collections.singletonList(slaveEnvironment.getId()), true);
+        waitUntilSlaveStarted(slaveConfiguration);
 
-        slaveApplication.getInjector().getInstance(SlaveService.class).stop();
+        slaveConfiguration.getInjector().getInstance(SlaveService.class).stop();
 
         int keepaliveIntervalSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getSlave().getKeepaliveIntervalSeconds();
         Common.waitABit(keepaliveIntervalSeconds *2);
