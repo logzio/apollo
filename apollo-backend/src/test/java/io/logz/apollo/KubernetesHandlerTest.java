@@ -255,8 +255,6 @@ public class KubernetesHandlerTest {
 
         String commitShaFromDeployableVersion = deployableVersionDao.getDeployableVersion(deployment.
                                                                                                             getDeployableVersionId()).getGitCommitSha();
-        // String commitShaFromOtherDeployableVersion = deployableVersionDao.getDeployableVersion(finishedDeploymentForEnvTest.getDeployment()
-        //         .getDeployableVersionId()).getGitCommitSha();
 
         return "{\"" + String.valueOf(deployment.getServiceId()) + "\":\"" + commitShaFromDeployableVersion + "\",\"" +
                 String.valueOf(finishedDeploymentForEnvTest.getService().getId()) + "\":{}}";
