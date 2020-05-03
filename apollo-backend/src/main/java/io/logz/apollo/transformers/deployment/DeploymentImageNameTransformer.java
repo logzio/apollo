@@ -1,6 +1,6 @@
 package io.logz.apollo.transformers.deployment;
 
-import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
