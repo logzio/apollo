@@ -11,5 +11,6 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/go.sh /go.sh
 
 COPY ui/dist /usr/share/nginx/html
+COPY ui2/build /usr/share/nginx/html/newApollo
 COPY apollo-backend/target/apollo-backend-jar-with-dependencies.jar /apollo-backend-jar-with-dependencies.jar
 CMD /go.sh

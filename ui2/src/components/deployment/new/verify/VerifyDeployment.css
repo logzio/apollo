@@ -1,0 +1,32 @@
+.list-icon{
+    width: 20px;
+    height: 20px;
+}
+
+.confirm-modal .ant-modal-footer{
+    display: flex;
+}
+
+.ant-modal-footer .cancel-modal-btn{
+    margin-left: auto;
+}
+
+.deploy{
+    flex-shrink: 0;
+}
+
+.ant-card-body{
+    max-height: 50vh;
+    overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 12px;
+}
+
+.ant-card-body:hover::-webkit-scrollbar-thumb {
+    border-radius: 12px;
+    border: 2px solid white;
+    background-color: rgba(0, 0, 0, .45);
+}

@@ -1,0 +1,15 @@
+.select-env .geoRegion, .select-env .availability{
+    max-width: 19%;
+}
+
+.select-env .kubernetesMaster{
+    max-width: 27%;
+}
+
+@media screen and (max-width: 1700px) {
+    .select-env .geoRegion, .select-env .availability{
+        max-width: 17%;
+    }
+}
+
+
