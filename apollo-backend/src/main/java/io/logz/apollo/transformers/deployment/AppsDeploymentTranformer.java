@@ -7,6 +7,7 @@ import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Service;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AppsDeploymentTranformer implements BaseDeploymentTransformer {
@@ -22,8 +23,8 @@ public class AppsDeploymentTranformer implements BaseDeploymentTransformer {
         LabelSelectorBuilder labelSelectorBuilder = new LabelSelectorBuilder();
         deployment.getSpec().getTemplate().getMetadata().getLabels().entrySet()
                   .stream()
-                  .filter(label -> label.getKey() != "apollo_unique_identifier")
-                  .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()))
+                  .filter(label -> !label.getKey().equals("apollo_unique_identifier"))
+                  .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
                   .forEach(labelSelectorBuilder::addToMatchLabels);
         deployment.getSpec().setSelector(labelSelectorBuilder.build());
 
