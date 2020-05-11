@@ -7,6 +7,8 @@ import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.Service;
 
+import java.util.stream.Collectors;
+
 public class AppsDeploymentTranformer implements BaseDeploymentTransformer {
     @Override
     public Deployment transform(Deployment deployment,
@@ -18,7 +20,10 @@ public class AppsDeploymentTranformer implements BaseDeploymentTransformer {
         deployment.setApiVersion("apps/v1");
 
         LabelSelectorBuilder labelSelectorBuilder = new LabelSelectorBuilder();
-        deployment.getSpec().getTemplate().getMetadata().getLabels()
+        deployment.getSpec().getTemplate().getMetadata().getLabels().entrySet()
+                  .stream()
+                  .filter(label -> label.getKey() != "apollo_unique_identifier")
+                  .collect(Collectors.toMap(map -> map.getKey(), map -> map.getValue()))
                   .forEach(labelSelectorBuilder::addToMatchLabels);
         deployment.getSpec().setSelector(labelSelectorBuilder.build());
 
