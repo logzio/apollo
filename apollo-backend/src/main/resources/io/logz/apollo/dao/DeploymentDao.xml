@@ -42,6 +42,12 @@
         WHERE status not in ("DONE", "CANCELED")
     </select>
 
+    <select id="getAllOngoingDeployments" resultType="io.logz.apollo.models.Deployment">
+        SELECT *
+        FROM deployment
+        WHERE status in ("STARTED", "CANCELING")
+    </select>
+
     <select id="getAllStartedDeployments" resultType="io.logz.apollo.models.Deployment">
         SELECT *
         FROM deployment
@@ -87,18 +93,15 @@
     </select>
 
     <sql id="getAllFilteredDeploymentHistory">
-        SELECT dep.id, dep.last_update, env.name as environment_name, ser.name as service_name,
-        dep.deployable_version_id, dep.group_name, dep.user_email, dep.status, dep.deployment_message
+        SELECT dep.id, dep.last_update, env.name as environment_name, ser.name as service_name, dep.deployable_version_id, dep.group_name, dep.user_email, dep.status, dep.deployment_message
         FROM deployment as dep
         INNER JOIN environment as env on dep.environment_id = env.id
         INNER JOIN service as ser on dep.service_id = ser.id
-        <if test="searchTerm != null">
-            WHERE env.name LIKE #{searchTerm}
-            OR ser.name LIKE #{searchTerm}
-            OR dep.user_email LIKE #{searchTerm}
-            OR dep.group_name LIKE #{searchTerm}
-            OR dep.deployment_message LIKE #{searchTerm}
-        </if>
+        WHERE env.name LIKE #{searchTerm}
+        OR ser.name LIKE #{searchTerm}
+        OR dep.user_email LIKE #{searchTerm}
+        OR dep.group_name LIKE #{searchTerm}
+        OR dep.deployment_message LIKE #{searchTerm}
     </sql>
 
     <select id="filterDeploymentHistoryDetails" resultType="io.logz.apollo.models.DeploymentHistoryDetails">
@@ -113,10 +116,8 @@
     </select>
 
     <insert id="addDeployment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO deployment (environment_id, service_id, deployable_version_id, user_email, status, source_version,
-        group_name, deployment_params, deployment_message)
-        VALUES (#{environmentId}, #{serviceId}, #{deployableVersionId}, #{userEmail}, #{status}, #{sourceVersion},
-        #{groupName}, #{deploymentParams}, #{deploymentMessage})
+        INSERT INTO deployment (environment_id, service_id, deployable_version_id, user_email, status, source_version, group_name, deployment_params, deployment_message, is_emergency_deployment)
+        VALUES (#{environmentId}, #{serviceId}, #{deployableVersionId}, #{userEmail}, #{status}, #{sourceVersion}, #{groupName}, #{deploymentParams}, #{deploymentMessage}, #{isEmergencyDeployment})
     </insert>
 
     <update id="updateDeploymentStatus">
@@ -131,6 +132,12 @@
         WHERE id=#{id}
     </update>
 
+    <update id="updateEmergencyDeployment">
+        UPDATE deployment
+        SET is_emergency_deployment=#{isEmergencyDeployment}
+        WHERE id=#{id}
+    </update>
+
     <update id="updateDeployment">
         UPDATE deployment SET
         environment_id=#{environmentId},
@@ -141,7 +148,8 @@
         source_version=#{sourceVersion},
         group_name=#{groupName},
         deployment_params=#{deploymentParams},
-        deployment_message=#{deploymentMessage}
+        deployment_message=#{deploymentMessage},
+        is_emergency_deployment=#{isEmergencyDeployment}
         WHERE id=#{id}
     </update>
 </mapper>

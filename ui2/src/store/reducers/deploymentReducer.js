@@ -26,9 +26,7 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
-  NEW_GROUP_DEPLOYMENT_REQUEST,
-  NEW_GROUP_DEPLOYMENT_SUCCESS,
-  NEW_GROUP_DEPLOYMENT_FAILURE,
+  BLOCKED_DEPLOYMENTS,
   SELECT_SERVICES,
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
@@ -72,7 +70,7 @@ const initialState = {
   environmentsStacks: null,
   versions: null,
   groups: [],
-  newDeploymentStatus: null,
+  newDeployments: null,
   ongoingDeployments: null,
   containers: null,
   lastCreatedPod: null,
@@ -82,6 +80,7 @@ const initialState = {
   error: null,
   deploymentDetails: null,
   allGroups: null,
+  blockedDeployments: null,
 };
 
 export default function deploymentsReducer(state = initialState, action) {
@@ -139,15 +138,11 @@ export default function deploymentsReducer(state = initialState, action) {
     case NEW_DEPLOYMENT_REQUEST:
       return { ...state, isLoading: true };
     case NEW_DEPLOYMENT_SUCCESS:
-      return { ...state, newDeploymentStatus: action.payload, isLoading: false };
+      return { ...state, newDeployments: action.payload, isLoading: false };
     case NEW_DEPLOYMENT_FAILURE:
       return { ...state, isLoading: false };
-    case NEW_GROUP_DEPLOYMENT_REQUEST:
-      return { ...state, isLoading: true };
-    case NEW_GROUP_DEPLOYMENT_SUCCESS:
-      return { ...state, newDeploymentStatus: action.payload, isLoading: false };
-    case NEW_GROUP_DEPLOYMENT_FAILURE:
-      return { ...state, isLoading: false };
+    case BLOCKED_DEPLOYMENTS:
+      return { ...state, blockedDeployments: action.payload, isLoading: false };
     case GET_ONGOING_DEPLOYMENT_REQUEST:
       return { ...state, isLoading: true };
     case GET_ONGOING_DEPLOYMENT_SUCCESS:

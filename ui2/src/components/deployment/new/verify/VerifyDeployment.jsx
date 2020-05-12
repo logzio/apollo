@@ -5,6 +5,7 @@ import { Spinner } from '../../../../common/Spinner';
 import { parse } from 'query-string';
 import { DeploymentDetailsContainer } from './DeploymentDetailsContainer';
 import { BlockedDeploymentsModal } from './BlockedDeploymentsModal';
+import { isEmpty } from 'lodash';
 import './VerifyDeployment.css';
 
 export const VerifyDeployment = ({
@@ -29,9 +30,11 @@ export const VerifyDeployment = ({
   isLoading,
   deploy,
   deployGroup,
-  newDeploymentStatus,
+  blockedDeployments,
+  newDeployments,
 }) => {
-  const [showModal, toggleShowModal] = useState(false);
+  const [showConfirmModal, toggleShowConfirmModal] = useState(false);
+  const [showBlockedDeploymentsModal, toggleShowBlockedDeploymentsModal] = useState(false);
   const { service: serviceId, group, environment: environmentsId } = parse(search);
 
   useEffect(() => {
@@ -58,6 +61,10 @@ export const VerifyDeployment = ({
     !selectedGroups.length && group && getSelectedGroups();
   }, [groups]);
 
+  useEffect(() => {
+    blockedDeployments && toggleShowBlockedDeploymentsModal(true);
+  }, [blockedDeployments]);
+
   const handleDeploy = isEmergencyDeployment => {
     if (!selectedGroups.length) {
       deploy(
@@ -77,7 +84,25 @@ export const VerifyDeployment = ({
         isEmergencyDeployment,
       );
     }
+    toggleShowConfirmModal(false);
   };
+
+  const findNameById = (itemId, itemsList) => {
+    const item = itemsList.find(({ id }) => id === itemId);
+    return item && item.name;
+  };
+
+  const formattedData =
+    blockedDeployments &&
+    blockedDeployments.map(({ groupId, environmentId, serviceId, exception, ...dataItem }) => {
+      return {
+        ...dataItem,
+        groupId: findNameById(groupId, groups),
+        environmentId: findNameById(environmentId, environments),
+        serviceId: findNameById(serviceId, services),
+        exception: exception.message,
+      };
+    });
 
   if (
     !services ||
@@ -105,22 +130,20 @@ export const VerifyDeployment = ({
         className={'deploy table-submit-button'}
         type="primary"
         onClick={() => {
-          toggleShowModal(true);
+          toggleShowConfirmModal(true);
         }}
       />
       <ConfirmModal
         isLoading={isLoading}
         handleDeploy={handleDeploy}
-        showModal={showModal}
-        toggleShowModal={toggleShowModal}
+        showModal={showConfirmModal}
+        toggleShowModal={toggleShowConfirmModal}
       />
       <BlockedDeploymentsModal
-        // showModal={showModal}
-        // toggleShowModal={toggleShowModal}
-        blockedDeployments={[
-          { environment: 1, service: 2, group: 3, reason: 4 },
-          { environment: 1, service: 2, group: 3, reason: 4 },
-        ]}
+        showModal={showBlockedDeploymentsModal}
+        toggleShowModal={toggleShowBlockedDeploymentsModal}
+        blockedDeployments={formattedData}
+        showOngoingDeploymentsLink={!isEmpty(newDeployments)}
       />
     </div>
   );

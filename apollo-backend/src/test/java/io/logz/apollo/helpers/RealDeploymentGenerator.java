@@ -149,7 +149,10 @@ public class RealDeploymentGenerator {
         return environment;
     }
 
-    public void setEnvironment(Environment environment) { this.environment = environment; }
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+        this.deployment.setEnvironmentId(environment.getId());
+    }
 
     public Service getService() {
         return service;

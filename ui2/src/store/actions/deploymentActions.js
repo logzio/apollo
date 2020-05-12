@@ -4,6 +4,8 @@ import { fetchAndStore, setToCache } from '../../utils/cacheService';
 import { cacheKeys } from '../../utils/cacheConfig';
 import { errorHandler } from '../../utils/errorHandler';
 import { appNotification } from '../../common/notification';
+import { isEmpty } from 'lodash';
+import { deployMock } from './mock_deployment';
 import {
   GET_SERVICES_REQUEST,
   GET_SERVICES_SUCCESS,
@@ -32,9 +34,6 @@ import {
   NEW_DEPLOYMENT_REQUEST,
   NEW_DEPLOYMENT_SUCCESS,
   NEW_DEPLOYMENT_FAILURE,
-  NEW_GROUP_DEPLOYMENT_REQUEST,
-  NEW_GROUP_DEPLOYMENT_SUCCESS,
-  NEW_GROUP_DEPLOYMENT_FAILURE,
   SELECT_SERVICES,
   SELECT_ENVIRONMENTS,
   SELECT_GROUPS,
@@ -54,6 +53,7 @@ import {
   GET_DEPLOYMENT_HISTORY_REQUEST,
   GET_DEPLOYMENT_HISTORY_SUCCESS,
   GET_DEPLOYMENT_HISTORY_FAILURE,
+  BLOCKED_DEPLOYMENTS,
   GET_ENV_STATUS_REQUEST,
   GET_ENV_STATUS_SUCCESS,
   GET_ENV_STATUS_FAILURE,
@@ -64,6 +64,8 @@ import {
   GET_ALL_GROUPS_SUCCESS,
   GET_ALL_GROUPS_FAILURE,
 } from './index';
+
+import { mock } from './mock';
 
 export const getServices = () => {
   return async dispatch => {
@@ -213,6 +215,26 @@ export const getGroups = (environmentId, serviceId) => {
   };
 };
 
+const handleNewDeployment = (dispatch, deployment, deployableVersionId) => {
+  dispatch({
+    type: NEW_DEPLOYMENT_SUCCESS,
+    payload: deployment.successful,
+  });
+
+  if (isEmpty(deployment.unsuccessful)) {
+    appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
+
+    historyBrowser.push({
+      pathname: '/deployment/ongoing',
+    });
+  } else {
+    dispatch({
+      type: BLOCKED_DEPLOYMENTS,
+      payload: deployment.unsuccessful,
+    });
+  }
+};
+
 export const deploy = (
   serviceIdsCsv,
   environmentIdsCsv,
@@ -225,21 +247,16 @@ export const deploy = (
       type: NEW_DEPLOYMENT_REQUEST,
     });
     try {
-      const data = await API.deploy(
-        serviceIdsCsv,
-        environmentIdsCsv,
-        deployableVersionId,
-        deploymentMessage,
-        isEmergencyDeployment,
-      );
-      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
-      historyBrowser.push({
-        pathname: '/deployment/ongoing',
-      });
-      dispatch({
-        type: NEW_DEPLOYMENT_SUCCESS,
-        payload: data,
-      });
+      // const data = setTimeout(() => deployMock, 1000);
+      const data = mock;
+      // const data = await API.deploy(
+      //   serviceIdsCsv,
+      //   environmentIdsCsv,
+      //   deployableVersionId,
+      //   deploymentMessage,
+      //   isEmergencyDeployment,
+      // );
+      handleNewDeployment(dispatch, data, deployableVersionId);
     } catch (error) {
       dispatch({
         type: NEW_DEPLOYMENT_FAILURE,
@@ -260,28 +277,25 @@ export const deployGroup = (
 ) => {
   return async dispatch => {
     dispatch({
-      type: NEW_GROUP_DEPLOYMENT_REQUEST,
+      type: NEW_DEPLOYMENT_REQUEST,
     });
     try {
-      const data = await API.deployGroup(
-        serviceIdsCsv,
-        environmentIdsCsv,
-        deployableVersionId,
-        deploymentMessage,
-        groupIdsCsv,
-        isEmergencyDeployment,
-      );
-      appNotification(`Commit: ${deployableVersionId} was successfully deployed`, '', 'smile', 'twoTone');
-      historyBrowser.push({
-        pathname: '/deployment/ongoing',
-      });
-      dispatch({
-        type: NEW_GROUP_DEPLOYMENT_SUCCESS,
-        payload: data,
-      });
+      const data = setTimeout(() => mock, 1000);
+      // const data = setTimeout(() => deployMock, 1000);
+
+      // const data = await API.deployGroup(
+      //   serviceIdsCsv,
+      //   environmentIdsCsv,
+      //   deployableVersionId,
+      //   deploymentMessage,
+      //   groupIdsCsv,
+      //   isEmergencyDeployment,
+      // );
+
+      handleNewDeployment(dispatch, data, deployableVersionId);
     } catch (error) {
       dispatch({
-        type: NEW_GROUP_DEPLOYMENT_FAILURE,
+        type: NEW_DEPLOYMENT_FAILURE,
         error,
       });
       errorHandler(error);

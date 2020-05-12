@@ -9,11 +9,9 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface StackDao {
-    Stack getStack(int id);
+    StackType getStackType(int id);
     EnvironmentsStack getEnvironmentsStack(int id);
     ServicesStack getServicesStack(int id);
-    List<Stack> getAllStacks();
-    List<Stack> getAllStackFromType(@Param("stackType") StackType stackType);
     List<EnvironmentsStack> getAllEnvironmentsStacks();
     List<ServicesStack> getAllServicesStacks();
     void addStack(Stack stack);

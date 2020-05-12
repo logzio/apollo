@@ -1,25 +1,27 @@
 package io.logz.apollo.helpers;
 
 import io.logz.apollo.kubernetes.KubernetesMonitor;
-import io.logz.apollo.models.DeploymentRole;
-import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PasswordManager;
-import io.logz.apollo.models.EnvironmentsStack;
-import io.logz.apollo.models.MultiDeploymentResponseObject;
-import io.logz.apollo.models.ServicesStack;
-import io.logz.apollo.models.StackType;
-import io.logz.apollo.models.User;
-import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.exceptions.ApolloClientException;
+import io.logz.apollo.models.DeploymentPermission;
+import io.logz.apollo.models.DeploymentRole;
+import io.logz.apollo.models.EnvironmentsStack;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.models.ServicesStack;
+import io.logz.apollo.models.Stack;
+import io.logz.apollo.models.StackType;
+import io.logz.apollo.models.User;
+import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Service;
 import io.logz.apollo.models.Group;
-import io.logz.apollo.models.Notification.NotificationType;
 import io.logz.apollo.models.Notification;
+import io.logz.apollo.models.Notification.NotificationType;
+
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,166 +38,56 @@ import java.util.Optional;
 public class ModelsGenerator {
 
     public static int DEFAULT_SCALING_FACTOR = 3;
+    private static int DEFAULT_CONCURRENCY_LIMIT = KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1;
 
-    public static Environment createEnvironment(String additionalParams) {
+    public static Environment createEnvironment(String additionalParams, int concurrencyLimit, String availability) {
         Environment testEnvironment = new Environment();
         testEnvironment.setName("env-name-" + Common.randomStr(5));
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
-        testEnvironment.setAvailability("PROD-" + Common.randomStr(5));
+        testEnvironment.setAvailability(availability);
         testEnvironment.setKubernetesMaster("kube.prod." + Common.randomStr(5));
         testEnvironment.setKubernetesToken("AaBbCc" + Common.randomStr(10));
         testEnvironment.setKubernetesNamespace("namespace-" + Common.randomStr(5));
         testEnvironment.setServicePortCoefficient(0);
         testEnvironment.setRequireDeploymentMessage(true);
-        testEnvironment.setConcurrencyLimit(KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1);
+        testEnvironment.setConcurrencyLimit(concurrencyLimit);
         testEnvironment.setAdditionalParams(additionalParams);
 
         return testEnvironment;
+    }
+
+    public static String generateRandomAvailability() {
+        return "PROD-" + Common.randomStr(5);
+    }
+
+    public static Environment createEnvironment(String additionalParams) {
+        return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
     }
 
     public static Environment createEnvironment() {
         return createEnvironment(null);
     }
 
-    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
-        Environment testEnvironment = ModelsGenerator.createEnvironment();
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams, int concurrencyLimit, String availability) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams, concurrencyLimit, availability);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
+    }
+
+    public static Environment createAndSubmitEnvironment(String availability, ApolloTestClient apolloTestClient) throws ApolloClientException {
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, availability);
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams) throws ApolloClientException {
-        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams);
-        testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
-        return testEnvironment;
+        return createAndSubmitEnvironment(apolloTestClient, additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
     }
 
-    public static EnvironmentsStack createEnvironmentsStack() {
-        EnvironmentsStack testEnvironmentsStack = new EnvironmentsStack();
-        testEnvironmentsStack.setName("environments-stack-" + Common.randomStr(5));
-        testEnvironmentsStack.setEnabled(true);
-        testEnvironmentsStack.setStackType(StackType.ENVIRONMENTS);
-        testEnvironmentsStack.setEnvironments(new ArrayList<>());
-
-        return testEnvironmentsStack;
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, int concurrencyLimit) throws ApolloClientException {
+        return createAndSubmitEnvironment(apolloTestClient, null, concurrencyLimit, generateRandomAvailability());
     }
 
-    public static EnvironmentsStack createEnvironmentsStack(List<Integer> environments) {
-        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack();
-        testEnvironmentsStack.setEnvironments(environments);
-
-        return testEnvironmentsStack;
-    }
-
-    public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient) throws Exception {
-        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack();
-        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
-        testEnvironmentsStack.setId(id);
-
-        return testEnvironmentsStack;
-    }
-
-    public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient, List<Integer> environments) throws Exception {
-        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack(environments);
-        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
-        testEnvironmentsStack.setId(id);
-
-        return testEnvironmentsStack;
-    }
-
-    public static ServicesStack createServicesStack() {
-        ServicesStack testServicesStack = new ServicesStack();
-        testServicesStack.setName("services-stack-" + Common.randomStr(5));
-        testServicesStack.setEnabled(true);
-        testServicesStack.setStackType(StackType.SERVICES);
-        testServicesStack.setServices(new ArrayList<>());
-
-        return testServicesStack;
-    }
-
-    public static ServicesStack createServicesStack(List<Integer> services) {
-        ServicesStack testServicessStack = createServicesStack();
-        testServicessStack.setServices(services);
-
-        return testServicessStack;
-    }
-
-    public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient) throws Exception {
-        ServicesStack testServicessStack = createServicesStack();
-        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
-        testServicessStack.setId(id);
-
-        return testServicessStack;
-    }
-
-    public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient, List<Integer> services) throws Exception {
-        ServicesStack testServicessStack = createServicesStack(services);
-        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
-        testServicessStack.setId(id);
-
-        return testServicessStack;
-    }
-
-    public static Group createGroup() {
-        Group testGroup = new Group();
-        testGroup.setName("group-name-" + Common.randomStr(5));
-        testGroup.setScalingFactor(DEFAULT_SCALING_FACTOR);
-        testGroup.setJsonParams(Common.generateJson("json", "params"));
-
-        return testGroup;
-    }
-
-    public static DeployableVersion createDeployableVersion(Service relatedService) {
-        DeployableVersion testDeployableVersion = new DeployableVersion();
-        testDeployableVersion.setGitCommitSha("abc129aed837f6" + Common.randomStr(5));
-        testDeployableVersion.setGithubRepositoryUrl("http://test.com/logzio/" + Common.randomStr(5));
-        testDeployableVersion.setServiceId(relatedService.getId());
-        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
-
-        return testDeployableVersion;
-    }
-
-    public static DeployableVersion createDeployableVersion(Service relatedService, String repositoryUrl, String commitSha) {
-        DeployableVersion testDeployableVersion = new DeployableVersion();
-        testDeployableVersion.setGitCommitSha(commitSha);
-        testDeployableVersion.setGithubRepositoryUrl(repositoryUrl);
-        testDeployableVersion.setServiceId(relatedService.getId());
-        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
-
-        return testDeployableVersion;
-    }
-
-    public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient) throws ApolloClientException {
-
-        // Needed for FK
-        Service testService = createAndSubmitService(apolloTestClient);
-
-        // Add deployable version
-        DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(testService);
-        testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
-
-        return testDeployableVersion;
-    }
-
-    public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient, Service service) throws ApolloClientException {
-
-        // Add deployable version
-        DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(service);
-        testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
-
-        return testDeployableVersion;
-    }
-
-    public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient, Service service, String repositoryUrl, String commitSha) throws ApolloClientException {
-
-        // Add deployable version
-        DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(service, repositoryUrl, commitSha);
-        testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
-
-        return testDeployableVersion;
-    }
-
-    public static Service createService() {
-        return createService(false);
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
     }
 
     public static Service createService(boolean isPartOfGroup) {
@@ -209,10 +101,8 @@ public class ModelsGenerator {
         return testService;
     }
 
-    public static Service createAndSubmitService(ApolloTestClient apolloTestClient) throws ApolloClientException {
-        Service testService = ModelsGenerator.createService();
-        testService.setId(apolloTestClient.addService(testService).getId());
-        return testService;
+    public static Service createService() {
+        return createService(false);
     }
 
     public static Service createAndSubmitService(ApolloTestClient apolloTestClient, boolean isPartOfGroup) throws ApolloClientException {
@@ -221,34 +111,81 @@ public class ModelsGenerator {
         return testService;
     }
 
-    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient) throws ApolloClientException {
-        return createAndSubmitGroup(apolloTestClient, createAndSubmitService(apolloTestClient).getId(), createAndSubmitEnvironment(apolloTestClient).getId());
+    public static Service createAndSubmitService(ApolloTestClient apolloTestClient) throws ApolloClientException {
+        return createAndSubmitService(apolloTestClient, false);
     }
 
-    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int environmentId) throws ApolloClientException {
-        return createAndSubmitGroup(apolloTestClient, createAndSubmitService(apolloTestClient).getId(), environmentId);
+    public static EnvironmentsStack createEnvironmentsStack(List<Integer> environments) {
+        EnvironmentsStack testEnvironmentsStack = new EnvironmentsStack();
+        testEnvironmentsStack.setName("environments-stack-" + Common.randomStr(5));
+        testEnvironmentsStack.setEnabled(true);
+        testEnvironmentsStack.setStackType(StackType.ENVIRONMENTS);
+        testEnvironmentsStack.setEnvironments(environments);
+
+        return testEnvironmentsStack;
     }
 
-    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId) throws ApolloClientException {
-        Group testGroup = createGroup();
-
-        testGroup.setServiceId(serviceId);
-        testGroup.setEnvironmentId(environmentId);
-
-        apolloTestClient.addGroup(testGroup);
-
-        testGroup.setId(apolloTestClient.getGroupByName(testGroup.getName()).getId());
-
-        return testGroup;
+    public static EnvironmentsStack createEnvironmentsStack() {
+        return createEnvironmentsStack(new ArrayList<>());
     }
 
-    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId, String name) throws ApolloClientException {
-        Group testGroup = createGroup();
+    public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient, List<Integer> environments) throws Exception {
+        EnvironmentsStack testEnvironmentsStack = createEnvironmentsStack(environments);
+        int id = apolloTestClient.addEnvironmentsStack(testEnvironmentsStack).getId();
+        testEnvironmentsStack.setId(id);
 
+        return testEnvironmentsStack;
+    }
+
+    public static EnvironmentsStack createAndSubmitEnvironmentsStack(ApolloTestClient apolloTestClient) throws Exception {
+        return createAndSubmitEnvironmentsStack(apolloTestClient, new ArrayList<>());
+    }
+
+    public static ServicesStack createServicesStack(List<Integer> services) {
+        ServicesStack testServicesStack = new ServicesStack();
+        testServicesStack.setName("services-stack-" + Common.randomStr(5));
+        testServicesStack.setEnabled(true);
+        testServicesStack.setStackType(StackType.SERVICES);
+        testServicesStack.setServices(services);
+
+        return testServicesStack;
+    }
+
+    public static ServicesStack createServicesStack() {
+       return createServicesStack(new ArrayList<>());
+    }
+
+    public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient, List<Integer> services) throws Exception {
+        ServicesStack testServicessStack = createServicesStack(services);
+        int id = apolloTestClient.addServicesStack(testServicessStack).getId();
+        testServicessStack.setId(id);
+
+        return testServicessStack;
+    }
+
+    public static ServicesStack createAndSubmitServicesStack(ApolloTestClient apolloTestClient) throws Exception {
+        return createAndSubmitServicesStack(apolloTestClient, new ArrayList<>());
+    }
+
+    public static Group createGroup(int serviceId, int environmentId, String name) {
+        Group testGroup = new Group();
+        testGroup.setName(generateRandomGroupName());
+        testGroup.setScalingFactor(DEFAULT_SCALING_FACTOR);
+        testGroup.setJsonParams(Common.generateJson("json", "params"));
         testGroup.setServiceId(serviceId);
         testGroup.setEnvironmentId(environmentId);
         testGroup.setName(name);
 
+        return testGroup;
+    }
+
+    private static String generateRandomGroupName() {
+        return "group-name-" + Common.randomStr(5);
+    }
+
+    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId, String name) throws ApolloClientException {
+        Group testGroup = createGroup(serviceId, environmentId, name);
+
         apolloTestClient.addGroup(testGroup);
 
         testGroup.setId(apolloTestClient.getGroupByName(testGroup.getName()).getId());
@@ -256,9 +193,61 @@ public class ModelsGenerator {
         return testGroup;
     }
 
-    public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
-                                              DeployableVersion relatedDeployableVersion) {
-        return createDeployment(relatedService, relatedEnvironment, relatedDeployableVersion, null);
+    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int serviceId, int environmentId) throws ApolloClientException {
+       return createAndSubmitGroup(apolloTestClient, serviceId, environmentId, generateRandomGroupName());
+    }
+
+    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient) throws ApolloClientException {
+        int environmentId = createAndSubmitEnvironment(apolloTestClient).getId();
+        int serviceId = createAndSubmitService(apolloTestClient).getId();
+
+        return createAndSubmitGroup(apolloTestClient, serviceId, environmentId);
+    }
+
+    public static Group createAndSubmitGroup(ApolloTestClient apolloTestClient, int environmentId) throws ApolloClientException {
+        int serviceId = createAndSubmitService(apolloTestClient).getId();
+
+        return createAndSubmitGroup(apolloTestClient, serviceId, environmentId);
+    }
+
+    public static DeployableVersion createDeployableVersion(Service relatedService, String repositoryUrl, String commitSha) {
+        DeployableVersion testDeployableVersion = new DeployableVersion();
+        testDeployableVersion.setGitCommitSha(commitSha);
+        testDeployableVersion.setGithubRepositoryUrl(repositoryUrl);
+        testDeployableVersion.setServiceId(relatedService.getId());
+        testDeployableVersion.setCommitDate(Date.from(LocalDateTime.now(ZoneId.of("UTC")).atZone(ZoneId.systemDefault()).toInstant()));
+
+        return testDeployableVersion;
+    }
+
+    public static DeployableVersion createDeployableVersion(Service relatedService) {
+        return createDeployableVersion(relatedService, generateRandomRepositoryUrl(), generateRandomCommitSha());
+    }
+
+    public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient, Service service, String repositoryUrl, String commitSha) throws ApolloClientException {
+
+        // Add deployable version
+        DeployableVersion testDeployableVersion = createDeployableVersion(service, repositoryUrl, commitSha);
+        testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
+
+        return testDeployableVersion;
+    }
+
+    public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient, Service service) throws ApolloClientException {
+        return createAndSubmitDeployableVersion(apolloTestClient, service, generateRandomRepositoryUrl(), generateRandomCommitSha());
+    }
+
+    public static DeployableVersion createAndSubmitDeployableVersion(ApolloTestClient apolloTestClient) throws ApolloClientException {
+        Service service = createAndSubmitService(apolloTestClient);
+        return createAndSubmitDeployableVersion(apolloTestClient, service);
+    }
+
+    private static String generateRandomRepositoryUrl() {
+        return "http://test.com/logzio/" + Common.randomStr(5);
+    }
+
+    private static String generateRandomCommitSha() {
+        return "abc129aed837f6" + Common.randomStr(5);
     }
 
     public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
@@ -275,39 +264,9 @@ public class ModelsGenerator {
         return testDeployment;
     }
 
-    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient) throws Exception {
-
-        // Add all foreign keys
-        Environment testEnvironment = ModelsGenerator.createEnvironment();
-        testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
-
-        Service testService = ModelsGenerator.createService();
-        testService.setId(apolloTestClient.addService(testService).getId());
-
-        DeployableVersion testDeployableVersion = ModelsGenerator.createDeployableVersion(testService);
-        testDeployableVersion.setId(apolloTestClient.addDeployableVersion(testDeployableVersion).getId());
-
-        return createAndSubmitDeployment(apolloTestClient, testEnvironment, testService, testDeployableVersion);
-    }
-
-    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
-                                                       Service service, DeployableVersion deployableVersion) throws Exception {
-
-        // Give the user permissions to deploy
-        Common.grantUserFullPermissionsOnEnvironment(apolloTestClient, environment);
-
-        // Now we have enough to create a deployment
-        Deployment testDeployment = ModelsGenerator.createDeployment(service, environment, deployableVersion);
-        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(testDeployment);
-
-        if (result.getSuccessful().size() > 0) {
-            Deployment deployment = result.getSuccessful().get(0).getDeployment();
-            testDeployment.setId(deployment.getId());
-        } else {
-            throw result.getUnsuccessful().get(0).getException();
-        }
-
-        return testDeployment;
+    public static Deployment createDeployment(Service relatedService, Environment relatedEnvironment,
+                                              DeployableVersion relatedDeployableVersion) {
+        return createDeployment(relatedService, relatedEnvironment, relatedDeployableVersion, null);
     }
 
     public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
@@ -328,6 +287,27 @@ public class ModelsGenerator {
         }
 
         return testDeployment;
+    }
+
+    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment,
+                                                       Service service, DeployableVersion deployableVersion) throws Exception {
+      return createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion, null);
+    }
+
+    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient, Environment environment) throws Exception {
+
+        Service service = createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, service);
+
+        return createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
+    }
+
+    public static Deployment createAndSubmitDeployment(ApolloTestClient apolloTestClient) throws Exception {
+        Environment testEnvironment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        Service testService = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion testDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, testService);
+
+        return createAndSubmitDeployment(apolloTestClient, testEnvironment, testService, testDeployableVersion);
     }
 
     public static DeploymentRole createDeploymentRole() {
@@ -362,11 +342,52 @@ public class ModelsGenerator {
         return blockerDefinition;
     }
 
+    public static BlockerDefinition createBlockerDefinition(Environment environment, Service service, Stack stack, String availability, String blockerTypeName, String blockerJsonConfiguration) {
+        BlockerDefinition blockerDefinition = new BlockerDefinition();
+
+        if (environment != null)
+            blockerDefinition.setEnvironmentId(environment.getId());
+
+        if (service != null)
+            blockerDefinition.setServiceId(service.getId());
+
+        if (stack != null)
+            blockerDefinition.setStackId(stack.getId());
+
+        blockerDefinition.setName("blocker-" + Common.randomStr(5));
+        blockerDefinition.setBlockerTypeName(blockerTypeName);
+        blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
+        blockerDefinition.setActive(true);
+        blockerDefinition.setAvailability(availability);
+
+        return blockerDefinition;
+    }
+
     public static BlockerDefinition createAndSubmitBlocker(ApolloTestAdminClient apolloTestAdminClient, String blockerTypeName,
                                                            String blockerJsonConfiguration, Environment environment,
                                                            Service service) throws Exception {
 
         BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, blockerTypeName, blockerJsonConfiguration);
+        testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
+
+        return testBlockerDefinition;
+    }
+
+    public static BlockerDefinition createAndSubmitBlocker(ApolloTestAdminClient apolloTestAdminClient, String blockerTypeName,
+                                                           String blockerJsonConfiguration, Environment environment,
+                                                           Service service, Stack stack) throws Exception {
+
+        BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, stack, null, blockerTypeName, blockerJsonConfiguration);
+        testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
+
+        return testBlockerDefinition;
+    }
+
+    public static BlockerDefinition createAndSubmitBlocker(ApolloTestAdminClient apolloTestAdminClient, String blockerTypeName,
+                                                           String blockerJsonConfiguration, Environment environment,
+                                                           Service service, Stack stack, String availability) throws Exception {
+
+        BlockerDefinition testBlockerDefinition = ModelsGenerator.createBlockerDefinition(environment, service, stack, availability, blockerTypeName, blockerJsonConfiguration);
         testBlockerDefinition.setId(apolloTestAdminClient.addBlocker(testBlockerDefinition).getId());
 
         return testBlockerDefinition;
@@ -431,6 +452,7 @@ public class ModelsGenerator {
         testUser.setHashedPassword(PasswordManager.encryptPassword(Common.DEFAULT_PASSWORD));
         testUser.setAdmin(admin);
         testUser.setEnabled(true);
+        testUser.setExecAllowed(true);
 
         return testUser;
     }

@@ -10,18 +10,21 @@ public class ApolloConfiguration {
     private KubernetesConfiguration kubernetes;
     private ScmConfiguration scm;
     private WebsocketConfiguration websocket;
+    private SlaveConfiguration slave;
 
     @JsonCreator
     public ApolloConfiguration(@JsonProperty("api") ApiConfiguration api,
                                @JsonProperty("db") DatabaseConfiguration database,
                                @JsonProperty("kubernetes") KubernetesConfiguration kubernetes,
                                @JsonProperty("scm") ScmConfiguration scm,
-                               @JsonProperty("websocket") WebsocketConfiguration websocket) {
+                               @JsonProperty("websocket") WebsocketConfiguration websocket,
+                               @JsonProperty("slave") SlaveConfiguration slave) {
         this.api = api;
         this.database = database;
         this.kubernetes = kubernetes;
         this.scm = scm;
         this.websocket = websocket;
+        this.slave = slave;
     }
 
     public ApiConfiguration getApi() {
@@ -44,4 +47,7 @@ public class ApolloConfiguration {
         return websocket;
     }
 
+    public SlaveConfiguration getSlave() {
+        return slave;
+    }
 }

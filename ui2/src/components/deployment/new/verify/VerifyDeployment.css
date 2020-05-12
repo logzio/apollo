@@ -3,14 +3,6 @@
     height: 20px;
 }
 
-.confirm-modal .ant-modal-footer{
-    display: flex;
-}
-
-.ant-modal-footer .cancel-modal-btn{
-    margin-left: auto;
-}
-
 .deploy{
     flex-shrink: 0;
 }

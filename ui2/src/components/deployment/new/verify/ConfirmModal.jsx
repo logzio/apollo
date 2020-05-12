@@ -1,6 +1,7 @@
+import React from 'react';
 import { AppModal } from '../../../../common/Modal';
 import { AppButton } from '../../../../common/Button';
-import React from 'react';
+import './ConfirmModal.css';
 
 export const ConfirmModal = ({ toggleShowModal, showModal, handleDeploy, isLoading }) => {
   return (
@@ -8,7 +9,7 @@ export const ConfirmModal = ({ toggleShowModal, showModal, handleDeploy, isLoadi
       visible={showModal}
       toggleModal={toggleShowModal}
       title="Fashizle?"
-      class="confirm-modal"
+      className="confirm-modal"
       footer={[
         <AppButton
           label={'Emergency'}

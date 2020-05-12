@@ -139,6 +139,8 @@ const mapStateToProps = ({
     selectedGroups,
     selectedVersion,
     newDeployment,
+    blockedDeployments,
+    newDeployments,
   },
 }) => ({
   services,
@@ -153,6 +155,8 @@ const mapStateToProps = ({
   selectedGroups,
   selectedVersion,
   newDeployment,
+  blockedDeployments,
+  newDeployments,
 });
 
 export const NewDeployment = connect(

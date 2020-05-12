@@ -4,7 +4,7 @@ import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.Blocker;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
-import io.logz.apollo.blockers.BlockerService;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.controllers.DeploymentController;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;
@@ -66,9 +66,17 @@ public class DeploymentHandler {
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Req req) throws ApolloDeploymentException {
+        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, false  , req);
+    }
+
+    public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Boolean isEmergencyDeployment, Req req) throws ApolloDeploymentException {
         // Get the username from the token
         String userEmail = req.token().get("_user").toString();
         String sourceVersion = null;
+
+        if (isEmergencyDeployment == null) {
+            isEmergencyDeployment = false;
+        }
 
         try {
             // Get the current commit sha from kubernetes so we can revert if necessary
@@ -95,6 +103,7 @@ public class DeploymentHandler {
         MDC.put("userEmail", userEmail);
         MDC.put("sourceVersion", sourceVersion);
         MDC.put("groupName", groupName);
+        MDC.put("isEmergencyDeployment", String.valueOf(isEmergencyDeployment));
 
         logger.info("Got request for a new deployment");
 
@@ -136,6 +145,7 @@ public class DeploymentHandler {
             newDeployment.setSourceVersion(sourceVersion);
             newDeployment.setDeploymentMessage(deploymentMessage);
             newDeployment.setGroupName(groupName);
+            newDeployment.setEmergencyDeployment(isEmergencyDeployment);
 
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());

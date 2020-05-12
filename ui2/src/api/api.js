@@ -83,7 +83,7 @@ export const getLastCommitFromBranch = async (branchName, deployableVersionId) =
 export const getGroups = async (environmentId, serviceId) =>
   await fetchData(`group/environment/${environmentId}/service/${serviceId}`);
 
-export const deploy = async (
+export const deployt = async (
   serviceIdsCsv,
   environmentIdsCsv,
   deployableVersionId,
@@ -105,7 +105,7 @@ export const deploy = async (
   }
 };
 
-export const deployGroup = async (
+export const deployGroupt = async (
   serviceIdsCsv,
   environmentIdsCsv,
   deployableVersionId,
