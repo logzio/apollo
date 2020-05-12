@@ -18,14 +18,23 @@ public class AppsDeploymentTranformer implements BaseDeploymentTransformer {
                                 Environment apolloEnvironment,
                                 DeployableVersion apolloDeployableVersion,
                                 Group apolloGroup) {
+
         deployment.setApiVersion("apps/v1");
 
         LabelSelectorBuilder labelSelectorBuilder = new LabelSelectorBuilder();
+
         deployment.getSpec().getTemplate().getMetadata().getLabels().entrySet()
                   .stream()
                   .filter(label -> !label.getKey().equals("apollo_unique_identifier"))
                   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
                   .forEach(labelSelectorBuilder::addToMatchLabels);
+
+        deployment.getSpec().getTemplate().getMetadata().getLabels().entrySet()
+                  .stream()
+                  .filter(label -> label.getKey().equals("apollo_unique_identifier"))
+                  .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                  .forEach((key, value) -> labelSelectorBuilder.removeFromMatchLabels(key));
+
         deployment.getSpec().setSelector(labelSelectorBuilder.build());
 
         return deployment;
