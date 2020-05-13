@@ -1,5 +1,9 @@
-package io.logz.apollo.blockers;
+package io.logz.apollo.services;
 
+import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.blockers.BlockerFunction;
+import io.logz.apollo.blockers.BlockerInjectableCommons;
+import io.logz.apollo.blockers.BlockerType;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.Deployment;
@@ -97,7 +101,7 @@ public class BlockerService {
             BlockerFunction blockerFunction = getBlockerTypeBinding(blockerDefinition.getBlockerTypeName()).get().newInstance();
             blockerFunction.init(blockerDefinition.getBlockerJsonConfiguration());
             return Optional.of(new Blocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getBlockerTypeName(), blockerDefinition.getServiceId(),
-                    blockerDefinition.getEnvironmentId(), blockerDefinition.getActive(), blockerFunction));
+                    blockerDefinition.getEnvironmentId(), blockerDefinition.getStackId(), blockerDefinition.getAvailability(), blockerDefinition.getActive(), blockerFunction));
 
         } catch (InstantiationException | IllegalAccessException e) {
             logger.warn("Could not create instance of {} ", blockerDefinition.getBlockerTypeName(), e);
@@ -110,6 +114,36 @@ public class BlockerService {
 
     @SuppressWarnings("RedundantIfStatement")
     private boolean isBlockerInScope(Blocker blocker, Deployment deployment) {
+        Integer environmentToCheck = null;
+        Integer serviceToCheck = null;
+
+        if (blocker.getEnvironmentId() != null) {
+            environmentToCheck = blocker.getEnvironmentId();
+        }
+
+        if (blocker.getServiceId() != null) {
+            serviceToCheck = blocker.getServiceId();
+        }
+
+        if (blocker.getStackId() != null) {
+            switch (blockerInjectableCommons.getStackService().getStackType(blocker.getStackId())) {
+                case ENVIRONMENTS:
+                    if (blockerInjectableCommons.getStackService().getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
+                        environmentToCheck = deployment.getEnvironmentId();
+                    }
+                    break;
+                case SERVICES:
+                    if (blockerInjectableCommons.getStackService().getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
+                        serviceToCheck = deployment.getServiceId();
+                    }
+                    break;
+            }
+
+            if (blocker.getStackId() != null && environmentToCheck == null && serviceToCheck == null) {
+                return false;
+            }
+        }
+
         if (!blocker.getActive()) {
             return false;
         }
@@ -118,20 +152,32 @@ public class BlockerService {
             return false;
         }
 
-        if (blocker.getEnvironmentId() == null && blocker.getServiceId() == null) {
+        if (environmentToCheck == null && serviceToCheck == null && blocker.getAvailability() == null) {
             return true;
         }
 
-        if (blocker.getEnvironmentId() == null && blocker.getServiceId().equals(deployment.getServiceId())) {
+        if (blocker.getAvailability() != null && !blocker.getAvailability().isEmpty()) {
+            if (blockerInjectableCommons.getEnvironmentDao().getEnvironment(deployment.getEnvironmentId()).getAvailability().equals(blocker.getAvailability()))     {
+                if ((serviceToCheck != null) && serviceToCheck == deployment.getServiceId()) {
+                    return true;
+                }
+                if (blocker.getServiceId() == null) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        if (environmentToCheck == null && serviceToCheck.equals(deployment.getServiceId())) {
             return true;
         }
 
-        if (blocker.getServiceId() == null && blocker.getEnvironmentId().equals(deployment.getEnvironmentId())) {
+        if (serviceToCheck == null && environmentToCheck.equals(deployment.getEnvironmentId())) {
             return true;
         }
 
-        if (blocker.getEnvironmentId() != null && blocker.getServiceId() != null) {
-            if (blocker.getEnvironmentId().equals(deployment.getEnvironmentId()) && blocker.getServiceId().equals(deployment.getServiceId())) {
+        if (environmentToCheck != null && serviceToCheck != null) {
+            if (environmentToCheck.equals(deployment.getEnvironmentId()) && serviceToCheck.equals(deployment.getServiceId())) {
                 return true;
             }
         }

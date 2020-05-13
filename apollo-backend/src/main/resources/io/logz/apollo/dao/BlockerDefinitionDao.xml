@@ -59,8 +59,8 @@
     </select>
 
     <insert id="addBlockerDefinition" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO blocker_definition (name, service_id, environment_id, is_active, blocker_type_name, blocker_json_configuration)
-        VALUES (#{name}, #{serviceId}, #{environmentId}, #{isActive}, #{blockerTypeName}, #{blockerJsonConfiguration})
+        INSERT INTO blocker_definition (name, service_id, environment_id, stack_id, availability, is_active, blocker_type_name, blocker_json_configuration)
+        VALUES (#{name}, #{serviceId}, #{environmentId}, #{stackId}, #{availability}, #{isActive}, #{blockerTypeName}, #{blockerJsonConfiguration})
     </insert>
 
     <insert id="addUserToBlockerOverride">
@@ -73,6 +73,8 @@
             name=#{name},
             service_id=#{serviceId},
             environment_id=#{environmentId},
+            stack_id=#{stackId},
+            availability=#{availability},
             is_active=#{isActive},
             blocker_type_name=#{blockerTypeName},
             blocker_json_configuration=#{blockerJsonConfiguration}

@@ -13,6 +13,7 @@ public interface DeploymentDao {
     Deployment getDeployment(int id);
     List<Deployment> getAllDeployments();
     List<Deployment> getAllRunningDeployments();
+    List<Deployment> getAllOngoingDeployments();
     List<Deployment> getAllStartedDeployments();
     List<Deployment> getRunningAndJustFinishedDeployments();
     List<Deployment> getLatestDeployments();
@@ -23,6 +24,7 @@ public interface DeploymentDao {
     void updateDeploymentStatus(@Param("id") int id, @Param("status") Deployment.DeploymentStatus status);
     void updateDeploymentEnvStatus(@Param("id") int id, @Param("envStatus") String envStatus);
     void updateDeployment(Deployment deployment);
+    void updateEmergencyDeployment(@Param("id") int id, @Param("isEmergencyDeployment") boolean isEmergencyDeployment);
     String getDeploymentEnvStatus(@Param("id") int id);
     List<Integer> getServicesDeployedOnEnv(@Param("environmentId") int environmentId);
     int getTotalDeploymentsCount();

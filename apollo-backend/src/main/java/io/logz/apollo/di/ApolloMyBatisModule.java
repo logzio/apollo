@@ -12,6 +12,7 @@ import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.NotificationDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.dao.ServicesStackDao;
+import io.logz.apollo.dao.SlaveDao;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.dao.UserDao;
 import io.logz.apollo.database.DataSourceFactory;
@@ -58,6 +59,7 @@ public class ApolloMyBatisModule extends MyBatisModule {
         addMapperClass(EnvironmentsStackDao.class);
         addMapperClass(ServicesStackDao.class);
         addMapperClass(StackDao.class);
+        addMapperClass(SlaveDao.class);
     }
 
     private void createDataSource() {

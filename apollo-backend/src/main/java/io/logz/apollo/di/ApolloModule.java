@@ -2,12 +2,15 @@ package io.logz.apollo.di;
 
 import com.google.inject.AbstractModule;
 import io.logz.apollo.ApolloApplication;
-import io.logz.apollo.blockers.BlockerService;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.notifications.ApolloNotifications;
 import io.logz.apollo.rest.RestServer;
+import io.logz.apollo.services.DeploymentService;
+import io.logz.apollo.services.SlaveService;
 import io.logz.apollo.websockets.WebSocketServer;
+import io.logz.apollo.services.AuthenticationService;
 import org.rapidoid.annotation.Controller;
 import org.reflections.Reflections;
 
@@ -30,7 +33,10 @@ public class ApolloModule extends AbstractModule {
         bind(WebSocketServer.class).asEagerSingleton();
         bind(RestServer.class).asEagerSingleton();
         bind(BlockerService.class).asEagerSingleton();
+        bind(AuthenticationService.class).asEagerSingleton();
         bind(ApolloNotifications.class).asEagerSingleton();
+        bind(DeploymentService.class).asEagerSingleton();
+        bind(SlaveService.class).asEagerSingleton();
 
         bindControllers();
     }
