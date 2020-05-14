@@ -19,7 +19,7 @@
     <parent>
         <artifactId>apollo</artifactId>
         <groupId>io.logz.apollo</groupId>
-        <version>1.0.2</version>
+        <version>1.0.3</version>
     </parent>
 
     <artifactId>apollo-model</artifactId>
