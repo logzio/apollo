@@ -50,7 +50,7 @@ public class AuthTest {
         // Login admin
         apolloTestAdminClient.login();
 
-        // SignupForm the user
+        // Signup the user
         apolloTestAdminClient.signup(apolloTestClient.getTestUser(), Common.DEFAULT_PASSWORD);
 
         // Make sure we cant signup again
