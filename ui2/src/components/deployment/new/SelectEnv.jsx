@@ -10,7 +10,7 @@ export const SelectEnvironment = ({
   environmentsStacks,
 }) => {
   useEffect(() => {
-    handleBreadcrumbs(`${window.location.href}`, 'environment');
+    handleBreadcrumbs('environment');
     getEnvironments();
     getEnvironmentsStacks();
   }, []);

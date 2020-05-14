@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
-import { history } from '../../utils/history';
+import { historyBrowser } from '../../utils/history';
 import { connect } from 'react-redux';
 import { appInit, logout } from '../../store/actions/authActions';
 import { Signup } from '../auth/Signup';
@@ -28,7 +28,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
   };
 
   return (
-    <Router history={history}>
+    <Router history={historyBrowser}>
       <Layout className="app">
         {isAuthenticate && (
           <Layout.Sider trigger={null} collapsible collapsed={collapsed}>
@@ -46,7 +46,7 @@ const AppComponent = ({ appInit, logout, isAdmin, loggedIn }) => {
               {isAdmin && <AppRoute path="/auth/addUser" title={'Add a new user'} component={Signup} />}
               <AppRoute path="/deployment/new" title={'New deployment'} component={NewDeployment} />
               {!isAuthenticate && <Route path="/auth/login" component={Login} />}
-              {isAuthenticate ? <Redirect to={`/auth/addUser`} /> : <Redirect to={`/auth/login`} />}
+              {isAuthenticate ? <Redirect to={`/deployment/new`} /> : <Redirect to={`/auth/login`} />}
             </Switch>
           </Layout.Content>
         </Layout>

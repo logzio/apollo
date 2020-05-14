@@ -4,8 +4,7 @@ import { Spinner } from '../../../common/Spinner';
 
 export const SelectService = ({ getServices, services, handleBreadcrumbs, getServicesStacks, servicesStacks, resetBreadcrumbs, match }) => {
   useEffect(() => {
-    resetBreadcrumbs();
-    handleBreadcrumbs(`${match.url}`, 'service');
+    handleBreadcrumbs('service');
     getServices();
     getServicesStacks();
   }, []);
