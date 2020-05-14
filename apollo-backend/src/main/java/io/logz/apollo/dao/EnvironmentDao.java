@@ -14,5 +14,6 @@ public interface EnvironmentDao {
     List<Environment> getAllEnvironments();
     List<Environment> getEnvironmentsByAvailability(@Param("availability") String availability);
     void addEnvironment(Environment environment);
+    void updateConcurrencyLimit(@Param("id") int id, @Param("concurrencyLimit") int concurrencyLimit);
 }
 

@@ -13,7 +13,7 @@ import io.logz.apollo.models.EnvironmentServiceGroupMap;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
-import io.logz.apollo.status.ServiceStatusHandler;
+import io.logz.apollo.services.ServiceStatusHandler;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.http.Req;

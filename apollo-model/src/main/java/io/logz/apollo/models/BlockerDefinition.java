@@ -11,6 +11,8 @@ public class BlockerDefinition {
     private String name;
     private Integer serviceId;
     private Integer environmentId;
+    private Integer stackId;
+    private String availability;
     private Date startedAt;
     private Boolean isActive;
     private String blockerTypeName;
@@ -49,6 +51,22 @@ public class BlockerDefinition {
 
     public void setEnvironmentId(Integer environmentId) {
         this.environmentId = environmentId;
+    }
+
+    public Integer getStackId() {
+        return stackId;
+    }
+
+    public void setStackId(Integer stackId) {
+        this.stackId = stackId;
+    }
+
+    public String getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(String availability) {
+        this.availability = availability;
     }
 
     public Date getStartedAt() {

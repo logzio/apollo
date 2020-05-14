@@ -2,6 +2,7 @@ package io.logz.apollo.websockets;
 
 import com.google.inject.Injector;
 import io.logz.apollo.configuration.ApolloConfiguration;
+import io.logz.apollo.services.SlaveService;
 import io.logz.apollo.websockets.exec.AuthenticationFilter;
 import io.logz.apollo.websockets.exec.ContainerExecEndpoint;
 import io.logz.apollo.websockets.logs.ContainerLogsEndpoint;
@@ -24,6 +25,8 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 import java.util.Arrays;
 
+import static java.util.Objects.requireNonNull;
+
 @Singleton
 public class WebSocketServer {
 
@@ -31,12 +34,14 @@ public class WebSocketServer {
 
     private final GuiceConfigurator configurator;
     private final Server server;
+    private final SlaveService slaveService;
 
     @Inject
     public WebSocketServer(ApolloConfiguration configuration, AuthenticationFilter authenticationFilter,
-                           Injector injector) {
+                           Injector injector, SlaveService slaveService) {
         this.configurator = new GuiceConfigurator(injector);
         this.server = createWebsocketServer(configuration, authenticationFilter);
+        this.slaveService = requireNonNull(slaveService);
     }
 
     private Server createWebsocketServer(ApolloConfiguration configuration, AuthenticationFilter authenticationFilter) {

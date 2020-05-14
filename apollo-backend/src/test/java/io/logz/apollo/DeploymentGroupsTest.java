@@ -27,7 +27,6 @@ import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitEnvironment;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 public class DeploymentGroupsTest {
 
     private static ApolloTestClient apolloTestClient;

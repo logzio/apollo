@@ -11,6 +11,14 @@ import java.util.Optional;
  */
 public class PermissionsValidator {
 
+    public static boolean isAllowedToExec(int serviceId, int environmentId, List<DeploymentPermission> userDeploymentPermissions, boolean isAdmin, boolean isExecAllowed) {
+
+        boolean isAllowedToDeploy = isAllowedToDeploy(serviceId, environmentId, userDeploymentPermissions);
+
+        return isAllowedToDeploy && (isAdmin || isExecAllowed);
+    }
+
+
     public static boolean isAllowedToDeploy(int serviceId, int environmentId, List<DeploymentPermission> userDeploymentPermissions) {
 
         boolean isAllowed = false;

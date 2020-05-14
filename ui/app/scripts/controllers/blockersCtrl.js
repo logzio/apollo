@@ -10,6 +10,9 @@ angular.module('apollo')
       $scope.selectedDays = [];
       $scope.timeBasedBlockerStartTime = {date: new Date()};
       $scope.timeBasedBlockerEndTime = {date: new Date()};
+      $scope.allStacks = [];
+      $scope.allAvailabilitiesWithoutDuplicates = [];
+      $scope.allBlockersAvailabilitiesList = [];
 
       $scope.toggleSelectedDay = function toggleSelectedDay(day) {
           var id = $scope.selectedDays.indexOf(day);
@@ -20,6 +23,11 @@ angular.module('apollo')
             $scope.selectedDays.push(day);
           }
       };
+
+      $scope.setBranchBlockerName = function(branchBlockerName) {
+        $scope.branchBlockerName = branchBlockerName;
+      };
+
       $scope.setBlockerTypeName = function (name) {
           $scope.blockerTypeName = name;
       };
@@ -36,6 +44,8 @@ angular.module('apollo')
           $scope.blockerName = blocker.name;
           $scope.blockerService = $scope.allServices[blocker.serviceId];
           $scope.blockerEnvironment = $scope.allEnvironments[blocker.environmentId];
+          $scope.blockerStack = $scope.allStacks[blocker.stackId];
+          $scope.blockerAvailability = $scope.allBlockersAvailabilitiesList[blocker.id];
           $scope.blockerActive = blocker.active;
 
           $scope.blockerTypeName = blocker.blockerTypeName;
@@ -84,6 +94,8 @@ angular.module('apollo')
 
           var serviceId = null;
           var environmentId = null;
+          var stackId = null;
+          var availability = $scope.blockerAvailability;
           var isActive = $scope.blockerActive;
           var blockerName = $scope.blockerName;
           var blockerTypeName = $scope.blockerTypeName;
@@ -95,6 +107,10 @@ angular.module('apollo')
 
           if ($scope.blockerEnvironment) {
               environmentId = $scope.blockerEnvironment.id;
+          }
+
+          if ($scope.blockerStack) {
+              stackId = $scope.blockerStack.id;
           }
 
           switch (blockerTypeName){
@@ -120,13 +136,13 @@ angular.module('apollo')
 
               case "branch":
                   jsonParams = {
-                      "branchName": $scope.branchBlockerName
+                      branchName: $scope.branchBlockerName
                   };
                   break;
           }
 
           if (!$scope.currentBlocker) {
-              apolloApiService.addBlocker(blockerName, environmentId, serviceId, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
+              apolloApiService.addBlocker(blockerName, environmentId, serviceId, stackId, availability, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
                   usSpinnerService.stop('blocker-spinner');
                   growl.success("Successfully added blocker " + blockerName + "!");
                   updateBlockers();
@@ -135,7 +151,7 @@ angular.module('apollo')
                   growl.error("Could not add blocker! got: " + error.statusText)
               });
           } else {
-              apolloApiService.updateBlocker($scope.currentBlocker.id, blockerName, environmentId, serviceId, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
+              apolloApiService.updateBlocker($scope.currentBlocker.id, blockerName, environmentId, serviceId, stackId, availability, isActive, blockerTypeName, JSON.stringify(jsonParams)).then(function (response) {
                   usSpinnerService.stop('blocker-spinner');
                   growl.success("Successfully updated blocker " + blockerName + "!");
                   updateBlockers();
@@ -158,8 +174,10 @@ angular.module('apollo')
           var tempEnvironment = {};
           response.data.forEach(function(environment) {
               tempEnvironment[environment.id] = environment;
+              $scope.allAvailabilitiesWithoutDuplicates[environment.id] = environment.availability;
           });
-        
+
+          $scope.allAvailabilitiesWithoutDuplicates = $scope.allAvailabilitiesWithoutDuplicates.filter((x, i, a) => a.indexOf(x) == i)
           $scope.allEnvironments = tempEnvironment;
       });
                 
@@ -172,14 +190,26 @@ angular.module('apollo')
           $scope.allServices = tempServices;
       });
 
+      apolloApiService.getAllStacks().then(function(response) {
+          var tempStacks = {};
+          response.data.forEach(function(stack) {
+            tempStacks[stack.id] = stack;
+          });
+
+        $scope.allStacks = tempStacks;
+      });
+
       function updateBlockers() {
           apolloApiService.getAllBlockers().then(function(response) {
               var tempBlockers = {};
+              var orderedAvailabilitiesByBlockersIds = [];
               response.data.forEach(function(blocker) {
                   tempBlockers[blocker.id] = blocker;
+                  orderedAvailabilitiesByBlockersIds[blocker.id] = blocker.availability;
               });
 
               $scope.allBlockers = tempBlockers;
+              $scope.allBlockersAvailabilitiesList = orderedAvailabilitiesByBlockersIds;
           });
       }
 
