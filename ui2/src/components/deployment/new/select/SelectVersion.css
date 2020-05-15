@@ -1,0 +1,18 @@
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+/* hide select all option in antd table */
+th.ant-table-selection-column{
+    visibility: hidden;
+}
+
+.select-version .shortendCommitSha, .select-version .commitDate{
+    max-width: 13%;
+}
+
+.select-version .author{
+    max-width: 20%;
+}

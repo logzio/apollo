@@ -1,0 +1,10 @@
+.ellipsis-text{
+    overflow: hidden;
+    overflow-wrap: break-word;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+div.ant-typography{
+    margin-bottom: 0;
+}

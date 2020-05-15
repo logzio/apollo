@@ -1,0 +1,41 @@
+.submit-transfer-table{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left-transfer-table{
+    min-height: 60px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.ant-transfer-list-header{
+    background-color: aliceblue;
+}
+
+.ant-transfer-list-header-title{
+    margin-right: 5px;
+    font-weight: bolder;
+}
+
+.ant-transfer-list{
+    min-width: 400px;
+    min-height: 1000px;
+}
+
+.ant-transfer-list-body-customize-wrapper{
+    height: 700px;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+@media screen and (max-width: 1700px) {
+    .ant-transfer-list-body-customize-wrapper{
+        height: 600px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+}

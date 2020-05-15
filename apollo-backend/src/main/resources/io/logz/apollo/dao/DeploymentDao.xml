@@ -97,13 +97,11 @@
         FROM deployment as dep
         INNER JOIN environment as env on dep.environment_id = env.id
         INNER JOIN service as ser on dep.service_id = ser.id
-        <if test="searchTerm != null">
-            WHERE env.name LIKE #{searchTerm}
-            OR ser.name LIKE #{searchTerm}
-            OR dep.user_email LIKE #{searchTerm}
-            OR dep.group_name LIKE #{searchTerm}
-            OR dep.deployment_message LIKE #{searchTerm}
-        </if>
+        WHERE env.name LIKE #{searchTerm}
+        OR ser.name LIKE #{searchTerm}
+        OR dep.user_email LIKE #{searchTerm}
+        OR dep.group_name LIKE #{searchTerm}
+        OR dep.deployment_message LIKE #{searchTerm}
     </sql>
 
     <select id="filterDeploymentHistoryDetails" resultType="io.logz.apollo.models.DeploymentHistoryDetails">

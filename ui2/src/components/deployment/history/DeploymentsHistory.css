@@ -1,0 +1,52 @@
+.modal-content-term{
+    width: 100%;
+}
+
+.ant-table-column-sorter{
+    visibility: hidden;
+}
+
+.id .ant-table-column-sorter{
+    visibility: visible;
+}
+
+.warning-text{
+    font-weight: bold;
+}
+
+.ant-modal-body .serviceName{
+    max-width: 25%;
+}
+
+.ant-modal-body .groupName{
+    max-width: 30%;
+}
+
+.deployments-history .environmentName{
+    max-width: 40%;
+    min-width: 12%;
+}
+
+.deployments-history .userEmail{
+    max-width: 14%;
+}
+
+.deployments-history .lastUpdate, .deployments-history .serviceName{
+    max-width: 12%;
+}
+
+.deployments-history .id, .deployments-history .actions, .deployments-history .status{
+    max-width: 8%;
+    display: flex;
+    justify-content: center;
+}
+
+@media screen and (max-width: 1700px) {
+    .deployments-history .serviceName{
+        max-width: 10%;
+    }
+
+    .deployments-history .actions, .deployments-history .status{
+        max-width: 8%;
+    }
+}

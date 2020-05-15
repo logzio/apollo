@@ -1,0 +1,10 @@
+.spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.bright .ant-spin-dot-item{
+    background-color: white;
+}

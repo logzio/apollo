@@ -1,0 +1,9 @@
+.app {
+    min-height: 100vh;
+}
+
+.app-content {
+    padding: 24px;
+    background: #fff;
+    min-height: 280px;
+}

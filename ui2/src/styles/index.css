@@ -1,0 +1,87 @@
+body {
+    margin: 0;
+    padding:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.large-title{
+    font-size: 28px;
+    font-weight: bold;
+}
+
+
+.med-title{
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.small-title{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.extra-small-title{
+    font-size: 14px;
+    font-weight: bolder;
+}
+
+.form-error {
+    color: red;
+    font-size: 14px;
+    height: 30px;
+}
+
+.ant-layout{
+    background: white;
+}
+
+.actions div{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+tbody > tr .table-action-button {
+    visibility:hidden;
+    transition: opacity 1s ease-in-out;
+}
+
+tbody > tr:hover .table-action-button {
+    visibility:visible;
+}
+
+.ant-modal-body{
+    display: flex;
+    align-items: center;
+    padding: 35px;
+}
+
+.ant-modal-footer .ant-btn[disabled]{
+    height: 32px;
+}
+
+.modal-spinner-wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+@media screen and (max-height: 1000px) {
+    .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td {
+        padding: 5px 8px;
+    }
+
+    .id{
+        max-width: 7%;
+    }
+}
