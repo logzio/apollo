@@ -121,9 +121,6 @@ public class ApolloToKubernetes {
                 additionalParams.putAll(jsonToMap(apolloDeployment.getDeploymentParams()));
             }
 
-            logger.info("Deployment yaml: {}", deploymentYaml);
-            logger.info("Deployment additionalParams: {}", additionalParams);
-
             // Convert the deployment object to fabric8 model
             Deployment deployment = getClassFromYamlWithParameters(deploymentYaml, additionalParams, Deployment.class);
 
