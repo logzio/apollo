@@ -105,6 +105,7 @@ public class KubernetesHandler {
 
         } catch (Exception e) {
             logger.error("Got exception while deploying to kubernetes deployment id {}. Leaving in its original state", deployment.getId(), e);
+            logger.error("Deployment details: serviceId - {}, environmentId - {}", deployment.getServiceId(), deployment.getEnvironmentId());
             return deployment;
         }
     }
