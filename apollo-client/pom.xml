@@ -8,7 +8,7 @@
     <parent>
         <artifactId>apollo</artifactId>
         <groupId>io.logz.apollo</groupId>
-        <version>1.0.3</version>
+        <version>1.0.4</version>
     </parent>
 
     <artifactId>apollo-client</artifactId>

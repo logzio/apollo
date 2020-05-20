@@ -128,6 +128,11 @@ public class ApolloClient {
         });
     }
 
+    public DeployableVersion getLatestDeployableVersionOnBranchBasedOnOtherDeployableVersion(String branchName, int deployableVersionId) throws ApolloClientException {
+        return genericApolloClient.getResult("/deployable-version/latest/branch/" + branchName + "/repofrom/" + deployableVersionId , new TypeReference<DeployableVersion>() {
+        });
+    }
+
     public MultiDeploymentResponseObject addDeployment(Deployment deployment) throws ApolloClientException {
         return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName(), deployment.getEmergencyDeployment());
     }
@@ -177,6 +182,12 @@ public class ApolloClient {
         return genericApolloClient.getResult("/deployment", new TypeReference<List<Deployment>>() {
         });
     }
+
+    public List<Deployment> getRunningAndJustFinishedDeployments() throws ApolloClientException {
+        return genericApolloClient.getResult("/running-and-just-finished-deployments", new TypeReference<List<Deployment>>() {
+        });
+    }
+
 
     public Group addGroup(Group group) throws ApolloClientException {
         String requestBody = Common.generateJson("name", String.valueOf(group.getName()),
