@@ -3,6 +3,7 @@ package io.logz.apollo.helpers;
 import io.logz.apollo.ApolloApplication;
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.clients.ApolloWebSocketClient;
 import io.logz.apollo.configuration.ApiConfiguration;
 import io.logz.apollo.configuration.ApolloConfiguration;
 import io.logz.apollo.configuration.DatabaseConfiguration;
@@ -13,12 +14,14 @@ import io.logz.apollo.configuration.WebsocketConfiguration;
 import io.logz.apollo.kubernetes.KubernetesMonitor;
 import io.logz.apollo.kubernetes.KubernetesHealth;
 import io.logz.apollo.scm.GithubConnector;
+import okhttp3.WebSocketListener;
 import org.apache.commons.lang3.StringUtils;
 import org.conf4j.core.ConfigurationProvider;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -30,6 +33,7 @@ public class StandaloneApollo {
     private static StandaloneApollo instance;
     private static String hostname = "localhost";
     private static String protocol = "http";
+    private static String wsProtocol = "ws";
 
     private final ApolloApplication apolloApplication;
     private final KubernetesMonitor kubernetesMonitor;
@@ -127,6 +131,14 @@ public class StandaloneApollo {
 
     public ApolloTestClient createTestClient() {
         return new ApolloTestClient(ModelsGenerator.createRegularUser(), hostname, apolloConfiguration.getApi().getPort(), protocol);
+    }
+
+    public ApolloWebSocketClient createTestWebSocketClient(WebSocketListener webSocketListener) {
+        try {
+            return new ApolloWebSocketClient(wsProtocol, hostname, apolloConfiguration.getWebsocket().getPort(), webSocketListener);
+        } catch (URISyntaxException e) {
+            throw  new RuntimeException("Could not create apollo websocket client", e);
+        }
     }
 
     public <T> T getInstance(Class<T> clazz) {

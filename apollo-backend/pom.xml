@@ -85,6 +85,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
+            <version>3.14.4</version>
         </dependency>
         <dependency>
             <groupId>org.kohsuke</groupId>
@@ -213,6 +214,12 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>3.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-ws</artifactId>
+            <version>3.4.2</version>
             <scope>test</scope>
         </dependency>
 

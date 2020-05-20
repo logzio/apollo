@@ -46,6 +46,10 @@ public class ApolloClient {
         genericApolloClient.login();
     }
 
+    public String getToken() {
+        return genericApolloClient.getToken();
+    }
+
     public List<User> getAllUsers() throws ApolloClientException {
         return genericApolloClient.getResult("/users", new TypeReference<List<User>>() {
         });
