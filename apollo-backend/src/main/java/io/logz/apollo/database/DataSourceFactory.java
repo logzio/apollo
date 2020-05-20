@@ -3,6 +3,8 @@ package io.logz.apollo.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.logz.apollo.configuration.DatabaseConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -11,6 +13,8 @@ import java.util.Properties;
  * Created by roiravhon on 11/20/16.
  */
 public class DataSourceFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataSourceFactory.class);
 
     private DataSourceFactory() {}
 
@@ -31,6 +35,8 @@ public class DataSourceFactory {
         HikariConfig hikariConfig = new HikariConfig(poolProperties);
 
         hikariConfig.addDataSourceProperty("properties", "useUnicode=true;characterEncoding=UTF-8");
+
+        logger.info("Creating connection pool with these parameters: {}, {}", poolProperties.toString(), hikariConfig.getDataSourceProperties());
 
         try {
             return new HikariDataSource(hikariConfig);
