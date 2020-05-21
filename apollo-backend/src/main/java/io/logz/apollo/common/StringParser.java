@@ -3,6 +3,7 @@ package io.logz.apollo.common;
 import com.google.common.base.Splitter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,6 +18,8 @@ public class StringParser {
     }
 
     public static Map<String, String> getQueryStringMap(String queryString) {
+        if(queryString.trim().isEmpty())
+            return Collections.emptyMap();
         return Splitter.on('&').trimResults().withKeyValueSeparator('=').split(queryString);
     }
 

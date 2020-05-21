@@ -28,6 +28,12 @@ function ApiService($q, $http){
         return $http.get(CONFIG.appUrl + 'environment/');
     };
 
+    var getAllActiveEnvironments = function() {
+        return $http.get(CONFIG.appUrl + 'environment/', {
+            params: {active: true}
+        });
+    };
+
     var getAllServices = function() {
         return $http.get(CONFIG.appUrl + 'service/');
     };
@@ -358,6 +364,7 @@ function ApiService($q, $http){
         getAllServicesStacks: getAllServicesStacks,
         getAllUsers: getAllUsers,
         getAllEnvironments: getAllEnvironments,
+        getAllActiveEnvironments: getAllActiveEnvironments,
         getAllServices: getAllServices,
         getAllDeployableVersions: getAllDeployableVersions,
         getAllGroups: getAllGroups,

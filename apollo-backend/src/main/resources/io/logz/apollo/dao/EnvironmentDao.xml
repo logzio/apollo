@@ -16,6 +16,12 @@
         FROM environment
     </select>
 
+    <select id="getAllActiveEnvironments" resultType="io.logz.apollo.models.Environment">
+        SELECT *
+        FROM environment
+        WHERE is_active = 1
+    </select>
+
     <select id="getEnvironmentsByAvailability" resultType="io.logz.apollo.models.Environment">
         SELECT *
         FROM environment
@@ -24,14 +30,32 @@
 
     <insert id="addEnvironment" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO environment
-        (name, geo_region, availability, kubernetes_master, kubernetes_token, kubernetes_ca_cert, kubernetes_namespace, service_port_coefficient, require_deployment_message, require_health_check, concurrency_limit, additional_params)
+        (name, geo_region, availability, kubernetes_master, kubernetes_token, kubernetes_ca_cert, kubernetes_namespace, service_port_coefficient, require_deployment_message, require_health_check, concurrency_limit, additional_params, is_active)
         VALUES
-        (#{name}, #{geoRegion}, #{availability}, #{kubernetesMaster}, #{kubernetesToken}, #{kubernetesCaCert}, #{kubernetesNamespace}, #{servicePortCoefficient}, #{requireDeploymentMessage}, #{requireHealthCheck}, #{concurrencyLimit}, #{additionalParams})
+        (#{name}, #{geoRegion}, #{availability}, #{kubernetesMaster}, #{kubernetesToken}, #{kubernetesCaCert}, #{kubernetesNamespace}, #{servicePortCoefficient}, #{requireDeploymentMessage}, #{requireHealthCheck}, #{concurrencyLimit}, #{additionalParams}, #{isActive})
     </insert>
 
     <update id="updateConcurrencyLimit">
         UPDATE environment SET
         concurrency_limit=#{concurrencyLimit}
+        WHERE id=#{id}
+    </update>
+
+    <update id="updateEnvironment" parameterType="io.logz.apollo.models.Environment">
+        UPDATE environment SET
+        name=#{name},
+        geo_region=#{geoRegion},
+        availability=#{availability},
+        kubernetes_master=#{kubernetesMaster},
+        kubernetes_token=#{kubernetesToken},
+        kubernetes_ca_cert=#{kubernetesCaCert},
+        kubernetes_namespace=#{kubernetesNamespace},
+        service_port_coefficient=#{servicePortCoefficient},
+        require_deployment_message=#{requireDeploymentMessage},
+        require_health_check=#{requireHealthCheck},
+        concurrency_limit=#{concurrencyLimit},
+        additional_params=#{additionalParams},
+        is_active=#{isActive}
         WHERE id=#{id}
     </update>
 

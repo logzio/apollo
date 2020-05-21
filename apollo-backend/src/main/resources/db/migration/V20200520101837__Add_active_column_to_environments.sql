@@ -1,0 +1,1 @@
+ALTER TABLE environment ADD is_active tinyint(1) DEFAULT '1';
