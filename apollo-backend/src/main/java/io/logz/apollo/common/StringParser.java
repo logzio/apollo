@@ -18,8 +18,9 @@ public class StringParser {
     }
 
     public static Map<String, String> getQueryStringMap(String queryString) {
-        if(queryString.trim().isEmpty())
+        if(queryString.trim().isEmpty()) {
             return Collections.emptyMap();
+        }
         return Splitter.on('&').trimResults().withKeyValueSeparator('=').split(queryString);
     }
 

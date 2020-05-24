@@ -2,6 +2,7 @@ package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
 import io.logz.apollo.services.BlockerService;
@@ -110,7 +111,7 @@ public class DeploymentHandler {
 
         if (!environment.getIsActive()) {
             logger.info("Environment {} is not active. Cannot deploy to this environment", environment.getName());
-            throw new ApolloDeploymentException("Cannot deploy. Target environment is not active.");
+            throw new ApolloIllegalEnvironmentException("Cannot deploy. Target environment is not active.");
         }
 
         List<DeploymentPermission> userPermissions = deploymentPermissionDao.getPermissionsByUser(userEmail);

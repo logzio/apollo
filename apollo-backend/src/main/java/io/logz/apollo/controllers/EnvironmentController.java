@@ -36,13 +36,16 @@ public class EnvironmentController {
 
     @LoggedIn
     @GET("/environment")
-    public List<Environment> getEnvironments(Req req) {
-        Map<String, String> queryStringMap = StringParser.getQueryStringMap(req.query());
-        boolean active = Boolean.parseBoolean(queryStringMap.get("active"));
+    public List<Environment> getEnvironments() {
+        return environmentDao.getAllEnvironments().stream()
+                .map(this::maskCredentials)
+                .collect(Collectors.toList());
+    }
 
-        List<Environment> environments = active ? environmentDao.getAllActiveEnvironments() :
-                environmentDao.getAllEnvironments();
-        return environments.stream()
+    @LoggedIn
+    @GET("/environment/active")
+    public List<Environment> getActiveEnvironments() {
+        return environmentDao.getAllActiveEnvironments().stream()
                 .map(this::maskCredentials)
                 .collect(Collectors.toList());
     }

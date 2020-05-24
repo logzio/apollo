@@ -29,9 +29,7 @@ function ApiService($q, $http){
     };
 
     var getAllActiveEnvironments = function() {
-        return $http.get(CONFIG.appUrl + 'environment/', {
-            params: {active: true}
-        });
+        return $http.get(CONFIG.appUrl + 'environment/active/');
     };
 
     var getAllServices = function() {

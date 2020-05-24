@@ -102,7 +102,7 @@ public class ApolloClient {
     }
 
     public List<Environment> getAllActiveEnvironments() throws ApolloClientException {
-        return genericApolloClient.getResult("/environment?active=true", new TypeReference<List<Environment>>() {
+        return genericApolloClient.getResult("/environment/active", new TypeReference<List<Environment>>() {
         });
     }
 

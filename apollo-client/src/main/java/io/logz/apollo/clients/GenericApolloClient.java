@@ -187,7 +187,7 @@ class GenericApolloClient {
     }
 
     private String getFullUrlWithToken(String url) {
-        String urlPrefix = prefix.isPresent() ? "/" + prefix.get() : "";
+        String urlPrefix = prefix.map(s -> "/" + s).orElse("");
         String tokenPrefix = url.contains("?") ? "&" : "?";
         String tokenPostfix = StringUtils.isNotBlank(token) ? "_token=" + token : "";
         return protocol + "://" + hostname + ":" + port + urlPrefix + url + tokenPrefix + tokenPostfix;

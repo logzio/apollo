@@ -55,17 +55,8 @@ public class EnvironmentTest {
         boolean found = false;
 
         // Make sure we got the correct one
-        if (environmentFromApi.isPresent()) {
-            if (environmentFromApi.get().getName().equals(testEnvironment.getName()) &&
-                    environmentFromApi.get().getGeoRegion().equals(testEnvironment.getGeoRegion()) &&
-                    environmentFromApi.get().getAvailability().equals(testEnvironment.getAvailability()) &&
-                    environmentFromApi.get().getKubernetesMaster().equals(testEnvironment.getKubernetesMaster()) &&
-                    environmentFromApi.get().getKubernetesToken().contains("*") &&
-                    environmentFromApi.get().getKubernetesNamespace().equals(testEnvironment.getKubernetesNamespace())) {
-                found = true;
-            }
-        }
-        assertThat(found).isTrue();
+        assertThat(environmentFromApi).isPresent();
+        assertEqualEnvironments(environmentFromApi.get(), testEnvironment);
     }
 
     @Test
@@ -82,10 +73,10 @@ public class EnvironmentTest {
 
         boolean foundNotActiveEnvironment = allEnvironments.stream()
                 .anyMatch(environment -> environment.getId().equals(testEnvironment.getId()));
+        assertThat(foundNotActiveEnvironment).isTrue();
+
         boolean foundActiveEnvironment = allEnvironments.stream()
                 .anyMatch(environment -> environment.getId().equals(activeTestEnvironment.getId()));
-
-        assertThat(foundNotActiveEnvironment).isTrue();
         assertThat(foundActiveEnvironment).isTrue();
 
 
@@ -97,20 +88,9 @@ public class EnvironmentTest {
         assertThat(foundNotActiveEnvironment).isFalse();
 
         // Active environment should be present in response
-        Optional<Environment> environmentFromApi = allActiveEnvironments.stream()
-                .filter(environment -> environment.getId().equals(activeTestEnvironment.getId()))
-                .findFirst();
-
-        assertThat(environmentFromApi).isPresent();
-
-        // Make sure we got the correct one
-        assertThat(environmentFromApi.get().getName()).isEqualTo(activeTestEnvironment.getName());
-        assertThat(environmentFromApi.get().getGeoRegion()).isEqualTo(activeTestEnvironment.getGeoRegion());
-        assertThat(environmentFromApi.get().getAvailability()).isEqualTo(activeTestEnvironment.getAvailability());
-        assertThat(environmentFromApi.get().getKubernetesMaster()).isEqualTo(activeTestEnvironment.getKubernetesMaster());
-        assertThat(environmentFromApi.get().getKubernetesToken()).contains("*");
-        assertThat(environmentFromApi.get().getKubernetesNamespace()).isEqualTo(activeTestEnvironment.getKubernetesNamespace());
-        assertThat(environmentFromApi.get().getIsActive()).isEqualTo(activeTestEnvironment.getIsActive());
+        foundActiveEnvironment = allActiveEnvironments.stream()
+                .anyMatch(environment -> environment.getId().equals(activeTestEnvironment.getId()));
+        assertThat(foundActiveEnvironment).isTrue();
     }
 
     @Test
@@ -120,11 +100,6 @@ public class EnvironmentTest {
 
         // Add environment
         Environment testEnvironment = createAndSubmitEnvironment(apolloTestClient);
-
-        // Check that environment is created
-        boolean foundTestEnvironment = apolloTestClient.getAllEnvironments().stream()
-                .anyMatch(environment -> environment.getId().equals(testEnvironment.getId()));
-        assertThat(foundTestEnvironment).isTrue();
 
         // Create a new environment object
         Environment newEnvironment = new Environment();
@@ -151,13 +126,17 @@ public class EnvironmentTest {
         assertThat(environmentFromApi).isPresent();
 
         // Make sure we got the correct one
-        assertThat(environmentFromApi.get().getName()).isEqualTo(newEnvironment.getName());
-        assertThat(environmentFromApi.get().getGeoRegion()).isEqualTo(newEnvironment.getGeoRegion());
-        assertThat(environmentFromApi.get().getAvailability()).isEqualTo(newEnvironment.getAvailability());
-        assertThat(environmentFromApi.get().getKubernetesMaster()).isEqualTo(newEnvironment.getKubernetesMaster());
-        assertThat(environmentFromApi.get().getKubernetesToken()).contains("*");
-        assertThat(environmentFromApi.get().getKubernetesNamespace()).isEqualTo(newEnvironment.getKubernetesNamespace());
-        assertThat(environmentFromApi.get().getConcurrencyLimit()).isEqualTo(newEnvironment.getConcurrencyLimit());
-        assertThat(environmentFromApi.get().getIsActive()).isEqualTo(newEnvironment.getIsActive());
+        assertEqualEnvironments(environmentFromApi.get(), newEnvironment);
+    }
+
+    private void assertEqualEnvironments(Environment first, Environment second) {
+        assertThat(first.getName()).isEqualTo(second.getName());
+        assertThat(first.getGeoRegion()).isEqualTo(second.getGeoRegion());
+        assertThat(first.getAvailability()).isEqualTo(second.getAvailability());
+        assertThat(first.getKubernetesMaster()).isEqualTo(second.getKubernetesMaster());
+        assertThat(first.getKubernetesToken()).contains("*");
+        assertThat(first.getKubernetesNamespace()).isEqualTo(second.getKubernetesNamespace());
+        assertThat(first.getConcurrencyLimit()).isEqualTo(second.getConcurrencyLimit());
+        assertThat(first.getIsActive()).isEqualTo(second.getIsActive());
     }
 }
