@@ -40,7 +40,7 @@ public class ModelsGenerator {
     public static int DEFAULT_SCALING_FACTOR = 3;
     private static int DEFAULT_CONCURRENCY_LIMIT = KubernetesMonitor.MINIMUM_CONCURRENCY_LIMIT - 1;
 
-    public static Environment createEnvironment(String additionalParams, int concurrencyLimit, String availability) {
+    public static Environment createEnvironment(String additionalParams, int concurrencyLimit, String availability, boolean isActive) {
         Environment testEnvironment = new Environment();
         testEnvironment.setName("env-name-" + Common.randomStr(5));
         testEnvironment.setGeoRegion("us-east-" + Common.randomStr(5));
@@ -52,6 +52,7 @@ public class ModelsGenerator {
         testEnvironment.setRequireDeploymentMessage(true);
         testEnvironment.setConcurrencyLimit(concurrencyLimit);
         testEnvironment.setAdditionalParams(additionalParams);
+        testEnvironment.setIsActive(isActive);
 
         return testEnvironment;
     }
@@ -61,33 +62,37 @@ public class ModelsGenerator {
     }
 
     public static Environment createEnvironment(String additionalParams) {
-        return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
+        return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability(), true);
     }
 
     public static Environment createEnvironment() {
         return createEnvironment(null);
     }
 
-    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams, int concurrencyLimit, String availability) throws ApolloClientException {
-        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams, concurrencyLimit, availability);
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams, int concurrencyLimit, String availability, boolean isActive) throws ApolloClientException {
+        Environment testEnvironment = ModelsGenerator.createEnvironment(additionalParams, concurrencyLimit, availability, isActive);
         testEnvironment.setId(apolloTestClient.addEnvironment(testEnvironment).getId());
         return testEnvironment;
     }
 
     public static Environment createAndSubmitEnvironment(String availability, ApolloTestClient apolloTestClient) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, availability);
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, availability, true);
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, String additionalParams) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
+        return createAndSubmitEnvironment(apolloTestClient, additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability(), true);
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, int concurrencyLimit) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, null, concurrencyLimit, generateRandomAvailability());
+        return createAndSubmitEnvironment(apolloTestClient, null, concurrencyLimit, generateRandomAvailability(), true);
     }
 
     public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient) throws ApolloClientException {
-        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability());
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability(), true);
+    }
+
+    public static Environment createAndSubmitEnvironment(ApolloTestClient apolloTestClient, boolean isActive) throws ApolloClientException {
+        return createAndSubmitEnvironment(apolloTestClient, null, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability(), isActive);
     }
 
     public static Service createService(boolean isPartOfGroup) {

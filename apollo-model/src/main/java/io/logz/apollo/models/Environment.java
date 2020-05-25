@@ -18,6 +18,7 @@ public class Environment {
     private Boolean requireHealthCheck;
     private Integer concurrencyLimit;
     private String additionalParams;
+    private Boolean isActive;
 
     public Environment() {
 
@@ -125,5 +126,13 @@ public class Environment {
 
     public void setAdditionalParams(String additionalParams) {
         this.additionalParams = additionalParams;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
     }
 }

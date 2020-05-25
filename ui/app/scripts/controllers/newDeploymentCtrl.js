@@ -636,7 +636,7 @@ angular.module('apollo')
             return $scope.allDeployableVersions.filter(function(a){return a.gitCommitSha === sha})[0].id;
         }
 
-        apolloApiService.getAllEnvironments()
+        apolloApiService.getAllActiveEnvironments()
          .then(parseAllEnvironments)
          .then(() => {
 		     apolloApiService.getAllEnvironmentsStacks().then(function(response) {

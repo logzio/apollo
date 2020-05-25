@@ -17,6 +17,7 @@ import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.Service;
+import org.assertj.core.api.AbstractThrowableAssert;
 import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,11 +25,12 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Optional;
 
+import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitEnvironment;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitService;
-import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Created by roiravhon on 1/5/17.
@@ -208,5 +210,19 @@ public class DeploymentTest {
                 RealDeploymentGenerator.DEFAULT_SERVICE_LABLE_KEY, serviceValue);
         Fabric8TestMethods.assertIngressLabelExists(apolloToKubernetes.getKubernetesIngress(),
                 RealDeploymentGenerator.DEFAULT_INGRESS_LABLE_KEY, ingressValue);
+    }
+
+    @Test
+    public void testDeploymentToInactiveEnvironment() throws Exception {
+        Environment inactiveEnvironment = createAndSubmitEnvironment(apolloTestClient, false);
+        Service service = createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, service);
+
+        AbstractThrowableAssert<?, ? extends Throwable> throwableAssert = assertThatThrownBy(
+                () -> createAndSubmitDeployment(apolloTestClient, inactiveEnvironment, service, deployableVersion)
+        );
+
+        throwableAssert.isInstanceOf(Exception.class);
+        throwableAssert.hasMessage("Cannot deploy. Target environment is not active.");
     }
 }

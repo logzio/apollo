@@ -2,6 +2,7 @@ package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
 import io.logz.apollo.services.BlockerService;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.rapidoid.http.Req;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
@@ -44,9 +46,9 @@ public class DeploymentHandler {
 
     @Inject
     public DeploymentHandler(KubernetesHandlerStore kubernetesHandlerStore,
-                                DeploymentPermissionDao deploymentPermissionDao, EnvironmentDao environmentDao,
-                                DeploymentDao deploymentDao, ServiceDao serviceDao, LockService lockService,
-                                BlockerService blockerService) {
+                             DeploymentPermissionDao deploymentPermissionDao, EnvironmentDao environmentDao,
+                             DeploymentDao deploymentDao, ServiceDao serviceDao, LockService lockService,
+                             BlockerService blockerService) {
         this.kubernetesHandlerStore = requireNonNull(kubernetesHandlerStore);
         this.deploymentPermissionDao = requireNonNull(deploymentPermissionDao);
         this.environmentDao = requireNonNull(environmentDao);
@@ -66,7 +68,7 @@ public class DeploymentHandler {
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Req req) throws ApolloDeploymentException {
-        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, false  , req);
+        return addDeployment(environmentId, serviceId, deployableVersionId, deploymentMessage, groupName, group, false, req);
     }
 
     public Deployment addDeployment(int environmentId, int serviceId, int deployableVersionId, String deploymentMessage, String groupName, Optional<Group> group, Boolean isEmergencyDeployment, Req req) throws ApolloDeploymentException {
@@ -78,9 +80,9 @@ public class DeploymentHandler {
             isEmergencyDeployment = false;
         }
 
+        Environment environment = environmentDao.getEnvironment(environmentId);
         try {
             // Get the current commit sha from kubernetes so we can revert if necessary
-            Environment environment = environmentDao.getEnvironment(environmentId);
             Service service = serviceDao.getService(serviceId);
             KubernetesDeploymentStatus kubernetesDeploymentStatus;
 
@@ -106,6 +108,11 @@ public class DeploymentHandler {
         MDC.put("isEmergencyDeployment", String.valueOf(isEmergencyDeployment));
 
         logger.info("Got request for a new deployment");
+
+        if (!environment.getIsActive()) {
+            logger.info("Environment {} is not active. Cannot deploy to this environment", environment.getName());
+            throw new ApolloIllegalEnvironmentException("Cannot deploy. Target environment is not active.");
+        }
 
         List<DeploymentPermission> userPermissions = deploymentPermissionDao.getPermissionsByUser(userEmail);
         if (!PermissionsValidator.isAllowedToDeploy(serviceId, environmentId, userPermissions)) {
