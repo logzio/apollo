@@ -63,9 +63,31 @@ public class ApolloClient {
                 "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
                 "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()),
                 "concurrencyLimit", String.valueOf(environment.getConcurrencyLimit()),
-                "additionalParams", environment.getAdditionalParams());
+                "additionalParams", environment.getAdditionalParams(),
+                "isActive", String.valueOf(environment.getIsActive()));
 
         return genericApolloClient.postAndGetResult("/environment", requestBody, new TypeReference<Environment>() {
+        });
+    }
+
+    public Environment updateEnvironment(Environment environment) throws ApolloClientException {
+        String requestBody = Common.generateJson(
+                "id", String.valueOf(environment.getId()),
+                "name", environment.getName(),
+                "geoRegion", environment.getGeoRegion(),
+                "availability", environment.getAvailability(),
+                "kubernetesMaster", environment.getKubernetesMaster(),
+                "kubernetesToken", environment.getKubernetesToken(),
+                "kubernetesCaCert", environment.getKubernetesCaCert(),
+                "kubernetesNamespace", environment.getKubernetesNamespace(),
+                "servicePortCoefficient", String.valueOf(environment.getServicePortCoefficient()),
+                "requireDeploymentMessage", String.valueOf(environment.getRequireDeploymentMessage()),
+                "requiresHealthCheck", String.valueOf(environment.getRequireHealthCheck()),
+                "concurrencyLimit", String.valueOf(environment.getConcurrencyLimit()),
+                "additionalParams", environment.getAdditionalParams(),
+                "isActive", String.valueOf(environment.getIsActive()));
+
+        return genericApolloClient.putAndGetResult("/environment", requestBody, new TypeReference<Environment>() {
         });
     }
 
@@ -76,6 +98,11 @@ public class ApolloClient {
 
     public List<Environment> getAllEnvironments() throws ApolloClientException {
         return genericApolloClient.getResult("/environment", new TypeReference<List<Environment>>() {
+        });
+    }
+
+    public List<Environment> getAllActiveEnvironments() throws ApolloClientException {
+        return genericApolloClient.getResult("/environment/active", new TypeReference<List<Environment>>() {
         });
     }
 
@@ -128,6 +155,11 @@ public class ApolloClient {
         });
     }
 
+    public DeployableVersion getLatestDeployableVersionOnBranchBasedOnOtherDeployableVersion(String branchName, int deployableVersionId) throws ApolloClientException {
+        return genericApolloClient.getResult("/deployable-version/latest/branch/" + branchName + "/repofrom/" + deployableVersionId , new TypeReference<DeployableVersion>() {
+        });
+    }
+
     public MultiDeploymentResponseObject addDeployment(Deployment deployment) throws ApolloClientException {
         return addDeployment(String.valueOf(deployment.getEnvironmentId()), String.valueOf(deployment.getServiceId()), deployment.getDeployableVersionId(), deployment.getGroupName(), deployment.getEmergencyDeployment());
     }
@@ -177,6 +209,12 @@ public class ApolloClient {
         return genericApolloClient.getResult("/deployment", new TypeReference<List<Deployment>>() {
         });
     }
+
+    public List<Deployment> getRunningAndJustFinishedDeployments() throws ApolloClientException {
+        return genericApolloClient.getResult("/running-and-just-finished-deployments", new TypeReference<List<Deployment>>() {
+        });
+    }
+
 
     public Group addGroup(Group group) throws ApolloClientException {
         String requestBody = Common.generateJson("name", String.valueOf(group.getName()),

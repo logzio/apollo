@@ -30,6 +30,7 @@ public class StandaloneApollo {
     private static StandaloneApollo instance;
     private static String hostname = "localhost";
     private static String protocol = "http";
+    private static final String DATA_SOURCE_CLASS_NAME = "org.mariadb.jdbc.MariaDbDataSource";
 
     private final ApolloApplication apolloApplication;
     private final KubernetesMonitor kubernetesMonitor;
@@ -50,7 +51,8 @@ public class StandaloneApollo {
                 apolloMySQL.getContainerIpAddress(),
                 apolloMySQL.getUsername(),
                 apolloMySQL.getPassword(),
-                apolloMySQL.getSchema()
+                apolloMySQL.getSchema(),
+                DATA_SOURCE_CLASS_NAME
         );
 
         apolloConfiguration = createApolloConfiguration(null, false, "", false);

@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static io.logz.apollo.models.Deployment.DeploymentStatus.CANCELING;
+import static io.logz.apollo.models.Deployment.DeploymentStatus.PENDING_CANCELLATION;
+
 /**
  * Created by roiravhon on 1/31/17.
  */
@@ -24,12 +27,17 @@ public class DeploymentLabelsTransformer implements BaseDeploymentTransformer {
                                 io.logz.apollo.models.DeployableVersion apolloDeployableVersion,
                                 io.logz.apollo.models.Group group) {
 
+        String gitCommitSha = apolloDeployableVersion.getGitCommitSha();
+        if (apolloDeployment.getStatus().equals(PENDING_CANCELLATION) || apolloDeployment.getStatus().equals(CANCELING)) {
+            gitCommitSha = apolloDeployment.getSourceVersion();
+        }
+
         Map<String, String> desiredLabels = ImmutableMap.<String, String> builder()
                 .put("environment", LabelsNormalizer.normalize(apolloEnvironment.getName()))
                 .put("geo_region", LabelsNormalizer.normalize(apolloEnvironment.getGeoRegion()))
                 .put("service", LabelsNormalizer.normalize(apolloService.getName()))
                 .put("availability", LabelsNormalizer.normalize(apolloEnvironment.getAvailability()))
-                .put(ApolloToKubernetes.getApolloCommitShaKey(), LabelsNormalizer.normalize(apolloDeployableVersion.getGitCommitSha()))
+                .put(ApolloToKubernetes.getApolloCommitShaKey(), LabelsNormalizer.normalize(gitCommitSha))
                 .put(ApolloToKubernetes.getApolloDeploymentUniqueIdentifierKey(),
                         ApolloToKubernetes.getApolloDeploymentUniqueIdentifierValue(apolloEnvironment, apolloService, Optional.ofNullable(apolloDeployment.getGroupName())))
                 .build();

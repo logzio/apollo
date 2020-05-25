@@ -105,7 +105,7 @@ public class SlaveService {
                                                               <= apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 2)
                                                       .map(Slave::getEnvironmentId)
                                                       .collect(Collectors.toList());
-            return environmentDao.getAllEnvironments()
+            return environmentDao.getAllActiveEnvironments()
                                                   .stream()
                                                   .map(Environment::getId)
                                                   .filter(id -> !ownedEnvironments.contains(id))

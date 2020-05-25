@@ -72,7 +72,7 @@ public class KubernetesHealth {
     }
 
     private void monitorHealth() {
-        environmentDao.getAllEnvironments().forEach(environment -> {
+        environmentDao.getAllActiveEnvironments().forEach(environment -> {
             if(environment.getRequireHealthCheck()) {
                 KubernetesHandler kubernetesHandler = kubernetesHandlerStore.getOrCreateKubernetesHandler(environment);
                 environmentsHealthMap.put(environment.getId(), kubernetesHandler.isEnvironmentHealthy());
