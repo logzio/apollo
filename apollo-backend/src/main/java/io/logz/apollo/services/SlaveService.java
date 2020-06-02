@@ -33,6 +33,7 @@ public class SlaveService {
 
     private final String slaveId;
     private final ScheduledExecutorService keepaliveExecutorService;
+    private final ScheduledExecutorService cleanupUnusedSlavesExecutorService;
     private final Boolean isSlave;
     private final Set<Integer> environmentIds;
     private final ApolloConfiguration apolloConfiguration;
@@ -59,13 +60,18 @@ public class SlaveService {
         keepaliveExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder()
                                             .namingPattern("slave-keepalive-pinger")
                                             .build());
+
+        cleanupUnusedSlavesExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder()
+                                                      .namingPattern("cleanup-unused-slaves-service")
+                                                      .build());
     }
 
     @PostConstruct
     public void start() {
         logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, apolloConfiguration.getSlave().getSlaveCsvEnvironments());
 
-        cleanupUnusedSlaves();
+        cleanupUnusedSlavesExecutorService.scheduleWithFixedDelay(this::cleanupUnusedSlaves,
+                0, 5, TimeUnit.MINUTES);
 
         if (isSlave && isStarted.compareAndSet(false, true)) {
             claimSlaveEnvironments();
