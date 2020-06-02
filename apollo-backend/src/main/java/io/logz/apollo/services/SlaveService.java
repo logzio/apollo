@@ -39,6 +39,7 @@ public class SlaveService {
     private final ApolloConfiguration apolloConfiguration;
     private final SlaveDao slaveDao;
     private final EnvironmentDao environmentDao;
+    private final static int CLEANUP_SLAVES_INTERVAL_IN_MINUTES = 5;
 
     private AtomicBoolean isStarted = new AtomicBoolean(false);
 
@@ -71,7 +72,7 @@ public class SlaveService {
         logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, apolloConfiguration.getSlave().getSlaveCsvEnvironments());
 
         cleanupUnusedSlavesExecutorService.scheduleWithFixedDelay(this::cleanupUnusedSlaves,
-                0, 5, TimeUnit.MINUTES);
+                0, CLEANUP_SLAVES_INTERVAL_IN_MINUTES, TimeUnit.MINUTES);
 
         if (isSlave && isStarted.compareAndSet(false, true)) {
             claimSlaveEnvironments();
