@@ -7,6 +7,7 @@ import org.testcontainers.containers.MySQLContainer;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.TimeZone;
 
 /**
  * Created by roiravhon on 11/23/16.
@@ -17,6 +18,7 @@ public class ApolloMySQL {
     private final MySQLContainer mysql;
 
     public ApolloMySQL() throws SQLException, IOException, ScriptException {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         // Create mysql instance
         logger.info("Starting MySQL container");

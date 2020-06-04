@@ -13,15 +13,18 @@ import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.DeploymentHistoryDetails;
 import io.logz.apollo.models.DeploymentHistory;
+import io.logz.apollo.services.CancelDeploymentService;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
+import org.rapidoid.annotation.PUT;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
@@ -41,13 +44,16 @@ public class DeploymentController {
     private final DeploymentDao deploymentDao;
     private final DeployableVersionDao deployableVersionDao;
     private final LockService lockService;
+    private final CancelDeploymentService cancelDeploymentService;
     private final DeploymentHandler deploymentHandler;
 
     @Inject
-    public DeploymentController(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, LockService lockService, DeploymentHandler deploymentHandler) {
+    public DeploymentController(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, LockService lockService,
+                                CancelDeploymentService cancelDeploymentService, DeploymentHandler deploymentHandler) {
         this.deploymentDao = requireNonNull(deploymentDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.lockService = requireNonNull(lockService);
+        this.cancelDeploymentService = requireNonNull(cancelDeploymentService);
         this.deploymentHandler = requireNonNull(deploymentHandler);
     }
 
@@ -185,6 +191,27 @@ public class DeploymentController {
             assignJsonResponseToReq(req, HttpStatus.CREATED, deploymentHistory);
         } catch (NumberFormatException e) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @LoggedIn
+    @PUT("/cancel-deployment")
+    public void cancelExpiredDeployment(String id, Req req) {
+        Deployment deployment = deploymentDao.getDeployment(Integer.parseInt(id));
+        switch (deployment.getStatus()) {
+            case PENDING:
+            case PENDING_CANCELLATION:
+            case STARTED:
+            case CANCELING:
+                if (cancelDeploymentService.isDeploymentHasExpired(deployment)) {
+                    deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.CANCELED);
+                    assignJsonResponseToReq(req, HttpStatus.OK, deploymentDao.getDeployment(Integer.parseInt(id)));
+                    return;
+                }
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST,"Please be patient, the time has not expired yet");
+                return;
+            default:
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Deployment is not stuck");
         }
     }
 
