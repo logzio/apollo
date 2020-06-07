@@ -4,18 +4,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DeploymentConfiguration {
-    private int timeoutInSeconds;
+    private int forceCancelTimeoutSeconds;
 
     @JsonCreator
-    public DeploymentConfiguration(@JsonProperty("timeoutInSeconds") int timeoutInSeconds) {
-        this.timeoutInSeconds = timeoutInSeconds;
+    public DeploymentConfiguration(@JsonProperty("timeoutInSeconds") int forceCancelTimeoutSeconds) {
+        this.forceCancelTimeoutSeconds = forceCancelTimeoutSeconds;
     }
 
-    public int getTimeoutInSeconds() {
-        return timeoutInSeconds;
+    public int getForceCancelTimeoutSeconds() {
+        return forceCancelTimeoutSeconds;
     }
 
-    public void setTimeoutInSeconds(int timeoutInSeconds) {
-        this.timeoutInSeconds = timeoutInSeconds;
+    public void setForceCancelTimeoutSeconds(int forceCancelTimeoutSeconds) {
+        this.forceCancelTimeoutSeconds = forceCancelTimeoutSeconds;
     }
 }

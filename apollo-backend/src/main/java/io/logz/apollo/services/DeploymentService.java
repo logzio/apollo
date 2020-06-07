@@ -56,7 +56,7 @@ public class DeploymentService {
     }
 
     public boolean isCancelable(Deployment deployment) {
-        return getTimeDiffFromNowInMinutes(deployment.getStartedAt()) >= deploymentConfiguration.getTimeoutInSeconds();
+        return getTimeDiffFromNowInMinutes(deployment.getStartedAt()) >= deploymentConfiguration.getForceCancelTimeoutSeconds();
     }
 
     private long getTimeDiffFromNowInMinutes(Date date) {

@@ -241,7 +241,7 @@ public class DeploymentTest {
                 .isInstanceOf(Exception.class)
                 .hasMessageContaining("Please be patient, the time has not expired yet");
 
-        int timeoutInSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getCancelDeployment().getTimeoutInSeconds();
+        int timeoutInSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getCancelDeployment().getForceCancelTimeoutSeconds();
 
         Common.waitABit(timeoutInSeconds+1);
         //Canceling an expired deployment that passed the timeout
