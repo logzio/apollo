@@ -2,7 +2,6 @@ package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.configuration.ApolloConfiguration;
-import io.logz.apollo.configuration.CancelDeploymentConfiguration;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
@@ -25,12 +24,8 @@ import org.json.JSONObject;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.sql.Time;
-import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
@@ -236,29 +231,26 @@ public class DeploymentTest {
     }
 
     @Test
-    public void tesIsDeploymentShouldBeCanceled() throws Exception {
+    public void testShouldDeploymentBeCanceled() throws Exception {
         DeploymentDao deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
 
-        TimeUnit timeUnit = standaloneApollo.getInstance(ApolloConfiguration.class).getCancelDeployment().getTimeUnit();
-        int timeout = standaloneApollo.getInstance(ApolloConfiguration.class).getCancelDeployment().getTimeout();
-
-        Deployment expiredDeployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient);
-
-        Common.waitABit((int)TimeUnit.SECONDS.convert(timeout, timeUnit)+1);
-        //Canceling an expired deployment that passed the timeout
-        expiredDeployment = apolloTestClient.cancelDeployment(expiredDeployment);
-        assertThat(expiredDeployment.getStatus()).isEqualTo(CANCELED);
-
         Deployment deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient);
+        int id = deployment.getId();
         //Canceling a deployment that didn't passed the timeout
-        assertThatThrownBy(() -> apolloTestClient.cancelDeployment(deploymentDao.getDeployment(deployment.getId())))
+        assertThatThrownBy(() -> apolloTestClient.cancelDeployment(deploymentDao.getDeployment(id)))
                 .isInstanceOf(Exception.class)
                 .hasMessageContaining("Please be patient, the time has not expired yet");
 
-        Deployment doneDeployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient);
-        deploymentDao.updateDeploymentStatus(doneDeployment.getId(), DONE);
+        int timeoutInSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getCancelDeployment().getTimeoutInSeconds();
+
+        Common.waitABit(timeoutInSeconds+1);
+        //Canceling an expired deployment that passed the timeout
+        deployment = apolloTestClient.cancelDeployment(deployment);
+        assertThat(deployment.getStatus()).isEqualTo(CANCELED);
+
+        deploymentDao.updateDeploymentStatus(deployment.getId(), DONE);
         //Canceling a deployment in a deterministic state
-        assertThatThrownBy(() -> apolloTestClient.cancelDeployment(deploymentDao.getDeployment(doneDeployment.getId())))
+        assertThatThrownBy(() -> apolloTestClient.cancelDeployment(deploymentDao.getDeployment(id)))
                 .isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is not stuck");
     }

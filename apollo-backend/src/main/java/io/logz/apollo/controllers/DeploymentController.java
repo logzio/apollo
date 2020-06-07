@@ -1,19 +1,19 @@
 package io.logz.apollo.controllers;
 
 import com.google.common.base.Splitter;
-import io.logz.apollo.database.OrderDirection;
-import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.LockService;
 import io.logz.apollo.common.HttpStatus;
-import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeployableVersionDao;
+import io.logz.apollo.dao.DeploymentDao;
+import io.logz.apollo.database.OrderDirection;
+import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.excpetions.ApolloDeploymentException;
-import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.DeploymentHistoryDetails;
 import io.logz.apollo.models.DeploymentHistory;
-import io.logz.apollo.services.CancelDeploymentService;
+import io.logz.apollo.models.DeploymentHistoryDetails;
+import io.logz.apollo.models.MultiDeploymentResponseObject;
+import io.logz.apollo.services.DeploymentService;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.DELETE;
 import org.rapidoid.annotation.GET;
@@ -44,16 +44,16 @@ public class DeploymentController {
     private final DeploymentDao deploymentDao;
     private final DeployableVersionDao deployableVersionDao;
     private final LockService lockService;
-    private final CancelDeploymentService cancelDeploymentService;
+    private final DeploymentService deploymentService;
     private final DeploymentHandler deploymentHandler;
 
     @Inject
     public DeploymentController(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, LockService lockService,
-                                CancelDeploymentService cancelDeploymentService, DeploymentHandler deploymentHandler) {
+                                DeploymentService deploymentService, DeploymentHandler deploymentHandler) {
         this.deploymentDao = requireNonNull(deploymentDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.lockService = requireNonNull(lockService);
-        this.cancelDeploymentService = requireNonNull(cancelDeploymentService);
+        this.deploymentService = requireNonNull(deploymentService);
         this.deploymentHandler = requireNonNull(deploymentHandler);
     }
 
@@ -195,7 +195,7 @@ public class DeploymentController {
     }
 
     @LoggedIn
-    @PUT("/cancel-deployment")
+    @PUT("/force-cancel")
     public void cancelExpiredDeployment(String id, Req req) {
         Deployment deployment = deploymentDao.getDeployment(Integer.parseInt(id));
         switch (deployment.getStatus()) {
@@ -203,7 +203,7 @@ public class DeploymentController {
             case PENDING_CANCELLATION:
             case STARTED:
             case CANCELING:
-                if (cancelDeploymentService.isDeploymentHasExpired(deployment)) {
+                if (deploymentService.isCancelable(deployment)) {
                     deploymentDao.updateDeploymentStatus(deployment.getId(), Deployment.DeploymentStatus.CANCELED);
                     assignJsonResponseToReq(req, HttpStatus.OK, deploymentDao.getDeployment(Integer.parseInt(id)));
                     return;

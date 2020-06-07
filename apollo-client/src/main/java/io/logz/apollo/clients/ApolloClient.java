@@ -452,7 +452,7 @@ public class ApolloClient {
     public Deployment cancelDeployment(Deployment deployment) throws Exception {
         String requestBody = Common.generateJson(
                 "id", String.valueOf(deployment.getId()));
-        return genericApolloClient.putAndGetResult("/cancel-deployment", requestBody, new TypeReference<Deployment>() {
+        return genericApolloClient.putAndGetResult("/force-cancel", requestBody, new TypeReference<Deployment>() {
         });
     }
 
