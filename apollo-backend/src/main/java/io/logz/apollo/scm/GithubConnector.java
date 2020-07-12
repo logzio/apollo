@@ -6,6 +6,8 @@ import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.PagedIterable;
+import org.kohsuke.github.PagedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +74,17 @@ public class GithubConnector {
     public Optional<String> getLatestCommitShaOnBranch(String githubRepo, String branchName) {
         try {
             return Optional.of(gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1());
+        } catch (Exception e) {
+            logger.warn("Could not get latest commit on branch from Github!", e);
+            return Optional.empty();
+        }
+    }
+
+    public Optional<String> getPreviousCommitShaOnBranch(String githubRepo) {
+        try {
+            PagedIterator<GHCommit> iterator = gitHub.getRepository(githubRepo).listCommits().iterator();
+            iterator.next();
+            return Optional.of(iterator.next().getSHA1());
         } catch (Exception e) {
             logger.warn("Could not get latest commit on branch from Github!", e);
             return Optional.empty();

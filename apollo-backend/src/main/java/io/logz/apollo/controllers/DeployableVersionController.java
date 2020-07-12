@@ -100,6 +100,12 @@ public class DeployableVersionController {
         DeployableVersion deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestSha.get(),
                 referenceDeployableVersion.getServiceId());
 
+        if (deployableVersionFromSha == null && branchName.equals("master")) {
+            Optional<String> previousCommitShaOnBranch = githubConnector.getPreviousCommitShaOnBranch(actualRepo);
+            deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(previousCommitShaOnBranch.get(),
+                    referenceDeployableVersion.getServiceId());
+        }
+
         if (deployableVersionFromSha == null) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestSha);
             throw new RuntimeException();
