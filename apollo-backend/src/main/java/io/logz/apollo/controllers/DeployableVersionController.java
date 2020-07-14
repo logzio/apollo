@@ -39,6 +39,7 @@ public class DeployableVersionController {
 
     public static int MAX_COMMIT_FIELDS_LENGTH = 1000;
     public static int MAX_COMMIT_MESSAGE_LENGTH = 10000;
+    private static int MAX_GET_LAST_COMMIT_COUNT = 5;
     public static String UNKNOWN_COMMIT_FIELD = "Unknown";
 
     @Inject
@@ -100,10 +101,12 @@ public class DeployableVersionController {
         DeployableVersion deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestSha.get(),
                 referenceDeployableVersion.getServiceId());
 
-        if (deployableVersionFromSha == null && branchName.equals("master")) {
+        int i = 0;
+        while (deployableVersionFromSha == null && branchName.equals("master") && i < MAX_GET_LAST_COMMIT_COUNT) {
             Optional<String> previousCommitShaOnBranch = githubConnector.getPreviousCommitShaOnBranch(actualRepo);
             deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(previousCommitShaOnBranch.get(),
                     referenceDeployableVersion.getServiceId());
+            i++;
         }
 
         if (deployableVersionFromSha == null) {
