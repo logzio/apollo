@@ -101,12 +101,18 @@ public class DeployableVersionController {
         DeployableVersion deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestSha.get(),
                 referenceDeployableVersion.getServiceId());
 
-        int i = 0;
-        while (deployableVersionFromSha == null && branchName.equals("master") && i < MAX_GET_LAST_COMMIT_COUNT) {
-            Optional<String> previousCommitShaOnBranch = githubConnector.getPreviousCommitShaOnBranch(actualRepo);
-            deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(previousCommitShaOnBranch.get(),
-                    referenceDeployableVersion.getServiceId());
-            i++;
+        if (deployableVersionFromSha == null && branchName.equals("master")) {
+            List<Optional<String>> previousCommitShaOnBranch = githubConnector.getPreviousCommitsShaOnBranch(actualRepo, MAX_GET_LAST_COMMIT_COUNT);
+            for (Optional<String> commit : previousCommitShaOnBranch) {
+                if (commit.isPresent()) {
+                    if (deployableVersionFromSha == null) {
+                        deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(commit.get(),
+                                referenceDeployableVersion.getServiceId());
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
 
         if (deployableVersionFromSha == null) {
