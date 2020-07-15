@@ -86,6 +86,7 @@ public class SlaveService {
     public void stop() {
         if (isStarted.compareAndSet(true, false)) {
             keepaliveExecutorService.shutdownNow();
+            cleanupUnusedSlavesExecutorService.shutdownNow();
             slaveDao.removeAllSlavesById(slaveId);
         }
     }
