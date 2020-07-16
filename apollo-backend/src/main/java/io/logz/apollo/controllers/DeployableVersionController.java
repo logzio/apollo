@@ -91,36 +91,25 @@ public class DeployableVersionController {
         DeployableVersion referenceDeployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
         String actualRepo = getRepoNameFromRepositoryUrl(referenceDeployableVersion.getGithubRepositoryUrl());
 
-        Optional<String> latestSha = githubConnector.getLatestCommitShaOnBranch(actualRepo, branchName);
+        List<String> latestCommitsShaOnBranch = githubConnector.getLatestCommitsShaOnBranch(actualRepo, branchName, MAX_GET_LAST_COMMIT_COUNT);
+        DeployableVersion deployableVersionFromSha = null;
 
-        if (!latestSha.isPresent()) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found latest commit on that branch");
-            throw new RuntimeException();
-        }
-
-        DeployableVersion deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestSha.get(),
-                referenceDeployableVersion.getServiceId());
-
-        if (deployableVersionFromSha == null && branchName.equals("master")) {
-            List<Optional<String>> previousCommitShaOnBranch = githubConnector.getPreviousCommitsShaOnBranch(actualRepo, MAX_GET_LAST_COMMIT_COUNT);
-            for (Optional<String> commit : previousCommitShaOnBranch) {
-                if (commit.isPresent()) {
-                    if (deployableVersionFromSha == null) {
-                        deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(commit.get(),
-                                referenceDeployableVersion.getServiceId());
-                    } else {
-                        break;
-                    }
+        if (latestCommitsShaOnBranch.size() > 0) {
+            if (branchName.equals("master")) {
+                for (String commit : latestCommitsShaOnBranch) {
+                    deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(commit, referenceDeployableVersion.getServiceId());
+                    if (deployableVersionFromSha != null) break;
                 }
+            } else {
+                deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestCommitsShaOnBranch.get(0), referenceDeployableVersion.getServiceId());
             }
         }
 
-        if (deployableVersionFromSha == null) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestSha);
+        if (latestCommitsShaOnBranch.size() == 0 || deployableVersionFromSha == null) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestCommitsShaOnBranch.get(0));
             throw new RuntimeException();
-        } else {
-            return deployableVersionFromSha;
         }
+        return deployableVersionFromSha;
     }
 
     @POST("/deployable-version")

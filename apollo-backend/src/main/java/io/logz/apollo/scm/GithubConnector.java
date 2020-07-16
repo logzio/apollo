@@ -18,6 +18,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Singleton
 public class GithubConnector {
@@ -71,27 +73,25 @@ public class GithubConnector {
         }
     }
 
-    public Optional<String> getLatestCommitShaOnBranch(String githubRepo, String branchName) {
-        try {
-            return Optional.of(gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1());
-        } catch (Exception e) {
-            logger.warn("Could not get latest commit on branch from Github!", e);
-            return Optional.empty();
-        }
-    }
-
-    public List<Optional<String>> getPreviousCommitsShaOnBranch(String githubRepo, int size) {
-        try {
-            PagedIterator<GHCommit> iterator = gitHub.getRepository(githubRepo).listCommits().iterator();
-            iterator.next();
-            List<Optional<String>> commits = new ArrayList<>();
-            for (int i = 0; i < size; i ++) {
-                commits.add(Optional.of(iterator.next().getSHA1()));
+    public List<String> getLatestCommitsShaOnBranch(String githubRepo, String branchName, int commitsAmount) {
+        if (branchName.equals("master")) {
+            try {
+                PagedIterator<GHCommit> iterator = gitHub.getRepository(githubRepo).listCommits().iterator();
+                List<String> commits = new ArrayList<>();
+                for (int i = 0; i < commitsAmount; i ++) {
+                    commits.add(iterator.next().getSHA1());
+                }
+                return commits;
+            } catch (Exception e) {
+                logger.warn("Could not get latest commit on branch from Github!", e);
+                return new ArrayList<>();
             }
-            return commits;
+        }
+        try {
+           return Stream.of(gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1()).collect(Collectors.toList());
         } catch (Exception e) {
             logger.warn("Could not get latest commit on branch from Github!", e);
-            return null;
+            return new ArrayList<>();
         }
     }
 
