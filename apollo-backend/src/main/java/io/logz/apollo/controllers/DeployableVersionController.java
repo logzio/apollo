@@ -14,6 +14,7 @@ import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
+import org.rapidoid.util.D;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
@@ -91,25 +92,35 @@ public class DeployableVersionController {
         DeployableVersion referenceDeployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
         String actualRepo = getRepoNameFromRepositoryUrl(referenceDeployableVersion.getGithubRepositoryUrl());
 
-        List<String> latestCommitsShaOnBranch = githubConnector.getLatestCommitsShaOnBranch(actualRepo, branchName, MAX_GET_LAST_COMMIT_COUNT);
-        DeployableVersion deployableVersionFromSha = null;
+        DeployableVersion latestDeployableVersionOnBranch = getLatestDeployableVersionOnBranch(branchName, actualRepo, referenceDeployableVersion.getServiceId());
 
-        if (latestCommitsShaOnBranch.size() > 0) {
-            if (branchName.equals("master")) {
-                for (String commit : latestCommitsShaOnBranch) {
-                    deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(commit, referenceDeployableVersion.getServiceId());
-                    if (deployableVersionFromSha != null) break;
-                }
-            } else {
-                deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestCommitsShaOnBranch.get(0), referenceDeployableVersion.getServiceId());
-            }
-        }
-
-        if (latestCommitsShaOnBranch.size() == 0 || deployableVersionFromSha == null) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestCommitsShaOnBranch.get(0));
+        if (latestDeployableVersionOnBranch == null) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestDeployableVersionOnBranch.getGitCommitSha());
             throw new RuntimeException();
         }
+        return latestDeployableVersionOnBranch;
+    }
+
+    private DeployableVersion getLatestDeployableVersionOnBranch(String branchName, String repo, int serviceId) {
+        if (branchName.equals("master")) {
+            return getMasterLastSuccessfulDeployableVersion(repo, serviceId);
+        }
+        return getLatestDeployableVersionOnOtherBranch(repo, branchName,serviceId);
+    }
+
+    private DeployableVersion getMasterLastSuccessfulDeployableVersion(String repo, int serviceId) {
+        DeployableVersion deployableVersionFromSha = null;
+        List<String> latestCommitsShaOnBranch = githubConnector.getLatestCommitsShaOnMaster(repo, MAX_GET_LAST_COMMIT_COUNT);
+
+        for (String commit : latestCommitsShaOnBranch) {
+            deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(commit, serviceId);
+            if (deployableVersionFromSha != null) break;
+        }
         return deployableVersionFromSha;
+    }
+
+    private DeployableVersion getLatestDeployableVersionOnOtherBranch(String repo, String branchName, int serviceId) {
+        return deployableVersionDao.getDeployableVersionFromSha(githubConnector.getLatestCommitShaOnBranch(repo, branchName), serviceId);
     }
 
     @POST("/deployable-version")

@@ -73,25 +73,26 @@ public class GithubConnector {
         }
     }
 
-    public List<String> getLatestCommitsShaOnBranch(String githubRepo, String branchName, int commitsAmount) {
-        if (branchName.equals("master")) {
-            try {
-                PagedIterator<GHCommit> iterator = gitHub.getRepository(githubRepo).listCommits().iterator();
-                List<String> commits = new ArrayList<>();
-                for (int i = 0; i < commitsAmount; i ++) {
-                    commits.add(iterator.next().getSHA1());
-                }
-                return commits;
-            } catch (Exception e) {
-                logger.warn("Could not get latest commit on branch from Github!", e);
-                return new ArrayList<>();
-            }
-        }
+    public List<String> getLatestCommitsShaOnMaster(String githubRepo, int commitsAmount) {
         try {
-           return Stream.of(gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1()).collect(Collectors.toList());
+            PagedIterator<GHCommit> iterator = gitHub.getRepository(githubRepo).listCommits().iterator();
+            List<String> commits = new ArrayList<>();
+            for (int i = 0; i < commitsAmount; i ++) {
+                commits.add(iterator.next().getSHA1());
+            }
+            return commits;
         } catch (Exception e) {
             logger.warn("Could not get latest commit on branch from Github!", e);
             return new ArrayList<>();
+        }
+    }
+
+    public String getLatestCommitShaOnBranch(String githubRepo, String branchName) {
+        try {
+            return gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1();
+        } catch (Exception e) {
+            logger.warn("Could not get latest commit on branch from Github!", e);
+            return "";
         }
     }
 
