@@ -80,7 +80,7 @@ public class GithubConnector {
             }
             return commits;
         } catch (Exception e) {
-            logger.warn("Could not get latest commit on branch from Github!", e);
+            logger.warn("Could not get latest commit on master branch of {} from Github!", githubRepo, e);
             return new ArrayList<>();
         }
     }
@@ -89,7 +89,7 @@ public class GithubConnector {
         try {
             return gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1();
         } catch (Exception e) {
-            logger.warn("Could not get latest commit on branch from Github!", e);
+            logger.warn("Could not get latest commit on {} branch of {} from Github!", branchName, githubRepo, e);
             return "";
         }
     }

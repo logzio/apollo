@@ -14,7 +14,6 @@ import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.POST;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
-import org.rapidoid.util.D;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;
