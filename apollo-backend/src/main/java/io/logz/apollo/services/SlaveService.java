@@ -71,8 +71,10 @@ public class SlaveService {
     public void start() {
         logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, apolloConfiguration.getSlave().getSlaveCsvEnvironments());
 
-        cleanupUnusedSlavesExecutorService.scheduleWithFixedDelay(this::cleanupUnusedSlaves,
-                0, CLEANUP_SLAVES_INTERVAL_IN_MINUTES, TimeUnit.MINUTES);
+        if(!isSlave) {
+            cleanupUnusedSlavesExecutorService.scheduleWithFixedDelay(this::cleanupUnusedSlaves,
+                    0, CLEANUP_SLAVES_INTERVAL_IN_MINUTES, TimeUnit.MINUTES);
+        }
 
         if (isSlave && isStarted.compareAndSet(false, true)) {
             claimSlaveEnvironments();
@@ -156,6 +158,9 @@ public class SlaveService {
     private void cleanupUnusedSlaves() {
         slaveDao.getAllSlaves().stream().filter(slave -> slave.getSecondsSinceLastKeepalive() >=
                 apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 4)
-                .forEach(slave -> slaveDao.removeEnvironmentFromSlave(slave.getSlaveId(), slave.getEnvironmentId()));
+                .forEach(slave -> {
+                    logger.info("Removing environment {} from slave {}", slave.getEnvironmentId(), slave.getSlaveId());
+                    slaveDao.removeEnvironmentFromSlave(slave.getSlaveId(), slave.getEnvironmentId());
+                });
     }
 }
