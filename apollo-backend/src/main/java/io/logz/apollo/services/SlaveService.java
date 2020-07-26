@@ -71,7 +71,7 @@ public class SlaveService {
     public void start() {
         logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, apolloConfiguration.getSlave().getSlaveCsvEnvironments());
 
-        if(!isSlave) {
+        if (!isSlave) {
             cleanupUnusedSlavesExecutorService.scheduleWithFixedDelay(this::cleanupUnusedSlaves,
                     0, CLEANUP_SLAVES_INTERVAL_IN_MINUTES, TimeUnit.MINUTES);
         }
