@@ -125,16 +125,22 @@ public class BlockerService {
             serviceToCheck = blocker.getServiceId();
         }
 
+        logger.info("ShapLog: Blocker name {}", blocker.getName());
         if (blocker.getStackId() != null) {
             switch (blockerInjectableCommons.getStackService().getStackType(blocker.getStackId())) {
                 case ENVIRONMENTS:
                     if (blockerInjectableCommons.getStackService().getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
                         environmentToCheck = deployment.getEnvironmentId();
+                    } else {
+                        return false;
                     }
                     break;
                 case SERVICES:
-                    if (blockerInjectableCommons.getStackService().getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
+                    List<Integer> servicesIdList = blockerInjectableCommons.getStackService().getServicesStack(blocker.getStackId()).getServices();
+                    if (servicesIdList.stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
                         serviceToCheck = deployment.getServiceId();
+                    } else {
+                        return false;
                     }
                     break;
             }
@@ -172,6 +178,7 @@ public class BlockerService {
             return true;
         }
 
+        ///////HERE!!!!/////
         if (serviceToCheck == null && environmentToCheck.equals(deployment.getEnvironmentId())) {
             return true;
         }
