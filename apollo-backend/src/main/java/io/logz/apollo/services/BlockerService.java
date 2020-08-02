@@ -118,6 +118,7 @@ public class BlockerService {
             return false;
         }
 
+
         Integer environmentToCheck = null;
         Integer serviceToCheck = null;
 
@@ -129,7 +130,6 @@ public class BlockerService {
             serviceToCheck = blocker.getServiceId();
         }
 
-        logger.info("ShapLog: Blocker name {}", blocker.getName());
         if (blocker.getStackId() != null) {
             switch (blockerInjectableCommons.getStackService().getStackType(blocker.getStackId())) {
                 case ENVIRONMENTS:
@@ -156,8 +156,6 @@ public class BlockerService {
         if (!blocker.getActive()) {
             return false;
         }
-
-
 
         if (environmentToCheck == null && serviceToCheck == null && blocker.getAvailability() == null) {
             return true;
