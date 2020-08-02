@@ -118,7 +118,6 @@ public class BlockerService {
             return false;
         }
 
-
         Integer environmentToCheck = null;
         Integer serviceToCheck = null;
 
