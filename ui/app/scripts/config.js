@@ -7,3 +7,4 @@ var CONFIG = {
         hawtioUrl: 'http://localhost:8080/'
 //        hawtioUrl: document.location.protocol + "//" + document.location.host + "/hawtio/"
     };
+
