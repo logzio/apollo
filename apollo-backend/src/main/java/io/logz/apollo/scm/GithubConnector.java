@@ -6,12 +6,14 @@ import org.kohsuke.github.GHCommit;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.PagedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -69,12 +71,26 @@ public class GithubConnector {
         }
     }
 
-    public Optional<String> getLatestCommitShaOnBranch(String githubRepo, String branchName) {
+    public List<String> getLatestCommitsShaOnMaster(String githubRepo, int commitsAmount) {
         try {
-            return Optional.of(gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1());
+            PagedIterator<GHCommit> iterator = gitHub.getRepository(githubRepo).listCommits().iterator();
+            List<String> commits = new ArrayList<>();
+            for (int i = 0; i < commitsAmount; i ++) {
+                commits.add(iterator.next().getSHA1());
+            }
+            return commits;
         } catch (Exception e) {
-            logger.warn("Could not get latest commit on branch from Github!", e);
-            return Optional.empty();
+            logger.warn("Could not get latest commit on master branch of {} from Github!", githubRepo, e);
+            return new ArrayList<>();
+        }
+    }
+
+    public String getLatestCommitShaOnBranch(String githubRepo, String branchName) {
+        try {
+            return gitHub.getRepository(githubRepo).getBranch(branchName).getSHA1();
+        } catch (Exception e) {
+            logger.warn("Could not get latest commit on {} branch of {} from Github!", branchName, githubRepo, e);
+            return "";
         }
     }
 
