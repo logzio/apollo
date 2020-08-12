@@ -249,6 +249,10 @@ public class ApolloClient {
         });
     }
 
+    public void deleteGroup(int id) throws IOException {
+        genericApolloClient.delete("/group/" + id);
+    }
+
     public Group updateScalingFactor(int groupId, int scalingFactor) throws ApolloClientException {
         String requestBody = Common.generateJson("id", String.valueOf(groupId), "scalingFactor", String.valueOf(scalingFactor));
         return genericApolloClient.putAndGetResult("/scaling/" + groupId, requestBody, new TypeReference<Group>() {

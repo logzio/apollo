@@ -39,6 +39,7 @@ public class DeployableVersionController {
 
     public static int MAX_COMMIT_FIELDS_LENGTH = 1000;
     public static int MAX_COMMIT_MESSAGE_LENGTH = 10000;
+    private static int MAX_GET_LAST_COMMIT_COUNT = 5;
     public static String UNKNOWN_COMMIT_FIELD = "Unknown";
 
     @Inject
@@ -90,22 +91,35 @@ public class DeployableVersionController {
         DeployableVersion referenceDeployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
         String actualRepo = getRepoNameFromRepositoryUrl(referenceDeployableVersion.getGithubRepositoryUrl());
 
-        Optional<String> latestSha = githubConnector.getLatestCommitShaOnBranch(actualRepo, branchName);
+        DeployableVersion latestDeployableVersionOnBranch = getLatestDeployableVersionOnBranch(branchName, actualRepo, referenceDeployableVersion.getServiceId());
 
-        if (!latestSha.isPresent()) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found latest commit on that branch");
+        if (latestDeployableVersionOnBranch == null) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestDeployableVersionOnBranch.getGitCommitSha());
             throw new RuntimeException();
         }
+        return latestDeployableVersionOnBranch;
+    }
 
-        DeployableVersion deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(latestSha.get(),
-                referenceDeployableVersion.getServiceId());
-
-        if (deployableVersionFromSha == null) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "Did not found deployable version matching the sha " + latestSha);
-            throw new RuntimeException();
-        } else {
-            return deployableVersionFromSha;
+    private DeployableVersion getLatestDeployableVersionOnBranch(String branchName, String repo, int serviceId) {
+        if (branchName.equals("master")) {
+            return getMasterLastSuccessfulDeployableVersion(repo, serviceId);
         }
+        return getLatestDeployableVersionOnOtherBranch(repo, branchName,serviceId);
+    }
+
+    private DeployableVersion getMasterLastSuccessfulDeployableVersion(String repo, int serviceId) {
+        DeployableVersion deployableVersionFromSha = null;
+        List<String> latestCommitsShaOnBranch = githubConnector.getLatestCommitsShaOnMaster(repo, MAX_GET_LAST_COMMIT_COUNT);
+
+        for (String commit : latestCommitsShaOnBranch) {
+            deployableVersionFromSha = deployableVersionDao.getDeployableVersionFromSha(commit, serviceId);
+            if (deployableVersionFromSha != null) break;
+        }
+        return deployableVersionFromSha;
+    }
+
+    private DeployableVersion getLatestDeployableVersionOnOtherBranch(String repo, String branchName, int serviceId) {
+        return deployableVersionDao.getDeployableVersionFromSha(githubConnector.getLatestCommitShaOnBranch(repo, branchName), serviceId);
     }
 
     @POST("/deployable-version")

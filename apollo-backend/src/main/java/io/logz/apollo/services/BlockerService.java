@@ -114,6 +114,10 @@ public class BlockerService {
 
     @SuppressWarnings("RedundantIfStatement")
     private boolean isBlockerInScope(Blocker blocker, Deployment deployment) {
+        if (isUserAllowedToOverride(deployment, blocker)) {
+            return false;
+        }
+
         Integer environmentToCheck = null;
         Integer serviceToCheck = null;
 
@@ -130,11 +134,15 @@ public class BlockerService {
                 case ENVIRONMENTS:
                     if (blockerInjectableCommons.getStackService().getEnvironmentsStack(blocker.getStackId()).getEnvironments().stream().anyMatch(environmentId -> environmentId == deployment.getEnvironmentId())) {
                         environmentToCheck = deployment.getEnvironmentId();
+                    } else {
+                        return false;
                     }
                     break;
                 case SERVICES:
                     if (blockerInjectableCommons.getStackService().getServicesStack(blocker.getStackId()).getServices().stream().anyMatch(serviceId -> serviceId == deployment.getServiceId())) {
                         serviceToCheck = deployment.getServiceId();
+                    } else {
+                        return false;
                     }
                     break;
             }
@@ -145,10 +153,6 @@ public class BlockerService {
         }
 
         if (!blocker.getActive()) {
-            return false;
-        }
-
-        if (isUserAllowedToOverride(deployment, blocker)) {
             return false;
         }
 

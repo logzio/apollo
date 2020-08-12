@@ -33,11 +33,13 @@ public class SlaveService {
 
     private final String slaveId;
     private final ScheduledExecutorService keepaliveExecutorService;
+    private final ScheduledExecutorService cleanupUnusedSlavesExecutorService;
     private final Boolean isSlave;
     private final Set<Integer> environmentIds;
     private final ApolloConfiguration apolloConfiguration;
     private final SlaveDao slaveDao;
     private final EnvironmentDao environmentDao;
+    private final static int CLEANUP_SLAVES_INTERVAL_IN_MINUTES = 5;
 
     private AtomicBoolean isStarted = new AtomicBoolean(false);
 
@@ -59,13 +61,20 @@ public class SlaveService {
         keepaliveExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder()
                                             .namingPattern("slave-keepalive-pinger")
                                             .build());
+
+        cleanupUnusedSlavesExecutorService = Executors.newSingleThreadScheduledExecutor(new BasicThreadFactory.Builder()
+                                                      .namingPattern("cleanup-unused-slaves-service")
+                                                      .build());
     }
 
     @PostConstruct
     public void start() {
         logger.info("Starting slave.. slaveId - {}, environmentIds - {}", slaveId, apolloConfiguration.getSlave().getSlaveCsvEnvironments());
 
-        cleanupUnusedSlaves();
+        if (!isSlave) {
+            cleanupUnusedSlavesExecutorService.scheduleWithFixedDelay(this::cleanupUnusedSlaves,
+                    0, CLEANUP_SLAVES_INTERVAL_IN_MINUTES, TimeUnit.MINUTES);
+        }
 
         if (isSlave && isStarted.compareAndSet(false, true)) {
             claimSlaveEnvironments();
@@ -79,6 +88,7 @@ public class SlaveService {
     public void stop() {
         if (isStarted.compareAndSet(true, false)) {
             keepaliveExecutorService.shutdownNow();
+            cleanupUnusedSlavesExecutorService.shutdownNow();
             slaveDao.removeAllSlavesById(slaveId);
         }
     }
@@ -148,6 +158,9 @@ public class SlaveService {
     private void cleanupUnusedSlaves() {
         slaveDao.getAllSlaves().stream().filter(slave -> slave.getSecondsSinceLastKeepalive() >=
                 apolloConfiguration.getSlave().getKeepaliveIntervalSeconds() * 4)
-                .forEach(slave -> slaveDao.removeEnvironmentFromSlave(slave.getSlaveId(), slave.getEnvironmentId()));
+                .forEach(slave -> {
+                    logger.info("Removing environment {} from slave {}", slave.getEnvironmentId(), slave.getSlaveId());
+                    slaveDao.removeEnvironmentFromSlave(slave.getSlaveId(), slave.getEnvironmentId());
+                });
     }
 }

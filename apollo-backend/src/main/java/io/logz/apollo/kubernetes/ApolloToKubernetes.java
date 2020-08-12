@@ -1,11 +1,11 @@
 package io.logz.apollo.kubernetes;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.extensions.Ingress;
 import io.logz.apollo.common.Encryptor;
 import io.logz.apollo.dao.DeploymentDao;
@@ -13,6 +13,7 @@ import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.excpetions.ApolloParseException;
 import io.logz.apollo.notifications.mustache.TemplateInjector;
 import io.logz.apollo.transformers.LabelsNormalizer;
+import io.logz.apollo.transformers.deployment.AppsDeploymentTranformer;
 import io.logz.apollo.transformers.deployment.BaseDeploymentTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentEnvironmentVariableTransformer;
 import io.logz.apollo.transformers.deployment.DeploymentImageNameTransformer;
@@ -24,16 +25,18 @@ import io.logz.apollo.transformers.ingress.IngressLabelTransformer;
 import io.logz.apollo.transformers.service.BaseServiceTransformer;
 import io.logz.apollo.transformers.service.ServiceLabelTransformer;
 import io.logz.apollo.transformers.service.ServiceNodePortCoefficientTransformer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
-import java.util.HashMap;
 
 import static java.util.Objects.requireNonNull;
+
 /**
  * Created by roiravhon on 1/31/17.
  */
@@ -81,7 +84,8 @@ public class ApolloToKubernetes {
         deploymentTransformers = Sets.newHashSet(Arrays.asList(
                 new DeploymentImageNameTransformer(),
                 new DeploymentLabelsTransformer(),
-                new DeploymentEnvironmentVariableTransformer()
+                new DeploymentEnvironmentVariableTransformer(),
+                new AppsDeploymentTranformer()
         ));
 
         if (apolloService.getIsPartOfGroup() != null && apolloService.getIsPartOfGroup()) {
@@ -143,7 +147,7 @@ public class ApolloToKubernetes {
             apolloDeployment = deploymentDao.getDeployment(apolloDeployment.getId());
 
             // Services are allowed to be null
-            if (apolloService.getServiceYaml() == null) {
+            if (StringUtils.isBlank(apolloService.getServiceYaml())) {
                 return null;
             }
 
@@ -170,7 +174,7 @@ public class ApolloToKubernetes {
             apolloDeployment = deploymentDao.getDeployment(apolloDeployment.getId());
 
             // Ingress are allowed to be null
-            if (apolloService.getIngressYaml() == null) {
+            if (StringUtils.isBlank(apolloService.getIngressYaml())) {
                 return null;
             }
 
@@ -215,7 +219,7 @@ public class ApolloToKubernetes {
     }
 
     public static String getApolloServiceUniqueIdentifier(io.logz.apollo.models.Environment apolloEnvironment,
-                                                           io.logz.apollo.models.Service apolloService, Optional<String> groupName) {
+                                                          io.logz.apollo.models.Service apolloService, Optional<String> groupName) {
         return getApolloUniqueIdentifierWithPrefix(apolloEnvironment, apolloService, groupName, "service");
     }
 
@@ -225,7 +229,7 @@ public class ApolloToKubernetes {
     }
 
     public static String getApolloPodUniqueIdentifier(io.logz.apollo.models.Environment apolloEnvironment,
-                                                          io.logz.apollo.models.Service apolloService, Optional<String> groupName) {
+                                                      io.logz.apollo.models.Service apolloService, Optional<String> groupName) {
         return getApolloUniqueIdentifierWithPrefix(apolloEnvironment, apolloService, groupName, "pod");
     }
 
@@ -261,6 +265,7 @@ public class ApolloToKubernetes {
             return new HashMap<>();
         }
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(deploymentParams, new TypeReference<HashMap<String, String>>() {});
+        return mapper.readValue(deploymentParams, new TypeReference<HashMap<String, String>>() {
+        });
     }
 }
