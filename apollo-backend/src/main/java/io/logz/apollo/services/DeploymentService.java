@@ -36,7 +36,7 @@ public class DeploymentService {
         this.serviceDao = requireNonNull(serviceDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.environmentDao = requireNonNull(environmentDao);
-        deploymentConfiguration = requireNonNull(apolloConfiguration).getCancelDeployment();
+        this.deploymentConfiguration = requireNonNull(apolloConfiguration).getCancelDeployment();
     }
 
     public void logDeploymentDescription(Deployment deployment) {
@@ -56,10 +56,10 @@ public class DeploymentService {
     }
 
     public boolean isCancelable(Deployment deployment) {
-        return getTimeDiffFromNowInMinutes(deployment.getStartedAt()) >= deploymentConfiguration.getForceCancelTimeoutSeconds();
+        return getTimeDiffFromNowInSeconds(deployment.getStartedAt()) >= deploymentConfiguration.getForceCancelTimeoutSeconds();
     }
 
-    private long getTimeDiffFromNowInMinutes(Date date) {
+    private long getTimeDiffFromNowInSeconds(Date date) {
         return Duration.between(date.toInstant(), new Date().toInstant()).getSeconds();
     }
 }
