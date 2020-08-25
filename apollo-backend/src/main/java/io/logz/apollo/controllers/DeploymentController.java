@@ -7,6 +7,7 @@ import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.database.OrderDirection;
 import io.logz.apollo.deployment.DeploymentHandler;
+import io.logz.apollo.excpetions.ApolloDeploymentDoesntExistException;
 import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
@@ -196,8 +197,12 @@ public class DeploymentController {
 
     @LoggedIn
     @PUT("/force-cancel")
-    public void cancelExpiredDeployment(String id, Req req) {
+    public void cancelExpiredDeployment(String id, Req req) throws ApolloDeploymentDoesntExistException {
         Deployment deployment = deploymentDao.getDeployment(Integer.parseInt(id));
+        if (deployment == null) {
+            logger.error("Cannot cancel deployment, deployment id {} doesn't exist", id);
+            throw new ApolloDeploymentDoesntExistException("Cannot cancel deployment, deployment id " + id + " doesn't exist");
+        }
         switch (deployment.getStatus()) {
             case PENDING:
             case PENDING_CANCELLATION:
