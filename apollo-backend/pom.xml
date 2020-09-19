@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.kohsuke</groupId>
             <artifactId>github-api</artifactId>
-            <version>1.92</version>
+            <version>1.99</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>io.fabric8</groupId>
             <artifactId>kubernetes-client</artifactId>
-            <version>4.3.0</version>
+            <version>4.6.2</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-server-mock -->
         <dependency>
