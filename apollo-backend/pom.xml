@@ -145,7 +145,7 @@
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>javax-websocket-server-impl</artifactId>
-            <version>9.4.5.v20170502</version>
+            <version>9.4.30.v20200611</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
