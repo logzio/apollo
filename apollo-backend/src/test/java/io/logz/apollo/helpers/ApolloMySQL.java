@@ -13,6 +13,17 @@ import java.sql.SQLException;
  */
 public class ApolloMySQL {
 
+    class ApolloMySQLContainer extends MySQLContainer{
+
+        public ApolloMySQLContainer(String mySqlDockerImage) {
+            super(mySqlDockerImage);
+        }
+
+        public String getDriverClassName() {
+            return "org.mariadb.jdbc.Driver";
+        }
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(ApolloMySQL.class);
     private final MySQLContainer mysql;
 
@@ -20,7 +31,7 @@ public class ApolloMySQL {
 
         // Create mysql instance
         logger.info("Starting MySQL container");
-        mysql = new MySQLContainer("mysql:5.7.22");
+        mysql = new ApolloMySQLContainer("mysql:5.7.22");
         mysql.start();
     }
 

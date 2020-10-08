@@ -102,8 +102,18 @@
         </dependency>
         <dependency>
             <groupId>org.rapidoid</groupId>
-            <artifactId>rapidoid-quick</artifactId>
+            <artifactId>rapidoid-web</artifactId>
             <version>5.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>4.3.11.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>4.3.11.Final</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
