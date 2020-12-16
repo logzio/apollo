@@ -11,6 +11,8 @@ import org.rapidoid.annotation.POST;
 import org.rapidoid.annotation.PUT;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -22,6 +24,7 @@ import static java.util.Objects.requireNonNull;
 @Controller
 public class GroupController {
 
+    private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
     private final GroupDao groupDao;
 
     @Inject
@@ -64,9 +67,13 @@ public class GroupController {
         newGroup.setEnvironmentId(environmentId);
         newGroup.setScalingFactor(scalingFactor);
         newGroup.setJsonParams(jsonParams);
-
-        groupDao.addGroup(newGroup);
-        assignJsonResponseToReq(req, HttpStatus.CREATED, newGroup);
+        try {
+            groupDao.addGroup(newGroup);
+            assignJsonResponseToReq(req, HttpStatus.CREATED, newGroup);
+            logger.info("New group was created with id " + groupDao.getGroupByName(name).getId());
+        } catch (Exception e){
+            logger.error("Could not create new group with name {}", name, e);
+        }
     }
 
     @LoggedIn
