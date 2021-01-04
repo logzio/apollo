@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import io.logz.apollo.common.HttpStatus;
-import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.DeploymentMarker;
 import io.logz.apollo.models.DeploymentMarkers;
 import io.logz.apollo.notifications.NotificationTemplateMetadata;
