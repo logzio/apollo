@@ -7,6 +7,7 @@ import io.logz.apollo.models.Deployment;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Notification;
 import io.logz.apollo.models.Service;
+import io.logz.apollo.notifications.senders.MarkersSender;
 import io.logz.apollo.notifications.senders.NotificationSender;
 import io.logz.apollo.notifications.senders.SlackSender;
 import org.slf4j.Logger;
@@ -60,6 +61,7 @@ public class ApolloNotifications {
         notificationDao.getAllNotifications()
                 .stream()
                 .filter(notification -> isNotificationInScope(notification, deployment))
+                .filter(notification -> filterNotificationByType(notification, status))
                 .forEach(notification -> {
                     NotificationTemplateMetadata notificationTemplateMetadata = new NotificationTemplateMetadata(deployment.getLastUpdate(),
                             status.toString(), service.getName(), environment.getName(),
@@ -69,6 +71,18 @@ public class ApolloNotifications {
 
                     queue.add(notificationTemplateMetadata);
                 });
+    }
+
+    private boolean filterNotificationByType(Notification notification, Deployment.DeploymentStatus status) {
+        if (notification.getType() == Notification.NotificationType.SLACK && status == Deployment.DeploymentStatus.STARTED) {
+            return false;
+        }
+
+        if (notification.getType() == Notification.NotificationType.MARKER && status != Deployment.DeploymentStatus.STARTED) {
+            return false;
+        }
+
+        return true;
     }
 
     @PreDestroy
@@ -92,6 +106,9 @@ public class ApolloNotifications {
                 switch (notificationTemplateMetadata.getType()) {
                     case SLACK:
                         notificationSender = new SlackSender(notificationTemplateMetadata.getNotificationJsonConfiguration());
+                        break;
+                    case MARKER:
+                        notificationSender = new MarkersSender(notificationTemplateMetadata.getNotificationJsonConfiguration());
                         break;
                     default:
                         continue;
