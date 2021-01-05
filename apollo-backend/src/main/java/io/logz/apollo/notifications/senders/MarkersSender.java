@@ -21,7 +21,7 @@ public class MarkersSender implements NotificationSender {
     private static final Logger logger = LoggerFactory.getLogger(MarkersSender.class);
     private final String X_API_TOKEN_HEADER = "X-API-TOKEN";
     private final String apiToken;
-    private final String createMarkersEndpointUrl;
+    private final String markersEndpointUrl;
     private final ObjectMapper objectMapper;
     private final OkHttpClient httpClient;
 
@@ -30,12 +30,12 @@ public class MarkersSender implements NotificationSender {
         httpClient = new OkHttpClient();
         DeploymentMarkersConfiguration markersConfiguration = objectMapper.readValue(notificationJsonConfiguration, DeploymentMarkersConfiguration.class);
         this.apiToken = markersConfiguration.getApiToken();
-        this.createMarkersEndpointUrl = markersConfiguration.getCreateMarkersEndpointUrl();
+        this.markersEndpointUrl = markersConfiguration.getMarkersEndpointUrl();
     }
 
     @Override
     public boolean send(NotificationTemplateMetadata notificationTemplateMetadata) {
-        Request.Builder builder = new Request.Builder().url(this.createMarkersEndpointUrl)
+        Request.Builder builder = new Request.Builder().url(this.markersEndpointUrl)
                 .header(X_API_TOKEN_HEADER, this.apiToken);
 
         DeploymentMarkers deploymentMarkers = getDeploymentMarkers(notificationTemplateMetadata);
@@ -83,7 +83,7 @@ public class MarkersSender implements NotificationSender {
 
     public static class DeploymentMarkersConfiguration {
         private String apiToken;
-        private String createMarkersEndpointUrl;
+        private String markersEndpointUrl;
 
         public DeploymentMarkersConfiguration() {
         }
@@ -92,8 +92,8 @@ public class MarkersSender implements NotificationSender {
             return apiToken;
         }
 
-        public String getCreateMarkersEndpointUrl() {
-            return createMarkersEndpointUrl;
+        public String getMarkersEndpointUrl() {
+            return markersEndpointUrl;
         }
     }
 }
