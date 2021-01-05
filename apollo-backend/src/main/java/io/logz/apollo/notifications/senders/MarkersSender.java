@@ -22,17 +22,19 @@ public class MarkersSender implements NotificationSender {
     private final String X_API_TOKEN_HEADER = "X-API-TOKEN";
     private final String apiToken;
     private final String createMarkersEndpointUrl;
+    private final ObjectMapper objectMapper;
+    private final OkHttpClient httpClient;
 
     public MarkersSender(String notificationJsonConfiguration) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        DeploymentMarkersConfiguration markersConfiguration = mapper.readValue(notificationJsonConfiguration, DeploymentMarkersConfiguration.class);
+        objectMapper = new ObjectMapper();
+        httpClient = new OkHttpClient();
+        DeploymentMarkersConfiguration markersConfiguration = objectMapper.readValue(notificationJsonConfiguration, DeploymentMarkersConfiguration.class);
         this.apiToken = markersConfiguration.getApiToken();
         this.createMarkersEndpointUrl = markersConfiguration.getCreateMarkersEndpointUrl();
     }
 
     @Override
     public boolean send(NotificationTemplateMetadata notificationTemplateMetadata) {
-        OkHttpClient httpClient = new OkHttpClient();
         Request.Builder builder = new Request.Builder().url(this.createMarkersEndpointUrl)
                 .header(X_API_TOKEN_HEADER, this.apiToken);
 
@@ -42,7 +44,6 @@ public class MarkersSender implements NotificationSender {
     }
 
     private void executeMarkersRequest(OkHttpClient httpClient, Request.Builder builder, DeploymentMarkers deploymentMarkers) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             String markersJson = objectMapper.writeValueAsString(deploymentMarkers);
 
@@ -69,7 +70,7 @@ public class MarkersSender implements NotificationSender {
         HashMap<String, String> metadata = new HashMap<>();
         metadata.put("deployment_message", String.valueOf(deployment.getDeploymentMessage()));
         metadata.put("deployment_id", String.valueOf(deployment.getDeploymentId()));
-        metadata.put("deployment_phase", String.valueOf(deployment.getStatus()));
+        metadata.put("deployment_status", String.valueOf(deployment.getStatus()));
         metadata.put("group_name", String.valueOf(deployment.getGroupName()));
         metadata.put("service_name", String.valueOf(deployment.getServiceName()));
         metadata.put("environment_name", String.valueOf(deployment.getEnvironmentName()));

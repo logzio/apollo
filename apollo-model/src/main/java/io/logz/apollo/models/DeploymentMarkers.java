@@ -6,7 +6,6 @@ public class DeploymentMarkers {
     private List<DeploymentMarker> markers;
 
     public DeploymentMarkers() {
-
     }
 
     public List<DeploymentMarker> getMarkers() {

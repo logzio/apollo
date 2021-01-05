@@ -7,13 +7,14 @@ public class DeploymentMarker {
     private String title;
     private Map<String, String> metadata;
     private String tag = "DEPLOYMENT";
-    private String timestamp = null;
 
     public DeploymentMarker() {
 
     }
 
-    public String getDescription() { return description; }
+    public String getDescription() {
+        return description;
+    }
 
     public void setDescription(String description) {
         this.description = description;
@@ -41,13 +42,5 @@ public class DeploymentMarker {
 
     public void setTag(String tag) {
         this.tag = tag;
-    }
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
     }
 }

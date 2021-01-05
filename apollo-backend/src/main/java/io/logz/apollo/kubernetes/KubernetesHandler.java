@@ -101,6 +101,7 @@ public class KubernetesHandler {
 
             logger.info("Started deployment id {}", deployment.getId());
             deployment.setStatus(Deployment.DeploymentStatus.STARTED);
+            apolloNotifications.notify(Deployment.DeploymentStatus.STARTED, deployment);
             return deployment;
 
         } catch (Exception e) {

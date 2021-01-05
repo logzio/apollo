@@ -73,18 +73,6 @@ public class ApolloNotifications {
                 });
     }
 
-    private boolean filterNotificationByType(Notification notification, Deployment.DeploymentStatus status) {
-        if (notification.getType() == Notification.NotificationType.SLACK && status == Deployment.DeploymentStatus.STARTED) {
-            return false;
-        }
-
-        if (notification.getType() == Notification.NotificationType.MARKER && status != Deployment.DeploymentStatus.STARTED) {
-            return false;
-        }
-
-        return true;
-    }
-
     @PreDestroy
     private void close() {
         try {
@@ -152,5 +140,17 @@ public class ApolloNotifications {
             }
         }
         return false;
+    }
+
+    private boolean filterNotificationByType(Notification notification, Deployment.DeploymentStatus status) {
+        if (notification.getType() == Notification.NotificationType.SLACK && status == Deployment.DeploymentStatus.STARTED) {
+            return false;
+        }
+
+        if (notification.getType() == Notification.NotificationType.MARKER && status != Deployment.DeploymentStatus.STARTED) {
+            return false;
+        }
+
+        return true;
     }
 }

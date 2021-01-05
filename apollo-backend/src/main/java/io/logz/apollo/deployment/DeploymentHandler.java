@@ -37,7 +37,7 @@ public class DeploymentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
 
-    private ApolloNotifications apolloNotifications;
+    private final ApolloNotifications apolloNotifications;
     private final KubernetesHandlerStore kubernetesHandlerStore;
     private final DeploymentPermissionDao deploymentPermissionDao;
     private final EnvironmentDao environmentDao;
@@ -176,8 +176,6 @@ public class DeploymentHandler {
 
             logger.info("All checks passed. Running deployment");
             deploymentDao.addDeployment(newDeployment);
-
-            apolloNotifications.notify(Deployment.DeploymentStatus.STARTED, newDeployment);
 
             return newDeployment;
         } finally {
