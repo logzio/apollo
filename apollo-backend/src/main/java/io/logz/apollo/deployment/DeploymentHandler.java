@@ -1,31 +1,30 @@
 package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
-import io.logz.apollo.auth.PermissionsValidator;
 import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
+import io.logz.apollo.models.DeploymentPermission;
+import io.logz.apollo.auth.PermissionsValidator;
+import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.controllers.DeploymentController;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.excpetions.ApolloDeploymentBlockedException;
-import io.logz.apollo.excpetions.ApolloDeploymentConflictException;
-import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.excpetions.ApolloDeploymentTooManyRequestsException;
-import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
+import io.logz.apollo.excpetions.ApolloDeploymentException;
+import io.logz.apollo.excpetions.ApolloDeploymentConflictException;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
 import io.logz.apollo.models.Deployment;
-import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
-import io.logz.apollo.notifications.ApolloNotifications;
-import io.logz.apollo.services.BlockerService;
-import org.rapidoid.http.Req;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.rapidoid.http.Req;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -37,7 +36,6 @@ public class DeploymentHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
 
-    private final ApolloNotifications apolloNotifications;
     private final KubernetesHandlerStore kubernetesHandlerStore;
     private final DeploymentPermissionDao deploymentPermissionDao;
     private final EnvironmentDao environmentDao;
@@ -47,16 +45,10 @@ public class DeploymentHandler {
     private final BlockerService blockerService;
 
     @Inject
-    public DeploymentHandler(
-            ApolloNotifications apolloNotifications,
-            KubernetesHandlerStore kubernetesHandlerStore,
-            DeploymentPermissionDao deploymentPermissionDao,
-            EnvironmentDao environmentDao,
-            DeploymentDao deploymentDao,
-            ServiceDao serviceDao,
-            LockService lockService,
-            BlockerService blockerService) {
-        this.apolloNotifications = apolloNotifications;
+    public DeploymentHandler(KubernetesHandlerStore kubernetesHandlerStore,
+                             DeploymentPermissionDao deploymentPermissionDao, EnvironmentDao environmentDao,
+                             DeploymentDao deploymentDao, ServiceDao serviceDao, LockService lockService,
+                             BlockerService blockerService) {
         this.kubernetesHandlerStore = requireNonNull(kubernetesHandlerStore);
         this.deploymentPermissionDao = requireNonNull(deploymentPermissionDao);
         this.environmentDao = requireNonNull(environmentDao);
@@ -176,7 +168,6 @@ public class DeploymentHandler {
 
             logger.info("All checks passed. Running deployment");
             deploymentDao.addDeployment(newDeployment);
-
             return newDeployment;
         } finally {
             lockService.releaseLock(lockName);
