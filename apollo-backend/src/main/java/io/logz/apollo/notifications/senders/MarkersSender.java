@@ -39,11 +39,10 @@ public class MarkersSender implements NotificationSender {
                 .header(X_API_TOKEN_HEADER, this.apiToken);
 
         DeploymentMarkers deploymentMarkers = getDeploymentMarkers(notificationTemplateMetadata);
-        executeMarkersRequest(httpClient, builder, deploymentMarkers);
-        return true;
+        return executeMarkersRequest(httpClient, builder, deploymentMarkers);
     }
 
-    private void executeMarkersRequest(OkHttpClient httpClient, Request.Builder builder, DeploymentMarkers deploymentMarkers) {
+    private boolean executeMarkersRequest(OkHttpClient httpClient, Request.Builder builder, DeploymentMarkers deploymentMarkers) {
         try {
             String markersJson = objectMapper.writeValueAsString(deploymentMarkers);
 
@@ -51,6 +50,7 @@ public class MarkersSender implements NotificationSender {
             try (okhttp3.Response response = httpClient.newCall(request).execute()) {
                 if (HttpStatus.isPositive(response.code())) {
                     logger.info("successfully sent marker");
+                    return true;
                 } else {
                     logger.warn("exception while sending marker");
                 }
@@ -60,6 +60,7 @@ public class MarkersSender implements NotificationSender {
         } catch (JsonProcessingException jsonProcessingException) {
             logger.warn("Could not process json", jsonProcessingException);
         }
+        return false;
     }
 
     private DeploymentMarkers getDeploymentMarkers(NotificationTemplateMetadata deployment) {
