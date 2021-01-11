@@ -1,7 +1,6 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
-import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.helpers.StandaloneApollo;
@@ -129,7 +128,7 @@ public class NotificationsTest {
 
         StandaloneApollo.getOrCreateServer().getInstance(ApolloNotifications.class).notify(Deployment.DeploymentStatus.STARTED, deployment);
 
-        waitForReq uest(slackPath);
+        waitForRequest(slackPath);
 
         mockServerClient.verify(
                 HttpRequest.request()
