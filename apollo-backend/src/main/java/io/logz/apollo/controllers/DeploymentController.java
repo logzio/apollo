@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -96,26 +97,28 @@ public class DeploymentController {
     @LoggedIn
     @POST("/deployment")
     public void addDeployment(String environmentIdsCsv, String serviceIdsCsv, int deployableVersionId, String deploymentMessage, String groupName, Boolean isEmergencyDeployment, Req req) {
-        Iterable<String> environmentIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(environmentIdsCsv);
-        Iterable<String> serviceIds = Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(serviceIdsCsv);
+        List<Integer> environmentIds = new ArrayList<>();
+        List<Integer> serviceIds = new ArrayList<>();
+
+        try {
+            Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().splitToList(environmentIdsCsv).forEach(id -> environmentIds.add(Integer.valueOf(id)));
+            Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().splitToList(serviceIdsCsv).forEach(id -> serviceIds.add(Integer.valueOf(id)));
+        } catch (NumberFormatException e) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
+            return;
+        }
 
         MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
 
         DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
 
-        environmentIds.forEach(environmentIdString -> serviceIds.forEach(serviceIdString -> {
+        try {
+            deploymentHandler.checkDeploymentShouldBeBlockedByServiceByRegionBlocker(serviceIds, environmentIds.size());
+        } catch (ApolloDeploymentException e) {
+            responseObject.addUnsuccessful(e);
+        }
 
-            int environmentId;
-            int serviceId;
-
-            try {
-                environmentId = Integer.parseInt(environmentIdString);
-                serviceId = Integer.parseInt(serviceIdString);
-            } catch (NumberFormatException e) {
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
-                return;
-            }
-
+        environmentIds.forEach(environmentId -> serviceIds.forEach(serviceId -> {
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);
 
             if (serviceDeployableVersion == null) {

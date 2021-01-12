@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * Created by roiravhon on 6/5/17.
  */
 public class BlockerTest {
-
     private final static String APOLLO_REPO_URL = "https://github.com/logzio/apollo";
     private final static String APOLLO_FAILED_STATUS_CHECKS_COMMIT = "63b79a229defab92df685dcc4e47dd35f0518ef0";
     private final static String APOLLO_VALID_STATUS_CHECKS_COMMIT = "7e01c7e4cfddeadd49d4a4e9ed575b24e9210f4b";
@@ -135,7 +134,7 @@ public class BlockerTest {
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", blockedEnvironment, null);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, service, deployableVersion)).isInstanceOf(Exception.class)
-            .hasMessageContaining("Deployment is currently blocked");
+                .hasMessageContaining("Deployment is currently blocked");
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, okEnvironment, service, deployableVersion);
     }
@@ -173,7 +172,7 @@ public class BlockerTest {
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, null, blockedEnvironmentsStack);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, service, deployableVersion)).isInstanceOf(Exception.class)
-                                                                                                                                                    .hasMessageContaining("Deployment is currently blocked");
+                .hasMessageContaining("Deployment is currently blocked");
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, okEnvironment, service, deployableVersion);
     }
@@ -193,7 +192,7 @@ public class BlockerTest {
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, null, blockedServicesStack);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, blockedService, blockedDeployableVersion)).isInstanceOf(Exception.class)
-                                                                                                                                                    .hasMessageContaining("Deployment is currently blocked");
+                .hasMessageContaining("Deployment is currently blocked");
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, okService, okDeployableVersion);
     }
@@ -215,7 +214,7 @@ public class BlockerTest {
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, blockedService, blockedDeployableVersion)).isInstanceOf(Exception.class)
-                                                                                                                                                           .hasMessageContaining("Deployment is currently blocked");
+                .hasMessageContaining("Deployment is currently blocked");
     }
 
     @Test
@@ -233,7 +232,7 @@ public class BlockerTest {
 
         createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, null, null, availability);
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, blockedEnvironment, service, deployableVersion)).isInstanceOf(Exception.class)
-                                                                                                                                         .hasMessageContaining("Deployment is currently blocked");
+                .hasMessageContaining("Deployment is currently blocked");
     }
 
     @Test
@@ -245,7 +244,7 @@ public class BlockerTest {
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(availability, apolloTestClient);
         String errorMessage = "Trying to add invalid blocker.";
 
-        assertThatThrownBy(() -> ModelsGenerator. createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, null, availability))
+        assertThatThrownBy(() -> ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, null, null, availability))
                 .isInstanceOf(ApolloClientException.class)
                 .hasMessageContaining(errorMessage);
     }
@@ -266,10 +265,10 @@ public class BlockerTest {
         String errorMessage = "Trying to add invalid blocker. ";
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", null, service, servicesStack)).isInstanceOf(ApolloClientException.class)
-                                                                                                                                                                   .hasMessageContaining(errorMessage);
+                .hasMessageContaining(errorMessage);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitBlocker(apolloTestAdminClient, "unconditional", "{}", environment, service, servicesStack)).isInstanceOf(ApolloClientException.class)
-                                                                                                                                                                .hasMessageContaining(errorMessage);
+                .hasMessageContaining(errorMessage);
     }
 
     @Test
@@ -308,8 +307,8 @@ public class BlockerTest {
         LocalTime threeMinutesFromNow = LocalTime.now().plusMinutes(3);
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "timebased",
-                getTimeBasedBlockerJsonConfiguration(dayOfWeek, twoMinutesBeforeNow, twoMinutesFromNow),
-                environment, service);
+                                                           getTimeBasedBlockerJsonConfiguration(dayOfWeek, twoMinutesBeforeNow, twoMinutesFromNow),
+                                                           environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
@@ -339,8 +338,8 @@ public class BlockerTest {
 
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "branch",
-                getBranchBlockerJsonConfiguration("develop"),
-                environment, service);
+                                                           getBranchBlockerJsonConfiguration("develop"),
+                                                           environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, deployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
@@ -366,8 +365,8 @@ public class BlockerTest {
         List<Integer> excludedService = new ArrayList<>();
 
         BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "concurrent",
-                getConcurrencyBlockerJsonConfiguration(1, excludedService),
-                environment, null);
+                                                           getConcurrencyBlockerJsonConfiguration(1, excludedService),
+                                                           environment, null);
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, serviceA, deployableVersionA);
 
@@ -390,16 +389,16 @@ public class BlockerTest {
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
 
         DeployableVersion failedDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service,
-                APOLLO_REPO_URL, APOLLO_FAILED_STATUS_CHECKS_COMMIT);
-        
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
+                                                                                                     APOLLO_REPO_URL, APOLLO_FAILED_STATUS_CHECKS_COMMIT);
+
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus", null, environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, failedDeployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
 
         // Attempt to deploy a valid commit should work
         DeployableVersion validDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service,
-                APOLLO_REPO_URL, APOLLO_VALID_STATUS_CHECKS_COMMIT);
+                                                                                                    APOLLO_REPO_URL, APOLLO_VALID_STATUS_CHECKS_COMMIT);
 
         ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, validDeployableVersion);
     }
@@ -414,9 +413,9 @@ public class BlockerTest {
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
 
         DeployableVersion failedDeployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, service,
-                APOLLO_REPO_URL, APOLLO_FAILED_STATUS_CHECKS_COMMIT);
+                                                                                                     APOLLO_REPO_URL, APOLLO_FAILED_STATUS_CHECKS_COMMIT);
 
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus", null, environment, service);
 
         assertThatThrownBy(() -> ModelsGenerator.createAndSubmitDeployment(apolloTestClient, environment, service, failedDeployableVersion)).isInstanceOf(Exception.class)
                 .hasMessageContaining("Deployment is currently blocked");
@@ -433,7 +432,7 @@ public class BlockerTest {
 
         Environment environment = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Service service = ModelsGenerator.createAndSubmitService(apolloTestClient);
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus",null, environment, service);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "githubCommitStatus", null, environment, service);
 
         Boolean beforeActive = blocker.getActive();
         Boolean afterActive = !beforeActive;
@@ -482,7 +481,7 @@ public class BlockerTest {
         }
 
         if (exceptionEnvironmentIds != null) {
-            jsonConfiguration +=     "  \"exceptionEnvironmentIds\":" + exceptionEnvironmentIds.toString();
+            jsonConfiguration += "  \"exceptionEnvironmentIds\":" + exceptionEnvironmentIds.toString();
         }
 
         return jsonConfiguration += "}";

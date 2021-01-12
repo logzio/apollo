@@ -2,6 +2,7 @@ package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.blockers.SingleRegionBlockerResponse;
 import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
@@ -173,4 +174,27 @@ public class DeploymentHandler {
             lockService.releaseLock(lockName);
         }
     }
+
+    public void checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) throws ApolloDeploymentException {
+        SingleRegionBlockerResponse singleRegionBlockerResponse = blockerService.checkDeploymentShouldBeBlockedByServiceByRegionBlocker(serviceIds, numOfEnvironments, deploymentDao.getAllRunningDeployments());
+        if (singleRegionBlockerResponse.isShouldBlock()) {
+            logger.info("User is not allow to perform this deployment!");
+
+            String messagePrefix =" Deployment is currently blocked by '" + SingleRegionBlockerResponse.blockerName + "' blocker -";
+            String serviceName = serviceDao.getService(singleRegionBlockerResponse.getServiceId()).getName();
+
+            if (singleRegionBlockerResponse.isReqToRunOnMultipleEnvironments()) {
+                logger.warn("attempt to deploy service {} to multi environment on single request", serviceName);
+                throw new ApolloDeploymentConflictException(messagePrefix + " you can not deploy the next service on multi environments - '" +
+                                                                    singleRegionBlockerResponse.getServiceId() + "'.");
+
+            } else {
+                logger.warn("attempt to deploy service {} when the service itself in middle of running deploy", serviceName);
+                throw new ApolloDeploymentBlockedException(messagePrefix + "can not deploy " +
+                                                                   serviceName +
+                                                                   " service because the service is involve on another deployment already");
+            }
+        }
+    }
+
 }

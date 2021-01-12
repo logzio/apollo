@@ -3,7 +3,7 @@ package io.logz.apollo.blockers;
 /**
  * Created by roiravhon on 6/4/17.
  */
-public class Blocker {
+public class Blocker <T extends CrossBlockerFunction>{
 
     private final Integer id;
     private final String name;
@@ -13,10 +13,10 @@ public class Blocker {
     private final String availability;
     private final Integer stackId;
     private final Boolean isActive;
-    private final BlockerFunction blockerFunction;
+    private final T crossBlockerFunction;
 
     public Blocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId, Integer stackId, String availability,
-                   Boolean isActive, BlockerFunction blockerFunction) {
+                   Boolean isActive, T crossBlockerFunction) {
         this.id = id;
         this.name = name;
         this.typeName = typeName;
@@ -25,7 +25,7 @@ public class Blocker {
         this.stackId = stackId;
         this.availability = availability;
         this.isActive = isActive;
-        this.blockerFunction = blockerFunction;
+        this.crossBlockerFunction = crossBlockerFunction;
     }
 
     public int getId() { return id; }
@@ -54,7 +54,7 @@ public class Blocker {
         return isActive;
     }
 
-    public BlockerFunction getBlockerFunction() {
-        return blockerFunction;
+    public T getCrossBlockerFunction() {
+        return crossBlockerFunction;
     }
 }
