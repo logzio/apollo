@@ -81,9 +81,9 @@ public class SingleRegionBlockerTest {
         assertThat(apolloTestClient.addDeployment(String.valueOf(env2.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId())
                            .getUnsuccessful().get(0).getException().getMessage().contains("the service is involve on another deployment already"));
 
-        MultiDeploymentResponseObject result2 = apolloTestClient.addDeployment(String.valueOf(env3.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
-        assertThat(result2.getSuccessful().size()).isEqualTo(1);
-        assertThat(result2.getUnsuccessful().size()).isEqualTo(0);
+        result = apolloTestClient.addDeployment(String.valueOf(env3.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
+        assertThat(result.getSuccessful().size()).isEqualTo(1);
+        assertThat(result.getUnsuccessful().size()).isEqualTo(0);
 
         blocker.setActive(false);
         apolloTestAdminClient.updateBlocker(blocker);
