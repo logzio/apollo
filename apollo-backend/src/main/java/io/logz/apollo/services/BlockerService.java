@@ -205,9 +205,9 @@ public class BlockerService {
         return false;
     }
 
-    public SingleRegionBlockerResponse checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, int numOfEnvironments, List<Deployment> runningDeployments) {
+    public SingleRegionBlockerResponse checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, List<Integer> environmentIds, List<Deployment> runningDeployments) {
         for (Blocker blocker : getSingleRegionBlockers()) {
-            SingleRegionBlockerResponse singleRegionBlockerResponse = ((RequestBlockerFunction)blocker.getCrossBlockerFunction()).shouldBlock(serviceIds, numOfEnvironments, runningDeployments);
+            SingleRegionBlockerResponse singleRegionBlockerResponse = ((RequestBlockerFunction)blocker.getCrossBlockerFunction()).shouldBlock(serviceIds, environmentIds, runningDeployments, blockerInjectableCommons);
             if (singleRegionBlockerResponse.isShouldBlock()){
                 return  singleRegionBlockerResponse;
             }

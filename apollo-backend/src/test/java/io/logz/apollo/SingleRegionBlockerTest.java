@@ -31,7 +31,7 @@ public class SingleRegionBlockerTest {
         DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "singleregion", getSingleRegionBlockerConfiguration(serviceIds), null, null);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "singleregion", getSingleRegionBlockerConfiguration(serviceIds, "PROD"), null, null);
 
         Environment env1 = ModelsGenerator.createEnvironment();
         env1.setId(apolloTestClient.addEnvironment(env1).getId());
@@ -62,7 +62,7 @@ public class SingleRegionBlockerTest {
         DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "singleregion", getSingleRegionBlockerConfiguration(serviceIds), null, null);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, "singleregion", getSingleRegionBlockerConfiguration(serviceIds, "PROD"), null, null);
 
         Environment env1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
@@ -77,9 +77,10 @@ public class SingleRegionBlockerTest {
         apolloTestAdminClient.updateBlocker(blocker);
     }
 
-    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
+    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds, String availability) {
         return "{\n" +
-                "  \"serviceIds\":" + serviceIds.toString() +
+                "  \"serviceIds\":" + serviceIds.toString() + ",\n" +
+                "  \"availability\":" + availability +
                 "}";
     }
 }

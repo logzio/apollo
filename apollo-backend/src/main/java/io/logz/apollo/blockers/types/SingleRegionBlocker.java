@@ -1,6 +1,7 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
 import io.logz.apollo.blockers.RequestBlockerFunction;
 import io.logz.apollo.blockers.SingleRegionBlockerResponse;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,32 +26,38 @@ public class SingleRegionBlocker implements RequestBlockerFunction {
         singleRegionBlockerConfiguration = mapper.readValue(jsonConfiguration, SingleRegionBlockerConfiguration.class);
     }
 
-    public SingleRegionBlockerResponse shouldBlock(List<Integer> serviceIdsFromReq, int numOfEnvironments, List<Deployment> runningDeployments) {
-        Optional<Integer> exceptionServiceIdOpt = getExceptionServiceId(serviceIdsFromReq);
-        if (exceptionServiceIdOpt.isPresent()) {
-            int serviceId = exceptionServiceIdOpt.get();
-            if (numOfEnvironments > 1) {
-                return new SingleRegionBlockerResponse(true, serviceId, true);
-            } else if (isServiceRunsAlready(runningDeployments, serviceId)) {
-                return new SingleRegionBlockerResponse(true, serviceId, false);
+    public SingleRegionBlockerResponse shouldBlock(List<Integer> serviceIdsFromReq, List<Integer> environmentIdsFromReq, List<Deployment> runningDeployments, BlockerInjectableCommons blockerInjectableCommons) {
+        List<Integer> exceptionServiceIds = getExceptionServiceIds(serviceIdsFromReq);
+        if (!exceptionServiceIds.isEmpty()) {
+            if (environmentIdsFromReq.size() > 1) {
+                return new SingleRegionBlockerResponse(true, exceptionServiceIds.get(0), true);
+            }
+
+            //Checks if the current block availability is in the scope of the deployment request.
+            if (isEnvironmentInTheBlockerScope(exceptionServiceIds.get(0), blockerInjectableCommons)) {
+                //For each service we checks if the current service is running already on the blocker's scope.
+                for (Integer serviceId : exceptionServiceIds) {
+                    if (isServiceRunsAlready(runningDeployments, serviceId, blockerInjectableCommons)) {
+                        return new SingleRegionBlockerResponse(true, serviceId, false);
+                    }
+                }
             }
         }
 
         return new SingleRegionBlockerResponse(false);
     }
 
-    private Optional<Integer> getExceptionServiceId(List<Integer> serviceIds) {
-        List<Integer> result = serviceIds.stream()
+    private List<Integer> getExceptionServiceIds(List<Integer> serviceIds) {
+        return serviceIds.stream()
                 .distinct()
                 .filter(singleRegionBlockerConfiguration.getServiceIds()::contains)
                 .collect(Collectors.toList());
-
-        return Optional.ofNullable(result.get(0));
     }
 
-    private boolean isServiceRunsAlready(List<Deployment> runningDeployments, int serviceId) {
+    private boolean isServiceRunsAlready(List<Deployment> runningDeployments, int serviceId, BlockerInjectableCommons blockerInjectableCommons) {
         Optional<Deployment> deploymentOpt = runningDeployments.stream()
                 .filter(deployment -> deployment.getServiceId() == serviceId)
+                .filter(deployment -> isDeploymentInTheBlockerScope(deployment, blockerInjectableCommons))
                 .findFirst();
 
         if (deploymentOpt.isPresent()) {
@@ -62,8 +70,30 @@ public class SingleRegionBlocker implements RequestBlockerFunction {
         return false;
     }
 
+    private boolean isDeploymentInTheBlockerScope(Deployment deployment, BlockerInjectableCommons blockerInjectableCommons) {
+        return isEnvironmentInTheBlockerScope(deployment.getEnvironmentId(), blockerInjectableCommons);
+    }
+
+    private boolean isEnvironmentInTheBlockerScope(int environmentId, BlockerInjectableCommons blockerInjectableCommons) {
+        if (Objects.isNull(singleRegionBlockerConfiguration.getAvailability()))
+            return true;
+
+        return blockerInjectableCommons.getEnvironmentDao().getEnvironment(environmentId).getAvailability()
+                .equals(singleRegionBlockerConfiguration.getAvailability());
+    }
+
+
     private static class SingleRegionBlockerConfiguration {
         private List<Integer> serviceIds;
+        private String availability;
+
+        public String getAvailability() {
+            return availability;
+        }
+
+        public void setAvailability(String availability) {
+            this.availability = availability;
+        }
 
         public SingleRegionBlockerConfiguration() {
         }

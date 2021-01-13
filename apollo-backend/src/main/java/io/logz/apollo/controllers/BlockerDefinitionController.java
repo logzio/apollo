@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.BlockerDefinition;
+import io.logz.apollo.models.StackType;
 import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.BlockerDefinitionDao;
@@ -23,6 +24,7 @@ import javax.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
@@ -95,6 +97,11 @@ public class BlockerDefinitionController {
         String userEmail = req.token().get("_user").toString();
         logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
+        if ((Objects.nonNull(environmentId) || isStackEnvironmentType(stackId)) && blockerTypeName.equals("singleregion")) {
+            logger.error("Could not initiate a SingleRegionBlocker with environments");
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add invalid blocker. stackId - %s, environmentId - %s, serviceId - %s, availability - %s", stackId, environmentId, serviceId, availability));
+            return;
+        }
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
             logger.warn("Could not find proper class that annotated with {}", blockerTypeName);
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "There is no implementation for blocker with name " + blockerTypeName);
@@ -120,6 +127,13 @@ public class BlockerDefinitionController {
         blockerDefinitionDao.addBlockerDefinition(blockerDefinition);
         logger.info(String.format("Added blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.CREATED, blockerDefinition);
+    }
+
+    private boolean isStackEnvironmentType(Integer stackId) {
+        if (Objects.isNull(stackId))
+            return false;
+
+        return stackDao.getStackType(stackId) == StackType.ENVIRONMENTS;
     }
 
     @Administrator

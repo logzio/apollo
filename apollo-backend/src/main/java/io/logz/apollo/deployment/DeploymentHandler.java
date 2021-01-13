@@ -175,8 +175,8 @@ public class DeploymentHandler {
         }
     }
 
-    public void checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) throws ApolloDeploymentException {
-        SingleRegionBlockerResponse singleRegionBlockerResponse = blockerService.checkDeploymentShouldBeBlockedByServiceByRegionBlocker(serviceIds, numOfEnvironments, deploymentDao.getAllRunningDeployments());
+    public void checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, List<Integer> environmentIds) throws ApolloDeploymentException {
+        SingleRegionBlockerResponse singleRegionBlockerResponse = blockerService.checkDeploymentShouldBeBlockedByServiceByRegionBlocker(serviceIds, environmentIds, deploymentDao.getAllRunningDeployments());
         if (singleRegionBlockerResponse.isShouldBlock()) {
             logger.info("User is not allow to perform this deployment!");
 
