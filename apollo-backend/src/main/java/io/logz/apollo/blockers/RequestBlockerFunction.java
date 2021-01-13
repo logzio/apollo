@@ -5,5 +5,5 @@ import io.logz.apollo.models.Deployment;
 import java.util.List;
 
 public interface RequestBlockerFunction extends CrossBlockerFunction{
-    SingleRegionBlockerResponse shouldBlock(List<Integer> serviceIds, List<Integer> environmentIds, List<Deployment> runningDeployments, BlockerInjectableCommons blockerInjectableCommons);
+    SingleRegionBlockerResponse shouldBlock(List<Integer> serviceIds, List<Integer> environmentIds, BlockerInjectableCommons blockerInjectableCommons, String blockAvailability);
 }
