@@ -1,5 +1,6 @@
 package io.logz.apollo.blockers.types;
 
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -8,7 +9,7 @@ import io.logz.apollo.models.Deployment;
 import io.logz.apollo.scm.GithubConnector;
 import java.io.IOException;
 
-@BlockerType(name = "githubCommitStatus")
+@BlockerType(name = BlockerTypeName.GITHUB_COMMIT_STATUS)
 public class GHCommitStatusBlocker implements DeploymentBlockerFunction {
 
     @Override

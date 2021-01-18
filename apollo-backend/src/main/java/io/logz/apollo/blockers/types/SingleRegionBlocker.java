@@ -3,6 +3,7 @@ package io.logz.apollo.blockers.types;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.blockers.RequestBlockerFunction;
 import io.logz.apollo.blockers.SingleRegionBlockerResponse;
 import io.logz.apollo.models.Deployment;
@@ -15,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@BlockerType(name = "singleregion")
+@BlockerType(name = BlockerTypeName.SINGLE_REGION)
 public class SingleRegionBlocker implements RequestBlockerFunction {
     private static final Logger logger = LoggerFactory.getLogger(SingleRegionBlocker.class);
     private SingleRegionBlockerConfiguration singleRegionBlockerConfiguration;

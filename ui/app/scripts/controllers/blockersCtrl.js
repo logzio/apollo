@@ -5,7 +5,7 @@ angular.module('apollo')
                                     '$timeout', '$state', '$interval', 'growl', 'usSpinnerService',
             function (apolloApiService, $scope, $filter, $timeout, $state, $interval, growl, usSpinnerService) {
 
-      $scope.tabsIndices = ["unconditional", "timebased", "branch", "singleregion"];
+      $scope.tabsIndices = ["unconditional", "timebased", "branch", "singleRegion"];
       $scope.days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
       $scope.selectedDays = [];
       $scope.timeBasedBlockerStartTime = {date: new Date()};
@@ -118,7 +118,7 @@ angular.module('apollo')
                   jsonParams = {};
                   break;
 
-              case "singleregion":
+              case "singleRegion":
                   jsonParams = {};
                   break;
 

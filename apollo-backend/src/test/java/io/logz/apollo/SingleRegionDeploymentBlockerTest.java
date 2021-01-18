@@ -1,5 +1,6 @@
 package io.logz.apollo;
 
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.helpers.Common;
@@ -21,7 +22,6 @@ import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVe
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SingleRegionDeploymentBlockerTest {
-    private final static String BLOCK_TYPE_NAME = "singleregion";
 
     @Test
     public void testSingleRegionBlockerWithMultiEnvironmentsException() throws Exception {
@@ -32,7 +32,7 @@ public class SingleRegionDeploymentBlockerTest {
         DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BLOCK_TYPE_NAME, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, null);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, null);
 
         Environment env1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
@@ -68,7 +68,7 @@ public class SingleRegionDeploymentBlockerTest {
         env3.setId(apolloTestClient.addEnvironment(env3).getId());
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BLOCK_TYPE_NAME, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
 
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);

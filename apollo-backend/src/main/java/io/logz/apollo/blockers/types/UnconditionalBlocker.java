@@ -1,6 +1,7 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Created by roiravhon on 6/4/17.
  */
-@BlockerType(name = "unconditional")
+@BlockerType(name = BlockerTypeName.UNCONDITIONAL)
 public class UnconditionalBlocker implements DeploymentBlockerFunction {
 
     private UnconditionalBlocker.UnconditionalBlockerConfiguration unconditionalBlockerConfiguration;

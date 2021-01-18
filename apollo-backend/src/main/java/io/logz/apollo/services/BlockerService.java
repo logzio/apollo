@@ -1,6 +1,7 @@
 package io.logz.apollo.services;
 
 import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.blockers.DeploymentBlocker;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -35,7 +36,6 @@ import static java.util.Objects.requireNonNull;
 public class BlockerService {
 
     private static final Logger logger = LoggerFactory.getLogger(BlockerService.class);
-    private static final String singleRegionBlockerTypeName = "singleregion";
 
     private final BlockerDefinitionDao blockerDefinitionDao;
     private final BlockerInjectableCommons blockerInjectableCommons;
@@ -90,7 +90,7 @@ public class BlockerService {
     private List<DeploymentBlocker> getDeploymentBlockers() {
         return blockerDefinitionDao.getAllBlockerDefinitions()
                 .stream()
-                .filter(blockerDefinition -> !blockerDefinition.getBlockerTypeName().equals(singleRegionBlockerTypeName))
+                .filter(blockerDefinition -> !blockerDefinition.getBlockerTypeName().equals(BlockerTypeName.SINGLE_REGION))
                 .map(blockerDefinition -> createBlockerFromDefinition(blockerDefinition, true))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -101,7 +101,7 @@ public class BlockerService {
     private List<RequestBlocker> getRequestBlockers() {
         return blockerDefinitionDao.getAllBlockerDefinitions()
                 .stream()
-                .filter(blockerDefinition -> blockerDefinition.getBlockerTypeName().equals(singleRegionBlockerTypeName))
+                .filter(blockerDefinition -> blockerDefinition.getBlockerTypeName().equals(BlockerTypeName.SINGLE_REGION))
                 .map(blockerDefinition -> createBlockerFromDefinition(blockerDefinition, false))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

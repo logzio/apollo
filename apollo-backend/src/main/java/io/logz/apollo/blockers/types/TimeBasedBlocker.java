@@ -1,6 +1,7 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
@@ -18,7 +19,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Created by roiravhon on 6/5/17.
  */
-@BlockerType(name = "timebased")
+@BlockerType(name = BlockerTypeName.TIME_BASED)
 public class TimeBasedBlocker implements DeploymentBlockerFunction {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeBasedBlocker.class);

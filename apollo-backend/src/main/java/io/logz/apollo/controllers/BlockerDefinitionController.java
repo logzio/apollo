@@ -3,6 +3,7 @@ package io.logz.apollo.controllers;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.StackType;
@@ -97,7 +98,7 @@ public class BlockerDefinitionController {
         String userEmail = req.token().get("_user").toString();
         logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
-        if (blockerTypeName.equals("singleregion")) {
+        if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
             if (environmentId != null || isStackEnvironmentType(stackId)) {
                 logger.error("Could not initiate a SingleRegionBlocker with environments");
                 assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add invalid blocker. stackId - %s, environmentId - %s, serviceId - %s, availability - %s", stackId, environmentId, serviceId, availability));
