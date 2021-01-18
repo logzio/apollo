@@ -1,10 +1,6 @@
 package io.logz.apollo.blockers;
 
-/**
- * Created by roiravhon on 6/4/17.
- */
-public class Blocker <T extends CrossBlockerFunction>{
-
+public abstract class Blocker<T extends BlockerFunction> {
     private final Integer id;
     private final String name;
     private final String typeName;
@@ -13,20 +9,19 @@ public class Blocker <T extends CrossBlockerFunction>{
     private final String availability;
     private final Integer stackId;
     private final Boolean isActive;
-    private final T crossBlockerFunction;
 
-    public Blocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId, Integer stackId, String availability,
-                   Boolean isActive, T crossBlockerFunction) {
+    public Blocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId, String availability, Integer stackId, Boolean isActive) {
         this.id = id;
         this.name = name;
         this.typeName = typeName;
         this.serviceId = serviceId;
         this.environmentId = environmentId;
-        this.stackId = stackId;
         this.availability = availability;
+        this.stackId = stackId;
         this.isActive = isActive;
-        this.crossBlockerFunction = crossBlockerFunction;
     }
+
+    protected abstract void setFunction(T function);
 
     public int getId() { return id; }
 
@@ -52,9 +47,5 @@ public class Blocker <T extends CrossBlockerFunction>{
 
     public Boolean getActive() {
         return isActive;
-    }
-
-    public T getCrossBlockerFunction() {
-        return crossBlockerFunction;
     }
 }

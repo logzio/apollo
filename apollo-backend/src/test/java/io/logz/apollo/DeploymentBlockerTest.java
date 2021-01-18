@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Created by roiravhon on 6/5/17.
  */
-public class BlockerTest {
+public class DeploymentBlockerTest {
     private final static String APOLLO_REPO_URL = "https://github.com/logzio/apollo";
     private final static String APOLLO_FAILED_STATUS_CHECKS_COMMIT = "63b79a229defab92df685dcc4e47dd35f0518ef0";
     private final static String APOLLO_VALID_STATUS_CHECKS_COMMIT = "7e01c7e4cfddeadd49d4a4e9ed575b24e9210f4b";

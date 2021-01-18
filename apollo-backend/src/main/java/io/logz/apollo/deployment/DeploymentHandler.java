@@ -1,7 +1,7 @@
 package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
-import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.blockers.DeploymentBlocker;
 import io.logz.apollo.blockers.SingleRegionBlockerResponse;
 import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
@@ -161,7 +161,7 @@ public class DeploymentHandler {
             }
 
             logger.info("Checking for blockers");
-            Optional<Blocker> blocker = blockerService.shouldBlock(newDeployment);
+            Optional<DeploymentBlocker> blocker = blockerService.shouldBlock(newDeployment);
             if (blocker.isPresent()) {
                 logger.info("Deployment is blocked by {}", blocker.get().getName());
                 throw new ApolloDeploymentTooManyRequestsException("Deployment is currently blocked by '" + blocker.get().getName() + "' of type '" + blocker.get().getTypeName() + "'");

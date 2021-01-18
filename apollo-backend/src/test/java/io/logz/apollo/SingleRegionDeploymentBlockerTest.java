@@ -20,7 +20,7 @@ import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SingleRegionBlockerTest {
+public class SingleRegionDeploymentBlockerTest {
     private final static String BLOCK_TYPE_NAME = "singleregion";
 
     @Test

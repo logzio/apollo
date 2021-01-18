@@ -97,11 +97,14 @@ public class BlockerDefinitionController {
         String userEmail = req.token().get("_user").toString();
         logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
-        if ((Objects.nonNull(environmentId) || isStackEnvironmentType(stackId)) && blockerTypeName.equals("singleregion")) {
-            logger.error("Could not initiate a SingleRegionBlocker with environments");
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add invalid blocker. stackId - %s, environmentId - %s, serviceId - %s, availability - %s", stackId, environmentId, serviceId, availability));
-            return;
+        if (blockerTypeName.equals("singleregion")) {
+            if (environmentId != null || isStackEnvironmentType(stackId)) {
+                logger.error("Could not initiate a SingleRegionBlocker with environments");
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to add invalid blocker. stackId - %s, environmentId - %s, serviceId - %s, availability - %s", stackId, environmentId, serviceId, availability));
+                return;
+            }
         }
+
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
             logger.warn("Could not find proper class that annotated with {}", blockerTypeName);
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "There is no implementation for blocker with name " + blockerTypeName);
