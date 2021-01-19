@@ -101,8 +101,8 @@ public class DeploymentController {
         List<Integer> serviceIds = new ArrayList<>();
 
         try {
-            Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().splitToList(environmentIdsCsv).forEach(id -> environmentIds.add(Integer.valueOf(id)));
-            Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().splitToList(serviceIdsCsv).forEach(id -> serviceIds.add(Integer.valueOf(id)));
+            Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(environmentIdsCsv).forEach(id -> environmentIds.add(Integer.valueOf(id)));
+            Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(serviceIdsCsv).forEach(id -> serviceIds.add(Integer.valueOf(id)));
         } catch (NumberFormatException e) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
             return;

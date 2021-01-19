@@ -1,33 +1,38 @@
 package io.logz.apollo.blockers;
 
+import java.util.List;
+
 public class SingleRegionBlockerResponse {
-    public static final String blockerName = "ServiceByRegionBlocker";
+    public static final String BLOCKER_NAME = "ServiceByRegionBlocker";
+
+    public enum BlockerCause {NONE, MULTIPLE_ENVIRONMENTS, SERVICE_ALREADY_RUN}
+
     private final boolean shouldBlock;
-    private final boolean isReqToRunOnMultipleEnvironments;
-    private final Integer serviceId;
+    private final List<Integer> serviceIds;
+    private final BlockerCause blockerCause;
 
-    public SingleRegionBlockerResponse(boolean shouldBlock){
+    public SingleRegionBlockerResponse(boolean shouldBlock) {
         this.shouldBlock = shouldBlock;
-        this.serviceId = null;
-        this.isReqToRunOnMultipleEnvironments = false;
+        this.serviceIds = null;
+        this.blockerCause = BlockerCause.NONE;
     }
 
-    public SingleRegionBlockerResponse(boolean shouldBlock, Integer serviceId, boolean isReqToRunOnMultipleEnvironments){
+    public SingleRegionBlockerResponse(boolean shouldBlock, List<Integer> serviceIds, BlockerCause blockerCause) {
         this.shouldBlock = shouldBlock;
-        this.serviceId = serviceId;
-        this.isReqToRunOnMultipleEnvironments = isReqToRunOnMultipleEnvironments;
+        this.serviceIds = serviceIds;
+        this.blockerCause = blockerCause;
     }
 
-    public Integer getServiceId() {
-        return serviceId;
+    public List<Integer> getServiceIds() {
+        return serviceIds;
     }
 
     public boolean isShouldBlock() {
         return shouldBlock;
     }
 
-    public boolean isReqToRunOnMultipleEnvironments() {
-        return isReqToRunOnMultipleEnvironments;
+    public BlockerCause getBlockerCause() {
+        return blockerCause;
     }
 }
 

@@ -3,6 +3,7 @@ package io.logz.apollo.deployment;
 import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.DeploymentBlocker;
 import io.logz.apollo.blockers.SingleRegionBlockerResponse;
+import io.logz.apollo.blockers.SingleRegionBlockerResponse.BlockerCause;
 import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
@@ -30,6 +31,7 @@ import org.rapidoid.http.Req;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -178,21 +180,16 @@ public class DeploymentHandler {
     public void checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, List<Integer> environmentIds) throws ApolloDeploymentException {
         SingleRegionBlockerResponse singleRegionBlockerResponse = blockerService.checkDeploymentShouldBeBlockedByServiceByRegionBlocker(serviceIds, environmentIds);
         if (singleRegionBlockerResponse.isShouldBlock()) {
-            logger.info("User is not allow to perform this deployment!");
+            logger.info("User is not allowed to perform this deployment!");
 
-            String messagePrefix =" Deployment is currently blocked by '" + SingleRegionBlockerResponse.blockerName + "' blocker -";
-            String serviceName = serviceDao.getService(singleRegionBlockerResponse.getServiceId()).getName();
+            String messagePrefix = "Deployment is currently blocked by '" + SingleRegionBlockerResponse.BLOCKER_NAME + "' blocker -";
 
-            if (singleRegionBlockerResponse.isReqToRunOnMultipleEnvironments()) {
-                logger.warn("attempt to deploy service {} to multi environment on single request", serviceName);
-                throw new ApolloDeploymentConflictException(messagePrefix + " you can not deploy the next service on multi environments - '" +
-                                                                    singleRegionBlockerResponse.getServiceId() + "'.");
-
+            if (singleRegionBlockerResponse.getBlockerCause() == BlockerCause.MULTIPLE_ENVIRONMENTS) {
+                logger.warn("attempt to deploy the service(s) {} to multiple environments on single request", singleRegionBlockerResponse.getServiceIds());
+                throw new ApolloDeploymentConflictException(messagePrefix + " you can not deploy requested services to multiple environments simultaneously.");
             } else {
-                logger.warn("attempt to deploy service {} when the service itself in middle of running deploy", serviceName);
-                throw new ApolloDeploymentBlockedException(messagePrefix + "can not deploy " +
-                                                                   serviceName +
-                                                                   " service because the service is involve on another deployment already");
+                logger.warn("attempt to deploy service(s) {} which is(are) in ongoing deployment", singleRegionBlockerResponse.getServiceIds());
+                throw new ApolloDeploymentBlockedException(messagePrefix + "requested services are in ongoing deployment in one of the environments");
             }
         }
     }

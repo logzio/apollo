@@ -7,6 +7,7 @@ import io.logz.apollo.blockers.BlockerType;
 import io.logz.apollo.models.DeployableVersion;
 import io.logz.apollo.models.Deployment;
 import io.logz.apollo.scm.GithubConnector;
+
 import java.io.IOException;
 
 @BlockerType(name = BlockerTypeName.GITHUB_COMMIT_STATUS)
