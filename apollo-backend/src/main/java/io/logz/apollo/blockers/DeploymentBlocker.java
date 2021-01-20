@@ -10,12 +10,7 @@ public class DeploymentBlocker extends Blocker{
     public DeploymentBlocker(Integer id, String name, String typeName, Integer serviceId, Integer environmentId,
                              Integer stackId, String availability, Boolean isActive, DeploymentBlockerFunction function) {
         super(id, name, typeName, serviceId, environmentId, availability, stackId, isActive);
-        this.setFunction(function);
-    }
-
-    @Override
-    protected void setFunction(BlockerFunction function) {
-        this.function = (DeploymentBlockerFunction) function;
+        this.function = function;
     }
 
     public DeploymentBlockerFunction getFunction() {

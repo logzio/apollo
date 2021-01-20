@@ -21,7 +21,6 @@ public abstract class Blocker<T extends BlockerFunction> {
         this.isActive = isActive;
     }
 
-    protected abstract void setFunction(T function);
 
     public int getId() { return id; }
 

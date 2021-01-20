@@ -1,6 +1,8 @@
 package io.logz.apollo.blockers;
 
-public class BlockerTypeName {
+public final class BlockerTypeName {
+    private BlockerTypeName(){}
+
     public static final String SINGLE_REGION = "singleRegion";
     public static final String BRANCH = "branch";
     public static final String CONCURRENCY = "concurrent";

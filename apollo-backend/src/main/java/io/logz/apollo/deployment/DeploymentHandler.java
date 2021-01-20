@@ -31,7 +31,7 @@ import org.rapidoid.http.Req;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
 
 import static java.util.Objects.requireNonNull;
 
@@ -177,7 +177,7 @@ public class DeploymentHandler {
         }
     }
 
-    public void checkDeploymentShouldBeBlockedByServiceByRegionBlocker(List<Integer> serviceIds, List<Integer> environmentIds) throws ApolloDeploymentException {
+    public void checkDeploymentShouldBeBlockedByRequestBlocker(List<Integer> serviceIds, List<Integer> environmentIds) throws ApolloDeploymentException {
         SingleRegionBlockerResponse singleRegionBlockerResponse = blockerService.checkDeploymentShouldBeBlockedByServiceByRegionBlocker(serviceIds, environmentIds);
         if (singleRegionBlockerResponse.isShouldBlock()) {
             logger.info("User is not allowed to perform this deployment!");
