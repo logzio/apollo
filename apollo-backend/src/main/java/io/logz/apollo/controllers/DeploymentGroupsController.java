@@ -40,7 +40,7 @@ public class DeploymentGroupsController {
         MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
 
         try {
-            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(new ArrayList<Integer>() {{ add(serviceId); }}, new ArrayList<Integer>() {{ add(environmentId); }});
+            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(new ArrayList<Integer>() {{ add(serviceId); }}, 1);
         } catch (ApolloDeploymentException e) {
             responseObject.addUnsuccessful(e);
         }

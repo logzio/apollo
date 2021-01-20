@@ -134,7 +134,7 @@ public class BlockerDefinitionController {
     }
 
     private boolean isStackEnvironmentType(Integer stackId) {
-        if (Objects.isNull(stackId))
+        if (stackId == null)
             return false;
 
         return stackDao.getStackType(stackId) == StackType.ENVIRONMENTS;

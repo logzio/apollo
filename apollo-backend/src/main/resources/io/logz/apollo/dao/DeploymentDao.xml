@@ -58,6 +58,13 @@
         AND status not in ("DONE", "CANCELED")
     </select>
 
+    <select id="getAllOngoingDeploymentsByServiceId" resultType="io.logz.apollo.models.Deployment">
+        SELECT *
+        FROM deployment
+        WHERE service_id = #{serviceId}
+        AND status not in ("DONE", "CANCELED")
+    </select>
+
     <select id="getAllStartedDeployments" resultType="io.logz.apollo.models.Deployment">
         SELECT *
         FROM deployment

@@ -5,7 +5,7 @@ import java.util.List;
 public class SingleRegionBlockerResponse {
     public static final String BLOCKER_NAME = "ServiceByRegionBlocker";
 
-    public enum BlockerCause {NONE, MULTIPLE_ENVIRONMENTS, SERVICE_ALREADY_RUN}
+    public enum BlockerCause {NONE, MULTIPLE_ENVIRONMENTS}
 
     private final boolean shouldBlock;
     private final List<Integer> serviceIds;

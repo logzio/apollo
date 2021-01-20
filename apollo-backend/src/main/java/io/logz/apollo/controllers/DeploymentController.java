@@ -113,7 +113,7 @@ public class DeploymentController {
         DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
 
         try {
-            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentIds);
+            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentIds.size());
         } catch (ApolloDeploymentException e) {
             responseObject.addUnsuccessful(e);
         }

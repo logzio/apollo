@@ -23,28 +23,18 @@ import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SingleRegionDeploymentBlockerTest {
-
-    private static BlockerDefinition blocker;
-    private static ApolloTestAdminClient apolloTestAdminClient;
-
-
-    @AfterEach
-    public void after() throws ApolloClientException {
-        blocker.setActive(false);
-        apolloTestAdminClient.updateBlocker(blocker);
-    }
+public class SingleRegionBlockerTest {
 
     @Test
     public void testSingleRegionBlockerWithMultiEnvironmentsException() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
-        apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
 
         Service serviceToBeLimitToOneRegion = ModelsGenerator.createAndSubmitService(apolloTestClient);
         DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, null);
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, null);
 
         Environment env1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
@@ -53,12 +43,15 @@ public class SingleRegionDeploymentBlockerTest {
 
         MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
         assertThat(result.getUnsuccessful().get(0).getException().getMessage().contains("you can not deploy requested services to multiple environments simultaneously."));
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
     }
 
     @Test
     public void testSingleRegionBlockerWithServiceAlreadyRunInSpecificAvailabilityException() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
-        apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
 
         Service serviceToBeLimitToOneRegion = ModelsGenerator.createAndSubmitService(apolloTestClient);
         DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
@@ -76,7 +69,7 @@ public class SingleRegionDeploymentBlockerTest {
         env3.setId(apolloTestClient.addEnvironment(env3).getId());
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
 
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
@@ -87,11 +80,49 @@ public class SingleRegionDeploymentBlockerTest {
         assertThat(result.getUnsuccessful().size()).isEqualTo(0);
 
         assertThat(apolloTestClient.addDeployment(String.valueOf(env2.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId())
-                           .getUnsuccessful().get(0).getException().getMessage().contains("requested services are in ongoing deployment in one of the environments"));
+                           .getUnsuccessful().get(0).getException().getMessage().contains("' of type '" + BlockerTypeName.SINGLE_REGION + "'"));
 
         result = apolloTestClient.addDeployment(String.valueOf(env3.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
         assertThat(result.getSuccessful().size()).isEqualTo(1);
         assertThat(result.getUnsuccessful().size()).isEqualTo(0);
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
+    }
+
+    @Test
+    public void testSingleRegionBlockerWithServiceAlreadyRunInNullAvailabilityException() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        ApolloTestAdminClient apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Service serviceToBeLimitToOneRegion = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
+
+        final String availabilityProd = "PRODTest";
+        final String availabilityStaging = "StagingTest";
+
+        Environment env1 = ModelsGenerator.createEnvironment(availabilityProd, null);
+        env1.setId(apolloTestClient.addEnvironment(env1).getId());
+
+        Environment env2 = ModelsGenerator.createEnvironment(availabilityStaging, null);;
+        env2.setId(apolloTestClient.addEnvironment(env2).getId());
+
+        List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
+        BlockerDefinition blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, null);
+
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(String.valueOf(env1.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
+        assertThat(result.getSuccessful().size()).isEqualTo(1);
+        assertThat(result.getUnsuccessful().size()).isEqualTo(0);
+
+        assertThat(apolloTestClient.addDeployment(String.valueOf(env2.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId())
+                           .getUnsuccessful().get(0).getException().getMessage().contains("' of type '" + BlockerTypeName.SINGLE_REGION + "'"));
+
+        blocker.setActive(false);
+        apolloTestAdminClient.updateBlocker(blocker);
+
     }
 
     private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
