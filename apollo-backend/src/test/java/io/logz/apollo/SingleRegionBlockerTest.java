@@ -72,7 +72,7 @@ public class SingleRegionBlockerTest {
         env2.setId(apolloTestClient.addEnvironment(env2).getId());
 
         Environment env3 = ModelsGenerator.createEnvironment(availabilityStaging, null);
-        ;
+
         env3.setId(apolloTestClient.addEnvironment(env3).getId());
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
