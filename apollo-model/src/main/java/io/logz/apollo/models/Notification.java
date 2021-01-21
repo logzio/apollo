@@ -9,7 +9,7 @@ public class Notification {
     private NotificationType type;
     private String notificationJsonConfiguration;
     public enum NotificationType {
-        SLACK
+        SLACK, MARKER
     }
 
     public Notification() {
