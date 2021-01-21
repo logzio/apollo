@@ -3,7 +3,6 @@ package io.logz.apollo;
 import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
-import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.ModelsGenerator;
 import io.logz.apollo.models.BlockerDefinition;
@@ -13,7 +12,6 @@ import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.Service;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 
 import java.util.ArrayList;
 import java.util.List;
