@@ -2,7 +2,7 @@ package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
 import io.logz.apollo.blockers.DeploymentBlocker;
-import io.logz.apollo.blockers.SingleRegionBlockerResponse;
+import io.logz.apollo.blockers.RequestBlockerResponse;
 import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
@@ -26,11 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.rapidoid.http.Req;
-
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-
 
 import static java.util.Objects.requireNonNull;
 
@@ -177,13 +175,13 @@ public class DeploymentHandler {
     }
 
     public void checkDeploymentShouldBeBlockedByRequestBlocker(List<Integer> serviceIds, int numOfEnvironments) throws ApolloDeploymentException {
-        SingleRegionBlockerResponse singleRegionBlockerResponse = blockerService.checkDeploymentShouldBeBlockedBySingleRegionBlocker(serviceIds, numOfEnvironments);
-        if (singleRegionBlockerResponse.isShouldBlock()) {
+        RequestBlockerResponse requestBlockerResponse = blockerService.checkDeploymentShouldBeBlockedBySingleRegionBlocker(serviceIds, numOfEnvironments);
+        if (requestBlockerResponse.isShouldBlock()) {
             logger.info("User is not allowed to perform this deployment!");
 
-            String messagePrefix = "Deployment is currently blocked by '" + SingleRegionBlockerResponse.BLOCKER_NAME + "' blocker -";
+            String messagePrefix = "Deployment is currently blocked by '" + requestBlockerResponse.getBlockerName() + "' blocker -";
 
-            logger.warn("attempt to deploy the service(s) {} to multiple environments on single request", singleRegionBlockerResponse.getServiceIds());
+            logger.warn("attempt to deploy the service(s) {} to multiple environments on single request", requestBlockerResponse.getServiceIds());
             throw new ApolloDeploymentConflictException(messagePrefix + " you can not deploy requested services to multiple environments simultaneously.");
         }
     }

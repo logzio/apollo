@@ -9,7 +9,8 @@ import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.RequestBlocker;
 import io.logz.apollo.blockers.RequestBlockerFunction;
-import io.logz.apollo.blockers.SingleRegionBlockerResponse;
+import io.logz.apollo.blockers.RequestBlockerResponse;
+import io.logz.apollo.blockers.types.SingleRegionBlocker;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.Deployment;
@@ -142,7 +143,7 @@ public class BlockerService {
         DeploymentBlockerFunction blockerFunction = (DeploymentBlockerFunction) clazz.newInstance();
         blockerFunction.init(blockerDefinition.getBlockerJsonConfiguration());
         return Optional.of(new DeploymentBlocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getBlockerTypeName(), blockerDefinition.getServiceId(),
-                                                 blockerDefinition.getEnvironmentId(), blockerDefinition.getStackId(), blockerDefinition.getAvailability(), blockerDefinition.getActive(), (DeploymentBlockerFunction) blockerFunction));
+                                                 blockerDefinition.getEnvironmentId(), blockerDefinition.getStackId(), blockerDefinition.getAvailability(), blockerDefinition.getActive(), blockerFunction));
     }
 
     @SuppressWarnings("RedundantIfStatement")
@@ -150,7 +151,6 @@ public class BlockerService {
         if (isUserAllowedToOverride(deployment, blocker)) {
             return false;
         }
-
 
         Integer environmentToCheck = null;
         Integer serviceToCheck = null;
@@ -227,17 +227,17 @@ public class BlockerService {
         return false;
     }
 
-    public SingleRegionBlockerResponse checkDeploymentShouldBeBlockedBySingleRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) {
-        SingleRegionBlockerResponse singleRegionBlockerResponse = new SingleRegionBlockerResponse(false);
-
+    public RequestBlockerResponse checkDeploymentShouldBeBlockedBySingleRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) {
         for (RequestBlocker blocker : getRequestBlockers()) {
-            singleRegionBlockerResponse = blocker.getFunction().shouldBlock(serviceIds, numOfEnvironments);
-            if (singleRegionBlockerResponse.isShouldBlock()) {
-                return singleRegionBlockerResponse;
+            if (blocker.getActive()) {
+                RequestBlockerResponse requestBlockerResponse = blocker.getFunction().shouldBlock(serviceIds, numOfEnvironments);
+                if (requestBlockerResponse.isShouldBlock()) {
+                    return requestBlockerResponse;
+                }
             }
         }
 
-        return singleRegionBlockerResponse;
+        return new RequestBlockerResponse(false, SingleRegionBlocker.BLOCKER_NAME);
     }
 
 }

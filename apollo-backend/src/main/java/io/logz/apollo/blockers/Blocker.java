@@ -1,6 +1,6 @@
 package io.logz.apollo.blockers;
 
-public abstract class Blocker<T extends BlockerFunction> {
+public abstract class Blocker {
     private final Integer id;
     private final String name;
     private final String typeName;
@@ -20,7 +20,6 @@ public abstract class Blocker<T extends BlockerFunction> {
         this.stackId = stackId;
         this.isActive = isActive;
     }
-
 
     public int getId() { return id; }
 

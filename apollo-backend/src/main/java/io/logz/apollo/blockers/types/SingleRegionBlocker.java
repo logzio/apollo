@@ -6,20 +6,19 @@ import io.logz.apollo.blockers.BlockerType;
 import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.RequestBlockerFunction;
-import io.logz.apollo.blockers.SingleRegionBlockerResponse;
-import io.logz.apollo.blockers.SingleRegionBlockerResponse.BlockerCause;
+import io.logz.apollo.blockers.RequestBlockerResponse;
 import io.logz.apollo.models.Deployment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @BlockerType(name = BlockerTypeName.SINGLE_REGION)
 public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBlockerFunction {
     private static final Logger logger = LoggerFactory.getLogger(SingleRegionBlocker.class);
+    public static final String BLOCKER_NAME = "SingleRegionBlocker";
     private SingleRegionBlockerConfiguration singleRegionBlockerConfiguration;
 
     @Override
@@ -39,14 +38,14 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
     }
 
     @Override
-    public SingleRegionBlockerResponse shouldBlock(List<Integer> serviceIds, int numOfEnvironments) {
+    public RequestBlockerResponse shouldBlock(List<Integer> serviceIds, int numOfEnvironments) {
         List<Integer> serviceIdsToCheck = getServicesWithinSingleRegionBlocker(serviceIds);
         if (!serviceIdsToCheck.isEmpty()) {
             if (numOfEnvironments > 1) {
-                return new SingleRegionBlockerResponse(true, serviceIdsToCheck, BlockerCause.MULTIPLE_ENVIRONMENTS);
+                return new RequestBlockerResponse(true, BLOCKER_NAME, serviceIdsToCheck);
             }
         }
-        return new SingleRegionBlockerResponse(false);
+        return new RequestBlockerResponse(false, BLOCKER_NAME);
     }
 
     private List<Integer> getServicesWithinSingleRegionBlocker(List<Integer> serviceIds) {
