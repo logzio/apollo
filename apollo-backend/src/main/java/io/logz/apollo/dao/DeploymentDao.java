@@ -15,6 +15,7 @@ public interface DeploymentDao {
     List<Deployment> getAllRunningDeployments();
     List<Deployment> getAllOngoingDeployments();
     List<Deployment> getAllStartedDeployments();
+    List<Deployment> getAllOngoingDeploymentsByServiceId(@Param("serviceId") int serviceId);
     List<Deployment> getRunningAndJustFinishedDeployments();
     List<Deployment> getLatestDeployments();
     Deployment getLatestDeploymentOfServiceAndEnvironment(@Param("serviceId") int serviceId, @Param("environmentId") int environmentId);

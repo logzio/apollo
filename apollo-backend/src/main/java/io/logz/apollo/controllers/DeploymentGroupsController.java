@@ -17,6 +17,7 @@ import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
 import io.logz.apollo.common.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Controller
@@ -37,6 +38,12 @@ public class DeploymentGroupsController {
     public void addDeployment(int environmentId, int serviceId, int deployableVersionId, String groupIdsCsv, String deploymentMessage, Boolean isEmergencyDeployment, Req req) throws NumberFormatException {
 
         MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
+
+        try {
+            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(new ArrayList<Integer>() {{ add(serviceId); }}, 1);
+        } catch (ApolloDeploymentException e) {
+            responseObject.addUnsuccessful(e);
+        }
 
         Iterable<String> groupIds = Splitter.on(GROUP_IDS_DELIMITER).omitEmptyStrings().trimResults().split(groupIdsCsv);
 

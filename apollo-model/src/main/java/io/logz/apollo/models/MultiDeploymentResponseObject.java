@@ -25,6 +25,10 @@ public class MultiDeploymentResponseObject {
         unsuccessful.add(new UnsuccessfulDeploymentResponseObject(environmentId, serviceId, exception));
     }
 
+    public void addUnsuccessful(Exception exception) {
+        unsuccessful.add(new UnsuccessfulDeploymentResponseObject(exception));
+    }
+
     public void addSuccessful(int environmentId, int serviceId, Deployment deployment) {
         successful.add(new SuccessfulDeploymentResponseObject(environmentId, serviceId, deployment));
     }
@@ -91,6 +95,10 @@ public class MultiDeploymentResponseObject {
         private Exception exception;
 
         UnsuccessfulDeploymentResponseObject() {}
+
+        UnsuccessfulDeploymentResponseObject(Exception exception) {
+            this.exception = exception;
+        }
 
         UnsuccessfulDeploymentResponseObject(Integer groupId, Exception exception) {
             super(groupId);

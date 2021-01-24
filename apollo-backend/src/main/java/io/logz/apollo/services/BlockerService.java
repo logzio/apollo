@@ -1,9 +1,16 @@
 package io.logz.apollo.services;
 
 import io.logz.apollo.blockers.Blocker;
-import io.logz.apollo.blockers.BlockerFunction;
+import io.logz.apollo.blockers.BlockerTypeName;
+import io.logz.apollo.blockers.DeploymentBlocker;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
+import io.logz.apollo.blockers.BlockerFunction;
+import io.logz.apollo.blockers.DeploymentBlockerFunction;
+import io.logz.apollo.blockers.RequestBlocker;
+import io.logz.apollo.blockers.RequestBlockerFunction;
+import io.logz.apollo.blockers.RequestBlockerResponse;
+import io.logz.apollo.blockers.types.SingleRegionBlocker;
 import io.logz.apollo.dao.BlockerDefinitionDao;
 import io.logz.apollo.models.BlockerDefinition;
 import io.logz.apollo.models.Deployment;
@@ -53,6 +60,7 @@ public class BlockerService {
         Set<Class<? extends BlockerFunction>> classes = reflections.getSubTypesOf(BlockerFunction.class);
 
         Optional<Class<? extends BlockerFunction>> foundClass = classes.stream()
+                .filter(clazz -> !clazz.isInterface())
                 .filter(clazz -> clazz.getAnnotation(BlockerType.class).name().equals(blockerTypeName))
                 .findFirst();
 
@@ -60,12 +68,12 @@ public class BlockerService {
         return foundClass;
     }
 
-    public Optional<Blocker> shouldBlock(Deployment deployment) {
-        for (Blocker blocker : getBlockers()) {
+    public Optional<DeploymentBlocker> shouldBlock(Deployment deployment) {
+        for (DeploymentBlocker blocker : getDeploymentBlockers()) {
             if (isBlockerInScope(blocker, deployment)) {
-                if (blocker.getBlockerFunction().shouldBlock(blockerInjectableCommons, deployment)) {
+                if (blocker.getFunction().shouldBlock(blockerInjectableCommons, deployment)) {
                     logger.info("Blocking deployment for service {}, in environment {}, with deployable version of {} from {} due to {} blocker",
-                            deployment.getServiceId(), deployment.getEnvironmentId(), deployment.getDeployableVersionId(), deployment.getUserEmail(), blocker.getName());
+                                deployment.getServiceId(), deployment.getEnvironmentId(), deployment.getDeployableVersionId(), deployment.getUserEmail(), blocker.getName());
 
                     return Optional.of(blocker);
                 }
@@ -75,34 +83,44 @@ public class BlockerService {
         return Optional.empty();
     }
 
-    private boolean isUserAllowedToOverride(Deployment deployment, Blocker blocker) {
+    private boolean isUserAllowedToOverride(Deployment deployment, DeploymentBlocker deploymentBlocker) {
         return blockerInjectableCommons.getBlockerDefinitionDao().getOverrideBlockersIdsByUser(deployment.getUserEmail())
-                .stream().anyMatch(id -> id == blocker.getId());
+                .stream().anyMatch(id -> id == deploymentBlocker.getId());
     }
 
-    private List<Blocker> getBlockers() {
+    private List<DeploymentBlocker> getDeploymentBlockers() {
         return blockerDefinitionDao.getAllBlockerDefinitions()
                 .stream()
-                .map(this::createBlockerFromDefinition)
+                .map(blockerDefinition -> createBlockerFromDefinition(blockerDefinition, true))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
+                .map(blocker -> (DeploymentBlocker) blocker)
                 .collect(Collectors.toList());
     }
 
-    private Optional<Blocker> createBlockerFromDefinition(BlockerDefinition blockerDefinition) {
+    private List<RequestBlocker> getRequestBlockers() {
+        return blockerDefinitionDao.getAllBlockerDefinitions()
+                .stream()
+                .filter(blockerDefinition -> blockerDefinition.getBlockerTypeName().equals(BlockerTypeName.SINGLE_REGION))
+                .map(blockerDefinition -> createBlockerFromDefinition(blockerDefinition, false))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(blocker -> (RequestBlocker) blocker)
+                .collect(Collectors.toList());
+    }
+
+    private Optional<? extends Blocker> createBlockerFromDefinition(BlockerDefinition blockerDefinition, boolean isDeploymentBlocker) {
         Optional<Class<? extends BlockerFunction>> blockerTypeBinding = getBlockerTypeBinding(blockerDefinition.getBlockerTypeName());
+
         if (!blockerTypeBinding.isPresent()) {
             logger.warn("Got blocker definition (id {}) of an unknown blocker name {}, nothing to do here!",
-                    blockerDefinition.getId(), blockerDefinition.getBlockerTypeName());
+                        blockerDefinition.getId(), blockerDefinition.getBlockerTypeName());
             return Optional.empty();
         }
 
         try {
-            BlockerFunction blockerFunction = getBlockerTypeBinding(blockerDefinition.getBlockerTypeName()).get().newInstance();
-            blockerFunction.init(blockerDefinition.getBlockerJsonConfiguration());
-            return Optional.of(new Blocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getBlockerTypeName(), blockerDefinition.getServiceId(),
-                    blockerDefinition.getEnvironmentId(), blockerDefinition.getStackId(), blockerDefinition.getAvailability(), blockerDefinition.getActive(), blockerFunction));
-
+            return isDeploymentBlocker ? createDeploymentBlockerFromDefinition(blockerDefinition, blockerTypeBinding.get()) :
+                    createRequestBlockerFromDefinition(blockerDefinition, blockerTypeBinding.get());
         } catch (InstantiationException | IllegalAccessException e) {
             logger.warn("Could not create instance of {} ", blockerDefinition.getBlockerTypeName(), e);
             return Optional.empty();
@@ -112,8 +130,24 @@ public class BlockerService {
         }
     }
 
+    private Optional<RequestBlocker> createRequestBlockerFromDefinition(BlockerDefinition blockerDefinition, Class<? extends BlockerFunction> clazz)
+            throws IllegalAccessException, InstantiationException, IOException {
+        RequestBlockerFunction blockerFunction = (RequestBlockerFunction) clazz.newInstance();
+        blockerFunction.init(blockerDefinition.getBlockerJsonConfiguration());
+        return Optional.of(new RequestBlocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getBlockerTypeName(), blockerDefinition.getServiceId(),
+                                              blockerDefinition.getEnvironmentId(), blockerDefinition.getStackId(), blockerDefinition.getAvailability(), blockerDefinition.getActive(), blockerFunction));
+    }
+
+    private Optional<DeploymentBlocker> createDeploymentBlockerFromDefinition(BlockerDefinition blockerDefinition, Class<? extends BlockerFunction> clazz)
+            throws IllegalAccessException, InstantiationException, IOException {
+        DeploymentBlockerFunction blockerFunction = (DeploymentBlockerFunction) clazz.newInstance();
+        blockerFunction.init(blockerDefinition.getBlockerJsonConfiguration());
+        return Optional.of(new DeploymentBlocker(blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getBlockerTypeName(), blockerDefinition.getServiceId(),
+                                                 blockerDefinition.getEnvironmentId(), blockerDefinition.getStackId(), blockerDefinition.getAvailability(), blockerDefinition.getActive(), blockerFunction));
+    }
+
     @SuppressWarnings("RedundantIfStatement")
-    private boolean isBlockerInScope(Blocker blocker, Deployment deployment) {
+    private boolean isBlockerInScope(DeploymentBlocker blocker, Deployment deployment) {
         if (isUserAllowedToOverride(deployment, blocker)) {
             return false;
         }
@@ -160,8 +194,12 @@ public class BlockerService {
             return true;
         }
 
+        if (blocker.getTypeName().equals(BlockerTypeName.SINGLE_REGION) && blocker.getAvailability() == null) {
+            return true;
+        }
+
         if (blocker.getAvailability() != null && !blocker.getAvailability().isEmpty()) {
-            if (blockerInjectableCommons.getEnvironmentDao().getEnvironment(deployment.getEnvironmentId()).getAvailability().equals(blocker.getAvailability()))     {
+            if (blockerInjectableCommons.getEnvironmentDao().getEnvironment(deployment.getEnvironmentId()).getAvailability().equals(blocker.getAvailability())) {
                 if ((serviceToCheck != null) && serviceToCheck == deployment.getServiceId()) {
                     return true;
                 }
@@ -188,4 +226,18 @@ public class BlockerService {
 
         return false;
     }
+
+    public RequestBlockerResponse checkDeploymentShouldBeBlockedBySingleRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) {
+        for (RequestBlocker blocker : getRequestBlockers()) {
+            if (blocker.getActive()) {
+                RequestBlockerResponse requestBlockerResponse = blocker.getFunction().shouldBlock(serviceIds, numOfEnvironments);
+                if (requestBlockerResponse.isShouldBlock()) {
+                    return requestBlockerResponse;
+                }
+            }
+        }
+
+        return new RequestBlockerResponse(false, SingleRegionBlocker.BLOCKER_NAME);
+    }
+
 }

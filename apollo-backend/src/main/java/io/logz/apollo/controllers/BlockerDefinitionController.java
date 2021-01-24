@@ -3,8 +3,10 @@ package io.logz.apollo.controllers;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import io.logz.apollo.blockers.BlockerTypeName;
 import io.logz.apollo.dao.StackDao;
 import io.logz.apollo.models.BlockerDefinition;
+import io.logz.apollo.models.StackType;
 import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.common.HttpStatus;
 import io.logz.apollo.dao.BlockerDefinitionDao;
@@ -95,6 +97,14 @@ public class BlockerDefinitionController {
         String userEmail = req.token().get("_user").toString();
         logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
+        if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
+            if (environmentId != null || isStackEnvironmentType(stackId)) {
+                logger.error("Could not initiate a SingleRegionBlocker with environment or stack");
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined for a specific environment or stack");
+                return;
+            }
+        }
+
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
             logger.warn("Could not find proper class that annotated with {}", blockerTypeName);
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "There is no implementation for blocker with name " + blockerTypeName);
@@ -120,6 +130,13 @@ public class BlockerDefinitionController {
         blockerDefinitionDao.addBlockerDefinition(blockerDefinition);
         logger.info(String.format("Added blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.CREATED, blockerDefinition);
+    }
+
+    private boolean isStackEnvironmentType(Integer stackId) {
+        if (stackId == null)
+            return false;
+
+        return stackDao.getStackType(stackId) == StackType.ENVIRONMENTS;
     }
 
     @Administrator

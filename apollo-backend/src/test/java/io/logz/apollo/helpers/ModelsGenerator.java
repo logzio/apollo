@@ -65,6 +65,10 @@ public class ModelsGenerator {
         return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT, generateRandomAvailability(), true);
     }
 
+    public static Environment createEnvironment(String availability, String additionalParams) {
+        return createEnvironment(additionalParams, DEFAULT_CONCURRENCY_LIMIT, availability, true);
+    }
+
     public static Environment createEnvironment() {
         return createEnvironment(null);
     }

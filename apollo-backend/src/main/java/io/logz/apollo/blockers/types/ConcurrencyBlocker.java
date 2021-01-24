@@ -1,7 +1,8 @@
 package io.logz.apollo.blockers.types;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.logz.apollo.blockers.BlockerFunction;
+import io.logz.apollo.blockers.BlockerTypeName;
+import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
 import io.logz.apollo.models.Deployment;
@@ -11,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
-@BlockerType(name = "concurrent")
-public class ConcurrencyBlocker implements BlockerFunction {
+@BlockerType(name = BlockerTypeName.CONCURRENCY)
+public class ConcurrencyBlocker implements DeploymentBlockerFunction {
 
     private static final Logger logger = LoggerFactory.getLogger(ConcurrencyBlocker.class);
     private ConcurrencyBlockerConfiguration concurrencyBlockerConfiguration;

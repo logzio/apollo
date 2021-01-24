@@ -1,7 +1,8 @@
 package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
-import io.logz.apollo.blockers.Blocker;
+import io.logz.apollo.blockers.DeploymentBlocker;
+import io.logz.apollo.blockers.RequestBlockerResponse;
 import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.auth.PermissionsValidator;
@@ -25,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.rapidoid.http.Req;
-
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
@@ -132,14 +132,14 @@ public class DeploymentHandler {
             Optional<Deployment> runningDeployment = deploymentDao.getAllRunningDeployments()
                     .stream()
                     .filter(deployment ->
-                            deployment.getServiceId() == serviceId &&
-                                    deployment.getEnvironmentId() == environmentId &&
-                                        (!group.isPresent() || deployment.getGroupName().equals(group.get().getName())))
+                                    deployment.getServiceId() == serviceId &&
+                                            deployment.getEnvironmentId() == environmentId &&
+                                            (!group.isPresent() || deployment.getGroupName().equals(group.get().getName())))
                     .findAny();
 
             if (runningDeployment.isPresent()) {
                 logger.warn("There is already a running deployment that initiated by {}. Can't start a new one",
-                        runningDeployment.get().getUserEmail());
+                            runningDeployment.get().getUserEmail());
                 throw new ApolloDeploymentConflictException("There is an on-going deployment for this service in this environment with this group");
             }
 
@@ -160,7 +160,7 @@ public class DeploymentHandler {
             }
 
             logger.info("Checking for blockers");
-            Optional<Blocker> blocker = blockerService.shouldBlock(newDeployment);
+            Optional<DeploymentBlocker> blocker = blockerService.shouldBlock(newDeployment);
             if (blocker.isPresent()) {
                 logger.info("Deployment is blocked by {}", blocker.get().getName());
                 throw new ApolloDeploymentTooManyRequestsException("Deployment is currently blocked by '" + blocker.get().getName() + "' of type '" + blocker.get().getTypeName() + "'");
@@ -173,4 +173,17 @@ public class DeploymentHandler {
             lockService.releaseLock(lockName);
         }
     }
+
+    public void checkDeploymentShouldBeBlockedByRequestBlocker(List<Integer> serviceIds, int numOfEnvironments) throws ApolloDeploymentException {
+        RequestBlockerResponse requestBlockerResponse = blockerService.checkDeploymentShouldBeBlockedBySingleRegionBlocker(serviceIds, numOfEnvironments);
+        if (requestBlockerResponse.isShouldBlock()) {
+            logger.info("User is not allowed to perform this deployment!");
+
+            String messagePrefix = "Deployment is currently blocked by '" + requestBlockerResponse.getBlockerName() + "' blocker -";
+
+            logger.warn("attempt to deploy the service(s) {} to multiple environments on single request", requestBlockerResponse.getServiceIds());
+            throw new ApolloDeploymentConflictException(messagePrefix + " you can not deploy requested services to multiple environments simultaneously.");
+        }
+    }
+
 }
