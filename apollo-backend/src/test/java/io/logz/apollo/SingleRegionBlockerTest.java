@@ -43,10 +43,11 @@ public class SingleRegionBlockerTest {
         DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
         List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, null);
 
         Environment env1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+
+        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
 
         String envIdsCsv = String.valueOf(env1.getId()) + "," + String.valueOf(env2.getId());
 
