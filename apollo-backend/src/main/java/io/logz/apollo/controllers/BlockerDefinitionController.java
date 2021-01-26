@@ -98,7 +98,11 @@ public class BlockerDefinitionController {
         logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
         if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
-            if (environmentId != null || isStackEnvironmentType(stackId)) {
+            if (availability == null) {
+                logger.error("Could not initiate a SingleRegionBlocker without availability");
+                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without specific availability");
+                return;
+            } else if (environmentId != null || isStackEnvironmentType(stackId)) {
                 logger.error("Could not initiate a SingleRegionBlocker with environment or stack");
                 assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined for a specific environment or stack");
                 return;

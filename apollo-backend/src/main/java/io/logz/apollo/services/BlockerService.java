@@ -194,10 +194,6 @@ public class BlockerService {
             return true;
         }
 
-        if (blocker.getTypeName().equals(BlockerTypeName.SINGLE_REGION) && blocker.getAvailability() == null) {
-            return true;
-        }
-
         if (blocker.getAvailability() != null && !blocker.getAvailability().isEmpty()) {
             if (blockerInjectableCommons.getEnvironmentDao().getEnvironment(deployment.getEnvironmentId()).getAvailability().equals(blocker.getAvailability())) {
                 if ((serviceToCheck != null) && serviceToCheck == deployment.getServiceId()) {
