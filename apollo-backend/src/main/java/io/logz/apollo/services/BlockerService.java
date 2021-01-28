@@ -243,10 +243,14 @@ public class BlockerService {
                 add(serviceId);
             }}));
         } else if (stackId != null) {
-            return Optional.of(getSingleRegionBlockerConfiguration(blockerInjectableCommons.getStackDao().getServicesStack(stackId).getServices()));
-        } else {
-            return Optional.empty();
+            List<Integer> serviceIds = blockerInjectableCommons.getStackDao().getServicesStack(stackId).getServices();
+            if (!serviceIds.isEmpty()) {
+                return Optional.of(getSingleRegionBlockerConfiguration(serviceIds));
+            }
         }
+
+        return Optional.empty();
+
     }
 
     private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
