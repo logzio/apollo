@@ -23,9 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
@@ -108,17 +108,14 @@ public class BlockerDefinitionController {
                 assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined for a specific environment or stack");
                 return;
             } else if (blockerJsonConfiguration.equals("{}")) {
-                if (serviceId != null) {
-                    blockerJsonConfiguration = getSingleRegionBlockerConfiguration(new ArrayList<Integer>() {{
-                        add(serviceId);
-                    }});
-                } else if (stackId != null) {
-                    blockerJsonConfiguration = getSingleRegionBlockerConfiguration(stackDao.getServicesStack(stackId).getServices());
-                } else {
-                    logger.error("Could not initiate a SingleRegionBlocker without service or service-stack");
-                    assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without service(s)");
-                    return;
-                }
+                Optional<String> configOpt = blockerService.initSingleRegionBlockerConfiguration(serviceId, stackId);
+                 if (configOpt.isPresent()) {
+                     blockerJsonConfiguration = configOpt.get();
+                 } else {
+                     logger.error("Could not initiate a SingleRegionBlocker without service or service-stack");
+                     assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without service(s)");
+                     return;
+                 }
             }
         }
 
@@ -263,11 +260,5 @@ public class BlockerDefinitionController {
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
         logger.info(String.format("Updated blocker's activeness: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
-    }
-
-    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
-        return "{\n" +
-                "  \"serviceIds\":" + serviceIds.toString() +
-                "}";
     }
 }
