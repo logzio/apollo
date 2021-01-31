@@ -29,7 +29,6 @@ import static java.util.Objects.requireNonNull;
 @Controller
 public class ScalingController {
 
-
     private static final Logger logger = LoggerFactory.getLogger(ScalingController.class);
 
     private final KubernetesHandlerStore kubernetesHandlerStore;
@@ -86,6 +85,7 @@ public class ScalingController {
             return;
         }
 
+        int oldScalingFactor = group.getScalingFactor();
         group.setScalingFactor(scalingFactor);
         group.setScalingStatus(Group.ScalingStatus.PENDING);
         groupDao.updateGroup(group);
@@ -100,7 +100,7 @@ public class ScalingController {
                                                 "envName", environment.getName(),
                                                 "newScalingFactor", String.valueOf(scalingFactor)),
             () -> logger.info("Scaling factor changed from {} to {} for group {} by user email {}, env ID: {}, service ID: {}, group ID: {}",
-                group.getScalingFactor(),
+                oldScalingFactor,
                 scalingFactor,
                 group.getName(),
                 userEmail,
