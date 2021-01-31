@@ -99,24 +99,8 @@ public class BlockerDefinitionController {
         logger.info("User: {} has just added blocker, name:{}", userEmail, name);
 
         if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
-            if (availability == null) {
-                logger.error("Could not initiate a SingleRegionBlocker without availability");
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without specific availability");
-                return;
-            } else if (environmentId != null || isStackEnvironmentType(stackId)) {
-                logger.error("Could not initiate a SingleRegionBlocker with environment or stack");
-                assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined for a specific environment or stack");
-                return;
-            } else if (blockerJsonConfiguration.equals("{}") || blockerJsonConfiguration == null) {
-                Optional<String> configOpt = blockerService.initSingleRegionBlockerConfiguration(serviceId, stackId);
-                 if (configOpt.isPresent()) {
-                     blockerJsonConfiguration = configOpt.get();
-                 } else {
-                     logger.error("Could not initiate a SingleRegionBlocker without service or service-stack");
-                     assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without service(s)");
-                     return;
-                 }
-            }
+            blockerJsonConfiguration = initSingleRegionBlockerJsonConfig(environmentId, serviceId, stackId, availability, blockerJsonConfiguration, req);
+            if (blockerJsonConfiguration == null) return;
         }
 
         if (!blockerService.getBlockerTypeBinding(blockerTypeName).isPresent()) {
@@ -144,6 +128,27 @@ public class BlockerDefinitionController {
         blockerDefinitionDao.addBlockerDefinition(blockerDefinition);
         logger.info(String.format("Added blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.CREATED, blockerDefinition);
+    }
+
+    private String initSingleRegionBlockerJsonConfig(Integer environmentId, Integer serviceId, Integer stackId, String availability, String blockerJsonConfiguration, Req req) {
+        String jsonConfig = null;
+
+        if (availability == null) {
+            logger.error("Could not initiate a SingleRegionBlocker without availability");
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without specific availability");
+        } else if (environmentId != null || isStackEnvironmentType(stackId)) {
+            logger.error("Could not initiate a SingleRegionBlocker with environment or stack");
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined for a specific environment or stack");
+        } else if (blockerJsonConfiguration.equals("{}") || blockerJsonConfiguration == null) {
+            Optional<String> configOpt = blockerService.initSingleRegionBlockerConfiguration(serviceId, stackId);
+             if (configOpt.isPresent()) {
+                 jsonConfig = configOpt.get();
+             } else {
+                 logger.error("Could not initiate a SingleRegionBlocker without service or service-stack");
+                 assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without service(s)");
+             }
+        }
+        return jsonConfig;
     }
 
     private boolean isStackEnvironmentType(Integer stackId) {
