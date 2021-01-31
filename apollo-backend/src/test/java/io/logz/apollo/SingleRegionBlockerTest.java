@@ -42,12 +42,10 @@ public class SingleRegionBlockerTest {
         Service serviceToBeLimitToOneRegion = ModelsGenerator.createAndSubmitService(apolloTestClient);
         DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
-        List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-
         Environment env1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
 
-        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
+        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION,"{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
 
         String envIdsCsv = String.valueOf(env1.getId()) + "," + String.valueOf(env2.getId());
 
@@ -76,8 +74,7 @@ public class SingleRegionBlockerTest {
 
         env3.setId(apolloTestClient.addEnvironment(env3).getId());
 
-        List<Integer> serviceIds = new ArrayList<Integer>() {{ add(serviceToBeLimitToOneRegion.getId()); }};
-        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, getSingleRegionBlockerConfiguration(serviceIds), null, null, null, env1.getAvailability());
+        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
 
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
@@ -95,9 +92,4 @@ public class SingleRegionBlockerTest {
         assertThat(result.getUnsuccessful().size()).isEqualTo(0);
     }
 
-    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
-        return "{\n" +
-                "  \"serviceIds\":" + serviceIds.toString() +
-                "}";
-    }
 }
