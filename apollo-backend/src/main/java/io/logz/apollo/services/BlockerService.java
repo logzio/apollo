@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,6 +235,28 @@ public class BlockerService {
         }
 
         return new RequestBlockerResponse(false, SingleRegionBlocker.BLOCKER_NAME);
+    }
+
+    public Optional<String> initSingleRegionBlockerConfiguration(Integer serviceId, Integer stackId) {
+        if (serviceId != null) {
+            return Optional.of(getSingleRegionBlockerConfiguration(new ArrayList<Integer>() {{
+                add(serviceId);
+            }}));
+        } else if (stackId != null) {
+            List<Integer> serviceIds = blockerInjectableCommons.getStackDao().getServicesStack(stackId).getServices();
+            if (!serviceIds.isEmpty()) {
+                return Optional.of(getSingleRegionBlockerConfiguration(serviceIds));
+            }
+        }
+
+        return Optional.empty();
+
+    }
+
+    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
+        return "{\n" +
+                "  \"serviceIds\":" + serviceIds.toString() +
+                "}";
     }
 
 }
