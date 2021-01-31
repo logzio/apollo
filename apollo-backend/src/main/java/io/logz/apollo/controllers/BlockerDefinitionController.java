@@ -147,7 +147,11 @@ public class BlockerDefinitionController {
                  logger.error("Could not initiate a SingleRegionBlocker without service or service-stack");
                  assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined without service(s)");
              }
+        } else {
+            logger.error("Could not initiate a SingleRegionBlocker");
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined - please initialize with service/services and availability");
         }
+
         return jsonConfig;
     }
 
