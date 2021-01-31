@@ -107,7 +107,7 @@ public class BlockerDefinitionController {
                 logger.error("Could not initiate a SingleRegionBlocker with environment or stack");
                 assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, "SingleRegionBlocker cannot be defined for a specific environment or stack");
                 return;
-            } else if (blockerJsonConfiguration.equals("{}")) {
+            } else if (blockerJsonConfiguration.equals("{}") || blockerJsonConfiguration == null) {
                 Optional<String> configOpt = blockerService.initSingleRegionBlockerConfiguration(serviceId, stackId);
                  if (configOpt.isPresent()) {
                      blockerJsonConfiguration = configOpt.get();
