@@ -1,20 +1,25 @@
 package io.logz.apollo.controllers;
 
+import com.google.common.collect.ImmutableMap;
 import io.logz.apollo.common.HttpStatus;
+import io.logz.apollo.common.MDCLogging;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.GroupDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.excpetions.ApolloNotFoundException;
-import io.logz.apollo.models.Deployment;
+import io.logz.apollo.kubernetes.KubernetesHandler;
+import io.logz.apollo.kubernetes.KubernetesHandlerStore;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
+import io.logz.apollo.models.Service;
 import org.rapidoid.annotation.Controller;
 import org.rapidoid.annotation.GET;
 import org.rapidoid.annotation.PUT;
 import org.rapidoid.http.Req;
 import org.rapidoid.security.annotation.LoggedIn;
-import io.logz.apollo.kubernetes.KubernetesHandler;
-import io.logz.apollo.kubernetes.KubernetesHandlerStore;
+import org.rapidoid.util.Tokens;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
@@ -23,6 +28,8 @@ import static java.util.Objects.requireNonNull;
 
 @Controller
 public class ScalingController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ScalingController.class);
 
     private final KubernetesHandlerStore kubernetesHandlerStore;
     private final EnvironmentDao environmentDao;
@@ -78,9 +85,28 @@ public class ScalingController {
             return;
         }
 
+        int oldScalingFactor = group.getScalingFactor();
         group.setScalingFactor(scalingFactor);
         group.setScalingStatus(Group.ScalingStatus.PENDING);
         groupDao.updateGroup(group);
+
+        String userEmail = req.token(Tokens._USER).toString();
+        Service service = serviceDao.getService(group.getServiceId());
+        Environment environment = environmentDao.getEnvironment(group.getEnvironmentId());
+
+        MDCLogging.withMDCFields(ImmutableMap.of("userEmail", userEmail,
+                                                "groupName", group.getName(),
+                                                "serviceName", service.getName(),
+                                                "envName", environment.getName(),
+                                                "newScalingFactor", String.valueOf(scalingFactor)),
+            () -> logger.info("Scaling factor changed from {} to {} for group {} by user email {}, env ID: {}, service ID: {}, group ID: {}",
+                oldScalingFactor,
+                scalingFactor,
+                group.getName(),
+                userEmail,
+                group.getEnvironmentId(),
+                group.getServiceId(),
+                group.getId()));
 
         assignJsonResponseToReq(req, HttpStatus.OK, group);
     }
