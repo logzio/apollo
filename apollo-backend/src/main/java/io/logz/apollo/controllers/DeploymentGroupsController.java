@@ -43,6 +43,8 @@ public class DeploymentGroupsController {
             deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(new ArrayList<Integer>() {{ add(serviceId); }}, 1);
         } catch (ApolloDeploymentException e) {
             responseObject.addUnsuccessful(e);
+            assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
+            return;
         }
 
         Iterable<String> groupIds = Splitter.on(GROUP_IDS_DELIMITER).omitEmptyStrings().trimResults().split(groupIdsCsv);
