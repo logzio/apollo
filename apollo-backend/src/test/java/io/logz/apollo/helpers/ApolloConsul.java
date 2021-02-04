@@ -29,7 +29,7 @@ public class ApolloConsul {
         Stopwatch stopwatch = Stopwatch.createStarted();
 
 
-        await().atMost(15, TimeUnit.SECONDS).pollInterval(2, TimeUnit.SECONDS)
+        await().atMost(60, TimeUnit.SECONDS).pollInterval(2, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
                     try {
                         standaloneConsul = new GenericContainer("consul:v0.6.4")
