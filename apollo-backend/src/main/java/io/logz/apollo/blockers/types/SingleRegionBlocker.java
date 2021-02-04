@@ -58,7 +58,7 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
         return blockerInjectableCommons.getDeploymentDao().getAllOngoingDeploymentsByServiceId(serviceId);
     }
 
-    private static class SingleRegionBlockerConfiguration {
+    public static class SingleRegionBlockerConfiguration {
         private List<Integer> serviceIds;
 
         public SingleRegionBlockerConfiguration() {

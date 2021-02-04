@@ -21,6 +21,12 @@
         FROM blocker_definition
     </select>
 
+    <select id="getBlockersJsonConfiguration" resultType="String">
+        SELECT blocker_definition.blocker_json_configuration
+        FROM blocker_definition
+        WHERE blocker_type_name=#{blockerTypeName}
+    </select>
+
     <select id="getUnconditionalBlockers" resultType="Integer">
         SELECT id FROM blocker_definition
         WHERE blocker_type_name = 'unconditional'
