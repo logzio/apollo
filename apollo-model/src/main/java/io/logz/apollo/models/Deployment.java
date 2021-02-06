@@ -30,6 +30,7 @@ public class Deployment {
     private String deploymentParams;
     private String deploymentMessage;
     private boolean isEmergencyDeployment;
+    private String availability;
 
     public Deployment() {
     }
@@ -136,5 +137,13 @@ public class Deployment {
 
     public void setEmergencyDeployment(boolean isEmergencyDeployment) {
         this.isEmergencyDeployment = isEmergencyDeployment;
+    }
+
+    public String getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(String availability) {
+        this.availability = availability;
     }
 }

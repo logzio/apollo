@@ -122,7 +122,7 @@ public class DeploymentHandler {
         }
 
         boolean hasSingleRegionBlocker = blockerService.hasSingleRegionBlocker(serviceId);
-        String lockName = hasSingleRegionBlocker ? lockService.getDeploymentLockName(serviceId) :
+        String lockName = hasSingleRegionBlocker ? lockService.getDeploymentLockName(serviceId, environment.getAvailability()) :
                 lockService.getDeploymentLockName(serviceId, environmentId);
 
         if (!lockService.getAndObtainLock(lockName)) {
@@ -157,6 +157,7 @@ public class DeploymentHandler {
             newDeployment.setDeploymentMessage(deploymentMessage);
             newDeployment.setGroupName(groupName);
             newDeployment.setEmergencyDeployment(isEmergencyDeployment);
+            newDeployment.setAvailability(environment.getAvailability());
 
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());

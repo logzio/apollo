@@ -50,8 +50,10 @@
 
     <select id="getAllOngoingDeploymentsByServiceId" resultType="io.logz.apollo.models.Deployment">
         SELECT *
-        FROM deployment
+        FROM deployment as dep
+        INNER JOIN environment as env on dep.environment_id = env.id
         WHERE service_id = #{serviceId}
+        AND env.availability = #{availability}
         AND status not in ("DONE", "CANCELED")
     </select>
 

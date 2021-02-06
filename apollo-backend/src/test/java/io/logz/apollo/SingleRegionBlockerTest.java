@@ -12,6 +12,7 @@ import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.models.Service;
+import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -67,7 +68,7 @@ public class SingleRegionBlockerTest {
     }
 
     @Test
-    public void testSingleRegionBlockerWithServiceAlreadyRunInSpecificAvailabilityException() throws Exception {
+    public void testSingleRegionBlockerRestrictsDeploymentsToSameRegion() throws Exception {
         ApolloTestClient apolloTestClient = Common.signupAndLogin();
         apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
 
@@ -83,24 +84,15 @@ public class SingleRegionBlockerTest {
         Environment env2 = ModelsGenerator.createEnvironment(availabilityProd, null);
         env2.setId(apolloTestClient.addEnvironment(env2).getId());
 
-        Environment env3 = ModelsGenerator.createEnvironment(availabilityStaging, null);
-        env3.setId(apolloTestClient.addEnvironment(env3).getId());
-
-        List<Environment> environments = Arrays.asList(env1, env2, env3);
+        List<Environment> prodEnvironments = Arrays.asList(env1, env2);
 
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
 
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
-        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env3), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
 
         List<Callable<MultiDeploymentResponseObject>> deploymentRequests = new ArrayList<>();
-
-        environments.forEach(region -> {
-            deploymentRequests.add(() -> {
-                return apolloTestClient.addDeployment(String.valueOf(region.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
-            });
-        });
+        addDeploymentRequests(apolloTestClient, serviceToBeLimitToOneRegion, deployableVersion, prodEnvironments, deploymentRequests);
 
         List<Future<MultiDeploymentResponseObject>> futures = executorService.invokeAll(deploymentRequests);
 
@@ -108,18 +100,70 @@ public class SingleRegionBlockerTest {
                 .map(this::futureGetUnchecked)
                 .collect(Collectors.toList());
 
-        List<MultiDeploymentResponseObject.SuccessfulDeploymentResponseObject> success = results.stream()
+        List<MultiDeploymentResponseObject.SuccessfulDeploymentResponseObject> success = getSuccessfulDeploymentResponseObjects(results);
+        List<MultiDeploymentResponseObject.UnsuccessfulDeploymentResponseObject> error = getUnsuccessfulDeploymentResponseObjects(results);
+
+        assertThat(success.size()).isEqualTo(1);
+        assertThat(error.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void testSingleRegionBlockerAllowsDeploymentsWithDifferentAvailability() throws Exception {
+        ApolloTestClient apolloTestClient = Common.signupAndLogin();
+        apolloTestAdminClient = Common.getAndLoginApolloTestAdminClient();
+
+        Service serviceToBeLimitToOneRegion = ModelsGenerator.createAndSubmitService(apolloTestClient);
+        DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
+
+        final String availabilityProd = "PRODTest";
+        final String availabilityStaging = "StagingTest";
+
+        Environment env1 = ModelsGenerator.createEnvironment(availabilityProd, null);
+        env1.setId(apolloTestClient.addEnvironment(env1).getId());
+
+        Environment env2 = ModelsGenerator.createEnvironment(availabilityStaging, null);
+        env2.setId(apolloTestClient.addEnvironment(env2).getId());
+
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+
+        blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
+
+        List<Environment> prodAndStagingEnvironments = Arrays.asList(env1, env2);
+
+        List<Callable<MultiDeploymentResponseObject>> deploymentRequests = new ArrayList<>();
+        addDeploymentRequests(apolloTestClient, serviceToBeLimitToOneRegion, deployableVersion, prodAndStagingEnvironments, deploymentRequests);
+
+        List<Future<MultiDeploymentResponseObject>> futures = executorService.invokeAll(deploymentRequests);
+
+        List<MultiDeploymentResponseObject> results = futures.stream()
+                .map(this::futureGetUnchecked)
+                .collect(Collectors.toList());
+
+        assertThat(getSuccessfulDeploymentResponseObjects(results).size()).isEqualTo(2);
+        assertThat(getUnsuccessfulDeploymentResponseObjects(results).size()).isEqualTo(0);
+    }
+
+    private void addDeploymentRequests(ApolloTestClient apolloTestClient, Service service, DeployableVersion deployableVersion, List<Environment> environments, List<Callable<MultiDeploymentResponseObject>> deploymentRequests) {
+        environments.forEach(region ->
+                deploymentRequests.add(() -> apolloTestClient.addDeployment(String.valueOf(region.getId()), String.valueOf(service.getId()), deployableVersion.getId()))
+        );
+    }
+
+    @NotNull
+    private List<MultiDeploymentResponseObject.SuccessfulDeploymentResponseObject> getSuccessfulDeploymentResponseObjects(List<MultiDeploymentResponseObject> results) {
+        return results.stream()
                 .map(MultiDeploymentResponseObject::getSuccessful)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
+    }
 
-        List<MultiDeploymentResponseObject.UnsuccessfulDeploymentResponseObject> error = results.stream()
+    @NotNull
+    private List<MultiDeploymentResponseObject.UnsuccessfulDeploymentResponseObject> getUnsuccessfulDeploymentResponseObjects(List<MultiDeploymentResponseObject> results) {
+        return results.stream()
                 .map(MultiDeploymentResponseObject::getUnsuccessful)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
-
-        assertThat(success.size()).isEqualTo(1);
-        assertThat(error.size()).isEqualTo(2);
     }
 
     private MultiDeploymentResponseObject futureGetUnchecked(Future<MultiDeploymentResponseObject> multiDeploymentResponseObjectFuture) {
