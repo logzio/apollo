@@ -15,13 +15,13 @@ import io.logz.apollo.models.Service;
 import org.junit.After;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SingleRegionBlockerTest {
 
@@ -49,8 +49,12 @@ public class SingleRegionBlockerTest {
 
         String envIdsCsv = String.valueOf(env1.getId()) + "," + String.valueOf(env2.getId());
 
-        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
-        assertThat(result.getUnsuccessful().get(0).getException().getMessage().contains("you can not deploy requested services to multiple environments simultaneously."));
+        Exception exception = assertThrows(ApolloClientException.class, () -> {
+            apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
+        });
+
+        String exceptionMsg = exception.getMessage();
+        assertTrue(exceptionMsg.contains("you can not deploy requested services to multiple environments simultaneously."));
     }
 
     @Test
