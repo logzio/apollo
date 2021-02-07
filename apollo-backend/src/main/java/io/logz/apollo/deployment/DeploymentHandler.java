@@ -1,31 +1,32 @@
 package io.logz.apollo.deployment;
 
 import io.logz.apollo.LockService;
+import io.logz.apollo.auth.PermissionsValidator;
 import io.logz.apollo.blockers.DeploymentBlocker;
 import io.logz.apollo.blockers.RequestBlockerResponse;
-import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
-import io.logz.apollo.models.DeploymentPermission;
-import io.logz.apollo.auth.PermissionsValidator;
-import io.logz.apollo.services.BlockerService;
 import io.logz.apollo.controllers.DeploymentController;
 import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.dao.DeploymentPermissionDao;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.ServiceDao;
 import io.logz.apollo.excpetions.ApolloDeploymentBlockedException;
-import io.logz.apollo.excpetions.ApolloDeploymentTooManyRequestsException;
-import io.logz.apollo.excpetions.ApolloDeploymentException;
 import io.logz.apollo.excpetions.ApolloDeploymentConflictException;
+import io.logz.apollo.excpetions.ApolloDeploymentException;
+import io.logz.apollo.excpetions.ApolloDeploymentTooManyRequestsException;
+import io.logz.apollo.excpetions.ApolloIllegalEnvironmentException;
 import io.logz.apollo.kubernetes.KubernetesHandlerStore;
 import io.logz.apollo.models.Deployment;
+import io.logz.apollo.models.DeploymentPermission;
 import io.logz.apollo.models.Environment;
 import io.logz.apollo.models.Group;
 import io.logz.apollo.models.KubernetesDeploymentStatus;
 import io.logz.apollo.models.Service;
+import io.logz.apollo.services.BlockerService;
+import org.rapidoid.http.Req;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.rapidoid.http.Req;
+
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
@@ -120,7 +121,10 @@ public class DeploymentHandler {
             throw new ApolloDeploymentBlockedException("Not Authorized!");
         }
 
-        String lockName = lockService.getDeploymentLockName(serviceId, environmentId);
+        boolean hasSingleRegionBlocker = blockerService.hasSingleRegionBlocker(serviceId);
+        String lockName = hasSingleRegionBlocker ? lockService.getDeploymentLockName(serviceId, environment.getAvailability()) :
+                lockService.getDeploymentLockName(serviceId, environmentId);
+
         if (!lockService.getAndObtainLock(lockName)) {
             logger.warn("A deployment request of this sort is currently being run");
             throw new ApolloDeploymentTooManyRequestsException("A deployment request is currently running for this service and environment! Wait until its done");
@@ -153,6 +157,7 @@ public class DeploymentHandler {
             newDeployment.setDeploymentMessage(deploymentMessage);
             newDeployment.setGroupName(groupName);
             newDeployment.setEmergencyDeployment(isEmergencyDeployment);
+            newDeployment.setAvailability(environment.getAvailability());
 
             if (group.isPresent()) {
                 newDeployment.setGroupName(group.get().getName());

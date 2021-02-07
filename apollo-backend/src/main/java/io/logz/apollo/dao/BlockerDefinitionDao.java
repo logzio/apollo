@@ -15,6 +15,7 @@ public interface BlockerDefinitionDao {
     List<Integer> getUnconditionalBlockersByEnvironmentTypeAndRegion(@Param("regions") List<String> regions, @Param("environmentTypes") List<String> environmentTypes);
     List<Integer> getUnconditionalBlockersByRegion(@Param("regions") List<String> regions);
     List<Integer> getUnconditionalBlockersByEnvironmentType(@Param("environmentTypes") List<String> environmentTypes);
+    List<String> getBlockersJsonConfiguration(String blockerTypeName);
     void addBlockerDefinition(BlockerDefinition blockerDefinition);
     void updateBlockerDefinition(BlockerDefinition blockerDefinition);
     void deleteBlockerDefinition(int id);

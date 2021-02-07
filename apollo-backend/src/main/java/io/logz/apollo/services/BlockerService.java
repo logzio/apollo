@@ -1,11 +1,12 @@
 package io.logz.apollo.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.logz.apollo.blockers.Blocker;
-import io.logz.apollo.blockers.BlockerTypeName;
-import io.logz.apollo.blockers.DeploymentBlocker;
+import io.logz.apollo.blockers.BlockerFunction;
 import io.logz.apollo.blockers.BlockerInjectableCommons;
 import io.logz.apollo.blockers.BlockerType;
-import io.logz.apollo.blockers.BlockerFunction;
+import io.logz.apollo.blockers.BlockerTypeName;
+import io.logz.apollo.blockers.DeploymentBlocker;
 import io.logz.apollo.blockers.DeploymentBlockerFunction;
 import io.logz.apollo.blockers.RequestBlocker;
 import io.logz.apollo.blockers.RequestBlockerFunction;
@@ -21,10 +22,12 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,6 +46,7 @@ public class BlockerService {
     private final BlockerInjectableCommons blockerInjectableCommons;
     private final Map<String, Class<? extends BlockerFunction>> blockerTypeNameBindings;
     private final Reflections reflections;
+    private final ObjectMapper mapper;
 
     @Inject
     public BlockerService(BlockerDefinitionDao blockerDefinitionDao, BlockerInjectableCommons blockerInjectableCommons) {
@@ -51,6 +55,7 @@ public class BlockerService {
 
         blockerTypeNameBindings = new HashMap<>();
         reflections = new Reflections("io.logz.apollo.blockers.types");
+        mapper = new ObjectMapper();
     }
 
     public Optional<Class<? extends BlockerFunction>> getBlockerTypeBinding(String blockerTypeName) {
@@ -222,6 +227,23 @@ public class BlockerService {
         }
 
         return false;
+    }
+
+    public boolean hasSingleRegionBlocker(int serviceId) {
+        return blockerDefinitionDao.getBlockersJsonConfiguration(BlockerTypeName.SINGLE_REGION).stream()
+                .map(this::toSingleRegionBlockerConfig)
+                .map(SingleRegionBlocker.SingleRegionBlockerConfiguration::getServiceIds)
+                .filter(Objects::nonNull)
+                .anyMatch(serviceIds -> serviceIds.contains(serviceId));
+    }
+
+    private SingleRegionBlocker.SingleRegionBlockerConfiguration toSingleRegionBlockerConfig(String jsonConfiguration) {
+        try {
+            return mapper.readValue(jsonConfiguration, SingleRegionBlocker.SingleRegionBlockerConfiguration.class);
+        } catch (IOException e) {
+            logger.error("Failed to read Single Region Configuration...", e);
+            throw new UncheckedIOException(e);
+        }
     }
 
     public RequestBlockerResponse checkDeploymentShouldBeBlockedBySingleRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) {

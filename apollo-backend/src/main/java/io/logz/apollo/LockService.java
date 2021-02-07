@@ -43,6 +43,10 @@ public class LockService {
         }
     }
 
+    public String getDeploymentLockName(int serviceId, String availability) {
+        return "lock-service-" + serviceId + "-availability-" + availability;
+    }
+
     public String getDeploymentLockName(int serviceId, int environmentId) {
         return "lock-service-" + serviceId + "-environment-" + environmentId;
     }
