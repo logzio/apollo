@@ -265,7 +265,7 @@ public class BlockerService {
                 add(serviceId);
             }}));
         } else if (stackId != null) {
-            List<Integer> serviceIds = blockerInjectableCommons.getStackDao().getServicesStack(stackId).getServices();
+            List<Integer> serviceIds = blockerInjectableCommons.getServicesStackDao().getServices(stackId);
             if (!serviceIds.isEmpty()) {
                 return Optional.of(getSingleRegionBlockerConfiguration(serviceIds));
             }
