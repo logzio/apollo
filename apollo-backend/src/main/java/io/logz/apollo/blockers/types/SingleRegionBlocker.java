@@ -29,7 +29,7 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
 
     @Override
     public boolean shouldBlock(BlockerInjectableCommons blockerInjectableCommons, Deployment deployment) {
-        if (!(getAllOngoingDeploymentsByServiceId(deployment.getServiceId(), blockerInjectableCommons).isEmpty())) {
+        if (!(getAllOngoingDeploymentsByServiceId(deployment.getServiceId(), deployment.getAvailability(), blockerInjectableCommons).isEmpty())) {
             logger.warn("There are already running deployments for the service {}", deployment.getServiceId());
             return true;
         }
@@ -54,11 +54,11 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
                 .collect(Collectors.toList());
     }
 
-    private List<Deployment> getAllOngoingDeploymentsByServiceId(int serviceId, BlockerInjectableCommons blockerInjectableCommons) {
-        return blockerInjectableCommons.getDeploymentDao().getAllOngoingDeploymentsByServiceId(serviceId);
+    private List<Deployment> getAllOngoingDeploymentsByServiceId(int serviceId, String availability, BlockerInjectableCommons blockerInjectableCommons) {
+        return blockerInjectableCommons.getDeploymentDao().getAllOngoingDeploymentsByServiceId(serviceId, availability);
     }
 
-    private static class SingleRegionBlockerConfiguration {
+    public static class SingleRegionBlockerConfiguration {
         private List<Integer> serviceIds;
 
         public SingleRegionBlockerConfiguration() {
