@@ -116,7 +116,7 @@ public class DeploymentController {
             deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentIds.size());
         } catch (ApolloDeploymentException e) {
             responseObject.addUnsuccessful(e);
-            assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, responseObject);
             return;
         }
 
