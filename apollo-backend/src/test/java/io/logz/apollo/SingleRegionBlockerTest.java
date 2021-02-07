@@ -62,7 +62,6 @@ public class SingleRegionBlockerTest {
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
 
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
-
         String envIdsCsv = env1.getId() + "," + env2.getId();
 
         Exception exception = assertThrows(ApolloClientException.class, () -> {
