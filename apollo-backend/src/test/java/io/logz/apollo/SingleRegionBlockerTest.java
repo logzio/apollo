@@ -30,8 +30,7 @@ import java.util.stream.Collectors;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class SingleRegionBlockerTest {
 
@@ -65,11 +64,8 @@ public class SingleRegionBlockerTest {
 
         String envIdsCsv = env1.getId() + "," + env2.getId();
 
-        Exception exception = assertThrows(ApolloClientException.class, () -> {
-            apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
-        });
-
-        assertTrue(exception.getMessage().contains("you can not deploy requested services to multiple environments simultaneously."));
+        assertThatThrownBy(() -> apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()))
+                .hasMessageContaining("you can not deploy requested services to multiple environments simultaneously.");
     }
 
     @Test
