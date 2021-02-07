@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class SingleRegionBlockerTest {
 
@@ -60,11 +61,10 @@ public class SingleRegionBlockerTest {
         Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
 
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
-
         String envIdsCsv = env1.getId() + "," + env2.getId();
 
-        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
-        assertThat(result.getUnsuccessful().get(0).getException().getMessage()).contains("you can not deploy requested services to multiple environments simultaneously.");
+        assertThatThrownBy(() -> apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()))
+                .hasMessageContaining("you can not deploy requested services to multiple environments simultaneously.");
     }
 
     @Test
@@ -76,7 +76,6 @@ public class SingleRegionBlockerTest {
         DeployableVersion deployableVersion = createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
         final String availabilityProd = "PRODTest";
-        final String availabilityStaging = "StagingTest";
 
         Environment env1 = ModelsGenerator.createEnvironment(availabilityProd, null);
         env1.setId(apolloTestClient.addEnvironment(env1).getId());
