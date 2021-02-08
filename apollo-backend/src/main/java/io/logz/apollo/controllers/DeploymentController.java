@@ -104,7 +104,7 @@ public class DeploymentController {
             Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(environmentIdsCsv).forEach(id -> environmentIds.add(Integer.valueOf(id)));
             Splitter.on(IDS_DELIMITER).omitEmptyStrings().trimResults().split(serviceIdsCsv).forEach(id -> serviceIds.add(Integer.valueOf(id)));
         } catch (NumberFormatException e) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, e.getMessage());
+            assignJsonResponseToReq(req, HttpStatus.CREATED, e.getMessage());
             return;
         }
 
