@@ -275,9 +275,9 @@ public class BlockerService {
 
     private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds, String availability) {
         return "{\n" +
-                "  \"serviceIds\":" + serviceIds.toString() + ","
-                + " \"availability\":" + "\"" +  availability + "\"" +
+                "  \"serviceIds\":" + serviceIds.toString() + "," +
+                "  \"availability\":" + "\"" +  availability + "\"" +
                 "}";
     }
-    
+
 }

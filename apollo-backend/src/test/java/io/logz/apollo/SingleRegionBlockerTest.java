@@ -132,8 +132,6 @@ public class SingleRegionBlockerTest {
 
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
 
-        List<Environment> prodAndStagingEnvironments = Arrays.asList(env1, env2, env3);
-
         List<Callable<MultiDeploymentResponseObject>> deploymentRequests = new ArrayList<>();
 
         deploymentRequests.add(() -> apolloTestClient.addDeployment(String.valueOf(env1.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()));
