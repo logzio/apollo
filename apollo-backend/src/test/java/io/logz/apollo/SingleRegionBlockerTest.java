@@ -63,8 +63,8 @@ public class SingleRegionBlockerTest {
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
         String envIdsCsv = env1.getId() + "," + env2.getId();
 
-        assertThatThrownBy(() -> apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()))
-                .hasMessageContaining("you can not deploy requested services to multiple environments simultaneously.");
+        MultiDeploymentResponseObject result = apolloTestClient.addDeployment(envIdsCsv, String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId());
+        assertThat(result.getUnsuccessful().get(0).getException().getMessage()).contains("you can not deploy requested services to multiple environments simultaneously.");
     }
 
     @Test
