@@ -270,4 +270,5 @@ public class BlockerDefinitionController {
         logger.info(String.format("Updated blocker's activeness: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
         assignJsonResponseToReq(req, HttpStatus.OK, blockerDefinition);
     }
+
 }

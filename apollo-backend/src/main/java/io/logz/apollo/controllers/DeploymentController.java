@@ -23,6 +23,7 @@ import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +117,7 @@ public class DeploymentController {
 
         DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
 
-        //In case the user deployed to Staging and Prod availabilities.
+        //In case the user deployed to Staging and Prod availabilities simultaneously.
         List<String> availabilities = environmentIds.stream().map(id -> environmentDao.getEnvironment(id).getAvailability()).distinct().collect(Collectors.toList());
         for (String availability : availabilities) {
             try {
@@ -127,7 +128,6 @@ public class DeploymentController {
                 return;
             }
         }
-
 
         environmentIds.forEach(environmentId -> serviceIds.forEach(serviceId -> {
             DeployableVersion serviceDeployableVersion = deployableVersionDao.getDeployableVersionFromSha(deployableVersion.getGitCommitSha(), serviceId);

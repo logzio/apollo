@@ -279,5 +279,5 @@ public class BlockerService {
                 + " \"availability\":" + "\"" +  availability + "\"" +
                 "}";
     }
-
+    
 }
