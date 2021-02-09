@@ -1,6 +1,8 @@
 package io.logz.apollo;
 
 import io.logz.apollo.clients.ApolloTestClient;
+import io.logz.apollo.configuration.ApolloConfiguration;
+import io.logz.apollo.dao.DeploymentDao;
 import io.logz.apollo.exceptions.ApolloClientException;
 import io.logz.apollo.helpers.Common;
 import io.logz.apollo.helpers.Fabric8TestMethods;
@@ -29,6 +31,8 @@ import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVe
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployment;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitEnvironment;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitService;
+import static io.logz.apollo.models.Deployment.DeploymentStatus.CANCELED;
+import static io.logz.apollo.models.Deployment.DeploymentStatus.DONE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -224,5 +228,30 @@ public class DeploymentTest {
 
         throwableAssert.isInstanceOf(Exception.class);
         throwableAssert.hasMessage("Cannot deploy. Target environment is not active.");
+    }
+
+    @Test
+    public void testShouldDeploymentBeCanceled() throws Exception {
+        DeploymentDao deploymentDao = standaloneApollo.getInstance(DeploymentDao.class);
+
+        Deployment deployment = ModelsGenerator.createAndSubmitDeployment(apolloTestClient);
+        int id = deployment.getId();
+        //Canceling a deployment that didn't passed the timeout
+        assertThatThrownBy(() -> apolloTestClient.cancelDeployment(deploymentDao.getDeployment(id)))
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Please be patient, the time has not expired yet");
+
+        int timeoutInSeconds = standaloneApollo.getInstance(ApolloConfiguration.class).getCancelDeployment().getForceCancelTimeoutSeconds();
+
+        Common.waitABit(timeoutInSeconds+1);
+        //Canceling an expired deployment that passed the timeout
+        deployment = apolloTestClient.cancelDeployment(deployment);
+        assertThat(deployment.getStatus()).isEqualTo(CANCELED);
+
+        deploymentDao.updateDeploymentStatus(deployment.getId(), DONE);
+        //Canceling a deployment in a deterministic state
+        assertThatThrownBy(() -> apolloTestClient.cancelDeployment(deploymentDao.getDeployment(id)))
+                .isInstanceOf(Exception.class)
+                .hasMessageContaining("Deployment is not stuck");
     }
 }

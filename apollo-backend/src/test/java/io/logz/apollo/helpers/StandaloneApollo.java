@@ -5,6 +5,7 @@ import io.logz.apollo.clients.ApolloTestAdminClient;
 import io.logz.apollo.clients.ApolloTestClient;
 import io.logz.apollo.configuration.ApiConfiguration;
 import io.logz.apollo.configuration.ApolloConfiguration;
+import io.logz.apollo.configuration.DeploymentConfiguration;
 import io.logz.apollo.configuration.DatabaseConfiguration;
 import io.logz.apollo.configuration.KubernetesConfiguration;
 import io.logz.apollo.configuration.ScmConfiguration;
@@ -77,7 +78,8 @@ public class StandaloneApollo {
                 new KubernetesConfiguration(1, 1),
                 new ScmConfiguration(StringUtils.EMPTY, StringUtils.EMPTY),
                 new WebsocketConfiguration(Common.getAvailablePort(), 5),
-                new SlaveConfiguration(slaveId,1, isSlave, slaveCsvEnvironments)
+                new SlaveConfiguration(slaveId,1, isSlave, slaveCsvEnvironments),
+                new DeploymentConfiguration(1)
         );
     }
 

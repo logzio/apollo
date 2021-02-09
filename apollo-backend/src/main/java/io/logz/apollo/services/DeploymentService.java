@@ -1,5 +1,7 @@
 package io.logz.apollo.services;
 
+import io.logz.apollo.configuration.ApolloConfiguration;
+import io.logz.apollo.configuration.DeploymentConfiguration;
 import io.logz.apollo.dao.DeployableVersionDao;
 import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.dao.ServiceDao;
@@ -14,6 +16,9 @@ import org.slf4j.MDC;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import java.time.Duration;
+import java.util.Date;
+
 import static java.util.Objects.requireNonNull;
 
 @Singleton
@@ -23,12 +28,15 @@ public class DeploymentService {
     private final ServiceDao serviceDao;
     private final DeployableVersionDao deployableVersionDao;
     private final EnvironmentDao environmentDao;
+    private final DeploymentConfiguration deploymentConfiguration;
 
     @Inject
-    public DeploymentService(ServiceDao serviceDao, DeployableVersionDao deployableVersionDao,EnvironmentDao environmentDao) {
+    public DeploymentService(ServiceDao serviceDao, DeployableVersionDao deployableVersionDao,
+                             EnvironmentDao environmentDao, ApolloConfiguration apolloConfiguration) {
         this.serviceDao = requireNonNull(serviceDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.environmentDao = requireNonNull(environmentDao);
+        this.deploymentConfiguration = requireNonNull(apolloConfiguration).getCancelDeployment();
     }
 
     public void logDeploymentDescription(Deployment deployment) {
@@ -45,5 +53,13 @@ public class DeploymentService {
             MDC.remove("env");
             MDC.remove("region");
         }
+    }
+
+    public boolean isCancelable(Deployment deployment) {
+        return getTimeDiffFromNowInSeconds(deployment.getStartedAt()) >= deploymentConfiguration.getForceCancelTimeoutSeconds();
+    }
+
+    private long getTimeDiffFromNowInSeconds(Date date) {
+        return Duration.between(date.toInstant(), new Date().toInstant()).getSeconds();
     }
 }

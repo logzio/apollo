@@ -452,4 +452,12 @@ public class ApolloClient {
         return genericApolloClient.postAndGetResult("/deployment-history", requestBody, new TypeReference<DeploymentHistory>() {
         });
     }
+
+    public Deployment cancelDeployment(Deployment deployment) throws Exception {
+        String requestBody = Common.generateJson(
+                "id", String.valueOf(deployment.getId()));
+        return genericApolloClient.putAndGetResult("/force-cancel", requestBody, new TypeReference<Deployment>() {
+        });
+    }
+
 }
