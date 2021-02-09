@@ -37,13 +37,16 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
     }
 
     @Override
-    public RequestBlockerResponse shouldBlock(List<Integer> serviceIds, int numOfEnvironments) {
-        List<Integer> serviceIdsToCheck = getServicesWithinSingleRegionBlocker(serviceIds);
-        if (!serviceIdsToCheck.isEmpty()) {
-            if (numOfEnvironments > 1) {
-                return new RequestBlockerResponse(true, BLOCKER_NAME, serviceIdsToCheck);
+    public RequestBlockerResponse shouldBlock(List<Integer> serviceIds, int numOfEnvironments, String availability) {
+        if (availability.equals(singleRegionBlockerConfiguration.getAvailability())) {
+            List<Integer> serviceIdsToCheck = getServicesWithinSingleRegionBlocker(serviceIds);
+            if (!serviceIdsToCheck.isEmpty()) {
+                if (numOfEnvironments > 1) {
+                    return new RequestBlockerResponse(true, BLOCKER_NAME, serviceIdsToCheck);
+                }
             }
         }
+
         return new RequestBlockerResponse(false, BLOCKER_NAME);
     }
 
@@ -60,6 +63,7 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
 
     public static class SingleRegionBlockerConfiguration {
         private List<Integer> serviceIds;
+        private String availability;
 
         public SingleRegionBlockerConfiguration() {
         }
@@ -70,6 +74,14 @@ public class SingleRegionBlocker implements RequestBlockerFunction, DeploymentBl
 
         public void setServiceIds(List<Integer> serviceId) {
             this.serviceIds = serviceId;
+        }
+
+        public String getAvailability() {
+            return availability;
+        }
+
+        public void setAvailability(String availability) {
+            this.availability = availability;
         }
     }
 }
