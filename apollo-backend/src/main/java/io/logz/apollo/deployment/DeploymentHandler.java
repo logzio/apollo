@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
 
 public class DeploymentHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentHandler.class);
 
     private final KubernetesHandlerStore kubernetesHandlerStore;
     private final DeploymentPermissionDao deploymentPermissionDao;

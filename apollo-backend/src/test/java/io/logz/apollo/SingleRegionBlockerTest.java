@@ -123,15 +123,21 @@ public class SingleRegionBlockerTest {
         Environment env2 = ModelsGenerator.createEnvironment(availabilityStaging, null);
         env2.setId(apolloTestClient.addEnvironment(env2).getId());
 
+        Environment env3 = ModelsGenerator.createEnvironment(availabilityStaging, null);
+        env3.setId(apolloTestClient.addEnvironment(env3).getId());
+
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
         ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env3), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
 
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
 
-        List<Environment> prodAndStagingEnvironments = Arrays.asList(env1, env2);
+        List<Environment> prodAndStagingEnvironments = Arrays.asList(env1, env2, env3);
 
         List<Callable<MultiDeploymentResponseObject>> deploymentRequests = new ArrayList<>();
-        addDeploymentRequests(apolloTestClient, serviceToBeLimitToOneRegion, deployableVersion, prodAndStagingEnvironments, deploymentRequests);
+
+        deploymentRequests.add(() -> apolloTestClient.addDeployment(String.valueOf(env1.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()));
+        deploymentRequests.add(() -> apolloTestClient.addDeployment(env2.getId() + "," + env3.getId(), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()));
 
         List<Future<MultiDeploymentResponseObject>> futures = executorService.invokeAll(deploymentRequests);
 
@@ -139,7 +145,7 @@ public class SingleRegionBlockerTest {
                 .map(this::futureGetUnchecked)
                 .collect(Collectors.toList());
 
-        assertThat(getSuccessfulDeploymentResponseObjects(results).size()).isEqualTo(2);
+        assertThat(getSuccessfulDeploymentResponseObjects(results).size()).isEqualTo(3);
         assertThat(getUnsuccessfulDeploymentResponseObjects(results).size()).isEqualTo(0);
     }
 
