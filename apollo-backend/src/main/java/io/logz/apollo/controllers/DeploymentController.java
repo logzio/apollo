@@ -1,6 +1,7 @@
 package io.logz.apollo.controllers;
 
 import com.google.common.base.Splitter;
+import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.database.OrderDirection;
 import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.LockService;
@@ -22,13 +23,17 @@ import org.rapidoid.security.annotation.LoggedIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Created by roiravhon on 1/5/17.
@@ -43,13 +48,15 @@ public class DeploymentController {
     private final DeployableVersionDao deployableVersionDao;
     private final LockService lockService;
     private final DeploymentHandler deploymentHandler;
+    private final EnvironmentDao environmentDao;
 
     @Inject
-    public DeploymentController(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, LockService lockService, DeploymentHandler deploymentHandler) {
+    public DeploymentController(DeploymentDao deploymentDao, DeployableVersionDao deployableVersionDao, LockService lockService, DeploymentHandler deploymentHandler, EnvironmentDao environmentDao) {
         this.deploymentDao = requireNonNull(deploymentDao);
         this.deployableVersionDao = requireNonNull(deployableVersionDao);
         this.lockService = requireNonNull(lockService);
         this.deploymentHandler = requireNonNull(deploymentHandler);
+        this.environmentDao = requireNonNull(environmentDao);
     }
 
     @LoggedIn
@@ -112,12 +119,15 @@ public class DeploymentController {
 
         DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
 
-        try {
-            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentIds.size());
-        } catch (ApolloDeploymentException e) {
-            responseObject.addUnsuccessful(e);
-            assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
-            return;
+        Map<String, List<Integer>> environmentsPerAvailability = environmentIds.stream().collect(groupingBy(id -> environmentDao.getEnvironment(id).getAvailability()));
+        for (String availability : environmentsPerAvailability.keySet()) {
+            try {
+                deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentsPerAvailability.get(availability).size(), availability);
+            } catch (ApolloDeploymentException e) {
+                responseObject.addUnsuccessful(e);
+                assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
+                return;
+            }
         }
 
         environmentIds.forEach(environmentId -> serviceIds.forEach(serviceId -> {

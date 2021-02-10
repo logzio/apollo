@@ -1,6 +1,7 @@
 package io.logz.apollo.controllers;
 
 import com.google.common.base.Splitter;
+import io.logz.apollo.dao.EnvironmentDao;
 import io.logz.apollo.deployment.DeploymentHandler;
 import io.logz.apollo.models.MultiDeploymentResponseObject;
 import io.logz.apollo.excpetions.ApolloDeploymentException;
@@ -25,12 +26,14 @@ public class DeploymentGroupsController {
 
     private final DeploymentHandler deploymentHandler;
     private final GroupDao groupDao;
+    private final EnvironmentDao environmentDao;
     private final static String GROUP_IDS_DELIMITER = ",";
 
     @Inject
-    public DeploymentGroupsController(DeploymentHandler deploymentHandler, GroupDao groupDao) {
+    public DeploymentGroupsController(DeploymentHandler deploymentHandler, GroupDao groupDao, EnvironmentDao environmentDao) {
         this.deploymentHandler = requireNonNull(deploymentHandler);
         this.groupDao = requireNonNull(groupDao);
+        this.environmentDao = requireNonNull(environmentDao);
     }
 
     @LoggedIn
@@ -40,7 +43,7 @@ public class DeploymentGroupsController {
         MultiDeploymentResponseObject responseObject = new MultiDeploymentResponseObject();
 
         try {
-            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(new ArrayList<Integer>() {{ add(serviceId); }}, 1);
+            deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(new ArrayList<Integer>() {{ add(serviceId); }}, 1, environmentDao.getEnvironment(environmentId).getAvailability());
         } catch (ApolloDeploymentException e) {
             responseObject.addUnsuccessful(e);
             assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);

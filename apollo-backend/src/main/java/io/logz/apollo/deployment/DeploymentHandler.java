@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
 
 public class DeploymentHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentHandler.class);
 
     private final KubernetesHandlerStore kubernetesHandlerStore;
     private final DeploymentPermissionDao deploymentPermissionDao;
@@ -179,8 +179,8 @@ public class DeploymentHandler {
         }
     }
 
-    public void checkDeploymentShouldBeBlockedByRequestBlocker(List<Integer> serviceIds, int numOfEnvironments) throws ApolloDeploymentException {
-        RequestBlockerResponse requestBlockerResponse = blockerService.checkDeploymentShouldBeBlockedBySingleRegionBlocker(serviceIds, numOfEnvironments);
+    public void checkDeploymentShouldBeBlockedByRequestBlocker(List<Integer> serviceIds, int numOfEnvironments, String availability) throws ApolloDeploymentException {
+        RequestBlockerResponse requestBlockerResponse = blockerService.checkDeploymentShouldBeBlockedBySingleRegionBlocker(serviceIds, numOfEnvironments, availability);
         if (requestBlockerResponse.isShouldBlock()) {
             logger.info("User is not allowed to perform this deployment!");
 

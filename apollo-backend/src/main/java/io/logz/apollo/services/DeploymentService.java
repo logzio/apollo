@@ -36,14 +36,24 @@ public class DeploymentService {
             DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployment.getDeployableVersionId());
             Service service = serviceDao.getService(deployment.getServiceId());
             Environment env = environmentDao.getEnvironment(deployment.getEnvironmentId());
+            String committerName = deployableVersion.getCommitterName();
             MDC.put("markers", String.format("service-name:%s", service.getName()));
             MDC.put("env", env.getAvailability());
             MDC.put("region", env.getGeoRegion());
+            MDC.put("service", service.getName());
+            MDC.put("commit", deployableVersion.getGitCommitSha());
+            MDC.put("committer",  committerName != null ? committerName : "unknown");
+            MDC.put("userEmail", deployment.getUserEmail());
+            logger.info("Apollo deployed the commit message = {} triggered by {}", deployableVersion.getCommitMessage(), deployment.getUserEmail());
             logger.info("<a href='{}'>{} Deployed commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
         } finally {
             MDC.remove("markers");
             MDC.remove("env");
             MDC.remove("region");
+            MDC.remove("service");
+            MDC.remove("commit");
+            MDC.remove("committer");
+            MDC.remove("userEmail");
         }
     }
 }

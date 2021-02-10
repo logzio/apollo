@@ -246,10 +246,10 @@ public class BlockerService {
         }
     }
 
-    public RequestBlockerResponse checkDeploymentShouldBeBlockedBySingleRegionBlocker(List<Integer> serviceIds, int numOfEnvironments) {
+    public RequestBlockerResponse checkDeploymentShouldBeBlockedBySingleRegionBlocker(List<Integer> serviceIds, int numOfEnvironments, String availability) {
         for (RequestBlocker blocker : getRequestBlockers()) {
             if (blocker.getActive()) {
-                RequestBlockerResponse requestBlockerResponse = blocker.getFunction().shouldBlock(serviceIds, numOfEnvironments);
+                RequestBlockerResponse requestBlockerResponse = blocker.getFunction().shouldBlock(serviceIds, numOfEnvironments, availability);
                 if (requestBlockerResponse.isShouldBlock()) {
                     return requestBlockerResponse;
                 }
@@ -259,15 +259,13 @@ public class BlockerService {
         return new RequestBlockerResponse(false, SingleRegionBlocker.BLOCKER_NAME);
     }
 
-    public Optional<String> initSingleRegionBlockerConfiguration(Integer serviceId, Integer stackId) {
+    public Optional<String> initSingleRegionBlockerConfiguration(Integer serviceId, Integer stackId, String availability) {
         if (serviceId != null) {
-            return Optional.of(getSingleRegionBlockerConfiguration(new ArrayList<Integer>() {{
-                add(serviceId);
-            }}));
+            return Optional.of(getSingleRegionBlockerConfiguration(new ArrayList<Integer>() {{ add(serviceId); }}, availability));
         } else if (stackId != null) {
             List<Integer> serviceIds = blockerInjectableCommons.getServicesStackDao().getServices(stackId);
             if (!serviceIds.isEmpty()) {
-                return Optional.of(getSingleRegionBlockerConfiguration(serviceIds));
+                return Optional.of(getSingleRegionBlockerConfiguration(serviceIds, availability));
             }
         }
 
@@ -275,9 +273,10 @@ public class BlockerService {
 
     }
 
-    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds) {
+    private String getSingleRegionBlockerConfiguration(List<Integer> serviceIds, String availability) {
         return "{\n" +
-                "  \"serviceIds\":" + serviceIds.toString() +
+                "  \"serviceIds\":" + serviceIds.toString() + "," +
+                "  \"availability\":" + "\"" +  availability + "\"" +
                 "}";
     }
 
