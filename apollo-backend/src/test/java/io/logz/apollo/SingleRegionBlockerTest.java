@@ -134,6 +134,7 @@ public class SingleRegionBlockerTest {
 
         List<Callable<MultiDeploymentResponseObject>> deploymentRequests = new ArrayList<>();
 
+        // deploying multiple environments in staging shouldn't be affected by SRB in prod
         deploymentRequests.add(() -> apolloTestClient.addDeployment(String.valueOf(env1.getId()), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()));
         deploymentRequests.add(() -> apolloTestClient.addDeployment(env2.getId() + "," + env3.getId(), String.valueOf(serviceToBeLimitToOneRegion.getId()), deployableVersion.getId()));
 

@@ -27,11 +27,13 @@ import org.slf4j.MDC;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static io.logz.apollo.common.ControllerCommon.assignJsonResponseToReq;
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * Created by roiravhon on 1/5/17.
@@ -117,11 +119,10 @@ public class DeploymentController {
 
         DeployableVersion deployableVersion = deployableVersionDao.getDeployableVersion(deployableVersionId);
 
-        //In case the user deployed to Staging and Prod availabilities simultaneously.
-        List<String> availabilities = environmentIds.stream().map(id -> environmentDao.getEnvironment(id).getAvailability()).distinct().collect(Collectors.toList());
-        for (String availability : availabilities) {
+        Map<String, List<Integer>> environmentsPerAvailability = environmentIds.stream().collect(groupingBy(id -> environmentDao.getEnvironment(id).getAvailability()));
+        for (String availability : environmentsPerAvailability.keySet()) {
             try {
-                deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentIds.size(), availability);
+                deploymentHandler.checkDeploymentShouldBeBlockedByRequestBlocker(serviceIds, environmentsPerAvailability.get(availability).size(), availability);
             } catch (ApolloDeploymentException e) {
                 responseObject.addUnsuccessful(e);
                 assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
