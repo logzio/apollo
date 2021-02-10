@@ -39,6 +39,10 @@ public class DeploymentService {
             MDC.put("markers", String.format("service-name:%s", service.getName()));
             MDC.put("env", env.getAvailability());
             MDC.put("region", env.getGeoRegion());
+            MDC.put("service", service.getName());
+            MDC.put("commit", deployableVersion.getGitCommitSha());
+            MDC.put("committer", deployableVersion.getCommitterName());
+            logger.info("Apollo deployed the commit message = {} triggered by {}", deployableVersion.getCommitMessage(), deployment.getUserEmail());
             logger.info("<a href='{}'>{} Deployed commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
         } finally {
             MDC.remove("markers");
