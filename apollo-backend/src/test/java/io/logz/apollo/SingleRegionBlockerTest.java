@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitBlocker;
 import static io.logz.apollo.helpers.ModelsGenerator.createAndSubmitDeployableVersion;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class SingleRegionBlockerTest {
 
@@ -57,8 +56,16 @@ public class SingleRegionBlockerTest {
         Service serviceToBeLimitToOneRegion = ModelsGenerator.createAndSubmitService(apolloTestClient);
         DeployableVersion deployableVersion = ModelsGenerator.createAndSubmitDeployableVersion(apolloTestClient, serviceToBeLimitToOneRegion);
 
-        Environment env1 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
-        Environment env2 = ModelsGenerator.createAndSubmitEnvironment(apolloTestClient);
+        final String availabilityProd = "PRODTest";
+
+        Environment env1 = ModelsGenerator.createEnvironment(availabilityProd, null);
+        env1.setId(apolloTestClient.addEnvironment(env1).getId());
+
+        Environment env2 = ModelsGenerator.createEnvironment(availabilityProd, null);
+        env2.setId(apolloTestClient.addEnvironment(env2).getId());
+
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env1), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
+        ModelsGenerator.createAndSubmitPermissions(apolloTestClient, Optional.of(env2), Optional.empty(), DeploymentPermission.PermissionType.ALLOW);
 
         blocker = createAndSubmitBlocker(apolloTestAdminClient, BlockerTypeName.SINGLE_REGION, "{}", null, serviceToBeLimitToOneRegion, null, env1.getAvailability());
         String envIdsCsv = env1.getId() + "," + env2.getId();
