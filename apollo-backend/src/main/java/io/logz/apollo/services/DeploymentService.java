@@ -43,6 +43,7 @@ public class DeploymentService {
             MDC.put("service", service.getName());
             MDC.put("commit", deployableVersion.getGitCommitSha());
             MDC.put("committer",  committerName != null ? committerName : "unknown");
+            MDC.put("userEmail", deployment.getUserEmail());
             logger.info("Apollo deployed the commit message = {} triggered by {}", deployableVersion.getCommitMessage(), deployment.getUserEmail());
             logger.info("<a href='{}'>{} Deployed commit</a>",deployableVersion.getCommitUrl(),deployment.getUserEmail());
         } finally {
@@ -52,6 +53,7 @@ public class DeploymentService {
             MDC.remove("service");
             MDC.remove("commit");
             MDC.remove("committer");
+            MDC.remove("userEmail");
         }
     }
 }
