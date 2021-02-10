@@ -48,6 +48,9 @@ public class DeploymentService {
             MDC.remove("markers");
             MDC.remove("env");
             MDC.remove("region");
+            MDC.remove("service");
+            MDC.remove("commit");
+            MDC.remove("committer");
         }
     }
 }
