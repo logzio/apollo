@@ -168,8 +168,12 @@ public class BlockerDefinitionController {
                                         Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
         String userEmail = req.token().get("_user").toString();
         logger.info("User: {} has just updated blocker, id:{}, name:{}", userEmail, id, name);
-
         BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
+
+        if (!blockerDefinition.getBlockerTypeName().equals(blockerTypeName)) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("You can not edit the blocker type. attempt to covert {} blocker into {} blocker", blockerDefinition.getBlockerTypeName(), blockerTypeName));
+            return;
+        }
 
         if (blockerDefinition == null) {
             Map<String, String> message = ImmutableMap.of("message", "Blocker not found");
@@ -182,14 +186,26 @@ public class BlockerDefinitionController {
             return;
         }
 
+        if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
+            blockerJsonConfiguration = initSingleRegionBlockerJsonConfig(environmentId, serviceId, stackId, availability, blockerJsonConfiguration, req);
+            if (blockerJsonConfiguration == null) return;
+        }
+
         blockerDefinition.setName(name);
         blockerDefinition.setEnvironmentId(environmentId);
         blockerDefinition.setServiceId(serviceId);
         blockerDefinition.setStackId(stackId);
         blockerDefinition.setAvailability(availability);
         blockerDefinition.setBlockerTypeName(blockerTypeName);
-        blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
         blockerDefinition.setActive(isActive);
+
+        if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
+            blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
+        } else {
+            if (blockerJsonConfiguration != null && !blockerJsonConfiguration.equals("{}")) {
+                blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
+            }
+        }
 
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
         logger.info(String.format("Updated blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
