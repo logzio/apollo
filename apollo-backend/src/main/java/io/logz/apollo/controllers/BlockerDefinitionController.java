@@ -170,14 +170,14 @@ public class BlockerDefinitionController {
         logger.info("User: {} has just updated blocker, id:{}, name:{}", userEmail, id, name);
         BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
 
-        if (!blockerDefinition.getBlockerTypeName().equals(blockerTypeName)) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("You can not edit the blocker type. attempt to covert {} blocker into {} blocker", blockerDefinition.getBlockerTypeName(), blockerTypeName));
-            return;
-        }
-
         if (blockerDefinition == null) {
             Map<String, String> message = ImmutableMap.of("message", "Blocker not found");
             assignJsonResponseToReq(req, HttpStatus.NOT_FOUND, message);
+            return;
+        }
+
+        if (!blockerDefinition.getBlockerTypeName().equals(blockerTypeName)) {
+            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("You can not edit the blocker type. attempt to covert {} blocker into {} blocker", blockerDefinition.getBlockerTypeName(), blockerTypeName));
             return;
         }
 
