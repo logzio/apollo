@@ -186,11 +186,6 @@ public class BlockerDefinitionController {
             return;
         }
 
-        if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
-            blockerJsonConfiguration = initSingleRegionBlockerJsonConfig(environmentId, serviceId, stackId, availability, blockerJsonConfiguration, req);
-            if (blockerJsonConfiguration == null) return;
-        }
-
         blockerDefinition.setName(name);
         blockerDefinition.setEnvironmentId(environmentId);
         blockerDefinition.setServiceId(serviceId);
@@ -200,6 +195,8 @@ public class BlockerDefinitionController {
         blockerDefinition.setActive(isActive);
 
         if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
+            blockerJsonConfiguration = initSingleRegionBlockerJsonConfig(environmentId, serviceId, stackId, availability, blockerJsonConfiguration, req);
+            if (blockerJsonConfiguration == null) return;
             blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
         } else {
             if (blockerJsonConfiguration != null && !blockerJsonConfiguration.equals("{}")) {
