@@ -176,11 +176,6 @@ public class BlockerDefinitionController {
             return;
         }
 
-        if (!blockerDefinition.getBlockerTypeName().equals(blockerTypeName)) {
-            assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("You can not edit the blocker type. attempt to covert {} blocker into {} blocker", blockerDefinition.getBlockerTypeName(), blockerTypeName));
-            return;
-        }
-
         if (!isValid(availability, stackId, environmentId, serviceId)) {
             assignJsonResponseToReq(req, HttpStatus.BAD_REQUEST, String.format("Trying to update invalid blocker. stackId - {}, environmentId - {}, serviceId - {}, availability - {}", stackId, environmentId, serviceId, availability));
             return;
@@ -198,10 +193,6 @@ public class BlockerDefinitionController {
             blockerJsonConfiguration = initSingleRegionBlockerJsonConfig(environmentId, serviceId, stackId, availability, blockerJsonConfiguration, req);
             if (blockerJsonConfiguration == null) return;
             blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
-        } else {
-            if (blockerJsonConfiguration != null && !blockerJsonConfiguration.equals("{}")) {
-                blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
-            }
         }
 
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
