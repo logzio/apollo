@@ -168,6 +168,7 @@ public class BlockerDefinitionController {
                                         Boolean isActive, String blockerTypeName, String blockerJsonConfiguration, Req req) {
         String userEmail = req.token().get("_user").toString();
         logger.info("User: {} has just updated blocker, id:{}, name:{}", userEmail, id, name);
+
         BlockerDefinition blockerDefinition = blockerDefinitionDao.getBlockerDefinition(id);
 
         if (blockerDefinition == null) {
@@ -277,4 +278,3 @@ public class BlockerDefinitionController {
     }
 
 }
-
