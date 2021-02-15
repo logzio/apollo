@@ -192,8 +192,9 @@ public class BlockerDefinitionController {
         if (blockerTypeName.equals(BlockerTypeName.SINGLE_REGION)) {
             blockerJsonConfiguration = initSingleRegionBlockerJsonConfig(environmentId, serviceId, stackId, availability, blockerJsonConfiguration, req);
             if (blockerJsonConfiguration == null) return;
-            blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
         }
+        
+        blockerDefinition.setBlockerJsonConfiguration(blockerJsonConfiguration);
 
         blockerDefinitionDao.updateBlockerDefinition(blockerDefinition);
         logger.info(String.format("Updated blocker: blockerId - %s, blockerName - %s, active - %s", blockerDefinition.getId(), blockerDefinition.getName(), blockerDefinition.getActive()));
