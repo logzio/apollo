@@ -22,7 +22,7 @@
     </div>
 
 
-    <div class="modal fade" id="confirm-revert" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal fade" id="confirm-revert-to-current" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -37,7 +37,30 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="revert()">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="revertToCurrent()">
+                        I'm 100% sure, and I know it can break everything!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirm-revert-to-previous" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h4 class="modal-title">Sure?</h4>
+                </div>
+                <div class="modal-body">
+                    This will revert the current version to the previous version. <br>
+                    <b>THIS CAN SERIOUSLY BREAK THINGS!</b> <br>
+                    Please, be <b>100% sure</b> that this is what you want to do, <br>
+                    and double check with at least 2 people that this is really, <b>really</b> what you want to do.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="revertToPrevious()">
                         I'm 100% sure, and I know it can break everything!
                     </button>
                 </div>

@@ -79,7 +79,7 @@ angular.module('apollo')
                     });
                 };
 
-                $scope.revert = function() {
+                $scope.revertToCurrent = function() {
 
                     if ($scope.selectedDeploymentId == null) {
                         $growl.error("Could not understand which deployment you are talking about, bailing..");
@@ -115,6 +115,44 @@ angular.module('apollo')
                         });
                     });
                 };
+
+                  $scope.revertToPrevious = function() {
+
+                                    if ($scope.selectedDeploymentId == null) {
+                                        $growl.error("Could not understand which deployment you are talking about, bailing..");
+                                        return;
+                                    }
+
+                                    apolloApiService.getDeployment($scope.selectedDeploymentId).then(function(response) {
+                                        var selectedDeployment = response.data;
+
+                                        // Set spinner
+                                        usSpinnerService.spin('revert-spinner');
+
+                                        // Now we can deploy
+
+                                        apolloApiService.createNewRevertDeployment(selectedDeployment.serviceId, selectedDeployment.environmentId)
+                                        .then(function (response) {
+
+                                            // Wait a bit to let the deployment be in the DB
+                                            setTimeout(function () {
+                                                usSpinnerService.stop('revert-spinner');
+
+                                                // Redirect user to ongoing deployments
+                                                $state.go('deployments.ongoing', {deploymentId: response.data.id});
+                                            }, 500);
+
+                                        }, function(error) {
+                                            // End spinner
+                                            usSpinnerService.stop('revert-spinner');
+
+                                            // 403 are handled generically on the interceptor
+                                            if (error.status !== 403) {
+                                                growl.error("Got from apollo API: " + error.status + " (" + error.statusText + ")", {ttl: 7000})
+                                            }
+                                        });
+                                    });
+                                };
 
                 $scope.dtOptions = DTOptionsBuilder.newOptions()
                     .withOption('ajax', {
@@ -159,7 +197,12 @@ angular.module('apollo')
                                                 </button>
                                                 <button type="button" class="btn btn-danger btn-circle" uib-tooltip="Back to this version"
                                                         ng-click="setSelectedDeploymentId(${full.id})"
-                                                        data-toggle="modal" data-target="#confirm-revert">
+                                                        data-toggle="modal" data-target="#confirm-revert-to-current" style="background-color:orange">
+                                                    <i class="fa fa-arrow-up"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-circle" uib-tooltip="Revert to the previous version"
+                                                        ng-click="setSelectedDeploymentId(${full.id})"
+                                                        data-toggle="modal" data-target="#confirm-revert-to-previous">
                                                     <i class="fa fa-undo"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-success btn-circle" uib-tooltip="Environment status"

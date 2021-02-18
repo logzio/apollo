@@ -122,6 +122,13 @@ function ApiService($q, $http){
         });
     };
 
+    var createNewRevertDeployment = function(deployedService, deployedEnvironment) {
+            return $http.post(CONFIG.appUrl + "revert-deployment/", {
+                serviceIdsCsv: deployedService,
+                environmentIdsCsv: deployedEnvironment,
+            });
+        };
+
     var createNewDeploymentWithGroup = function(deployableVersionId, deployedService, deployedEnvironment,
                                                 deploymentMessage, groupIdsCsv, isEmergencyDeployment) {
         return $http.post(CONFIG.appUrl + "deployment-groups/", {
@@ -374,6 +381,7 @@ function ApiService($q, $http){
         getLatestDeployableVersionsByServiceId: getLatestDeployableVersionsByServiceId,
         createNewDeployment: createNewDeployment,
         createNewDeploymentWithGroup: createNewDeploymentWithGroup,
+        createNewRevertDeployment: createNewRevertDeployment,
         getAllRunningDeployments: getAllRunningDeployments,
         getRunningAndJustFinishedDeployments: getRunningAndJustFinishedDeployments,
         getAllDeployments: getAllDeployments,

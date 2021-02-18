@@ -148,6 +148,14 @@ public class DeploymentController {
         assignJsonResponseToReq(req, HttpStatus.CREATED, responseObject);
     }
 
+
+    @LoggedIn
+    @POST("/revert-deployment")
+    public void revertDeployment(String environmentIdsCsv, String serviceIdsCsv) {
+        logger.info("revertDeployment endpoint");
+        return;
+    }
+
     @LoggedIn
     @DELETE("/deployment/{id}")
     public void cancelDeployment(int id, Req req) {
