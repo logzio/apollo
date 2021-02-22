@@ -1,3 +1,5 @@
+# THIS PROJECT IS NO LONGER MAINTAINED
+
 [![Build Status](https://travis-ci.org/logzio/apollo.svg?branch=master)](https://travis-ci.org/logzio/apollo)
 
 # Apollo
